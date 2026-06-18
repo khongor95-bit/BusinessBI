@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BusinessBI.mn — Dashboard, хэрэгсэл, шийдэл</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+body{background:#f8f8f8;color:#111}
+.container{width:90%;max-width:1400px;margin:auto}
+
+/* HEADER */
+header{background:#fff;padding:20px 0;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100}
+.navbar{display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:26px;font-weight:800;color:#b79a63;text-decoration:none;letter-spacing:-.02em}
+.logo span{color:#111}
+.menu{display:flex;gap:38px;align-items:center}
+.menu a{text-decoration:none;color:#111;font-weight:500;font-size:15px;transition:color .2s}
+.menu a:hover{color:#b79a63}
+.menu .cta{background:#111;color:#fff;padding:11px 22px;border-radius:50px;font-size:14px}
+.menu .cta:hover{color:#fff;background:#333}
+.burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:6px}
+.burger span{display:block;width:24px;height:2px;background:#111;transition:.3s}
+.burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.burger.open span:nth-child(2){opacity:0}
+.burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* HERO */
+.hero{margin-top:30px}
+.hero-slider{position:relative;border-radius:30px;overflow:hidden;height:500px}
+.hero-slider img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;opacity:0;transition:opacity 1s ease}
+.hero-slider img.active{opacity:1}
+.overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.7) 0%,rgba(0,0,0,.35) 100%)}
+.hero-content{position:absolute;left:80px;bottom:80px;color:#fff;max-width:640px}
+.hero-content .tag{font-size:14px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#e9d6a8;margin-bottom:16px}
+.hero-content h1{font-size:64px;line-height:1.02;font-weight:800;letter-spacing:-.02em}
+.hero-content p{margin-top:18px;font-size:18px;color:#e8e8e8;line-height:1.6}
+.hero-content .btns{margin-top:28px;display:flex;gap:14px;flex-wrap:wrap}
+.hero-content button,.hero-content a.btn{padding:15px 36px;border:none;border-radius:50px;font-size:16px;font-weight:600;cursor:pointer;text-decoration:none;transition:transform .15s}
+.btn-light{background:#fff;color:#111}
+.btn-line{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.6)!important}
+.hero-content button:hover,.hero-content a.btn:hover{transform:translateY(-2px)}
+.dots{position:absolute;left:80px;bottom:40px;display:flex;gap:8px}
+.dots span{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.4);cursor:pointer;transition:.3s}
+.dots span.active{background:#fff;width:26px;border-radius:5px}
+
+/* INTRO */
+.intro{display:grid;grid-template-columns:1.2fr 1fr;gap:80px;padding:90px 0;align-items:center}
+.intro h2{font-size:56px;line-height:1.05;font-weight:800;letter-spacing:-.02em}
+.intro h2 em{font-style:normal;color:#b79a63}
+.intro p{color:#555;font-size:18px;line-height:1.8}
+
+/* CARDS */
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:25px;margin-bottom:90px;align-items:stretch}
+.card{background:#fff;border-radius:20px;overflow:hidden;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.04);text-decoration:none;color:#111;display:block}
+.card:hover{transform:translateY(-6px);box-shadow:0 18px 40px -22px rgba(0,0,0,.4)}
+.card img{width:100%;height:200px;object-fit:cover}
+.card-body{padding:24px}
+.card-body h3{font-size:24px;margin-bottom:8px;font-weight:700;letter-spacing:-.01em}
+.card-body p{color:#666;font-size:15px;line-height:1.5}
+.card-body .go{display:inline-block;margin-top:14px;font-size:14px;font-weight:600;color:#b79a63}
+/* featured free-tools card */
+.card.free{background:linear-gradient(150deg,#1a1a1a,#2c2c2c);color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:28px;min-height:284px}
+.card.free .pill{align-self:flex-start;background:#1f9d55;color:#fff;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:6px 13px;border-radius:20px}
+.card.free .ic{font-size:34px;margin:10px 0 16px}
+.card.free h3{font-size:26px;font-weight:800;letter-spacing:-.01em;margin-bottom:8px}
+.card.free p{color:#bbb;font-size:14px;line-height:1.5}
+.card.free .go{color:#e9d6a8;margin-top:18px;font-size:15px}
+
+/* REQUEST / PRODUCTS */
+.request{background:#fff;padding:90px 0}
+.section-title{font-size:48px;font-weight:800;margin-bottom:14px;letter-spacing:-.02em}
+.section-sub{font-size:18px;color:#666;margin-bottom:50px;max-width:60ch}
+.product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:30px}
+.product{background:#f8f8f8;border-radius:18px;overflow:hidden;transition:.3s}
+.product:hover{transform:translateY(-5px)}
+.product img{width:100%;height:210px;object-fit:cover}
+.product-info{padding:22px}
+.product-info .cat{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#b79a63;margin-bottom:8px}
+.product-info h4{font-size:21px;margin-bottom:14px;font-weight:700;letter-spacing:-.01em}
+.product-bottom{display:flex;justify-content:space-between;align-items:center}
+.price{font-size:20px;font-weight:700;color:#111}
+.product-bottom a{text-decoration:none;font-size:14px;font-weight:600;color:#b79a63}
+
+/* STEPS */
+.steps{padding:90px 0}
+.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:50px}
+.step{background:#fff;border-radius:18px;padding:34px;position:relative}
+.step .n{font-size:14px;font-weight:700;color:#b79a63;letter-spacing:.08em}
+.step h4{font-size:23px;font-weight:700;margin:14px 0 10px;letter-spacing:-.01em}
+.step p{color:#666;font-size:15px;line-height:1.6}
+
+/* CTA BAND */
+.band{background:#111;color:#fff;border-radius:30px;padding:70px 60px;display:flex;justify-content:space-between;align-items:center;gap:40px;flex-wrap:wrap;margin:30px 0}
+.band h2{font-size:44px;font-weight:800;letter-spacing:-.02em;max-width:16ch;line-height:1.05}
+.band a{background:#b79a63;color:#fff;text-decoration:none;padding:17px 42px;border-radius:50px;font-weight:600;font-size:17px;white-space:nowrap;transition:transform .15s}
+.band a:hover{transform:translateY(-2px)}
+
+/* FOOTER */
+footer{background:#111;color:#fff;padding:60px 0 40px;margin-top:0}
+.foot-grid{display:flex;justify-content:space-between;flex-wrap:wrap;gap:30px;align-items:flex-start}
+.foot-grid .logo{color:#b79a63}
+.foot-grid .logo span{color:#fff}
+.foot-col h5{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:16px}
+.foot-col a{display:block;color:#ddd;text-decoration:none;font-size:15px;margin-bottom:10px}
+.foot-col a:hover{color:#b79a63}
+.foot-bottom{border-top:1px solid #2a2a2a;margin-top:40px;padding-top:24px;text-align:center;color:#777;font-size:14px}
+
+@media(max-width:1100px){
+  .cards,.product-grid{grid-template-columns:repeat(2,1fr)}
+  .intro{grid-template-columns:1fr;gap:30px}
+  .steps-grid{grid-template-columns:1fr}
+  .hero-content h1{font-size:48px}
+}
+@media(max-width:768px){
+  .menu{position:fixed;top:69px;left:0;right:0;background:#fff;flex-direction:column;gap:0;padding:10px 0;transform:translateY(-130%);transition:transform .3s;border-bottom:1px solid #e5e5e5;box-shadow:0 12px 30px -18px rgba(0,0,0,.3)}
+  .menu.open{transform:translateY(0)}
+  .menu a{padding:14px 5%;width:100%}
+  .menu .cta{margin:8px 5%;width:auto;text-align:center}
+  .burger{display:flex}
+  .cards,.product-grid{grid-template-columns:1fr}
+  .hero-slider{height:420px}
+  .hero-content{left:30px;right:30px;bottom:60px}
+  .hero-content h1{font-size:34px}
+  .dots{left:30px}
+  .intro h2{font-size:38px}
+  .section-title{font-size:34px}
+  .band{padding:46px 30px}
+  .band h2{font-size:30px}
+}
+*:focus-visible{outline:2px solid #b79a63;outline-offset:3px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container navbar">
+    <a href="#" class="logo">Business<span>BI</span></a>
+    <nav class="menu" id="menu">
+      <a href="tools.html">Хэрэгслүүд</a>
+      <a href="#custom">Захиалгат Dashboard</a>
+      <a href="accountants.html">Нягтлан холбох</a>
+      <a href="#courses">Сургалт</a>
+      <a href="#contact" class="cta">Холбогдох</a>
+    </nav>
+    <button class="burger" id="burger" aria-label="Цэс"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-slider" id="slider">
+      <img class="active" src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1600&q=80" alt="dashboard">
+      <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&q=80" alt="analytics">
+      <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=1600&q=80" alt="team data">
+      <div class="overlay"></div>
+      <div class="hero-content">
+        <div class="tag">Бизнесийн оюун ухаан · Монгол</div>
+        <h1>Тоо баримтаа шийдвэр болгоё</h1>
+        <p>Бэлэн dashboard хэрэгсэл, танай өгөгдөлд тааруулсан захиалгат шийдэл, мэргэжлийн сургалт — нэг дороос.</p>
+        <div class="btns">
+          <a href="tools.html" class="btn btn-light">Хэрэгслүүдийг үзэх</a>
+          <a href="#custom" class="btn btn-line">Захиалгат хийлгэх</a>
+        </div>
+      </div>
+      <div class="dots" id="dots"></div>
+    </div>
+  </div>
+</section>
+
+<section class="container intro" id="templates">
+  <div>
+    <h2>Бэлэн <em>Dashboard</em> ба захиалгат шийдэл</h2>
+  </div>
+  <div>
+    <p>Excel, Power BI, санхүү, төсөл, борлуулалтын хяналтын самбарууд — бүгд бүрэн засварлагдах, бодит бизнесийн тайланд зориулсан. Загвар биш үр дүн: өгөгдлөө холбоод л ажиллаж эхэлнэ.</p>
+  </div>
+</section>
+
+<section class="container">
+  <div class="cards">
+    <a class="card free" href="tools.html">
+      <span class="pill">Үнэгүй</span>
+      <div>
+        <div class="ic">🧮</div>
+        <h3>Үнэгүй хэрэгслүүд</h3>
+        <p>НДШ/ХХОАТ хөрвүүлэгч, нэхэмжлэх, тайлангийн шинжилгээ. Бүртгэлгүйгээр шууд ашигла.</p>
+      </div>
+      <span class="go">Хэрэгслүүд рүү →</span>
+    </a>
+    <a class="card" href="tools.html">
+      <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80">
+      <div class="card-body"><h3>Excel Dashboard</h3><p>Мэргэжлийн KPI хяналтын самбар.</p><span class="go">Үзэх →</span></div>
+    </a>
+    <a class="card" href="index.html#custom">
+      <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&q=80">
+      <div class="card-body"><h3>Power BI тайлан</h3><p>Интерактив дүн шинжилгээ.</p><span class="go">Захиалах →</span></div>
+    </a>
+    <a class="card" href="accountants.html">
+      <img src="https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&q=80">
+      <div class="card-body"><h3>Нягтлан холбох</h3><p>Баталгаажсан нягтлантай холбогд.</p><span class="go">Үзэх →</span></div>
+    </a>
+  </div>
+</section>
+
+<section class="request" id="custom">
+  <div class="container">
+    <h2 class="section-title">Захиалгат Dashboard</h2>
+    <p class="section-sub">Танай өгөгдөл, процесст тааруулж бид бүтээж өгнө. Үнэ нь ажлын хэмжээнээс хамаарна.</p>
+    <div class="product-grid">
+      <div class="product">
+        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80">
+        <div class="product-info">
+          <div class="cat">AI</div>
+          <h4>AI хяналтын самбар</h4>
+          <div class="product-bottom"><span class="price">₮250,000-аас</span><a href="#contact">Захиалах →</a></div>
+        </div>
+      </div>
+      <div class="product">
+        <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80">
+        <div class="product-info">
+          <div class="cat">Excel</div>
+          <h4>Excel Dashboard</h4>
+          <div class="product-bottom"><span class="price">₮150,000-аас</span><a href="#contact">Захиалах →</a></div>
+        </div>
+      </div>
+      <div class="product">
+        <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=600&q=80">
+        <div class="product-info">
+          <div class="cat">Power BI</div>
+          <h4>Power BI шийдэл</h4>
+          <div class="product-bottom"><span class="price">₮900,000-аас</span><a href="#contact">Захиалах →</a></div>
+        </div>
+      </div>
+      <div class="product">
+        <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&q=80">
+        <div class="product-info">
+          <div class="cat">Дата</div>
+          <h4>Дата аналитик</h4>
+          <div class="product-bottom"><span class="price">₮350,000-аас</span><a href="#contact">Захиалах →</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container steps" id="how">
+  <h2 class="section-title">Хэрхэн ажилладаг</h2>
+  <div class="steps-grid">
+    <div class="step"><div class="n">01</div><h4>Хэрэгцээгээ хэл</h4><p>Бизнес, өгөгдөл, хүсэж буй үр дүнгээ товч тайлбарла.</p></div>
+    <div class="step"><div class="n">02</div><h4>Шийдлээ ав</h4><p>Бэлэн хэрэгсэл сонгох эсвэл захиалгат dashboard бүтээлгэх.</p></div>
+    <div class="step"><div class="n">03</div><h4>Үр дүнг хар</h4><p>Өгөгдлөө холбоод л шийдвэр гаргахуйц самбараа ашигла.</p></div>
+  </div>
+</section>
+
+<section class="container" id="courses">
+  <div class="band">
+    <h2>Өөрөө хийж сурмаар байна уу?</h2>
+    <a href="#contact">Сургалт үзэх</a>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-col">
+        <a href="#" class="logo">Business<span>BI</span></a>
+        <p style="color:#999;margin-top:14px;max-width:30ch;font-size:15px;line-height:1.6">Тоо баримтыг шийдвэр болгодог Монголын BI хэрэгсэл, шийдэл.</p>
+      </div>
+      <div class="foot-col">
+        <h5>Үйлчилгээ</h5>
+        <a href="tools.html">Хэрэгслүүд</a>
+        <a href="#custom">Захиалгат Dashboard</a>
+        <a href="accountants.html">Нягтлан холбох</a>
+        <a href="#courses">Сургалт</a>
+      </div>
+      <div class="foot-col">
+        <h5>Холбоо барих</h5>
+        <a href="tel:+97699112233">+976 9911-2233</a>
+        <a href="mailto:hello@businessbi.mn">hello@businessbi.mn</a>
+        <a href="#">Facebook</a>
+      </div>
+    </div>
+    <div class="foot-bottom">© 2026 BusinessBI.mn. Бүх эрх хуулиар хамгаалагдсан.</div>
+  </div>
+</footer>
+
+<script>
+  const burger=document.getElementById('burger'), menu=document.getElementById('menu');
+  burger.addEventListener('click',()=>{burger.classList.toggle('open');menu.classList.toggle('open');});
+  menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{burger.classList.remove('open');menu.classList.remove('open');}));
+
+  // hero slider
+  const imgs=[...document.querySelectorAll('#slider img')];
+  const dotsBox=document.getElementById('dots');
+  imgs.forEach((_,i)=>{const d=document.createElement('span');if(i===0)d.className='active';d.addEventListener('click',()=>go(i));dotsBox.appendChild(d);});
+  const dots=[...dotsBox.children];
+  let cur=0;
+  function go(i){imgs[cur].classList.remove('active');dots[cur].classList.remove('active');cur=i;imgs[cur].classList.add('active');dots[cur].classList.add('active');}
+  setInterval(()=>go((cur+1)%imgs.length),5000);
+</script>
+</body>
+</html>
