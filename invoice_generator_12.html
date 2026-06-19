@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Нэхэмжлэх үүсгэгч — BusinessBI</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef0f3;--panel:#fff;--ink:#1a1f2e;--muted:#6b7280;--line:#e5e7eb;--brand:#0f5e57;--accent:#e0a82e}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+body{background:var(--bg);color:var(--ink);padding:24px}
+.wrap{max-width:1480px;margin:0 auto}
+.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:14px}
+.head h1{font-size:24px;font-weight:800;letter-spacing:-.02em}
+.head .brand{color:var(--brand);font-weight:700}
+.btn{background:var(--accent);color:#fff;border:none;padding:13px 26px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:transform .15s}
+.btn:hover{transform:translateY(-2px)}
+.btn.sec{background:var(--brand)}
+.templates{display:flex;gap:14px;overflow-x:auto;padding:6px 2px 6px}
+.tpl-chip{flex-shrink:0;width:72px;cursor:pointer;border:2px solid transparent;border-radius:10px;background:#fff;transition:.2s;padding:5px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.tpl-chip.active{border-color:var(--accent)}
+.tpl-chip .mini{height:54px;border-radius:4px;overflow:hidden;background:#fff}
+.tpl-chip .name{font-size:10px;text-align:center;margin-top:4px;font-weight:600;color:var(--muted)}
+.layout{display:grid;grid-template-columns:380px 44px 1fr;gap:16px;align-items:stretch}
+@media(max-width:980px){.layout{grid-template-columns:1fr}}
+.form{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;overflow-y:auto}
+.form h3{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:14px 0 8px;font-weight:700}
+.form h3:first-child{margin-top:0}
+.field{margin-bottom:8px}
+.field label{display:block;font-size:12px;font-weight:600;margin-bottom:3px;color:#374151}
+.field input,.field textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit}
+.field input:focus,.field textarea:focus{outline:2px solid var(--brand);border-color:transparent}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+/* party color accents */
+.sec-supplier{padding-left:0;margin-left:0}
+.sec-customer{padding-left:0;margin-left:0}
+.sec-supplier h3{color:var(--brand)}
+.sec-customer h3{color:#b8860b}
+/* add item box */
+.add-box{background:#f8fafa;border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
+.add-box .field{margin-bottom:8px}
+.add-box .field:last-of-type{margin-bottom:10px}
+.add-btn{background:var(--brand);color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;width:100%;font-family:inherit;transition:background .2s}
+.add-btn:hover{background:#0a443f}
+/* added item chips */
+.item-chip{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:9px 11px;margin-bottom:7px}
+.item-chip .ic-main{flex:1;min-width:0}
+.item-chip .ic-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-chip .ic-sub{font-size:11px;color:var(--muted);font-family:'Roboto Mono',monospace}
+.item-chip .ic-amt{font-size:13px;font-weight:700;font-family:'Roboto Mono',monospace;white-space:nowrap}
+.item-chip .ic-del{background:none;border:none;color:#dc2626;cursor:pointer;font-size:18px;line-height:1;padding:2px 4px;flex-shrink:0}
+.item-chip .ic-del:hover{color:#991b1b}
+.empty-items{font-size:12px;color:var(--muted);text-align:center;padding:10px;font-style:italic}
+/* delete button inside preview rows */
+.inv tbody tr{position:relative}
+.row-del{position:absolute;right:-26px;top:50%;transform:translateY(-50%);width:20px;height:20px;border-radius:50%;background:#fee2e2;color:#dc2626;border:none;cursor:pointer;font-size:13px;line-height:1;opacity:0;transition:opacity .15s;display:flex;align-items:center;justify-content:center;z-index:5}
+.inv tbody tr:hover .row-del{opacity:1}
+@media print{.row-del{display:none!important}}
+.inv td{position:relative}
+.item-row{display:grid;grid-template-columns:1fr 48px 80px 28px;gap:6px;margin-bottom:8px;align-items:center}
+.item-row input{padding:8px;font-size:13px}
+.item-del{background:#fee2e2;color:#dc2626;border:none;border-radius:7px;height:34px;cursor:pointer}
+.add-item{background:#f3f4f6;border:1px dashed #cbd5e1;color:#374151;padding:9px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:600;width:100%;margin-top:4px}
+.logo-prev{width:50px;height:50px;border-radius:8px;object-fit:contain;border:1px solid var(--line);background:#fff;display:none}
+.preview-col{display:flex;flex-direction:column;gap:0}
+.tpl-col{display:flex;flex-direction:column;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:10px 6px;}
+.tpl-chip{cursor:pointer;border:2px solid transparent;border-radius:7px;background:var(--bg);transition:.15s;padding:5px 6px;display:flex;align-items:center;justify-content:center;width:32px;height:32px}
+.tpl-chip:hover{border-color:#e5e7eb;background:#fff}
+.tpl-chip.active{border-color:var(--accent);background:#fff}
+.tpl-chip .mini{width:20px;height:15px;border-radius:2px;overflow:hidden;flex-shrink:0}
+.tpl-chip .name{display:none}
+.preview-area{display:flex;justify-content:center;align-items:flex-start;background:#c8cdd6;border-radius:16px;padding:28px}
+.page{background:#fff;width:210mm;box-shadow:0 4px 20px rgba(0,0,0,.10)}
+.inv{padding:14mm;font-size:12px;color:#1a1f2e;display:flex;flex-direction:column}
+.inv .num{font-family:'Roboto Mono',monospace}
+.inv table{width:100%;border-collapse:collapse;margin:8px 0}
+.inv th{font-size:11px;text-transform:uppercase;letter-spacing:.03em;padding:9px 10px;text-align:left}
+.inv td{padding:9px 10px;font-size:12px;border-bottom:1px solid #eee}
+.inv th.r,.inv td.r{text-align:right;font-family:'Roboto Mono',monospace}
+.inv .logo-img{max-height:46px;max-width:150px;object-fit:contain}
+.inv .logo-txt{font-size:20px;font-weight:800;letter-spacing:-.02em}
+.bill-line{border-bottom:1px solid #cbd5e1;height:15px;margin-bottom:7px}
+.totbox{margin-left:auto;width:46%}
+.totbox .l{display:flex;justify-content:space-between;padding:7px 10px;font-size:12px}
+.totbox .g{font-weight:800;font-size:15px;padding:11px}
+.sign-line{margin-top:34px;border-top:1px solid #999;padding-top:5px;font-size:11px;color:#666;display:inline-block;min-width:150px}
+.foot-pay{margin-top:20px}
+.foot-pay .ttl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.foot-pay p{font-size:11px;color:#444;line-height:1.7}
+/* T1 */
+.t1 .head1{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+.t1 .co{display:flex;gap:12px;align-items:flex-start}
+.t1 .co-info{font-size:11px;color:#555;line-height:1.6}
+.t1 .co-name{font-size:17px;font-weight:800;margin-bottom:3px}
+.t1 .title{font-size:24px;font-weight:800;color:var(--brand);text-align:right}
+.t1 .title small{display:block;font-size:11px;color:#888;font-weight:500}
+.t1 .boxes{display:flex;gap:14px;margin-bottom:14px}
+.t1 .box{flex:1;border:1px solid #e5e7eb;border-radius:7px;padding:12px}
+.t1 .box .bt{font-size:11px;font-weight:700;color:var(--brand);text-transform:uppercase;margin-bottom:8px}
+.t1 .box p{font-size:11px;color:#555;line-height:1.8}
+.t1 thead tr{background:var(--brand);color:#fff}
+.t1 td,.t1 th{border:1px solid #e5e7eb}
+.t1 .totbox .g{background:var(--brand);color:#fff}
+/* T2 */
+.t2 .title{font-size:46px;font-weight:800;color:var(--brand);line-height:1}
+.t2 .head1{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.t2 .meta{font-size:12px;line-height:1.8;text-align:right}
+.t2 .co-name{font-size:15px;font-weight:700;margin-top:8px}
+.t2 .billto{margin:22px 0}
+.t2 .bt{font-size:12px;font-weight:700;margin-bottom:10px}
+.t2 thead tr{background:var(--brand);color:#fff}
+.t2 th,.t2 td{border:none}
+.t2 tbody tr{border-bottom:1px solid #eee}
+.t2 .totbox .g{border-top:2px solid var(--brand)}
+.t2 .thanks{text-align:center;color:var(--brand);font-weight:600;margin-top:20px;font-size:12px}
+/* T3 */
+.t3 .banner{background:linear-gradient(100deg,#1e40af 70%,#3b82f6);color:#fff;margin:-14mm -14mm 18px;padding:22px 14mm;display:flex;justify-content:space-between;align-items:center}
+.t3 .banner .co-name{font-size:18px;font-weight:800}
+.t3 .banner .tag{font-size:10px;letter-spacing:.1em;opacity:.85}
+.t3 .banner .title{text-align:right;font-size:22px;font-weight:800}
+.t3 .banner .title small{display:block;font-size:10px;opacity:.8;font-weight:500}
+.t3 .boxes{display:flex;gap:14px;margin-bottom:14px}
+.t3 .box{flex:1}
+.t3 .box .bt{font-size:11px;font-weight:700;color:#1e40af;text-transform:uppercase;margin-bottom:8px}
+.t3 .box p{font-size:11px;color:#555;line-height:1.9}
+.t3 thead tr{background:#1e40af;color:#fff}
+.t3 td,.t3 th{border:1px solid #e5e7eb}
+.t3 .totbox .g{background:#1e40af;color:#fff}
+/* T4 */
+.t4 .title{font-size:30px;font-weight:800;color:#6d28d9}
+.t4 .head1{display:flex;justify-content:space-between;align-items:flex-start}
+.t4 .proj{font-size:14px;color:#444;margin:4px 0 18px}
+.t4 .meta{font-size:12px;line-height:1.8;text-align:right}
+.t4 .billto{background:#faf5ff;border-radius:8px;padding:14px;margin-bottom:14px}
+.t4 .bt{font-size:11px;font-weight:700;color:#6d28d9;text-transform:uppercase;margin-bottom:8px}
+.t4 thead tr{background:#6d28d9;color:#fff}
+.t4 td,.t4 th{border:1px solid #ede9fe}
+.t4 .totbox .g{background:#6d28d9;color:#fff}
+.t4 .pay-grid{display:flex;gap:14px;margin-top:10px}
+.t4 .pay-grid>div{flex:1;border:1px solid #ede9fe;border-radius:8px;padding:12px}
+/* T5 */
+.t5{border:2px solid #111}
+.t5 .inv{padding:12mm}
+.t5 .head1{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
+.t5 .co-name{font-size:20px;font-weight:800}
+.t5 .tag{font-size:11px;color:#666}
+.t5 .title{font-size:30px;font-weight:800;font-family:Georgia,serif}
+.t5 .meta{font-size:12px;line-height:1.8;text-align:right}
+.t5 .billto{margin:14px 0}
+.t5 .bt{font-size:12px;font-weight:700;margin-bottom:8px}
+.t5 thead tr{background:#111;color:#fff}
+.t5 th,.t5 td{border-bottom:1px solid #ddd}
+.t5 .totbox .g{background:#111;color:#fff}
+/* T6 — official НХМаягт-1 */
+.t6 .inv{padding:16mm;font-size:12px}
+.t6 .hd{font-size:11px;line-height:1.7;margin-bottom:18px}
+.t6 .hd .code{font-weight:700}
+.t6 .doc-t{text-align:center;font-weight:700;font-size:14px;margin:6px 0 16px}
+.t6 .parties{display:flex;gap:30px;margin-bottom:14px}
+.t6 .parties>div{flex:1}
+.t6 .pl{font-weight:700;margin-bottom:6px}
+.t6 .ln{font-size:11px;line-height:2.1}
+.t6 .dotfill{border-bottom:1px dotted #555;display:inline-block;min-width:120px}
+.t6 table{border-collapse:collapse;width:100%;margin:6px 0}
+.t6 th,.t6 td{border:1px solid #333;padding:7px 8px;font-size:11px}
+.t6 th{background:#fff;font-weight:700;text-align:center}
+.t6 td.r{text-align:right;font-family:'Roboto Mono',monospace}
+.t6 .sumrows td{text-align:right;font-weight:600}
+.t6 .sumrows td.lbl{text-align:right;border:none;padding-right:10px}
+.t6 .money{margin:18px 0 10px}
+.t6 .money .l{font-size:12px;line-height:2.2}
+.t6 .sign{margin-top:24px;font-size:12px;line-height:2.6}
+@media print{body *{visibility:hidden}#page,#page *{visibility:visible}#page{position:absolute;left:0;top:0;box-shadow:none}body{padding:0;background:#fff}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <h1>Нэхэмжлэх үүсгэгч <span class="brand">· BusinessBI</span></h1>
+    <div style="display:flex;gap:10px">
+      <button class="btn sec" onclick="window.print()">🖨 Хэвлэх</button>
+      <button class="btn" id="dlBtn">⬇ PDF татах</button>
+    </div>
+  </div>
+  <div class="layout">
+    <div class="form">
+      <h3>Лого</h3>
+      <div class="field" style="display:flex;gap:12px;align-items:center">
+        <input type="file" id="logoFile" accept="image/*" style="border:none;padding:0;font-size:13px">
+        <img id="logoPrev" class="logo-prev">
+      </div>
+      <div class="sec-supplier">
+      <h3>Нийлүүлэгч (Танай мэдээлэл)</h3>
+      <div class="field"><label>Компанийн нэр</label><input id="fromName" value="Business BI LLC"></div>
+      <div class="row2">
+        <div class="field"><label>Регистр</label><input id="fromReg" value="12345678"></div>
+        <div class="field"><label>Утас</label><input id="fromPhone" value="99112233"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Имэйл</label><input id="fromMail" value="info@businessbi.mn"></div>
+        <div class="field"><label>Хаяг</label><input id="fromAddr" value="Улаанбаатар, Монгол"></div>
+      </div>
+      </div>
+
+      <div class="sec-customer">
+      <h3>Харилцагч (Худалдан авагч)</h3>
+      <div class="row3">
+        <div class="field"><label>Нэр</label><input id="toName" value=""></div>
+        <div class="field"><label>Регистр</label><input id="toReg" value=""></div>
+        <div class="field"><label>Утас</label><input id="toPhone" value=""></div>
+      </div>
+      </div>
+
+      <h3>Нэхэмжлэх</h3>
+      <div style="display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:8px">
+        <div class="field"><label>Дугаар</label><input id="invNo" value="INV-2026-001"></div>
+        <div class="field"><label>Огноо</label><input id="invDate" type="date"></div>
+        <div class="field"><label>Төлөх хугацаа</label><input id="dueDate" type="date"></div>
+      </div>
+      <h3>Бараа / Үйлчилгээ нэмэх</h3>
+      <div class="add-box">
+        <div class="field"><label>Нэр</label><input id="newDesc" placeholder="Бараа, үйлчилгээний нэр"></div>
+        <div class="row2">
+          <div class="field"><label>Тоо хэмжээ</label><input id="newQty" type="number" value="1"></div>
+          <div class="field"><label>Нэгж үнэ (₮)</label><input id="newPrice" type="number" placeholder="0"></div>
+        </div>
+        <button class="add-btn" id="addItem">+ Нэхэмжлэхэд нэмэх</button>
+      </div>
+      <h3>Тохиргоо · Төлбөр</h3>
+      <div class="row2">
+        <div class="field" style="display:flex;align-items:center;gap:8px;margin-top:22px">
+          <input type="checkbox" id="vatOn" checked style="width:18px;height:18px;cursor:pointer">
+          <label for="vatOn" style="margin:0;cursor:pointer">НӨАТ-тэй (10%)</label>
+        </div>
+        <div class="field"><label>Хөнгөлөлт (₮)</label><input id="discount" type="number" value="0"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Банк</label><input id="bank" value="Хаан банк"></div>
+        <div class="field"><label>Дансны дугаар</label><input id="acc" value="5000 1234 5678"></div>
+      </div>
+      <div class="field"><label>Дансны нэр</label><input id="accName" value="Business BI LLC"></div>
+    </div>
+    <div class="tpl-col" id="tplPicker"></div>
+    <div class="preview-area">
+      <div class="page t1" id="page"><div class="inv" id="inv"></div></div>
+    </div>
+  </div>
+</div>
+<script>
+const TEMPLATES=[{id:'t1',name:'Загвар 1'},{id:'t2',name:'Загвар 2'},{id:'t3',name:'Загвар 3'},{id:'t4',name:'Загвар 4'},{id:'t5',name:'Загвар 5'},{id:'t6',name:'Загвар 6'}];
+let cur='t1', logoData='';
+let items=[{desc:'Power BI Dashboard',qty:1,price:1500000},{desc:'Data Modeling',qty:1,price:800000},{desc:'Training',qty:1,price:500000}];
+function miniSVG(id){
+  const M={
+    t1:{c:'#0f5e57'},t2:{c:'#0f5e57'},t3:{c:'#1e40af'},
+    t4:{c:'#6d28d9'},t5:{c:'#111'},t6:{c:'#555'}
+  };
+  const c=M[id].c;
+  const border=id==='t5'?'border:1.5px solid #111;':'border:1px solid #eee;';
+  const head=id==='t3'
+    ?`<div style="height:6px;background:${c};border-radius:1px 1px 0 0"></div>`
+    :`<div style="height:4px;background:${c};border-radius:1px 1px 0 0"></div>`;
+  return `<div style="width:28px;height:20px;background:#fff;${border}border-radius:3px;overflow:hidden;display:flex;flex-direction:column">${head}<div style="flex:1;padding:2px 3px;display:flex;flex-direction:column;gap:1px"><div style="height:2px;background:#eee;border-radius:1px;width:90%"></div><div style="height:2px;background:#eee;border-radius:1px;width:70%"></div><div style="height:2px;background:${c};border-radius:1px;width:50%;margin-left:auto;margin-top:auto"></div></div></div>`;
+}
+const picker=document.getElementById('tplPicker');
+TEMPLATES.forEach(t=>{
+  const chip=document.createElement('div');
+  chip.className='tpl-chip'+(t.id===cur?' active':'');
+  chip.title=t.name;
+  chip.innerHTML=`${miniSVG(t.id)}`;
+  chip.onclick=()=>{cur=t.id;document.querySelectorAll('.tpl-chip').forEach(c=>c.classList.remove('active'));chip.classList.add('active');document.getElementById('page').className='page '+t.id;render();};
+  picker.appendChild(chip);
+});
+const g=id=>{const el=document.getElementById(id);return el?el.value:'';};
+const fmt=n=>(Math.round(n)||0).toLocaleString('en-US');
+function tugrugToWords(num){
+  num=Math.round(num);
+  if(num===0) return 'тэг';
+  const ones=['','нэг','хоёр','гурван','дөрвөн','таван','зургаан','долоон','найман','есөн'];
+  const tens=['','арван','хорин','гучин','дөчин','тавин','жаран','далан','наян','ерэн'];
+  const huns=['','нэг','хоёр','гурван','дөрвөн','таван','зургаан','долоон','найман','есөн'];
+  function under1000(n){
+    let s=[];
+    const h=Math.floor(n/100), t=Math.floor((n%100)/10), o=n%10;
+    if(h){s.push(huns[h]+' зуун');}
+    if(t){s.push(tens[t]);}
+    if(o){s.push(ones[o]);}
+    return s.join(' ');
+  }
+  const units=[['тэрбум',1e9],['сая',1e6],['мянга',1e3]];
+  let parts=[], rem=num;
+  for(const [name,val] of units){
+    const cnt=Math.floor(rem/val);
+    if(cnt){parts.push(under1000(cnt)+' '+name);rem%=val;}
+  }
+  if(rem) parts.push(under1000(rem));
+  let words=parts.join(' ').trim();
+  return words.charAt(0).toUpperCase()+words.slice(1)+' төгрөг';
+}
+function renderItems(){ /* зүүн жагсаалт байхгүй — баруун preview дээр харагдана */ }
+function addNewItem(){
+  const desc=document.getElementById('newDesc').value.trim();
+  const qty=+document.getElementById('newQty').value||1;
+  const price=+document.getElementById('newPrice').value||0;
+  if(!desc){document.getElementById('newDesc').focus();return;}
+  items.push({desc,qty,price});
+  document.getElementById('newDesc').value='';
+  document.getElementById('newQty').value='1';
+  document.getElementById('newPrice').value='';
+  document.getElementById('newDesc').focus();
+  render();
+}
+document.getElementById('addItem').onclick=addNewItem;
+['newDesc','newQty','newPrice'].forEach(id=>{
+  document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addNewItem();}});
+});
+// preview дээрх устгах товчийг сонсох
+document.getElementById('inv').addEventListener('click',e=>{
+  const del=e.target.closest('[data-pdel]');
+  if(del){items.splice(+del.dataset.pdel,1);render();}
+});
+document.getElementById('logoFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{logoData=ev.target.result;const p=document.getElementById('logoPrev');p.src=logoData;p.style.display='block';render();};r.readAsDataURL(f);});
+function calc(){
+  let grand=0;items.forEach(it=>grand+=it.qty*it.price);
+  const vatOn=document.getElementById('vatOn').checked;
+  // Оруулсан үнэ нь НӨАТ-тай → НӨАТ = нийт × 10/110
+  const vat=vatOn?Math.round(grand*10/110):0;
+  const sub=grand-vat; // НӨАТ-гүй дүн
+  const disc=+g('discount')||0;
+  return{sub,vat,disc,vatOn,grand:grand-disc};
+}
+function rowsHTML(){return items.map((it,i)=>`<tr><td style="text-align:center;width:34px">${i+1}</td><td>${it.desc||'—'}</td><td class="r" style="text-align:center">${it.qty}</td><td class="r">${fmt(it.price)}</td><td class="r">${fmt(it.qty*it.price)}₮<button class="row-del" data-pdel="${i}" title="Устгах">×</button></td></tr>`).join('')}
+function rowsNoNum(){return items.map((it,i)=>`<tr><td>${it.desc||'—'}</td><td class="r" style="text-align:center">${it.qty}</td><td class="r">${fmt(it.price)}</td><td class="r">${fmt(it.qty*it.price)}₮<button class="row-del" data-pdel="${i}" title="Устгах">×</button></td></tr>`).join('')}
+function render(){
+  const t=calc();const inv=document.getElementById('inv');const dt=g('invDate'),due=g('dueDate');
+  if(cur==='t1'){inv.innerHTML=`<div class="head1"><div class="co">${logoData?`<img src="${logoData}" class="logo-img">`:''}<div><div class="co-name">${g('fromName')}</div><div class="co-info">Регистр: ${g('fromReg')}<br>Утас: ${g('fromPhone')}<br>Имэйл: ${g('fromMail')}</div></div></div><div><div class="title">НЭХЭМЖЛЭХ</div><div class="co-info num" style="margin-top:8px;text-align:right">Нэхэмжлэх №: ${g('invNo')}<br>Огноо: ${dt}<br>Төлөх хугацаа: ${due}</div></div></div><div class="boxes"><div class="box"><div class="bt">Үйлчилгээ үзүүлэгч</div><p>Компани: ${g('fromName')}<br>Регистр: ${g('fromReg')}<br>Хаяг: ${g('fromAddr')}<br>Утас: ${g('fromPhone')}</p></div><div class="box"><div class="bt">Харилцагч</div><p>Компани: ${g('toName')||'_______'}<br>Регистр: ${g('toReg')||'_______'}<br>Утас: ${g('toPhone')||'_______'}</p></div></div><table><thead><tr><th>№</th><th>Бараа, үйлчилгээний нэр</th><th class="r" style="text-align:center">Тоо</th><th class="r">Нэгж үнэ</th><th class="r">Нийт үнэ</th></tr></thead><tbody>${rowsHTML()}</tbody></table><div class="totbox"><div class="l"><span>НӨАТ-гүй дүн</span><span>${fmt(t.sub)}₮</span></div>${t.vatOn?`<div class="l"><span>НӨАТ багтсан (10/110)</span><span>${fmt(t.vat)}₮</span></div>`:''}${t.disc?`<div class="l"><span>Хөнгөлөлт</span><span>-${fmt(t.disc)}₮</span></div>`:''}<div class="l g"><span>Нийт төлөх дүн</span><span>${fmt(t.grand)}₮</span></div></div><div class="foot-pay"><div class="ttl">Төлбөрийн мэдээлэл</div><p>Банк: ${g('bank')}<br>Дансны нэр: ${g('accName')}<br>Дансны дугаар: ${g('acc')}</p></div><div style="display:flex;justify-content:space-between;margin-top:auto;padding-top:30px"><span class="sign-line">Гүйцэтгэсэн</span><span class="sign-line" style="text-align:right">Хүлээн авсан</span></div>`;}
+  else if(cur==='t2'){inv.innerHTML=`<div class="head1"><div><div class="title">НЭХЭМЖЛЭХ</div><div class="co-name">${g('fromName')}</div><div style="font-size:11px;color:#666">${g('fromAddr')}</div></div><div class="meta num">Дугаар: <b>${g('invNo')}</b><br>Огноо: ${dt}<br>Төлөх хугацаа: ${due}</div></div><div class="billto"><div class="bt">Нэхэмжлэх хүлээн авагч:</div><div>${g('toName')||'<div class="bill-line"></div>'}</div><div>${g('toReg')?'Регистр: '+g('toReg'):'<div class="bill-line"></div>'}</div><div>${g('toPhone')?'Утас: '+g('toPhone'):'<div class="bill-line" style="width:60%"></div>'}</div></div><table><thead><tr><th>Бараа, үйлчилгээ</th><th class="r" style="text-align:center">Тоо</th><th class="r">Нэгж үнэ</th><th class="r">Дүн</th></tr></thead><tbody>${rowsNoNum()}</tbody></table><div class="totbox"><div class="l"><span>НӨАТ-гүй дүн</span><span>${fmt(t.sub)}₮</span></div>${t.vatOn?`<div class="l"><span>НӨАТ багтсан (10/110)</span><span>${fmt(t.vat)}₮</span></div>`:''}${t.disc?`<div class="l"><span>Хөнгөлөлт</span><span>-${fmt(t.disc)}₮</span></div>`:''}<div class="l g"><span>НИЙТ ДҮН</span><span>${fmt(t.grand)}₮</span></div></div><div class="foot-pay"><div class="ttl" style="color:var(--brand)">Төлбөрийн мэдээлэл</div><p>Банк: ${g('bank')}<br>Дансны нэр: ${g('accName')}<br>Дансны дугаар: ${g('acc')}</p></div><div class="thanks">Хамтран ажилласанд баярлалаа!</div>`;}
+  else if(cur==='t3'){inv.innerHTML=`<div class="banner"><div style="display:flex;gap:12px;align-items:center">${logoData?`<img src="${logoData}" style="max-height:40px;filter:brightness(0) invert(1)">`:''}<div><div class="co-name">${g('fromName')}</div></div></div><div class="title">НЭХЭМЖЛЭХ</div></div><div class="boxes"><div class="box"><div class="bt">Үйлчилгээ үзүүлэгч</div><p>Компани: ${g('fromName')}<br>Регистр: ${g('fromReg')}<br>Хаяг: ${g('fromAddr')}<br>Утас: ${g('fromPhone')}<br>Имэйл: ${g('fromMail')}</p></div><div class="box"><p class="num">Нэхэмжлэх №: ${g('invNo')}<br>Огноо: ${dt}<br>Төлөх хугацаа: ${due}</p><div class="bt" style="margin-top:12px">Захиалагч</div><p>Компани: ${g('toName')||'_______'}<br>Регистр: ${g('toReg')||'_______'}<br>Утас: ${g('toPhone')||'_______'}</p></div></div><table><thead><tr><th>№</th><th>Үйлчилгээний нэр</th><th class="r" style="text-align:center">Тоо</th><th class="r">Нэгж үнэ</th><th class="r">Нийт үнэ</th></tr></thead><tbody>${rowsHTML()}</tbody></table><div class="totbox"><div class="l"><span>НӨАТ-гүй дүн</span><span>${fmt(t.sub)}₮</span></div>${t.vatOn?`<div class="l"><span>НӨАТ багтсан (10/110)</span><span>${fmt(t.vat)}₮</span></div>`:''}${t.disc?`<div class="l"><span>Хөнгөлөлт</span><span>-${fmt(t.disc)}₮</span></div>`:''}<div class="l g"><span>Төлөх дүн</span><span>${fmt(t.grand)}₮</span></div></div><div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:auto;padding-top:20px"><div class="foot-pay"><div class="ttl" style="color:#1e40af">Төлбөрийн мэдээлэл</div><p>Банк: ${g('bank')}<br>Дансны нэр: ${g('accName')}<br>Дансны дугаар: ${g('acc')}</p></div><span class="sign-line">Гарын үсэг</span></div>`;}
+  else if(cur==='t4'){inv.innerHTML=`<div class="head1"><div><div class="title">ТӨСЛИЙН НЭХЭМЖЛЭХ</div><div class="proj">Нэхэмжлэх № ${g('invNo')}</div></div><div class="meta num">Нэхэмжлэх №: ${g('invNo')}<br>Огноо: ${dt}<br>Төлөх хугацаа: ${due}</div></div><div class="billto"><div class="bt">Харилцагч</div><p style="font-size:11px;line-height:1.9">Компани: ${g('toName')||'_______'}<br>Регистр: ${g('toReg')||'_______'}<br>Утас: ${g('toPhone')||'_______'}</p></div><table><thead><tr><th>№</th><th>Ажлын нэр</th><th class="r" style="text-align:center">Тоо</th><th class="r">Нэгж үнэ</th><th class="r">Үнэ</th></tr></thead><tbody>${rowsHTML()}</tbody></table><div class="totbox"><div class="l"><span>Төслийн дүн</span><span>${fmt(t.sub)}₮</span></div>${t.vatOn?`<div class="l"><span>НӨАТ багтсан (10/110)</span><span>${fmt(t.vat)}₮</span></div>`:''}${t.disc?`<div class="l"><span>Хөнгөлөлт</span><span>-${fmt(t.disc)}₮</span></div>`:''}<div class="l g"><span>ТӨЛӨХ ДҮН</span><span>${fmt(t.grand)}₮</span></div></div><div class="pay-grid"><div><div class="bt">Төлбөрийн нөхцөл</div><p style="font-size:11px;line-height:1.9">☑ 50% Урьдчилгаа<br>☑ 50% Хүлээлгэн өгөхөд</p></div><div><div class="bt">Төлбөр хийх данс</div><p style="font-size:11px;line-height:1.9">Банк: ${g('bank')}<br>Дансны нэр: ${g('accName')}<br>Дансны дугаар: ${g('acc')}</p></div></div>`;}
+  else if(cur==='t6'){
+    inv.innerHTML=`
+      <div class="hd"><span class="code">НХМаягт -1</span>&nbsp;&nbsp;&nbsp;&nbsp;Санхүү эдийн засгийн сайд, Үндэсний статистикийн газрын даргын<br>2002 оны 171/111 тушаалын хавсралт &nbsp; 2002 оны 6-р сарын 18-ний</div>
+      <div class="doc-t">НЭХЭМЖЛЭХ № ${g('invNo')}</div>
+      <div class="parties">
+        <div>
+          <div class="pl">Нэхэмжлэгч:</div>
+          <div class="ln">Байгууллагын нэр: ${g('fromName')}<br>
+          Хаяг: ${g('fromAddr')}<br>
+          Утас, факс: ${g('fromPhone')}<br>
+          Э-шуудан: ${g('fromMail')}<br>
+          Банкны нэр: ${g('bank')}<br>
+          Банкны дансны дугаар: ${g('acc')}</div>
+        </div>
+        <div>
+          <div class="pl">Төлөгч:</div>
+          <div class="ln">Байгууллагын нэр: ${g('toName')||'<span class="dotfill"></span>'}<br>
+          Хаяг: <span class="dotfill"></span><br>
+          Гэрээний №: <span class="dotfill"></span><br>
+          &nbsp;<br>
+          Нэхэмжлэх огноо: ${dt}<br>
+          Төлбөр хийх хугацаа: ${due}</div>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th style="width:34px">№</th><th>Гүйлгээний утга</th><th style="width:70px">Тоо хэмжээ</th><th style="width:90px">Нэгжийн үнэ</th><th style="width:100px">Нийт үнэ</th></tr></thead>
+        <tbody>${items.map((it,i)=>`<tr><td style="text-align:center">${i+1}</td><td>${it.desc||''}</td><td style="text-align:center">${it.qty}</td><td class="r">${fmt(it.price)}</td><td class="r">${fmt(it.qty*it.price)}<button class="row-del" data-pdel="${i}" title="Устгах">×</button></td></tr>`).join('')}
+        ${Array(Math.max(0,4-items.length)).fill('<tr><td style="height:24px">&nbsp;</td><td></td><td></td><td></td><td></td></tr>').join('')}
+        <tr class="sumrows"><td colspan="4" class="lbl">Дүн</td><td class="r">${fmt(t.sub)}</td></tr>
+        ${t.vatOn?`<tr class="sumrows"><td colspan="4" class="lbl">НӨАТ</td><td class="r">${fmt(t.vat)}</td></tr>`:''}
+        ${t.disc?`<tr class="sumrows"><td colspan="4" class="lbl">Хөнгөлөлт</td><td class="r">-${fmt(t.disc)}</td></tr>`:''}
+        <tr class="sumrows"><td colspan="4" class="lbl">Нийт дүн</td><td class="r"><b>${fmt(t.grand)}</b></td></tr>
+        </tbody>
+      </table>
+      <div class="money">
+        <div class="l">Мөнгөний дүн /үсгээр/: <span class="dotfill" style="min-width:380px">${tugrugToWords(t.grand)}</span> болно.</div>
+      </div>
+      <div class="sign">
+        Тамга&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Дарга <span class="dotfill" style="min-width:150px"></span> /<span class="dotfill" style="min-width:120px"></span>/<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Нягтлан бодогч <span class="dotfill" style="min-width:120px"></span> /<span class="dotfill" style="min-width:120px"></span>/
+      </div>`;
+  }
+}
+document.querySelectorAll('.form input,.form textarea').forEach(el=>{if(el.type!=='file')el.addEventListener('input',render)});
+document.getElementById('invDate').valueAsDate=new Date();
+const d2=new Date();d2.setDate(d2.getDate()+11);document.getElementById('dueDate').valueAsDate=d2;
+document.getElementById('dlBtn').onclick=()=>{const el=document.getElementById('page');html2pdf().set({margin:0,filename:'nehemjleh_'+g('invNo')+'.pdf',image:{type:'jpeg',quality:.98},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).from(el).save();};
+function fitPreview(){
+  if(window.innerWidth<=980){
+    const avail=document.querySelector('.preview-area').clientWidth;
+    const s=Math.min(.96,avail/(210*3.7795));
+    document.documentElement.style.setProperty('--scale',s.toFixed(3));
+  }else{document.documentElement.style.removeProperty('--scale');}
+}
+window.addEventListener('resize',fitPreview);
+setTimeout(fitPreview,100);
+renderItems();render();
+</script>
+</body>
+</html>
