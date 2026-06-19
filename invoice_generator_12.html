@@ -5,16 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Нэхэмжлэх үүсгэгч — BusinessBI</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;1,600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
 <style>
-:root{--bg:#eef0f3;--panel:#fff;--ink:#1a1f2e;--muted:#6b7280;--line:#e5e7eb;--brand:#0f5e57;--accent:#e0a82e}
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
-body{background:var(--bg);color:var(--ink);padding:24px}
-.wrap{max-width:1480px;margin:0 auto}
+/* ── хэрэгслийн өөрийн стиль ── */
+:root{--bg:#f6f4ee;--panel:#fff;--muted:#6b7280;--brand:#0f5e57;--accent:#d98324}
+body{background:var(--bg);padding:0}
+.tool-wrap{max-width:1480px;margin:0 auto;padding:28px 28px 60px}
 .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:14px}
-.head h1{font-size:24px;font-weight:800;letter-spacing:-.02em}
-.head .brand{color:var(--brand);font-weight:700}
-.btn{background:var(--accent);color:#fff;border:none;padding:13px 26px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:transform .15s}
+.head h1{font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--ink)}
+.head .brand{color:var(--brand)}
+.btn{background:var(--accent);color:#fff;border:none;padding:11px 22px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:transform .15s}
 .btn:hover{transform:translateY(-2px)}
 .btn.sec{background:var(--brand)}
 .templates{display:flex;gap:14px;overflow-x:auto;padding:6px 2px 6px}
@@ -27,10 +29,10 @@ body{background:var(--bg);color:var(--ink);padding:24px}
 .form{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;overflow-y:auto}
 .form h3{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:14px 0 8px;font-weight:700}
 .form h3:first-child{margin-top:0}
-.field{margin-bottom:8px}
-.field label{display:block;font-size:12px;font-weight:600;margin-bottom:3px;color:#374151}
-.field input,.field textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit}
-.field input:focus,.field textarea:focus{outline:2px solid var(--brand);border-color:transparent}
+.form .field{margin-bottom:8px}
+.form .field label{display:block;font-size:12px;font-weight:600;margin-bottom:3px;color:#374151}
+.form .field input,.form .field textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit}
+.form .field input:focus,.form .field textarea:focus{outline:2px solid var(--brand);border-color:transparent}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 /* party color accents */
@@ -176,13 +178,25 @@ body{background:var(--bg);color:var(--ink);padding:24px}
 </style>
 </head>
 <body>
-<div class="wrap">
+
+<!-- NAV -->
+<nav>
+  <div class="wrap nav-inner">
+    <a href="index.html" class="logo">Business<span>BI</span></a>
+    <div class="nav-links" id="navLinks">
+      <a href="tools.html" class="active">Хэрэгслүүд</a>
+      <a href="index.html#custom">Захиалгат Dashboard</a>
+      <a href="accountants.html">Нягтлан холбох</a>
+      <a href="index.html#courses">Сургалт</a>
+      <a href="index.html#contact" class="nav-cta">Холбогдох</a>
+    </div>
+    <button class="menu-btn" id="menuBtn" aria-label="Цэс"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="tool-wrap">
   <div class="head">
     <h1>Нэхэмжлэх үүсгэгч <span class="brand">· BusinessBI</span></h1>
-    <div style="display:flex;gap:10px">
-      <button class="btn sec" onclick="window.print()">🖨 Хэвлэх</button>
-      <button class="btn" id="dlBtn">⬇ PDF татах</button>
-    </div>
   </div>
   <div class="layout">
     <div class="form">
@@ -243,8 +257,12 @@ body{background:var(--bg);color:var(--ink);padding:24px}
       <div class="field"><label>Дансны нэр</label><input id="accName" value="Business BI LLC"></div>
     </div>
     <div class="tpl-col" id="tplPicker"></div>
-    <div class="preview-area">
-      <div class="page t1" id="page"><div class="inv" id="inv"></div></div>
+    <div class="preview-area" style="position:relative">
+      <div style="position:absolute;top:14px;right:14px;display:flex;gap:8px;z-index:100">
+        <button class="btn sec" onclick="window.print()">🖨 Хэвлэх</button>
+        <button class="btn" id="dlBtn">⬇ PDF татах</button>
+      </div>
+      <div class="page t1" id="page" style="position:relative;z-index:1"><div class="inv" id="inv"></div></div>
     </div>
   </div>
 </div>
@@ -397,5 +415,22 @@ window.addEventListener('resize',fitPreview);
 setTimeout(fitPreview,100);
 renderItems();render();
 </script>
+
+<!-- FOOTER -->
+<footer style="margin-top:60px">
+  <div class="wrap foot-inner">
+    <div>
+      <a href="index.html" class="logo" style="display:block;margin-bottom:6px">Business<span>BI</span></a>
+      <p>Тоо баримтыг шийдвэр болгоно. © 2026</p>
+    </div>
+    <div class="foot-links">
+      <a href="tools.html">Хэрэгслүүд</a>
+      <a href="accountants.html">Нягтлан холбох</a>
+      <a href="index.html#courses">Сургалт</a>
+      <a href="index.html#contact">Холбоо барих</a>
+    </div>
+  </div>
+</footer>
+<script src="shared.js"></script>
 </body>
 </html>
