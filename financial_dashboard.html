@@ -8,7 +8,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 :root{
-  --sb:#0d1117;--sb2:#161b22;--sbh:#21262d;--sba:#0f5e57;
+  --sb:#1f2937;--sb2:#263445;--sbh:#2d3748;--sba:#0f5e57;
   --bg:#f0f2f5;--panel:#fff;--line:#e5e7eb;--line2:#d1d5db;
   --ink:#111827;--mu:#6b7280;--mu2:#9ca3af;
   --br:#0f5e57;--br2:#0a443f;--brl:#e6f4f2;
@@ -18,11 +18,11 @@
   --grn:#16a34a;--grnbg:#f0fdf4;--grnb:#bbf7d0;
 }
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
-html,body{height:100%;overflow:hidden}
-body{background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
+html,body{height:100%;overflow:hidden;display:flex;flex-direction:column}
+body{background:var(--bg);color:var(--ink)}
 
 /* SIDEBAR */
-.sb{width:210px;height:calc(100vh - 56px);background:var(--sb);display:flex;flex-direction:column;flex-shrink:0;border-right:1px solid #1a2540}
+.sb{width:210px;background:var(--sb);display:flex;flex-direction:column;flex-shrink:0;border-right:1px solid #2d3748}
 .sb-logo{display:flex;align-items:center;gap:10px}
 .sb-logo-icon{width:34px;height:34px;background:#1a2a4a;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .sb-logo-icon svg{width:20px;height:20px}
@@ -30,23 +30,23 @@ body{background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
 .sb-logo-text span{color:var(--gd)}
 .sb-logo-sub{font-size:10px;color:#3d5070;margin-top:1px}
 .sb-nav{flex:1;padding:4px 8px;overflow-y:auto}
-.sb-sec{font-size:9px;font-weight:700;color:#2d4060;text-transform:uppercase;letter-spacing:.1em;padding:12px 8px 5px}
-.sb-i{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;cursor:pointer;color:#5a7090;font-size:12.5px;font-weight:500;transition:.12s;margin-bottom:1px;border:none;background:none;width:100%;text-align:left;font-family:inherit}
-.sb-i:hover{background:#141e32;color:#a0b4cc}
+.sb-sec{font-size:9px;font-weight:700;color:#4b6080;text-transform:uppercase;letter-spacing:.1em;padding:12px 8px 5px}
+.sb-i{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;cursor:pointer;color:#8fa3b8;font-size:12.5px;font-weight:500;transition:.12s;margin-bottom:1px;border:none;background:none;width:100%;text-align:left;font-family:inherit}
+.sb-i:hover{background:#2d3748;color:#a0b4cc}
 .sb-i.active{background:var(--sba);color:#fff;font-weight:600}
 .sb-i .ic{width:15px;height:15px;flex-shrink:0;opacity:.7}
 .sb-i.active .ic{opacity:1}
 .sb-badge{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:1px 6px;border-radius:10px}
-.sb-div{height:1px;background:#1a2540;margin:6px 8px}
-.sb-user{padding:12px 14px;border-top:1px solid #1a2540;display:flex;align-items:center;gap:9px}
+.sb-div{height:1px;background:#2d3748;margin:6px 8px}
+.sb-user{padding:12px 14px;border-top:1px solid #2d3748;display:flex;align-items:center;gap:9px}
 .sb-av{width:30px;height:30px;border-radius:8px;background:var(--br);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .sb-un{font-size:12px;font-weight:600;color:#c0d0e0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px}
-.sb-ur{font-size:10px;color:#3d5070}
-.sb-out{margin-left:auto;border:none;background:none;color:#3d5070;cursor:pointer;padding:3px;flex-shrink:0}
-.sb-out:hover{color:#5a7090}
+.sb-ur{font-size:10px;color:#5a7090}
+.sb-out{margin-left:auto;border:none;background:none;color:#5a7090;cursor:pointer;padding:3px;flex-shrink:0}
+.sb-out:hover{color:#8fa3b8}
 
 /* MAIN */
-.main{flex:1;height:calc(100vh - 56px);display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 
 /* TOPBAR */
 .top{background:#fff;border-bottom:1px solid var(--line);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
@@ -209,22 +209,25 @@ body{background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
 </style>
 </head>
 <body>
-<nav class="bbi-nav">
-  <div class="bbi-nav-inner">
-    <a href="index.html" class="bbi-logo">Business<span>BI</span>
-      <div class="bbi-logo-sep"></div>
-      <span class="bbi-logo-title">Санхүүгийн шинжилгаэ</span>
-    </a>
-    <div class="bbi-nav-links">
-      <a href="tools.html" class="bbi-back">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-        Хэрэгслүүд
-      </a>
-      <a href="index.html">Нүүр хуудас</a>
+
+<div class="top">
+    <div class="top-l">
+      <a href="index.html" style="font-size:18px;font-weight:800;color:#b79a63;text-decoration:none;letter-spacing:-.02em;flex-shrink:0">Business<span style="color:#111">BI</span></a>
+      <div style="width:1px;height:18px;background:var(--line);flex-shrink:0"></div>
+      <div class="top-title" id="topTitle">Компани санхүүгийн ерөнхий тойм</div>
+      <div class="top-meta" id="topMeta"></div>
+    </div>
+    <div class="top-r">
+      <div id="yearTags" style="display:flex;gap:4px;align-items:center"></div>
+      <button class="tbtn tbtn-o" id="addYearBtn" style="display:none" onclick="document.getElementById('addYearInput').click()">
+        + Тайлан нэмэх
+        <input type="file" id="addYearInput" accept=".pdf" style="display:none">
+      </button>
+      <button class="tbtn tbtn-o" onclick="resetDash()">↩ Дахин эхлэх</button>
+      <button class="tbtn tbtn-b" onclick="window.print()">⬇ PDF тайлан</button>
     </div>
   </div>
-</nav>
-<div style="display:flex;flex:1;min-height:0;overflow:hidden">
+<div style="display:flex;flex:1;min-height:0;overflow:hidden;min-height:0">
 <aside class="sb">
   <nav class="sb-nav">
     <div class="sb-sec">Үндсэн цэс</div>
@@ -282,23 +285,6 @@ body{background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
 
 <!-- MAIN -->
 <div class="main">
-  <!-- TOPBAR -->
-  <div class="top">
-    <div class="top-l">
-      <div class="top-title" id="topTitle">Компани санхүүгийн ерөнхий тойм</div>
-      <div class="top-meta" id="topMeta"></div>
-    </div>
-    <div class="top-r">
-      <div id="yearTags" style="display:flex;gap:4px;align-items:center"></div>
-      <button class="tbtn tbtn-o" id="addYearBtn" style="display:none" onclick="document.getElementById('addYearInput').click()">
-        + Тайлан нэмэх
-        <input type="file" id="addYearInput" accept=".pdf" style="display:none">
-      </button>
-      <button class="tbtn tbtn-o" onclick="resetDash()">↩ Дахин эхлэх</button>
-      <button class="tbtn tbtn-b" onclick="window.print()">⬇ PDF тайлан</button>
-    </div>
-  </div>
-
   <!-- UPLOAD -->
   <div class="upload" id="upScreen">
     <div class="upload-card">
