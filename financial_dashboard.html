@@ -23,7 +23,6 @@ body{background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
 
 /* SIDEBAR */
 .sb{width:210px;height:calc(100vh - 56px);background:var(--sb);display:flex;flex-direction:column;flex-shrink:0;border-right:1px solid #1a2540}
-.sb-top{padding:18px 16px 14px;border-bottom:1px solid #1a2540}
 .sb-logo{display:flex;align-items:center;gap:10px}
 .sb-logo-icon{width:34px;height:34px;background:#1a2a4a;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .sb-logo-icon svg{width:20px;height:20px}
@@ -195,10 +194,21 @@ body{background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
 .bc-chg span{font-weight:600}
 .bc-chg .up{color:var(--grn)}
 .bc-chg .dn{color:var(--red)}
+
+.bbi-nav{background:#fff;border-bottom:1px solid #e5e7eb;height:56px;display:flex;align-items:center;flex-shrink:0}
+.bbi-nav-inner{max-width:100%;padding:0 28px;display:flex;justify-content:space-between;align-items:center;width:100%}
+.bbi-logo{font-size:20px;font-weight:800;color:#b79a63;text-decoration:none;letter-spacing:-.02em;display:flex;align-items:center;gap:12px}
+.bbi-logo span{color:#111}
+.bbi-logo-sep{width:1px;height:20px;background:#e5e7eb;flex-shrink:0}
+.bbi-logo-title{font-size:14px;font-weight:600;color:#6b7280}
+.bbi-nav-links{display:flex;gap:24px;align-items:center}
+.bbi-nav-links a{text-decoration:none;color:#374151;font-weight:500;font-size:13px;transition:color .15s}
+.bbi-nav-links a:hover{color:#b79a63}
+.bbi-back{display:flex;align-items:center;gap:5px;color:#6b7280!important}
+
 </style>
 </head>
 <body>
-
 <nav class="bbi-nav">
   <div class="bbi-nav-inner">
     <a href="index.html" class="bbi-logo">Business<span>BI</span>
@@ -214,22 +224,8 @@ body{background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
     </div>
   </div>
 </nav>
-<div style="display:flex;flex:1;overflow:hidden;min-height:0">
+<div style="display:flex;flex:1;min-height:0;overflow:hidden">
 <aside class="sb">
-  <div class="sb-top">
-    <div class="sb-logo">
-      <div class="sb-logo-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
-          <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
-          <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
-        </svg>
-      </div>
-      <div>
-        <div class="sb-logo-text">Business<span>BI</span></div>
-        <div class="sb-logo-sub">Financial Intelligence</div>
-      </div>
-    </div>
-  </div>
   <nav class="sb-nav">
     <div class="sb-sec">Үндсэн цэс</div>
     <button class="sb-i active" onclick="showSection('overview')">
