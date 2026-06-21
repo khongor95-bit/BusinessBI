@@ -1,205 +1,280 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="mn">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2487.3">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Нэвтрэх — BusinessBI.mn</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#b79a63;--teal:#0f5e57;--ink:#111;--bg:#f6f4ee;--line:#e2ddd2;--muted:#6b7280;--red:#dc2626}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+body{background:var(--bg);color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{background:#fff;border:1px solid var(--line);border-radius:20px;width:100%;max-width:420px;padding:36px 32px;box-shadow:0 10px 40px -20px rgba(0,0,0,.25)}
+.logo{font-size:26px;font-weight:800;letter-spacing:-.02em;text-align:center;margin-bottom:6px}
+.logo span{color:var(--gold)}
+.sub{text-align:center;color:var(--muted);font-size:14px;margin-bottom:26px}
+.tabs{display:flex;background:var(--bg);border-radius:11px;padding:4px;margin-bottom:24px}
+.tab{flex:1;text-align:center;padding:10px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;color:var(--muted);border:none;background:none;font-family:inherit;transition:.2s}
+.tab.active{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+.field input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit}
+.field input:focus{outline:2px solid var(--teal);border-color:transparent}
+.btn{width:100%;background:var(--teal);color:#fff;border:none;padding:13px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .2s}
+.btn:hover{background:#0a443f}
+.btn:disabled{opacity:.6;cursor:default}
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted);font-size:13px}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line)}
+.btn-google{width:100%;background:#fff;border:1px solid var(--line);padding:12px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .2s}
+.btn-google:hover{background:#f9fafb}
+.btn-google svg{width:18px;height:18px}
+.msg{font-size:13px;padding:10px 12px;border-radius:8px;margin-bottom:14px;display:none}
+.msg.err{background:#fef2f2;color:var(--red);display:block}
+.msg.ok{background:#f0fdf4;color:#15803d;display:block}
+.back{text-align:center;margin-top:16px}
+.back a{color:var(--muted);font-size:13px;text-decoration:none}
+.back a:hover{color:var(--ink)}
+.forgot{text-align:right;margin-top:-6px;margin-bottom:14px}
+.forgot a{color:var(--teal);font-size:12px;text-decoration:none;cursor:pointer}
+
+/* Нэвтэрсэн байх үед харуулах хэсэг */
+.logged-in-card{display:none;text-align:center}
+.logged-in-card .avatar{width:56px;height:56px;border-radius:50%;background:var(--teal);color:#fff;font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+.logged-in-card .user-name{font-size:17px;font-weight:700;margin-bottom:4px}
+.logged-in-card .user-email{font-size:13px;color:var(--muted);margin-bottom:20px}
+.btn-outline{width:100%;background:#fff;color:var(--ink);border:1px solid var(--line);padding:12px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .2s;margin-bottom:10px}
+.btn-outline:hover{background:var(--bg)}
+.btn-danger{width:100%;background:#fff;color:var(--red);border:1px solid #fecaca;padding:12px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .2s}
+.btn-danger:hover{background:#fef2f2}
+</style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="mn"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1">&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1">&lt;title&gt;Нэвтрэх — BusinessBI.mn&lt;/title&gt;</p>
-<p class="p1">&lt;link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"&gt;</p>
-<p class="p1">&lt;style&gt;</p>
-<p class="p1">:root{--gold:#b79a63;--teal:#0f5e57;--ink:#111;--bg:#f6f4ee;--line:#e2ddd2;--muted:#6b7280;--red:#dc2626}</p>
-<p class="p1">*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}</p>
-<p class="p1">body{background:var(--bg);color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}</p>
-<p class="p1">.card{background:#fff;border:1px solid var(--line);border-radius:20px;width:100%;max-width:420px;padding:36px 32px;box-shadow:0 10px 40px -20px rgba(0,0,0,.25)}</p>
-<p class="p1">.logo{font-size:26px;font-weight:800;letter-spacing:-.02em;text-align:center;margin-bottom:6px}</p>
-<p class="p1">.logo span{color:var(--gold)}</p>
-<p class="p1">.sub{text-align:center;color:var(--muted);font-size:14px;margin-bottom:26px}</p>
-<p class="p1">.tabs{display:flex;background:var(--bg);border-radius:11px;padding:4px;margin-bottom:24px}</p>
-<p class="p1">.tab{flex:1;text-align:center;padding:10px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;color:var(--muted);border:none;background:none;font-family:inherit;transition:.2s}</p>
-<p class="p1">.tab.active{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.08)}</p>
-<p class="p1">.field{margin-bottom:14px}</p>
-<p class="p1">.field label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}</p>
-<p class="p1">.field input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit}</p>
-<p class="p1">.field input:focus{outline:2px solid var(--teal);border-color:transparent}</p>
-<p class="p1">.btn{width:100%;background:var(--teal);color:#fff;border:none;padding:13px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .2s}</p>
-<p class="p1">.btn:hover{background:#0a443f}</p>
-<p class="p1">.btn:disabled{opacity:.6;cursor:default}</p>
-<p class="p1">.divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted);font-size:13px}</p>
-<p class="p1">.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line)}</p>
-<p class="p1">.btn-google{width:100%;background:#fff;border:1px solid var(--line);padding:12px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;transition:.2s}</p>
-<p class="p1">.btn-google:hover{background:#f9fafb}</p>
-<p class="p1">.btn-google svg{width:18px;height:18px}</p>
-<p class="p1">.msg{font-size:13px;padding:10px 12px;border-radius:8px;margin-bottom:14px;display:none}</p>
-<p class="p1">.msg.err{background:#fef2f2;color:var(--red);display:block}</p>
-<p class="p1">.msg.ok{background:#f0fdf4;color:#15803d;display:block}</p>
-<p class="p1">.back{text-align:center;margin-top:16px}</p>
-<p class="p1">.back a{color:var(--muted);font-size:13px;text-decoration:none}</p>
-<p class="p1">.back a:hover{color:var(--ink)}</p>
-<p class="p1">.forgot{text-align:right;margin-top:-6px;margin-bottom:14px}</p>
-<p class="p1">.forgot a{color:var(--teal);font-size:12px;text-decoration:none;cursor:pointer}</p>
-<p class="p1">&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p1">&lt;div class="card"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="logo"&gt;Business&lt;span&gt;BI&lt;/span&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="sub" id="subtitle"&gt;Бүртгэлдээ нэвтэрнэ үү&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="tabs"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;button class="tab active" id="tabLogin"&gt;Нэвтрэх&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;button class="tab" id="tabSignup"&gt;Бүртгүүлэх&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="msg" id="msg"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="field" id="nameField" style="display:none"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;label&gt;Нэр&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;input type="text" id="name" placeholder="Таны нэр"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="field"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;label&gt;Имэйл&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;input type="email" id="email" placeholder="name@example.com"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="field"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;label&gt;Нууц үг&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;input type="password" id="password" placeholder="••••••••"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="forgot" id="forgotWrap"&gt;&lt;a id="forgotLink"&gt;Нууц үгээ мартсан уу?&lt;/a&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;button class="btn" id="submitBtn"&gt;Нэвтрэх&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="divider"&gt;эсвэл&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;button class="btn-google" id="googleBtn"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;svg viewBox="0 0 24 24"&gt;&lt;path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/&gt;&lt;path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/&gt;&lt;path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/&gt;&lt;path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/&gt;&lt;/svg&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>Google-ээр үргэлжлүүлэх</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="back"&gt;&lt;a href="index.html"&gt;← Нүүр хуудас руу буцах&lt;/a&gt;&lt;/div&gt;</p>
-<p class="p1">&lt;/div&gt;</p>
-<p class="p1">&lt;script type="module"&gt;</p>
-<p class="p1">import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";</p>
-<p class="p1">import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,</p>
-<p class="p1"><span class="Apple-converted-space">  </span>GoogleAuthProvider, signInWithPopup, updateProfile, sendPasswordResetEmail,</p>
-<p class="p1"><span class="Apple-converted-space">  </span>onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";</p>
-<p class="p1">import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";</p>
-<p class="p2"><br></p>
-<p class="p1">const firebaseConfig = {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>apiKey: "AIzaSyAXslBVU1__Ibhk3P7TEeJRS2oi-8fi6Jc",</p>
-<p class="p1"><span class="Apple-converted-space">  </span>authDomain: "businessbi.firebaseapp.com",</p>
-<p class="p1"><span class="Apple-converted-space">  </span>projectId: "businessbi",</p>
-<p class="p1"><span class="Apple-converted-space">  </span>storageBucket: "businessbi.firebasestorage.app",</p>
-<p class="p1"><span class="Apple-converted-space">  </span>messagingSenderId: "84765528435",</p>
-<p class="p1"><span class="Apple-converted-space">  </span>appId: "1:84765528435:web:edf7066e6399dbc76af506",</p>
-<p class="p1"><span class="Apple-converted-space">  </span>measurementId: "G-R1PJ3P6FHM"</p>
-<p class="p1">};</p>
-<p class="p1">const app = initializeApp(firebaseConfig);</p>
-<p class="p1">const auth = getAuth(app);</p>
-<p class="p1">const db = getFirestore(app);</p>
-<p class="p1">auth.languageCode = 'mn';</p>
-<p class="p2"><br></p>
-<p class="p1">let mode = 'login';</p>
-<p class="p1">const $ = id =&gt; document.getElementById(id);</p>
-<p class="p1">const msg = $('msg');</p>
-<p class="p1">function showMsg(t,type){ msg.textContent=t; msg.className='msg '+type; }</p>
-<p class="p1">function clearMsg(){ msg.className='msg'; }</p>
-<p class="p2"><br></p>
-<p class="p1">function setMode(m){</p>
-<p class="p1"><span class="Apple-converted-space">  </span>mode=m;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>$('tabLogin').classList.toggle('active',m==='login');</p>
-<p class="p1"><span class="Apple-converted-space">  </span>$('tabSignup').classList.toggle('active',m==='signup');</p>
-<p class="p1"><span class="Apple-converted-space">  </span>$('nameField').style.display=m==='signup'?'block':'none';</p>
-<p class="p1"><span class="Apple-converted-space">  </span>$('forgotWrap').style.display=m==='login'?'block':'none';</p>
-<p class="p1"><span class="Apple-converted-space">  </span>$('submitBtn').textContent=m==='login'?'Нэвтрэх':'Бүртгүүлэх';</p>
-<p class="p1"><span class="Apple-converted-space">  </span>$('subtitle').textContent=m==='login'?'Бүртгэлдээ нэвтэрнэ үү':'Шинэ бүртгэл үүсгэх';</p>
-<p class="p1"><span class="Apple-converted-space">  </span>clearMsg();</p>
-<p class="p1">}</p>
-<p class="p1">$('tabLogin').onclick=()=&gt;setMode('login');</p>
-<p class="p1">$('tabSignup').onclick=()=&gt;setMode('signup');</p>
-<p class="p2"><br></p>
-<p class="p1">const params=new URLSearchParams(location.search);</p>
-<p class="p1">const next=params.get('next')||'index.html';</p>
-<p class="p2"><br></p>
-<p class="p1">async function saveUser(user,extraName){</p>
-<p class="p1"><span class="Apple-converted-space">  </span>try{</p>
-<p class="p1"><span class="Apple-converted-space">    </span>await setDoc(doc(db,'users',user.uid),{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>name: extraName||user.displayName||'',</p>
-<p class="p1"><span class="Apple-converted-space">      </span>email: user.email,</p>
-<p class="p1"><span class="Apple-converted-space">      </span>createdAt: serverTimestamp(),</p>
-<p class="p1"><span class="Apple-converted-space">      </span>plan:'free'</p>
-<p class="p1"><span class="Apple-converted-space">    </span>},{merge:true});</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}catch(e){ console.warn('profile save',e); }</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">$('submitBtn').onclick=async()=&gt;{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const email=$('email').value.trim();</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const pass=$('password').value;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const name=$('name').value.trim();</p>
-<p class="p1"><span class="Apple-converted-space">  </span>if(!email||!pass){ showMsg('Имэйл болон нууц үгээ оруулна уу.','err'); return; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>if(mode==='signup'&amp;&amp;pass.length&lt;6){ showMsg('Нууц үг доод тал нь 6 тэмдэгт байх ёстой.','err'); return; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>$('submitBtn').disabled=true;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>try{</p>
-<p class="p1"><span class="Apple-converted-space">    </span>if(mode==='signup'){</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const cred=await createUserWithEmailAndPassword(auth,email,pass);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if(name) await updateProfile(cred.user,{displayName:name});</p>
-<p class="p1"><span class="Apple-converted-space">      </span>await saveUser(cred.user,name);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>showMsg('Амжилттай бүртгүүллээ!','ok');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}else{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>await signInWithEmailAndPassword(auth,email,pass);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>showMsg('Амжилттай нэвтэрлээ!','ok');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>setTimeout(()=&gt;location.href=next,600);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}catch(e){ showMsg(mnError(e.code),'err'); $('submitBtn').disabled=false; }</p>
-<p class="p1">};</p>
-<p class="p2"><br></p>
-<p class="p1">$('googleBtn').onclick=async()=&gt;{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const provider=new GoogleAuthProvider();</p>
-<p class="p1"><span class="Apple-converted-space">  </span>try{</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const result=await signInWithPopup(auth,provider);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>await saveUser(result.user);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>showMsg('Амжилттай нэвтэрлээ!','ok');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>setTimeout(()=&gt;location.href=next,600);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}catch(e){ showMsg(mnError(e.code),'err'); }</p>
-<p class="p1">};</p>
-<p class="p2"><br></p>
-<p class="p1">$('forgotLink').onclick=async()=&gt;{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const email=$('email').value.trim();</p>
-<p class="p1"><span class="Apple-converted-space">  </span>if(!email){ showMsg('Эхлээд имэйлээ оруулна уу.','err'); return; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>try{</p>
-<p class="p1"><span class="Apple-converted-space">    </span>await sendPasswordResetEmail(auth,email);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>showMsg('Нууц үг сэргээх холбоосыг имэйлрүү илгээлээ.','ok');</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}catch(e){ showMsg(mnError(e.code),'err'); }</p>
-<p class="p1">};</p>
-<p class="p2"><br></p>
-<p class="p1">['email','password','name'].forEach(id=&gt;{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>$(id).addEventListener('keydown',e=&gt;{ if(e.key==='Enter') $('submitBtn').click(); });</p>
-<p class="p1">});</p>
-<p class="p2"><br></p>
-<p class="p1">onAuthStateChanged(auth,user=&gt;{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>if(user){ $('subtitle').textContent=(user.displayName||user.email)+' нэрээр нэвтэрсэн байна'; }</p>
-<p class="p1">});</p>
-<p class="p2"><br></p>
-<p class="p1">function mnError(code){</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const m={</p>
-<p class="p1"><span class="Apple-converted-space">    </span>'auth/invalid-email':'Имэйл хаяг буруу байна.',</p>
-<p class="p1"><span class="Apple-converted-space">    </span>'auth/user-not-found':'Ийм бүртгэл олдсонгүй.',</p>
-<p class="p1"><span class="Apple-converted-space">    </span>'auth/wrong-password':'Нууц үг буруу байна.',</p>
-<p class="p1"><span class="Apple-converted-space">    </span>'auth/invalid-credential':'Имэйл эсвэл нууц үг буруу байна.',</p>
-<p class="p1"><span class="Apple-converted-space">    </span>'auth/email-already-in-use':'Энэ имэйл аль хэдийн бүртгэлтэй байна.',</p>
-<p class="p1"><span class="Apple-converted-space">    </span>'auth/weak-password':'Нууц үг хэт богино байна (6+ тэмдэгт).',</p>
-<p class="p1"><span class="Apple-converted-space">    </span>'auth/popup-closed-by-user':'Нэвтрэх цонх хаагдсан.',</p>
-<p class="p1"><span class="Apple-converted-space">    </span>'auth/too-many-requests':'Хэт олон оролдлого. Түр хүлээнэ үү.',</p>
-<p class="p1"><span class="Apple-converted-space">    </span>'auth/network-request-failed':'Сүлжээний алдаа. Холболтоо шалгана уу.'</p>
-<p class="p1"><span class="Apple-converted-space">  </span>};</p>
-<p class="p1"><span class="Apple-converted-space">  </span>return m[code]||('Алдаа гарлаа: '+code);</p>
-<p class="p1">}</p>
-<p class="p1">&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+<div class="card">
+  <div class="logo">Business<span>BI</span></div>
+
+  <!-- Нэвтрэх / Бүртгүүлэх хэсэг -->
+  <div id="authSection">
+    <div class="sub" id="subtitle">Бүртгэлдээ нэвтэрнэ үү</div>
+    <div class="tabs">
+      <button class="tab active" id="tabLogin">Нэвтрэх</button>
+      <button class="tab" id="tabSignup">Бүртгүүлэх</button>
+    </div>
+    <div class="msg" id="msg"></div>
+    <div class="field" id="nameField" style="display:none">
+      <label>Нэр</label>
+      <input type="text" id="name" placeholder="Таны нэр">
+    </div>
+    <div class="field">
+      <label>Имэйл</label>
+      <input type="email" id="email" placeholder="name@example.com" autocomplete="email">
+    </div>
+    <div class="field">
+      <label>Нууц үг</label>
+      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div class="forgot" id="forgotWrap">
+      <a id="forgotLink">Нууц үгээ мартсан уу?</a>
+    </div>
+    <button class="btn" id="submitBtn">Нэвтрэх</button>
+    <div class="divider">эсвэл</div>
+    <button class="btn-google" id="googleBtn">
+      <svg viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      Google-ээр үргэлжлүүлэх
+    </button>
+  </div>
+
+  <!-- Аль хэдийн нэвтэрсэн байх үед -->
+  <div class="logged-in-card" id="loggedInSection">
+    <div class="avatar" id="avatarInitial">?</div>
+    <div class="user-name" id="loggedName"></div>
+    <div class="user-email" id="loggedEmail"></div>
+    <button class="btn" id="continueBtn">Үргэлжлүүлэх →</button>
+    <br><br>
+    <button class="btn-danger" id="signOutBtn">Гарах</button>
+  </div>
+
+  <div class="back"><a href="index.html">← Нүүр хуудас руу буцах</a></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+  updateProfile,
+  sendPasswordResetEmail,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ─── Firebase тохиргоо ───────────────────────────────────────────────────────
+// ⚠️ ЗААВАЛ: Firebase Console → Authentication → Sign-in method дээр
+//    Email/Password болон Google-ийг идэвхжүүл.
+// ⚠️ ЗААВАЛ: Google Cloud Console → Credentials → API key → HTTP referrers дээр
+//    https://businessbi.mn/* нэм.
+const firebaseConfig = {
+  apiKey: "AIzaSyAXslBVU1__Ibhk3P7TEeJRS2oi-8fi6Jc",
+  authDomain: "businessbi.firebaseapp.com",
+  projectId: "businessbi",
+  storageBucket: "businessbi.firebasestorage.app",
+  messagingSenderId: "84765528435",
+  appId: "1:84765528435:web:edf7066e6399dbc76af506",
+  measurementId: "G-R1PJ3P6FHM"
+};
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+auth.languageCode = 'mn';
+
+// ─── Хаана шилжих вэ ────────────────────────────────────────────────────────
+const params = new URLSearchParams(location.search);
+const next   = params.get('next') || 'index.html';
+
+// ─── Хэрэгсэл функцүүд ──────────────────────────────────────────────────────
+const $   = id => document.getElementById(id);
+const msg = $('msg');
+let mode  = 'login';
+
+function showMsg(t, type) { msg.textContent = t; msg.className = 'msg ' + type; }
+function clearMsg()        { msg.className = 'msg'; }
+
+// ─── Нэвтрэх / Бүртгүүлэх горим солих ──────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  $('tabLogin').classList.toggle('active', m === 'login');
+  $('tabSignup').classList.toggle('active', m === 'signup');
+  $('nameField').style.display   = m === 'signup' ? 'block' : 'none';
+  $('forgotWrap').style.display  = m === 'login'  ? 'block' : 'none';
+  $('submitBtn').textContent     = m === 'login'  ? 'Нэвтрэх' : 'Бүртгүүлэх';
+  $('subtitle').textContent      = m === 'login'  ? 'Бүртгэлдээ нэвтэрнэ үү' : 'Шинэ бүртгэл үүсгэх';
+  clearMsg();
+}
+$('tabLogin').onclick  = () => setMode('login');
+$('tabSignup').onclick = () => setMode('signup');
+
+// ─── Хэрэглэгчийн профайлыг Firestore-д хадгалах ───────────────────────────
+async function saveUser(user, extraName) {
+  try {
+    await setDoc(doc(db, 'users', user.uid), {
+      name:      extraName || user.displayName || '',
+      email:     user.email,
+      createdAt: serverTimestamp(),
+      plan:      'free'   // төлбөр төлсний дараа 'pro' болгоно
+    }, { merge: true });
+  } catch(e) {
+    console.warn('Профайл хадгалахад алдаа:', e);
+  }
+}
+
+// ─── Имэйл / Нууц үгээр нэвтрэх ────────────────────────────────────────────
+$('submitBtn').onclick = async () => {
+  const email = $('email').value.trim();
+  const pass  = $('password').value;
+  const name  = $('name').value.trim();
+
+  if (!email || !pass) { showMsg('Имэйл болон нууц үгээ оруулна уу.', 'err'); return; }
+  if (mode === 'signup' && pass.length < 6) { showMsg('Нууц үг доод тал нь 6 тэмдэгт байх ёстой.', 'err'); return; }
+  if (mode === 'signup' && !name) { showMsg('Нэрээ оруулна уу.', 'err'); return; }
+
+  $('submitBtn').disabled = true;
+  try {
+    if (mode === 'signup') {
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      await updateProfile(cred.user, { displayName: name });
+      await saveUser(cred.user, name);
+      showMsg('Амжилттай бүртгүүллээ!', 'ok');
+    } else {
+      await signInWithEmailAndPassword(auth, email, pass);
+      showMsg('Амжилттай нэвтэрлээ!', 'ok');
+    }
+    setTimeout(() => location.href = next, 800);
+  } catch(e) {
+    showMsg(mnError(e.code), 'err');
+    $('submitBtn').disabled = false;
+  }
+};
+
+// ─── Google-ээр нэвтрэх ─────────────────────────────────────────────────────
+$('googleBtn').onclick = async () => {
+  const provider = new GoogleAuthProvider();
+  try {
+    const result = await signInWithPopup(auth, provider);
+    await saveUser(result.user);
+    showMsg('Амжилттай нэвтэрлээ!', 'ok');
+    setTimeout(() => location.href = next, 800);
+  } catch(e) {
+    showMsg(mnError(e.code), 'err');
+  }
+};
+
+// ─── Нууц үг сэргээх ────────────────────────────────────────────────────────
+$('forgotLink').onclick = async () => {
+  const email = $('email').value.trim();
+  if (!email) { showMsg('Эхлээд имэйлээ оруулна уу.', 'err'); return; }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    showMsg('Нууц үг сэргээх холбоосыг имэйлрүү илгээлээ.', 'ok');
+  } catch(e) {
+    showMsg(mnError(e.code), 'err');
+  }
+};
+
+// ─── Enter товч ─────────────────────────────────────────────────────────────
+['email', 'password', 'name'].forEach(id => {
+  $(id).addEventListener('keydown', e => { if (e.key === 'Enter') $('submitBtn').click(); });
+});
+
+// ─── Аль хэдийн нэвтэрсэн хэрэглэгч ────────────────────────────────────────
+onAuthStateChanged(auth, user => {
+  if (user) {
+    // Нэвтэрсэн байвал auth хэсгийг нуугаад logged-in card харуулна
+    $('authSection').style.display    = 'none';
+    $('loggedInSection').style.display = 'block';
+
+    const displayName = user.displayName || user.email.split('@')[0];
+    $('loggedName').textContent  = displayName;
+    $('loggedEmail').textContent = user.email;
+    $('avatarInitial').textContent = displayName.charAt(0).toUpperCase();
+
+    $('continueBtn').onclick = () => location.href = next;
+    $('signOutBtn').onclick  = () => signOut(auth);
+  } else {
+    $('authSection').style.display    = 'block';
+    $('loggedInSection').style.display = 'none';
+  }
+});
+
+// ─── Firebase алдааны монгол мессеж ─────────────────────────────────────────
+function mnError(code) {
+  const m = {
+    'auth/invalid-email':         'Имэйл хаяг буруу байна.',
+    'auth/user-not-found':        'Ийм бүртгэл олдсонгүй.',
+    'auth/wrong-password':        'Нууц үг буруу байна.',
+    'auth/invalid-credential':    'Имэйл эсвэл нууц үг буруу байна.',
+    'auth/email-already-in-use':  'Энэ имэйл аль хэдийн бүртгэлтэй байна.',
+    'auth/weak-password':         'Нууц үг хэт богино байна (6+ тэмдэгт).',
+    'auth/popup-closed-by-user':  'Нэвтрэх цонх хаагдсан.',
+    'auth/too-many-requests':     'Хэт олон оролдлого. Түр хүлээнэ үү.',
+    'auth/network-request-failed':'Сүлжээний алдаа. Холболтоо шалгана уу.',
+    'auth/popup-blocked':         'Popup хаагдсан. Browser-ийн popup зөвшөөрлийг шалгана уу.'
+  };
+  return m[code] || ('Алдаа гарлаа: ' + code);
+}
+</script>
 </body>
 </html>
