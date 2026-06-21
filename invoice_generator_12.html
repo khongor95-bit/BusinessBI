@@ -184,48 +184,8 @@ body{background:var(--bg);color:var(--ink)}
 </head>
 <body>
 <!-- ── NAV ── -->
-<style>
-.bbi-header{background:#fff;padding:20px 0;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:200}
-.bbi-navbar{display:flex;justify-content:space-between;align-items:center}
-.bbi-logo{font-size:26px;font-weight:800;color:#b79a63;text-decoration:none;letter-spacing:-.02em;display:flex;align-items:center;gap:16px}
-.bbi-logo span{color:#111}
-.bbi-logo-sep{width:1px;height:24px;background:#e5e5e5;flex-shrink:0}
-.bbi-logo-title{font-size:17px;font-weight:700;color:#111;letter-spacing:-.01em;white-space:nowrap}
-.bbi-menu{display:flex;gap:38px;align-items:center}
-.bbi-menu a{text-decoration:none;color:#111;font-weight:500;font-size:15px;transition:color .2s}
-.bbi-menu a:hover,.bbi-menu a.active{color:#b79a63}
-.bbi-menu .cta{background:#111;color:#fff!important;padding:11px 22px;border-radius:50px;font-size:14px}
-.bbi-menu .cta:hover{background:#333}
-.bbi-burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:6px}
-.bbi-burger span{display:block;width:24px;height:2px;background:#111;transition:.3s}
-.bbi-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
-.bbi-burger.open span:nth-child(2){opacity:0}
-.bbi-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-@media(max-width:768px){
-  .bbi-menu{position:fixed;top:69px;left:0;right:0;background:#fff;flex-direction:column;gap:0;padding:10px 0;transform:translateY(-130%);transition:transform .3s;border-bottom:1px solid #e5e5e5;box-shadow:0 12px 30px -18px rgba(0,0,0,.3)}
-  .bbi-menu.open{transform:translateY(0)}
-  .bbi-menu a{padding:14px 5%;width:100%}
-  .bbi-menu .cta{margin:8px 5%;width:auto;text-align:center}
-  .bbi-burger{display:flex}
-  .bbi-logo-sep,.bbi-logo-title{display:none}
-}
-</style>
-<header class="bbi-header">
-  <div style="max-width:1480px;margin:0 auto;padding:0 28px;display:flex;justify-content:space-between;align-items:center">
-    <a href="index.html" class="bbi-logo">Business<span>BI</span>
-      <div class="bbi-logo-sep"></div>
-      <span class="bbi-logo-title">Нэхэмжлэх үүсгэгч</span>
-    </a>
-    <nav class="bbi-menu" id="bbiMenu">
-      <a href="tools.html" class="active">Хэрэгслүүд</a>
-      <a href="index.html#custom">Захиалгат Dashboard</a>
-      <a href="accountants.html">Нягтлан холбох</a>
-      <a href="index.html#courses">Сургалт</a>
-      <a href="index.html#contact" class="cta">Холбогдох</a>
-    </nav>
-    <button class="bbi-burger" id="bbiBurger" aria-label="Цэс"><span></span><span></span><span></span></button>
-  </div>
-</header>
+
+
 
 <div class="wrap">
   <div class="layout">
