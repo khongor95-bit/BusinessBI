@@ -28,6 +28,13 @@ header{background:#fff;padding:20px 0;border-bottom:1px solid #e5e5e5;position:s
 .burger.open span:nth-child(2){opacity:0}
 .burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
 
+/* AUTH ТОВЧ */
+.btn-login{background:transparent;color:#111;border:1.5px solid #ddd;padding:9px 20px;border-radius:50px;font-size:14px;font-weight:600;transition:.2s;white-space:nowrap}
+.btn-login:hover{border-color:#b79a63;color:#b79a63}
+.btn-user{display:flex;align-items:center;gap:8px;background:#f5f5f5;border:none;padding:7px 16px 7px 7px;border-radius:50px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s;text-decoration:none;color:#111}
+.btn-user:hover{background:#eee}
+.btn-user .av{width:28px;height:28px;border-radius:50%;background:#0f5e57;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+
 /* HERO */
 .hero{margin-top:30px}
 .hero-slider{position:relative;border-radius:30px;overflow:hidden;height:500px}
@@ -139,6 +146,9 @@ footer{background:#111;color:#fff;padding:60px 0 40px;margin-top:0}
       <a href="#courses">Сургалт</a>
       <a href="#contact" class="cta">Холбогдох</a>
     </nav>
+    <div id="authNav" style="display:flex;align-items:center;gap:10px">
+      <!-- Firebase auth state ажиллаж байна -->
+    </div>
     <button class="burger" id="burger" aria-label="Цэс"><span></span><span></span><span></span></button>
   </div>
 </header>
@@ -275,6 +285,38 @@ footer{background:#111;color:#fff;padding:60px 0 40px;margin-top:0}
     <div class="foot-bottom">© 2026 BusinessBI.mn. Бүх эрх хуулиар хамгаалагдсан.</div>
   </div>
 </footer>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const app = initializeApp({
+  apiKey: "AIzaSyAXslBVU1__Ibhk3P7TEeJRS2oi-8fi6Jc",
+  authDomain: "businessbi.firebaseapp.com",
+  projectId: "businessbi",
+  storageBucket: "businessbi.firebasestorage.app",
+  messagingSenderId: "84765528435",
+  appId: "1:84765528435:web:edf7066e6399dbc76af506"
+});
+const auth = getAuth(app);
+const nav  = document.getElementById('authNav');
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    const name    = user.displayName || user.email.split('@')[0];
+    const initial = name.charAt(0).toUpperCase();
+    nav.innerHTML = `
+      <a href="dashboard.html" class="btn-user">
+        <span class="av">${initial}</span>${name}
+      </a>
+      <button id="signOutBtn" style="background:none;border:none;font-size:13px;color:#888;cursor:pointer;font-family:inherit">Гарах</button>
+    `;
+    document.getElementById('signOutBtn').onclick = () => signOut(auth);
+  } else {
+    nav.innerHTML = `<a href="auth.html" class="btn-login">Нэвтрэх</a>`;
+  }
+});
+</script>
 
 <script>
   const burger=document.getElementById('burger'), menu=document.getElementById('menu');
