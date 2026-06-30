@@ -70,10 +70,10 @@ header{background:#fff;padding:20px 0;border-bottom:1px solid #e5e5e5;position:s
 .product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px}
 .product{background:#f8f8f8;border-radius:18px;overflow:hidden;transition:.3s}
 .product:hover{transform:translateY(-5px)}
-.product img{width:100%;height:210px;object-fit:cover;object-position:top;transition:transform .4s ease}
+.product img{width:100%;height:200px;object-fit:cover;object-position:left top;transition:transform .4s ease;display:block}
 .product:hover img{transform:scale(1.04)}
-.product .thumb{overflow:hidden;position:relative}
-.product .thumb .free-tag{position:absolute;top:12px;right:12px;background:#2f6b4f;color:#fff;font-size:11px;font-weight:700;letter-spacing:.04em;padding:5px 12px;border-radius:50px;z-index:2}
+.product .thumb{overflow:hidden;position:relative;background:#eef1f0;border-bottom:1px solid #e4e7e6}
+.product .thumb .free-tag{position:absolute;top:12px;right:12px;background:#2f6b4f;color:#fff;font-size:11px;font-weight:700;letter-spacing:.04em;padding:5px 12px;border-radius:50px;z-index:2;box-shadow:0 2px 8px -2px rgba(0,0,0,.3)}
 .product-info{padding:22px}
 .product-info .cat{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#b79a63;margin-bottom:8px}
 .product-info h4{font-size:21px;margin-bottom:14px;font-weight:700;letter-spacing:-.01em}
@@ -191,7 +191,7 @@ footer{background:#111;color:#fff;padding:60px 0 40px;margin-top:0}
     <p class="section-sub">Нягтлан, санхүүчдэд зориулсан автоматжуулсан бэлэн системүүд — бүртгэлгүйгээр шууд ашиглаж эхэл. Бусад бэлэн системийг <a href="market.html" style="color:#b79a63;text-decoration:underline">дэлгүүрээс</a> үзнэ үү.</p>
     <div class="product-grid">
       <a class="product" href="ndsh_hhoat_converter.html" style="text-decoration:none;color:inherit">
-        <div class="thumb"><span class="free-tag">ҮНЭГҮЙ</span><img src="img/tool-ndsh.png" alt="НДШ тайлан dashboard"></div>
+        <div class="thumb"><span class="free-tag">ҮНЭГҮЙ</span><img src="img/tool-ndsh.jpg" alt="НДШ тайлан dashboard"></div>
         <div class="product-info">
           <div class="cat">Татвар</div>
           <h4>НДШ / ХХОАТ хөрвүүлэгч</h4>
@@ -199,7 +199,7 @@ footer{background:#111;color:#fff;padding:60px 0 40px;margin-top:0}
         </div>
       </a>
       <a class="product" href="invoice_generator_12.html" style="text-decoration:none;color:inherit">
-        <div class="thumb"><span class="free-tag">ҮНЭГҮЙ</span><img src="img/tool-invoice.png" alt="Автомат нэхэмжлэх"></div>
+        <div class="thumb"><span class="free-tag">ҮНЭГҮЙ</span><img src="img/tool-invoice.jpg" alt="Автомат нэхэмжлэх"></div>
         <div class="product-info">
           <div class="cat">Нэхэмжлэх</div>
           <h4>Автомат нэхэмжлэх</h4>
@@ -207,7 +207,7 @@ footer{background:#111;color:#fff;padding:60px 0 40px;margin-top:0}
         </div>
       </a>
       <a class="product" href="financial_dashboard.html" style="text-decoration:none;color:inherit">
-        <div class="thumb"><span class="free-tag">ҮНЭГҮЙ</span><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80" alt="Санхүүгийн шинжилгээ"></div>
+        <div class="thumb"><span class="free-tag">ҮНЭГҮЙ</span><img src="img/tool-financial.jpg" alt="Санхүүгийн шинжилгээ dashboard"></div>
         <div class="product-info">
           <div class="cat">Санхүү</div>
           <h4>Санхүүгийн тайлангийн шинжилгээ</h4>
