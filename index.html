@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BusinessBI.mn — Dashboard, хэрэгсэл, шийдэл</title>
+<title>BusinessBI.mn — Санхүүгийн бэлэн системүүд ба нягтлан бодогчдын platform</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -27,13 +27,6 @@ header{background:#fff;padding:20px 0;border-bottom:1px solid #e5e5e5;position:s
 .burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
 .burger.open span:nth-child(2){opacity:0}
 .burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-
-/* AUTH ТОВЧ */
-.btn-login{background:transparent;color:#111;border:1.5px solid #ddd;padding:9px 20px;border-radius:50px;font-size:14px;font-weight:600;transition:.2s;white-space:nowrap}
-.btn-login:hover{border-color:#b79a63;color:#b79a63}
-.btn-user{display:flex;align-items:center;gap:8px;background:#f5f5f5;border:none;padding:7px 16px 7px 7px;border-radius:50px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s;text-decoration:none;color:#111}
-.btn-user:hover{background:#eee}
-.btn-user .av{width:28px;height:28px;border-radius:50%;background:#0f5e57;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
 
 /* HERO */
 .hero{margin-top:30px}
@@ -61,7 +54,7 @@ header{background:#fff;padding:20px 0;border-bottom:1px solid #e5e5e5;position:s
 .intro p{color:#555;font-size:18px;line-height:1.8}
 
 /* CARDS */
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:25px;margin-bottom:90px;align-items:stretch}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:25px;margin-bottom:90px;align-items:stretch}
 .card{background:#fff;border-radius:20px;overflow:hidden;transition:.3s;box-shadow:0 4px 16px -8px rgba(0,0,0,.18);text-decoration:none;color:#111;display:flex;flex-direction:column}
 .card:hover{transform:translateY(-6px);box-shadow:0 22px 44px -20px rgba(0,0,0,.45)}
 .card img{width:100%;aspect-ratio:3/2;object-fit:cover;display:block}
@@ -74,10 +67,13 @@ header{background:#fff;padding:20px 0;border-bottom:1px solid #e5e5e5;position:s
 .request{background:#fff;padding:90px 0}
 .section-title{font-size:48px;font-weight:800;margin-bottom:14px;letter-spacing:-.02em}
 .section-sub{font-size:18px;color:#666;margin-bottom:50px;max-width:60ch}
-.product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:30px}
+.product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px}
 .product{background:#f8f8f8;border-radius:18px;overflow:hidden;transition:.3s}
 .product:hover{transform:translateY(-5px)}
-.product img{width:100%;height:210px;object-fit:cover}
+.product img{width:100%;height:210px;object-fit:cover;object-position:top;transition:transform .4s ease}
+.product:hover img{transform:scale(1.04)}
+.product .thumb{overflow:hidden;position:relative}
+.product .thumb .free-tag{position:absolute;top:12px;right:12px;background:#2f6b4f;color:#fff;font-size:11px;font-weight:700;letter-spacing:.04em;padding:5px 12px;border-radius:50px;z-index:2}
 .product-info{padding:22px}
 .product-info .cat{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#b79a63;margin-bottom:8px}
 .product-info h4{font-size:21px;margin-bottom:14px;font-weight:700;letter-spacing:-.01em}
@@ -93,11 +89,6 @@ header{background:#fff;padding:20px 0;border-bottom:1px solid #e5e5e5;position:s
 .step h4{font-size:23px;font-weight:700;margin:14px 0 10px;letter-spacing:-.01em}
 .step p{color:#666;font-size:15px;line-height:1.6}
 
-/* CTA BAND */
-.band{background:#111;color:#fff;border-radius:30px;padding:70px 60px;display:flex;justify-content:space-between;align-items:center;gap:40px;flex-wrap:wrap;margin:30px 0}
-.band h2{font-size:44px;font-weight:800;letter-spacing:-.02em;max-width:16ch;line-height:1.05}
-.band a{background:#b79a63;color:#fff;text-decoration:none;padding:17px 42px;border-radius:50px;font-weight:600;font-size:17px;white-space:nowrap;transition:transform .15s}
-.band a:hover{transform:translateY(-2px)}
 
 /* FOOTER */
 footer{background:#111;color:#fff;padding:60px 0 40px;margin-top:0}
@@ -128,8 +119,6 @@ footer{background:#111;color:#fff;padding:60px 0 40px;margin-top:0}
   .dots{left:30px}
   .intro h2{font-size:38px}
   .section-title{font-size:34px}
-  .band{padding:46px 30px}
-  .band h2{font-size:30px}
 }
 *:focus-visible{outline:2px solid #b79a63;outline-offset:3px}
 </style>
@@ -140,15 +129,11 @@ footer{background:#111;color:#fff;padding:60px 0 40px;margin-top:0}
   <div class="container navbar">
     <a href="#" class="logo">Business<span>BI</span></a>
     <nav class="menu" id="menu">
-      <a href="tools.html">Хэрэгслүүд</a>
-      <a href="#custom">Захиалгат Dashboard</a>
-      <a href="accountants.html">Нягтлан холбох</a>
-      <a href="#courses">Сургалт</a>
+      <a href="tools.html">Бэлэн системүүд</a>
+      <a href="#tools">Үнэгүй татах</a>
+      <a href="accountants.html">Нягтлан хайх</a>
       <a href="#contact" class="cta">Холбогдох</a>
     </nav>
-    <div id="authNav" style="display:flex;align-items:center;gap:10px">
-      <!-- Firebase auth state ажиллаж байна -->
-    </div>
     <button class="burger" id="burger" aria-label="Цэс"><span></span><span></span><span></span></button>
   </div>
 </header>
@@ -163,10 +148,10 @@ footer{background:#111;color:#fff;padding:60px 0 40px;margin-top:0}
       <div class="hero-content">
         <div class="tag">Бизнесийн оюун ухаан · Монгол</div>
         <h1>Тоо баримтаа шийдвэр болгоё</h1>
-        <p>Бэлэн dashboard хэрэгсэл, танай өгөгдөлд тааруулсан захиалгат шийдэл, мэргэжлийн сургалт — нэг дороос.</p>
+        <p>Бэлэн Dashboard загварууд, санхүүгийн автоматжуулсан файлуудыг нэг дороос.</p>
         <div class="btns">
-          <a href="tools.html" class="btn btn-light">Хэрэгслүүдийг үзэх</a>
-          <a href="#custom" class="btn btn-line">Захиалгат хийлгэх</a>
+          <a href="tools.html" class="btn btn-light">Бүх загварыг үзэх</a>
+          <a href="#tools" class="btn btn-line">Үнэгүй татах</a>
         </div>
       </div>
       <div class="dots" id="dots"></div>
@@ -176,71 +161,59 @@ footer{background:#111;color:#fff;padding:60px 0 40px;margin-top:0}
 
 <section class="container intro" id="templates">
   <div>
-    <h2>Бэлэн <em>Dashboard</em> ба захиалгат шийдэл</h2>
+    <h2>Бэлэн <em>Dashboard</em> болон Санхүүгийн загварууд</h2>
   </div>
   <div>
-    <p>Excel, Power BI, санхүү, төсөл, борлуулалтын хяналтын самбарууд — бүгд бүрэн засварлагдах, бодит бизнесийн тайланд зориулсан. Загвар биш үр дүн: өгөгдлөө холбоод л ажиллаж эхэлнэ.</p>
+    <p>Excel, Power BI, санхүү, төсөл, борлуулалтын автоматжуулсан бэлэн системүүд — бүгд бүрэн засварлагдах, бодит бизнесийн тайланд зориулсан. Загвар биш үр дүн: өгөгдлөө холбоод л ажиллаж эхэлнэ.</p>
   </div>
 </section>
 
 <section class="container">
   <div class="cards">
     <a class="card free" href="accountants.html">
-      <img src="img/accounting.png" alt="Нягтлан холбох">
-      <div class="card-foot"><span class="label">Нягтлан холбох</span><span class="go">Үзэх →</span></div>
+      <img src="img/accounting.png" alt="Нягтлан хайх">
+      <div class="card-foot"><span class="label">Нягтлан хайх</span><span class="go">Хайх →</span></div>
     </a>
     <a class="card" href="tools.html">
       <img src="img/excel-dashboard.png" alt="Excel Dashboard">
       <div class="card-foot"><span class="label">Excel Dashboard</span><span class="go">Үзэх →</span></div>
     </a>
-    <a class="card" href="index.html#custom">
-      <img src="img/powerbi-dashboard.png" alt="Power BI тайлан">
-      <div class="card-foot"><span class="label">Power BI тайлан</span><span class="go">Захиалах →</span></div>
-    </a>
-    <a class="card" href="index.html#courses">
-      <img src="img/training.png" alt="Сургалт">
-      <div class="card-foot"><span class="label">Сургалт</span><span class="go">Үзэх →</span></div>
+    <a class="card" href="#tools">
+      <img src="img/powerbi-dashboard.png" alt="Үнэгүй татах">
+      <div class="card-foot"><span class="label">Үнэгүй татах</span><span class="go">Татах →</span></div>
     </a>
   </div>
 </section>
 
-<section class="request" id="custom">
+<section class="request" id="tools">
   <div class="container">
-    <h2 class="section-title">Захиалгат Dashboard</h2>
-    <p class="section-sub">Танай өгөгдөл, процесст тааруулж бид бүтээж өгнө. Үнэ нь ажлын хэмжээнээс хамаарна.</p>
+    <h2 class="section-title">Бүх <em style="font-style:normal;color:#b79a63">бүтээгдэхүүн</em></h2>
+    <p class="section-sub">Нягтлан, санхүүчдэд зориулсан автоматжуулсан бэлэн системүүд. Зарим нь үнэгүй, бусад нь хэрэгцээнд тань тохирсон үнэтэй.</p>
     <div class="product-grid">
-      <div class="product">
-        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80">
+      <a class="product" href="salary_journal.html" style="text-decoration:none;color:inherit">
+        <div class="thumb"><span class="free-tag">ҮНЭГҮЙ</span><img src="img/tool-ndsh.png" alt="НДШ тайлан dashboard"></div>
         <div class="product-info">
-          <div class="cat">AI</div>
-          <h4>AI хяналтын самбар</h4>
-          <div class="product-bottom"><span class="price">₮250,000-аас</span><a href="#contact">Захиалах →</a></div>
+          <div class="cat">Татвар</div>
+          <h4>НДШ / ХХОАТ хөрвүүлэгч</h4>
+          <div class="product-bottom"><span class="price" style="color:#2f6b4f">Үнэгүй</span><span style="font-size:14px;font-weight:600;color:#b79a63">Нээх →</span></div>
         </div>
-      </div>
-      <div class="product">
-        <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80">
+      </a>
+      <a class="product" href="#" style="text-decoration:none;color:inherit">
+        <div class="thumb"><img src="img/tool-invoice.png" alt="Автомат нэхэмжлэх"></div>
         <div class="product-info">
-          <div class="cat">Excel</div>
-          <h4>Excel Dashboard</h4>
-          <div class="product-bottom"><span class="price">₮150,000-аас</span><a href="#contact">Захиалах →</a></div>
+          <div class="cat">Нэхэмжлэх</div>
+          <h4>Автомат нэхэмжлэх</h4>
+          <div class="product-bottom"><span class="price">₮49,000</span><span style="font-size:14px;font-weight:600;color:#b79a63">Дэлгэрэнгүй →</span></div>
         </div>
-      </div>
-      <div class="product">
-        <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=600&q=80">
+      </a>
+      <a class="product" href="#" style="text-decoration:none;color:inherit">
+        <div class="thumb"><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80" alt="Санхүүгийн шинжилгээ"></div>
         <div class="product-info">
-          <div class="cat">Power BI</div>
-          <h4>Power BI шийдэл</h4>
-          <div class="product-bottom"><span class="price">₮900,000-аас</span><a href="#contact">Захиалах →</a></div>
+          <div class="cat">Санхүү</div>
+          <h4>Санхүүгийн тайлангийн шинжилгээ</h4>
+          <div class="product-bottom"><span class="price">₮150,000</span><span style="font-size:14px;font-weight:600;color:#b79a63">Дэлгэрэнгүй →</span></div>
         </div>
-      </div>
-      <div class="product">
-        <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&q=80">
-        <div class="product-info">
-          <div class="cat">Дата</div>
-          <h4>Дата аналитик</h4>
-          <div class="product-bottom"><span class="price">₮350,000-аас</span><a href="#contact">Захиалах →</a></div>
-        </div>
-      </div>
+      </a>
     </div>
   </div>
 </section>
@@ -249,15 +222,8 @@ footer{background:#111;color:#fff;padding:60px 0 40px;margin-top:0}
   <h2 class="section-title">Хэрхэн ажилладаг</h2>
   <div class="steps-grid">
     <div class="step"><div class="n">01</div><h4>Хэрэгцээгээ хэл</h4><p>Бизнес, өгөгдөл, хүсэж буй үр дүнгээ товч тайлбарла.</p></div>
-    <div class="step"><div class="n">02</div><h4>Шийдлээ ав</h4><p>Бэлэн хэрэгсэл сонгох эсвэл захиалгат dashboard бүтээлгэх.</p></div>
+    <div class="step"><div class="n">02</div><h4>Шийдлээ ав</h4><p>Бэлэн систем сонгох эсвэл нягтлан бодогчтой холбогдох.</p></div>
     <div class="step"><div class="n">03</div><h4>Үр дүнг хар</h4><p>Өгөгдлөө холбоод л шийдвэр гаргахуйц самбараа ашигла.</p></div>
-  </div>
-</section>
-
-<section class="container" id="courses">
-  <div class="band">
-    <h2>Өөрөө хийж сурмаар байна уу?</h2>
-    <a href="#contact">Сургалт үзэх</a>
   </div>
 </section>
 
@@ -266,14 +232,13 @@ footer{background:#111;color:#fff;padding:60px 0 40px;margin-top:0}
     <div class="foot-grid">
       <div class="foot-col">
         <a href="#" class="logo">Business<span>BI</span></a>
-        <p style="color:#999;margin-top:14px;max-width:30ch;font-size:15px;line-height:1.6">Тоо баримтыг шийдвэр болгодог Монголын BI хэрэгсэл, шийдэл.</p>
+        <p style="color:#999;margin-top:14px;max-width:32ch;font-size:15px;line-height:1.6">Санхүүгийн автоматжуулсан бэлэн системүүд, нягтлан бодогчдыг холбосон Монголын platform.</p>
       </div>
       <div class="foot-col">
         <h5>Үйлчилгээ</h5>
-        <a href="tools.html">Хэрэгслүүд</a>
-        <a href="#custom">Захиалгат Dashboard</a>
-        <a href="accountants.html">Нягтлан холбох</a>
-        <a href="#courses">Сургалт</a>
+        <a href="tools.html">Бэлэн системүүд</a>
+        <a href="#tools">Үнэгүй татах</a>
+        <a href="accountants.html">Нягтлан хайх</a>
       </div>
       <div class="foot-col">
         <h5>Холбоо барих</h5>
@@ -285,38 +250,6 @@ footer{background:#111;color:#fff;padding:60px 0 40px;margin-top:0}
     <div class="foot-bottom">© 2026 BusinessBI.mn. Бүх эрх хуулиар хамгаалагдсан.</div>
   </div>
 </footer>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-const app = initializeApp({
-  apiKey: "AIzaSyAXslBVU1__Ibhk3P7TEeJRS2oi-8fi6Jc",
-  authDomain: "businessbi.firebaseapp.com",
-  projectId: "businessbi",
-  storageBucket: "businessbi.firebasestorage.app",
-  messagingSenderId: "84765528435",
-  appId: "1:84765528435:web:edf7066e6399dbc76af506"
-});
-const auth = getAuth(app);
-const nav  = document.getElementById('authNav');
-
-onAuthStateChanged(auth, user => {
-  if (user) {
-    const name    = user.displayName || user.email.split('@')[0];
-    const initial = name.charAt(0).toUpperCase();
-    nav.innerHTML = `
-      <a href="dashboard.html" class="btn-user">
-        <span class="av">${initial}</span>${name}
-      </a>
-      <button id="signOutBtn" style="background:none;border:none;font-size:13px;color:#888;cursor:pointer;font-family:inherit">Гарах</button>
-    `;
-    document.getElementById('signOutBtn').onclick = () => signOut(auth);
-  } else {
-    nav.innerHTML = `<a href="auth.html" class="btn-login">Нэвтрэх</a>`;
-  }
-});
-</script>
 
 <script>
   const burger=document.getElementById('burger'), menu=document.getElementById('menu');
