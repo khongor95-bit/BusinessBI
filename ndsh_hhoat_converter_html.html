@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>НДШ → ХХОАТ хөрвүүлэгч</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1a2b25; --bg:#f0f3f1; --card:#ffffff;
+    --green:#216a4c; --green-bright:#2e8b62; --green-soft:#eaf3ee;
+    --accent:#216a4c; --gold:#b8862f;
+    --line:#e3e7e4; --line-soft:#eef1ef; --muted:#6b7670; --danger:#c0492b; --ok:#2e8b62;
+    --shadow:0 1px 3px rgba(20,40,30,.05), 0 6px 20px rgba(20,40,30,.04);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Inter','Helvetica Neue',-apple-system,sans-serif;
+    background:var(--bg);
+    color:var(--ink); min-height:100vh; padding:0 0 60px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .topbar{
+    background:#1a4d38;
+    color:#fff; padding:22px 40px; position:relative;
+  }
+  .topbar h1{font-size:21px; letter-spacing:.2px; font-weight:700; font-family:'Inter',sans-serif}
+  .topbar p{font-size:12.5px; opacity:.78; margin-top:4px; font-weight:400}
+  .wrap{max-width:1880px; margin:18px auto 0; padding:0 28px}
+  .panel{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:18px 20px; box-shadow:var(--shadow); margin-bottom:16px;
+  }
+  .step-label{
+    font-size:10.5px; letter-spacing:1.2px;
+    text-transform:uppercase; color:var(--muted); font-weight:600; margin-bottom:5px;
+  }
+  .panel h2{font-size:17px; margin-bottom:16px; color:var(--ink); font-weight:700}
+  /* month cards — нягт, цомхон хэвтээ хэлбэр */
+  .m-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-top:8px}
+  .m-card{
+    border:1.5px dashed var(--line); border-radius:10px; padding:10px 8px;
+    text-align:center; cursor:pointer; transition:.15s; background:#fafbfa;
+    position:relative; min-height:74px; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:4px;
+  }
+  .m-card:hover{border-color:var(--green-bright); background:var(--green-soft)}
+  .m-card.done{border-style:solid; border-color:#bfe0cc; background:var(--green-soft)}
+  .m-card .mtitle{font-size:13px; font-weight:600}
+  .m-card .micon{font-size:18px; line-height:1; color:var(--muted)}
+  .m-card .mhint{font-size:10px; color:var(--muted)}
+  .m-card .mcount{font-size:10.5px; color:var(--green); font-weight:600}
+  .m-card .mname{font-size:9px; color:var(--muted); max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .m-card.err{border-color:#e6c0b5; background:#fcf2ee}
+  .m-card .merr{font-size:9.5px; color:var(--danger); max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .badge-num{
+    position:absolute; top:-7px; left:-7px; width:20px; height:20px; border-radius:50%;
+    background:#c7cdc9; color:#fff; font-size:10.5px; font-weight:600;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .m-card.done .badge-num{background:var(--ok)}
+  .m-del{
+    position:absolute; top:-7px; right:-7px; width:20px; height:20px; border-radius:50%;
+    background:var(--danger); color:#fff; font-size:13px; line-height:1; font-weight:700;
+    border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    padding:0; opacity:.85; transition:.12s; z-index:2;
+  }
+  .m-del:hover{opacity:1; transform:scale(1.12)}
+  /* params */
+  .params{display:grid; grid-template-columns:1fr 1fr; gap:14px 24px; margin-top:4px}
+  .law-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:4px}
+  .law-box{border:1px solid var(--line); border-radius:10px; padding:14px 16px; background:#fafbfa}
+  .law-h{font-size:11px; font-weight:600; color:var(--green); text-transform:uppercase; letter-spacing:.4px; margin-bottom:9px}
+  .law-t{width:100%; border-collapse:collapse; font-size:12.5px}
+  .law-t td{padding:5px 4px; border-bottom:1px solid var(--line-soft)}
+  .law-t td:last-child{text-align:right; font-weight:600; color:var(--ink)}
+  .law-t tr:last-child td{border-bottom:none}
+  /* эвхэгддэг лавлагаа — бүдэг, жижиг */
+  .ref-panel{border:1px solid var(--line); border-radius:12px; background:var(--card); margin-bottom:18px; overflow:hidden}
+  .ref-panel summary{cursor:pointer; padding:14px 18px; font-size:12.5px; font-weight:600; color:var(--muted); list-style:none; user-select:none; display:flex; align-items:center; gap:8px}
+  .ref-panel summary::-webkit-details-marker{display:none}
+  .ref-panel summary::before{content:'▸'; font-size:10px; transition:transform .15s; color:var(--muted)}
+  .ref-panel[open] summary::before{transform:rotate(90deg)}
+  .ref-panel summary:hover{color:var(--ink)}
+  .ref-body{padding:2px 18px 18px}
+  .cfg-row{display:grid; grid-template-columns:160px 1fr; gap:14px 22px; margin-bottom:6px; align-items:end}
+  .cfg-row select{width:100%; padding:9px 11px; border:1px solid var(--line); border-radius:9px; font-size:14px; background:#fff; color:var(--ink)}
+  .field label{display:block; font-size:12px; color:var(--muted); margin-bottom:5px}
+  .field input{
+    width:100%; padding:10px 12px; border:1.5px solid var(--line); border-radius:8px;
+    font-size:15px; background:#fff;
+  }
+  .field input:focus{outline:none; border-color:var(--green-bright)}
+  /* download button — цорын ганц тод элемент */
+  .dl-btn{
+    display:inline-flex; align-items:center; gap:10px; background:var(--green);
+    color:#fff; border:none; padding:14px 26px; border-radius:10px; font-size:15px;
+    font-weight:600; cursor:pointer;
+    transition:.15s;
+  }
+  .dl-btn:hover{background:#1a5840}
+  .dl-btn:disabled{background:#d2d6d3; color:#fff; cursor:not-allowed}
+  .hint{font-size:12px; color:var(--muted); margin-top:13px; line-height:1.55}
+  .hidden{display:none}
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    background:var(--ink); color:#fff; padding:12px 22px; border-radius:10px;
+    font-size:13.5px; box-shadow:var(--shadow);
+    opacity:0; transition:.25s; pointer-events:none; z-index:99;
+  }
+  .toast.show{opacity:1; bottom:34px}
+  .foot{text-align:center; font-size:11px; color:var(--muted); margin-top:14px}
+
+  /* two-column layout: зүүн нарийн, баруун dashboard өргөн */
+  .layout{display:grid; grid-template-columns:340px minmax(0,1fr); gap:20px; align-items:start}
+  .col-left .panel{margin-bottom:14px}
+  .col-right{position:static}
+  .m-grid{grid-template-columns:repeat(3,1fr)}
+  .dash{padding:20px 24px}
+  .dash-head{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px}
+  .dash h2{margin-bottom:0}
+  .dash-empty{font-size:13px; color:var(--muted); padding:60px 6px; text-align:center}
+  /* Гол KPI картууд — дугуй icon-той */
+  .kpi-cards{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:14px}
+  .kpi-card{display:flex; align-items:center; gap:13px; border:1px solid var(--line); border-radius:12px; padding:15px 16px; background:#fff}
+  .kpi-card.accent-green{background:linear-gradient(135deg,#eef6f1,#fff)}
+  .kpi-card.accent-gold{background:linear-gradient(135deg,#faf3e4,#fff)}
+  .kpi-ic{width:48px; height:48px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#fff}
+  .kpi-ic svg{width:24px; height:24px}
+  .kpi-ic.g{background:#3d8a5f}
+  .kpi-ic.blue{background:#3b7dd8}
+  .kpi-ic.gold{background:#cda73a}
+  .kpi-card.accent-blue{background:linear-gradient(135deg,#eef3fb,#fff)}
+  .kpi-card.accent-blue .val{color:#2f6cc0}
+  .kpi-card.accent-gold .val{color:#a8791f}
+  .kpi-tx{min-width:0}
+  .kpi-tx .lbl{font-size:11px; color:var(--muted); font-weight:500; line-height:1.2}
+  .kpi-tx .val{font-size:21px; font-weight:800; color:var(--ink); line-height:1.15; margin:2px 0 1px; white-space:nowrap}
+  .kpi-tx .val .u{font-size:13px; font-weight:600; color:var(--muted)}
+  .kpi-tx .sub{font-size:10px; color:var(--muted); line-height:1.2}
+  /* dashboard chart grid — 3 багана */
+  .dash-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:14px}
+  .chart-card{border:1px solid var(--line); border-radius:12px; padding:14px 16px; background:#fff; min-width:0}
+  .chart-card.span2{grid-column:span 2}
+  .chart-card.span3{grid-column:span 3}
+  /* бүрэлдэхүүн зурвар */
+  .comp-wrap{margin-top:4px}
+  .comp-line{display:grid; grid-template-columns:46px 1fr; gap:10px; align-items:center}
+  .comp-title{font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.3px}
+  .stack-bar{display:flex; height:24px; border-radius:6px; overflow:hidden; background:#eef1ef}
+  .stack-bar span{display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:#fff; min-width:0; overflow:hidden}
+  .stack-legend{display:flex; flex-wrap:wrap; gap:4px 14px; margin:5px 0 2px 56px; font-size:11.5px; color:var(--ink)}
+  .stack-legend i{display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:5px; vertical-align:-1px}
+  /* Insights мөр */
+  .insights{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; border-top:1px solid var(--line); padding-top:16px}
+  .insight{display:flex; gap:10px; align-items:flex-start}
+  .insight-ic{width:34px; height:34px; border-radius:50%; background:var(--green-soft); color:var(--green); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0}
+  .insight-tx .h{font-size:11.5px; font-weight:700; color:var(--ink); margin-bottom:2px}
+  .insight-tx .b{font-size:11px; color:var(--muted); line-height:1.4}
+  .card-head{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap}
+  .card-head .dash-h{margin-bottom:0}
+  .dash-h{font-size:11px; font-weight:600; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:.3px}
+  .chart{width:100%}
+  .chart svg{width:100%; height:auto; display:block}
+  .chart-tabs{display:flex; gap:5px; flex-wrap:wrap}
+  .ctab{border:1px solid var(--line); background:#fff; color:var(--muted); border-radius:6px; padding:4px 9px; font-size:10.5px; font-weight:500; cursor:pointer; transition:.15s}
+  .ctab:hover{border-color:var(--green-bright); color:var(--ink)}
+  .ctab.active{background:var(--green); color:#fff; border-color:var(--green)}
+  .chart-legend{display:flex; flex-wrap:wrap; gap:6px 18px; margin:2px 0 10px; font-size:12px; color:var(--ink)}
+  .chart-legend span{display:inline-flex; align-items:center; gap:6px}
+  .chart-legend i{width:12px; height:12px; border-radius:3px; display:inline-block}
+  .chart-legend i.line{width:18px; height:0; border-top:2.5px solid #14402e; border-radius:0; position:relative}
+  .chart-legend i.line::after{content:''; position:absolute; left:6px; top:-3px; width:6px; height:6px; border-radius:50%; background:#fff; border:2px solid #14402e}
+
+  @media(max-width:1100px){
+    .layout{grid-template-columns:1fr}
+    .m-grid{grid-template-columns:repeat(6,1fr)} .kpi-cards{grid-template-columns:repeat(2,1fr)}
+    .dash-grid{grid-template-columns:repeat(2,1fr)} .chart-card.span2,.chart-card.span3{grid-column:span 2}
+    .insights{grid-template-columns:repeat(2,1fr)}
+  }
+  @media(max-width:680px){
+    .m-grid{grid-template-columns:repeat(4,1fr)}
+    .params{grid-template-columns:1fr} .law-grid{grid-template-columns:1fr}
+    .kpi-cards{grid-template-columns:1fr}
+    .dash-grid{grid-template-columns:1fr} .chart-card.span2,.chart-card.span3{grid-column:span 1}
+    .insights{grid-template-columns:1fr}
+    .cfg-row{grid-template-columns:1fr} .topbar{padding:20px 22px}
+  }
+  @media(max-width:420px){
+    .m-grid{grid-template-columns:repeat(3,1fr)}
+  }
+
+.bbi-nav{background:#fff;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:center}
+.bbi-nav-inner{max-width:1880px;margin:0 auto;padding:0 28px;display:flex;justify-content:space-between;align-items:center;width:100%}
+.bbi-logo{font-size:20px;font-weight:800;color:#b79a63;text-decoration:none;letter-spacing:-.02em;display:flex;align-items:center;gap:12px}
+.bbi-logo span{color:#111}
+.bbi-logo-sep{width:1px;height:20px;background:#e5e7eb;flex-shrink:0}
+.bbi-logo-title{font-size:14px;font-weight:600;color:#6b7280}
+.bbi-nav-links{display:flex;gap:28px;align-items:center}
+.bbi-nav-links a{text-decoration:none;color:#374151;font-weight:500;font-size:13px;transition:color .15s}
+.bbi-nav-links a:hover{color:#b79a63}
+.bbi-back{display:flex;align-items:center;gap:5px;color:#6b7280!important;font-weight:600!important}
+
+</style>
+</head>
+<body>
+<nav class="bbi-nav">
+  <div class="bbi-nav-inner">
+    <a href="index.html" class="bbi-logo">Business<span>BI</span>
+      <div class="bbi-logo-sep"></div>
+      <span class="bbi-logo-title">НДШ / ХХОАТ хөрвүүлэгч</span>
+    </a>
+    <div class="bbi-nav-links">
+      <a href="tools.html" class="bbi-back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        Хэрэгслүүд
+      </a>
+      <a href="index.html">Нүүр хуудас</a>
+    </div>
+  </div>
+</nav>
+<div class="wrap">
+ <div class="layout">
+  <!-- LEFT: month input + download -->
+  <div class="col-left">
+    <div class="panel" id="monthPanel">
+      <div class="step-label">Алхам 1 — Сарын тайлан</div>
+      <h2 id="monthHeading">НДШ тайлан оруулах</h2>
+      <div class="m-grid" id="mGrid"></div>
+      <p class="hint">Сар бүр дээр дарж тухайн сарын НДШ тайлангийн PDF-ийг оруулна уу. Оруулсан сараар улирлын тайлан автоматаар бэлдэнэ.</p>
+    </div>
+
+    <div class="panel" id="dlPanel">
+      <div class="step-label">Алхам 2 — Татах</div>
+      <button class="dl-btn" id="dlBtn" disabled>⬇ Excel файл татах</button>
+      <p class="hint" id="dlHint">Дор хаяж нэг сарын тайлан оруулна уу.</p>
+    </div>
+
+    <details class="ref-panel">
+      <summary>Татварын аргачлал ба хуулийн лавлагаа</summary>
+      <div class="ref-body">
+      <div class="law-grid">
+        <div class="law-box">
+          <div class="law-h">Шатлалт татвар (21.1)</div>
+          <table class="law-t">
+            <tr><td>0 – 120 сая₮</td><td>10%</td></tr>
+            <tr><td>120 – 180 сая₮</td><td>12 сая + 15%</td></tr>
+            <tr><td>180 сая₮-аас дээш</td><td>21 сая + 20%</td></tr>
+          </table>
+        </div>
+        <div class="law-box">
+          <div class="law-h">Жилийн хөнгөлөлт (23.1)</div>
+          <table class="law-t">
+            <tr><td>0 – 6 сая₮</td><td>240,000₮</td></tr>
+            <tr><td>6 – 12 сая₮</td><td>216,000₮</td></tr>
+            <tr><td>12 – 18 сая₮</td><td>192,000₮</td></tr>
+            <tr><td>18 – 24 сая₮</td><td>168,000₮</td></tr>
+            <tr><td>24 – 30 сая₮</td><td>144,000₮</td></tr>
+            <tr><td>30 – 36 сая₮</td><td>120,000₮</td></tr>
+            <tr><td>36 сая₮-аас дээш</td><td>—</td></tr>
+          </table>
+        </div>
+      </div>
+      <p class="hint">ЭМД, НДШ дүн = нийт орлого × 11.5%. Татвар ногдох орлого = нийт орлого − ЭМД дүн. Ногдуулсан татвар = ТНО × 10%. Хөнгөлөлт: улирлын тайланд сар бүрээр, жилийн эцэст жилийн нийт орлогоор. etax маягттай тулгасан.</p>
+      </div>
+    </details>
+  </div><!-- /col-left -->
+
+  <!-- RIGHT: dashboard -->
+  <div class="col-right">
+  <div class="panel dash" id="dashPanel">
+      <div class="dash-head">
+        <div>
+          <div class="step-label">Хяналтын самбар</div>
+          <h2 id="dashTitle">Тойм</h2>
+        </div>
+      </div>
+      <div id="dashEmpty" class="dash-empty">Сарын тайлан оруулмагц энд нэгдсэн үзүүлэлт, график гарч ирнэ.</div>
+      <div id="dashBody" class="hidden">
+
+        <!-- 1. Гол KPI картууд (дугуй icon-той) -->
+        <div class="kpi-cards" id="kpiCards"></div>
+
+        <!-- 2. Чиг хандлага -->
+        <div class="chart-card span3" style="margin-bottom:14px">
+          <div class="card-head">
+            <div class="dash-h">Сар бүрийн хэлбэлзэл</div>
+            <div class="chart-tabs" id="trendTabs">
+              <button class="ctab active" data-metric="salary">Цалин</button>
+              <button class="ctab" data-metric="count">Ажилтан</button>
+              <button class="ctab" data-metric="ndshEmployer">НДШ</button>
+            </div>
+          </div>
+          <div class="chart-legend" id="trendLegend"></div>
+          <div id="trendChart" class="chart"></div>
+        </div>
+
+        <!-- 3. Бүрэлдэхүүн задаргаа -->
+        <div class="dash-grid">
+          <div class="chart-card">
+            <div class="dash-h">Хүйс ба ажилтны төрөл</div>
+            <div class="comp-wrap">
+              <div class="comp-line"><span class="comp-title">Хүйс</span><div id="genderBar" class="stack-bar"></div></div>
+              <div id="genderLegend" class="stack-legend"></div>
+              <div class="comp-line" style="margin-top:10px"><span class="comp-title">Төрөл</span><div id="statusBar" class="stack-bar"></div></div>
+              <div id="statusLegend" class="stack-legend"></div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="dash-h">Насны бүтэц</div>
+            <div id="ageChart" class="chart"></div>
+          </div>
+          <div class="chart-card">
+            <div class="card-head">
+              <div class="dash-h">Ажил мэргэжлээр</div>
+              <div class="chart-tabs" id="occTabs">
+                <button class="ctab active" data-occlevel="unit">Нарийн</button>
+                <button class="ctab" data-occlevel="major">Бүлэг</button>
+              </div>
+            </div>
+            <div id="occChart" class="chart"></div>
+          </div>
+        </div>
+
+        <!-- 4. Гол дүгнэлт -->
+        <div class="insights" id="insights"></div>
+      </div>
+  </div><!-- /dash panel -->
+  </div><!-- /col-right -->
+ </div><!-- /layout -->
+
+  <p class="foot">Бүх боловсруулалт таны хөтөч дотор хийгдэнэ — өгөгдөл хаашаа ч илгээгдэхгүй.</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<input type="file" id="fileInput" accept="application/pdf" class="hidden">
+
+<script>
+// Worker-ийг идэвхгүй болгож үндсэн thread дээр ажиллуулна — ингэснээр
+// file:// (локал) болон https (сервер) хоёуланд нь алдаагүй ажиллана.
+pdfjsLib.GlobalWorkerOptions.workerSrc='';
+
+// ───────────────────────────────────────────────────────────
+// Баталгаажсан нэрсийн толь: регистр -> [Эцэг/эхийн нэр, Нэр]
+// Нэрийн гар засварын толь (заавал биш).
+// НДШ тайлан нэрийг "Овог Нэр" хэлбэрээр зайгаар цэвэр тусгаарлаж гаргадаг тул
+// нэрийг автоматаар салгана — ямар ч компанийн дурын ажилтанд ажиллана.
+// Хэрэв ямар нэг тусгай PDF дээр нэр буруу салбал, тэр регистрийн зөв нэрийг
+// энд "РЕГИСТР":["Овог","Нэр"] хэлбэрээр нэмж гараар давуу эрхээр зааж болно.
+const NAME_DB={
+  // Жишээ: "АА00112233":["БАТБАЯР","ДОРЖ"],
+}
+
+const ALL_MONTHS=[1,2,3,4,5,6,7,8,9,10,11,12];
+const state={year:new Date().getFullYear(), data:{}}; // data[month] = {rows, meta, fileName}
+let activeMonth=null;
+
+const $=id=>document.getElementById(id);
+const fmt=n=>n.toLocaleString('en-US',{maximumFractionDigits:2});
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
+
+const MONTH_NAMES={1:'1-р сар',2:'2-р сар',3:'3-р сар',4:'4-р сар',5:'5-р сар',6:'6-р сар',7:'7-р сар',8:'8-р сар',9:'9-р сар',10:'10-р сар',11:'11-р сар',12:'12-р сар'};
+
+// ---- Улирлыг оруулсан сараар автоматаар тодорхойлох ----
+// 1-3 сар → 1-р улирал, 1-6 → 2-р, 1-9 → 3-р, 1-12 → жилийн эцэс (4-р).
+// Зөвхөн тухайн улирал хүртэлх сар бүрэн орсон тохиолдолд тэр улирлыг өгнө.
+function detectQuarter(){
+  const filled=ALL_MONTHS.filter(m=>state.data[m]&&!state.data[m].error);
+  if(filled.length===0) return {q:0, label:'', complete:false, annual:false};
+  const maxM=Math.max(...filled);
+  const has=m=>filled.includes(m);
+  const range=(a,b)=>{for(let m=a;m<=b;m++) if(!has(m)) return false; return true;};
+  // бүх 12 сар → жилийн эцсийн (4-р улирал), хөнгөлөлт жилээр
+  if(range(1,12)) return {q:4, label:'Жилийн эцсийн тайлан', complete:true, annual:true};
+  if(range(1,9) && maxM<=9) return {q:3, label:'3-р улирлын тайлан', complete:true, annual:false};
+  if(range(1,6) && maxM<=6) return {q:2, label:'2-р улирлын тайлан', complete:true, annual:false};
+  if(range(1,3) && maxM<=3) return {q:1, label:'1-р улирлын тайлан', complete:true, annual:false};
+  // бүрэн улирал биш — өссөн дүнгээр (сараар хөнгөлөлт)
+  return {q:0, label:`${filled.length} сарын тайлан (өссөн дүн)`, complete:false, annual:false};
+}
+
+function renderMonths(){
+  $('mGrid').innerHTML=ALL_MONTHS.map(m=>{
+    const d=state.data[m];
+    if(d&&d.error)
+      return `<div class="m-card err" data-m="${m}"><span class="badge-num">${m}</span>
+        <button class="m-del" data-del="${m}" title="Устгах">×</button>
+        <div class="micon">⚠</div><div class="mtitle">${MONTH_NAMES[m]}</div>
+        <div class="merr">${d.error}</div><div class="mhint">дахин оролдох</div></div>`;
+    if(d)
+      return `<div class="m-card done" data-m="${m}"><span class="badge-num">✓</span>
+        <button class="m-del" data-del="${m}" title="Устгах">×</button>
+        <div class="micon">📄</div><div class="mtitle">${MONTH_NAMES[m]}</div>
+        <div class="mcount">${d.rows.length} ажилтан</div>
+        <div class="mname">${d.fileName}</div></div>`;
+    return `<div class="m-card" data-m="${m}"><span class="badge-num">${m}</span>
+      <div class="micon">＋</div><div class="mtitle">${MONTH_NAMES[m]}</div>
+      <div class="mhint">PDF оруулах</div></div>`;
+  }).join('');
+  $('mGrid').querySelectorAll('.m-card').forEach(c=>c.onclick=()=>{activeMonth=+c.dataset.m;$('fileInput').click();});
+  // Устгах товч — карт дарагдахаас сэргийлж stopPropagation
+  $('mGrid').querySelectorAll('.m-del').forEach(b=>b.onclick=ev=>{
+    ev.stopPropagation();
+    const m=+b.dataset.del;
+    delete state.data[m];
+    renderMonths(); refreshSummary();
+    toast(`${MONTH_NAMES[m]} устгагдлаа`);
+  });
+}
+renderMonths();
+
+// ---- File handling ----
+$('fileInput').onchange=async e=>{
+  const f=e.target.files[0]; e.target.value='';
+  if(!f||activeMonth==null) return;
+  toast(`${activeMonth}-р сарын файл уншиж байна…`);
+  try{
+    const parsed=await parsePDF(f);
+    if(!parsed.rows.length) throw new Error('Ажилтны өгөгдөл олдсонгүй');
+    state.data[activeMonth]={...parsed, fileName:f.name};
+    // PDF-ээс тайлант он олдвол автоматаар тохируулна
+    if(parsed.meta&&parsed.meta.year){state.year=parsed.meta.year;}
+  }catch(err){
+    state.data[activeMonth]={error:err.message||'Уншиж чадсангүй'};
+  }
+  renderMonths(); refreshSummary();
+};
+refreshSummary();
+
+async function parsePDF(file){
+  const buf=await file.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data:buf, disableWorker:true}).promise;
+  const allLines=[];   // мөр бүр: {y, items:[{str,x,w}]}
+  let metaText='';
+  for(let p=1;p<=pdf.numPages;p++){
+    const page=await pdf.getPage(p);
+    const tc=await page.getTextContent();
+    const items=tc.items.filter(it=>it.str.trim()!=='').map(it=>({
+      str:it.str, x:it.transform[4], y:Math.round(it.transform[5]), w:it.width||0
+    }));
+    // y-ээр (мөрөөр) бүлэглэх — ±2px-ийг нэг мөр гэж үзнэ
+    const lineMap={};
+    items.forEach(it=>{
+      const key=Object.keys(lineMap).map(Number).find(k=>Math.abs(k-it.y)<=2);
+      const k=key!==undefined?key:it.y;
+      (lineMap[k]=lineMap[k]||[]).push(it);
+    });
+    Object.keys(lineMap).map(Number).sort((a,b)=>b-a).forEach(y=>{
+      const seg=lineMap[y].sort((a,b)=>a.x-b.x);
+      allLines.push({y, items:seg});
+      // мета задлахад текст хувилбар хэрэгтэй
+      metaText+=seg.map(s=>s.str).join(' ')+'\n';
+    });
+  }
+  return extractRows(allLines, metaText);
+}
+
+// Регистрийн загвар: 2 кирилл үсэг + 8 орон (худал зай тэвчинэ)
+const REG_RE=/[А-ЯӨҮЁ]\s*[А-ЯӨҮЁ]\s*\d{8}/;
+const NUM_RE=/^[\d,]+\.?\d*$/;
+
+function extractRows(lines, metaText){
+  const meta={};
+  const mReg=metaText.match(/бүртгэлийн\s*ду\s*гаар:\s*([0-9]{6,})/)||metaText.match(/бүртгэлийн\s*дугаар:\s*([0-9]{6,})/);
+  if(mReg) meta.regNo=mReg[1];
+  const mCo=metaText.match(/([А-ЯӨҮЁ][А-ЯӨҮЁ\- ]*?)\s*-д\s*ажиллаж/);
+  if(mCo) meta.company=mCo[1].trim();
+  // Тайлант он/сар — "2026 оны 4 сарын нийгмийн даатгал..." гэснээс авна
+  // (толгойн тушаалын огноо болох "2020 оны 12 сар"-аас зөрүүлнэ)
+  let mYm=metaText.match(/(\d{4})\s*оны\s*(\d{1,2})\s*сарын\s*нийгмийн\s*даатгал/);
+  if(!mYm) mYm=metaText.match(/(\d{4})\s*оны\s*(\d{1,2})\s*сар/);
+  if(mYm){meta.year=+mYm[1]; meta.month=+mYm[2];}
+
+  const rows=[];
+  const num=s=>parseFloat(String(s).replace(/,/g,''))||0;
+
+  lines.forEach(line=>{
+    const its=line.items;
+    if(!its.length) return;
+    // Мөрийн эхний item нь дугаар (1..N) байх ёстой
+    const first=its[0].str.trim();
+    if(!/^\d{1,3}$/.test(first)) return;
+    const rowNo=+first;
+    if(rowNo<1||rowNo>500) return;
+
+    // 1) Регистрийг олох: бүх item-ийн текстийг нэгтгээд regex-ээр хайна.
+    //    Регистрийн x-байрлалыг тэмдэглэж, түүгээр овог/нэр/тоонуудыг хуваана.
+    let regToken=null, regStartX=null, regEndX=null;
+    // item-үүдийг нэгтгэж регистр хайхдаа x-ийг хадгална
+    let concat='', map=[];
+    its.forEach(it=>{ for(const ch of it.str){ concat+=ch; map.push(it.x); } });
+    const rm=concat.match(REG_RE);
+    let reg='';
+    if(rm){
+      reg=rm[0].replace(/\s+/g,'');
+      regStartX=map[rm.index];
+      regEndX=map[rm.index+rm[0].length-1];
+    }
+    if(!reg) return; // регистргүй мөр — алгасна
+
+    // 2) Овог, нэрийг x-границаар хуваана.
+    //    Регистрийн өмнөх item-үүд = овог+нэр. Нэр баганын эхлэлийг
+    //    тухайн мөрийн item-үүдийн x-завсраас динамикаар олно.
+    const beforeReg=its.filter(it=>it.x < regStartX-2 && it.x>its[0].x+1);
+    // Овог|нэр-ийн заагийг хоёр аргаар олно:
+    //  (a) хамгийн том x-завсар (нэр доторх худал зай үүнээс жижиг);
+    //  (b) нэр баганын ойролцоо абсолют x (≈ регистрийн эхлэлээс ~80px зүүн).
+    //  Хоёрын аль найдвартайг сонгоно.
+    let splitIdx=-1, maxGap=0;
+    for(let i=1;i<beforeReg.length;i++){
+      const gap=beforeReg[i].x-(beforeReg[i-1].x+beforeReg[i-1].w);
+      if(gap>maxGap){maxGap=gap; splitIdx=i;}
+    }
+    let lastName='', firstName='';
+    if(splitIdx>0 && maxGap>=4){
+      lastName=beforeReg.slice(0,splitIdx).map(s=>s.str).join('').replace(/\s+/g,'');
+      firstName=beforeReg.slice(splitIdx).map(s=>s.str).join('').replace(/\s+/g,'');
+    }else{
+      lastName=''; firstName=beforeReg.map(s=>s.str).join('').replace(/\s+/g,'');
+    }
+
+    // 3) Регистрийн дараах тоон баганууд: x-ээр эрэмбэлж тоонуудыг түүнэ.
+    //    Дараалал: төрөл(5орон), мэргэжил(NNNN-NN), цалин, нийтНДШ, аж олгогч, даатгуулагч
+    const afterReg=its.filter(it=>it.x > regEndX+1).sort((a,b)=>a.x-b.x);
+    // Зөвхөн "цэвэр тоо" (таслал/цэгтэй) болон код утгуудыг ялгана
+    let type='', occ='';
+    const moneys=[];
+    afterReg.forEach(it=>{
+      const t=it.str.trim();
+      if(/^\d{5}$/.test(t) && !type) type=t;                 // даатгуулагчийн төрөл
+      else if(/^\d{3,4}-\d{2}$/.test(t) && !occ) occ=t;       // мэргэжлийн ангилал
+      else if(NUM_RE.test(t)) moneys.push(num(t));            // мөнгөн дүнгүүд
+    });
+    // мөнгөн баганууд: [цалин, нийт НДШ, ажил олгогч, даатгуулагч]
+    const salary=moneys[0]||0;
+    const totalNdsh=moneys[1]||0;
+    const employer=moneys[2]||0;
+    const employee=moneys[3]||0;
+
+    // Сонголтоор: тодорхой регистрийн нэрийг гараар тольд зааж өгсөн бол давуу эрхээр авна
+    if(NAME_DB[reg]){ lastName=NAME_DB[reg][0]; firstName=NAME_DB[reg][1]; }
+
+    rows.push({
+      lastName, firstName, reg, type, occ, nameSource:'auto',
+      salary, totalNdsh, employer, employee
+    });
+  });
+  return {rows, meta};
+}
+
+// ---- Регистрээс нас, хүйс задлах ----
+// Монгол регистр: 2 кирилл үсэг + ЖЖССӨӨ + 2 орон.
+// Сарын код 2000+ онд төрсөн хүнд +20 нэмэгддэг (СС 21-32 = 2000-аад он).
+// Хүйс: сүүлийн оронтой тоо сондгой=эр, тэгш=эм (Монголын стандарт).
+// Хүйс: регистрийн сүүлээсээ 2 дахь орон — тэгш = эмэгтэй, сондгой = эрэгтэй.
+function regBirth(reg){
+  const m=String(reg).match(/[А-ЯӨҮЁ]{2}(\d{2})(\d{2})(\d{2})(\d)(\d)/);
+  if(!m) return null;
+  let yy=+m[1], mm=+m[2], dd=+m[3], secondLast=+m[4];
+  let year;
+  if(mm>20){ year=2000+yy; mm-=20; }
+  else if(mm>=1&&mm<=12){ year=1900+yy; }
+  else return null;
+  if(mm<1||mm>12||dd<1||dd>31) return null;
+  const gender = (secondLast%2===0)?'F':'M';
+  return {year, month:mm, day:dd, gender};
+}
+function regAge(reg, refYear){
+  const b=regBirth(reg);
+  if(!b) return null;
+  const age=(refYear||new Date().getFullYear())-b.year;
+  return (age>=14&&age<=90)?age:null;
+}
+function ageBand(age){
+  if(age==null) return 'Тодорхойгүй';
+  if(age<=25) return '18-25';
+  if(age<=35) return '26-35';
+  if(age<=45) return '36-45';
+  if(age<=55) return '46-55';
+  return '55+';
+}
+
+const OCC_DICT={"unit":{"0110":"Зэвсэгт хүчний зэрэг, цол бүхий офицер","0210":"Зэвсэгт хүчний ахлагч","0310":"Зэвсэгт хүчний зэрэглэлийн бусад ажил, мэргэжил","1111":"Хууль тогтоогч","1112":"Төрийн байгууллагын удирдах албан тушаалтан","1113":"Өөрөө удирдах нутгийн байгууллагын Засаг дарга, Захирагч, бусад удирдах албан тушаалтан","1114":"Тусгай сонирхол бүхий байгууллагын удирдах албан тушаалтан /улс төр, олон нийтийн, ТББ/","1120":"Захирал, гүйцэтгэх захирал","1121":"Дэд захирал /дэд дарга, орлогч дарга/","1211":"Санхүүгийн менежер","1212":"Хүмүүний нөөцийн менежер","1213":"Бодлого, төлөвлөлтийн менежер","1219":"Бизнес үйлчилгээ, захиргааны менежер /өөр газар ангилагдаагүй/","1221":"Борлуулалт, маркетингийн менежер","1222":"Зар сурталчилгаа, олон нийттэй харилцах менежер","1223":"Судалгаа, хөгжлийн менежер","1311":"Хөдөө аж ахуй, ой, загас агнуурын үйдвэрлэлийн менежер","1312":"Усны амьтан үржүүлэгч, загасны аж ахуйн үйлдвэрлэлийн менежер","1321":"Үйлдвэрийн менежер","1322":"Уурхайн менежер","1323":"Барилга угсралтын менежер","1324":"Хангамж, түгээлт, холбогдох бусад менежер","1330":"Мэдээлэл холбооны технологи үйлчилгээний менежер","1341":"Хүүхдийн асрамж, халамжийн үйлчилгээний менежер","1342":"Эрүүл мэндийн үйлчилгээний менежер","1343":"Настанг асрамжлах үйлчилгээний менежер","1344":"Нийгмийн халамжийн менежер","1345":"Ерөнхий боловсролын сургалтын байгууллагын менежер","1346":"Банк, санхүү, даатгалын үйлчилгээний менежер","1349":"Аль нэг ангилалд ороогүй мэргэшсэн үйлчилгээний бусад менежер","1411":"Зочид буудлын менежер","1412":"Рестораны менежер","1420":"Жижиглэн болон бөөний худалдааны менежер","1431":"Соёл, спорт, амралтын төвийн менежер","1439":"Аль нэг ангилалд ороогүй холбогдох бусад үйлчилгээний менежер","2111":"Физикч, одон орон судлаач","2112":"Цаг уурч","2113":"Химич","2114":"Геологич, геофизикч","2120":"Математикч, актуарч, статистикч","2131":"Биологич, ботаникч, амьтан судлаач, холбогдох бусад мэргэжилтэн","2132":"Фермч, ойн болон загасны аж ахуйн зөвлөгч","2133":"Байгаль хамгааллын мэргэжилтэн","2141":"Аж үйлдвэрийн инженер","2142":"Иргэний барилга байгууламжийн инженер","2143":"Байгаль орчны инженер","2144":"Механикч инженер","2145":"Химийн инженер","2146":"Уул уурхайн инженер, металлургич, холбогдох бусад мэргэжилтэн","2149":"Энэ ангилалд ороогүй инженер мэргэжилтэн","2151":"Цахилгааны инженер","2152":"Цахим зүйн инженер","2153":"Телехолбооны инженер","2161":"Барилгын архитекторч","2162":"Газар тохижуулалтын архитекторч","2163":"Бүтээгдэхүүн, хувцасны дизайнч","2164":"Хот байгуулалт, тээврийн хөдөлгөөн төлөвлөгч","2165":"Зурагзүйч, байрзүйч","2166":"График, мультимедиа зохиомжийн дизайнч","2211":"Ерөнхий мэргэжлийн их эмч","2212":"Мэргэшсэн их эмч","2221":"Сувилахуйн мэргэжилтэн","2222":"Эх барихуйн мэргэжилтэн","2230":"Уламжлалт, хавсарга анагаахын мэргэжилтэн","2240":"Яаралтай тусламжийн эмч","2250":"Малын эмч","2261":"Нүүр амны эмч (Шүдний эмч)","2262":"Эм зүйн мэргэжилтэн","2263":"Хүрээлэх орчны болон үйлдвэрлэлийн эрүүл ахуй, ариун цэврийн мэргэжилтэн","2264":"Сэргээн засахын мэргэжилтэн","2265":"Хоол тэжээлийн мэргэжилтэн, хоолны арга зүйч","2266":"Сонсголын мэргэжилтэн, хэлний согог засалч","2267":"Хараа зүйч, хараа хэмжигч","2269":"Аль нэг ангилалд ороогүй эрүүл мэндийн бусад мэргэжилтэн","2310":"Багш, дээд боловсрол олгох багш","2320":"Техник мэргэжлийн боловсролын багш","2330":"Суурь бүрэн дунд боловсрол олгох багш","2341":"Бага боловсрол олгох  багш","2342":"Сургуулийн өмнөх боловсрол олгох багш","2351":"Боловсролын сургалтын байгууллагын арга зүйн мэргэжилтэн","2352":"Тусгай хэрэгцээт боловсролын багш","2359":"Аль нэг ангилалд ороогүй багшлах бусад мэргэжилтэн","2411":"Нягтлан бодогч","2412":"Санхүү хөрөнгө оруулалтын зөвлөх","2413":"Санхүүгийн шинжээч","2421":"Удирдлага, байгууллагын задлан шинжээч","2422":"Бодлогын захиргааны мэргэжилтэн","2423":"Хүний нөөц, ажил, мэргэжлийн зөвлөгөө өгөгч мэргэжилтэн","2424":"Сургалтын болон боловсон хүчнийг хөгжүүлэх албаны мэргэжилтэн","2431":"Зар сурталчилгаа, маркетингийн мэргэжилтэн","2432":"Олон нийттэй харилцах албаны мэргэжилтэн","2433":"Техникийн болон эмнэлгийн борлуулалтын мэргэжилтэн /мэдээлэл, холбооны технологиос бусад/","2434":"Мэдээлэл, холбооны технологи борлуулалтын мэргэжилтэн","2511":"Мэдээллийн системийн шинжээч","2512":"Программ зохиогч","2513":"Веб, мультимедиа зохиогч","2514":"Хэрэглээний программ зохиогч","2519":"Энэ ангилалд ороогүй бусад программ хангамж, хэрэглээний программ зохиогч, шинжээч","2521":"Өгөгдлийн сангийн дизайнч, эрхлэгч","2522":"Системийн эрхлэгч","2523":"Компьютерийн сүлжээний мэргэжилтэн","2529":"Энэ ангилалд ороогүй өгөгдлийн сан, сүлжээний бусад мэргэжилтэн","2611":"Эрх зүйч, (Хуульч)","2612":"Шүүгч","2619":"Аль нэг ангилалд ороогүй эрх зүйн бусад мэргэжилтэн","2621":"Архивч, музейн харгалзагч","2622":"Номын санч, холбогдох мэдээллийн бусад мэргэжилтэн","2631":"Эдийн засагч","2632":"Социологич, антропологич, холбогдох бусад мэргэжилтэн","2633":"Философич, улс төр судлаач, түүхч","2634":"Сэтгэл зүйч","2635":"Нийгмийн (мэргэшсэн) ажилтан, зөвлөгөө өгөгч мэргэжилтэн","2636":"Шашны мэргэжилтэн /мяндагтан/","2641":"Зохиолч, холбогдох бусад нийтлэлч","2642":"Сэтгүүлч","2643":"Орчуулагч, хэлмэрч, бусад хэл шинжлээч","2651":"Дүрслэх урлаач","2652":"Хөгжмийн зохиолч, хөгжимчин, дуучин","2653":"Бүжиг болон бүжиг дэглээч","2654":"Кино тайз болон түүнд холбогдох найруулагч","2655":"Жүжигчин","2656":"Радио, телевиз, бусад мэдээллийн хэрэгсэлээр нэвтрүүлэгч","2659":"Аль нэг ангилалд ороогүй бусад уран бүтээлч, жүжигчин","3111":"Химийн болон физикийн ухааны техникч","3112":"Иргэний барилгын инженерийн техникч","3113":"Цахилгаан инженерийн техникч","3114":"Цахим инженерийн техникч","3115":"Механик инженерийн техникч","3116":"Химийн инженерийн техникч","3117":"Уурхай, металлургийн техникч","3118":"Шугам зурагч, техникч","3119":"Энэ ангилалд ороогүй инженерийн ухааны бусад техникч","3121":"Уурхайн байцаагч, хянагч","3122":"Үйлдвэрийн байцаагч","3123":"Барилга угсралтын байцаагч","3131":"Цахилгаан үйлдвэрлэлийн төхөөрөгийн операторч","3132":"Шатаагч зуух, ус цэвэрлэх байгууламжийн операторч","3133":"Хими процессийн төхөөрөмжийн операторч","3134":"Нефть, хий цэвэрлэх төхөөргийн операторч","3135":"Металл үйлдвэрлэлийн процесс хянагч","3139":"Энэ ангилалд ороогүй процесс хяналтын техникч","3141":"Амьд байгалийн ухааны техникч (Анагаах ухаанаас бусад)","3142":"Хөдөө аж ахуйн техникч","3143":"Ойн аж ахуйн техникч","3151":"Усан онгоцны инженер","3152":"Усан онгоцны тавцан дээрх ажилтан, чиглүүлэгч","3153":"Агаарын хөлгийн нисгэгч, холбогдох бусад туслах/дэд мэргэжилтэн","3154":"Агаарын хөдөлгөөн хянагч","3155":"Агаарын хөдөлгөөний аюулгүйн цахим техникч","3211":"Эмчилгээ оношлогооны тоног төхөөрөмжийн техникч","3212":"Эмчилгээ, эмгэг судлалын лабораторийн техникч","3213":"Эм зүйн техникч болон туслагч","3214":"Эмчилгээ, хиймэл шүдний техникч","3221":"Сувилахуйн туслах ажилтан","3222":"Эх барихуйн туслах ажилтан","3230":"Уламжлалт, хавсарга анагаахын туслах/дэд мэргэжилтэн","3240":"Мал эмнэлгийн техникч, туслах/дэд мэргэжилтэн","3251":"Нүүр амны эмчилгээний туслах, эмчлэгч","3252":"Эмчилгээний тэмдэглэл, эрүүл мэндийн мэдээллийн техникч","3253":"Өрхийн ба бүлгийн эрүүл мэндийн ажилтан","3254":"Харааны шилний мэргэжилтэн, шил олгогч","3255":"Нөхөн сэргээх эмчилгээний техникч, туслагч","3256":"Эмчилгээний туслах ажилтан","3257":"Хүрээлэх орчны болон үйлдвэрлэлийн эрүүл ахуйн байцаагч, туслагч ажилтан","3258":"Яаралтай тусламжийн ажилтан","3259":"Энэ ангилалд ороогүй эрүүл мэндийн туслах /дэд мэргэжилтэн /","3311":"Үнэт цаас, санхүүгийн дилер, брокер","3312":"Зээл, зээллэгийн мэргэжилтэн","3313":"Нягтлан бодох бүртгэлийн туслах/дэд мэргэжилтэн","3314":"Статистик, математик тоцоолол, түүнтэй адилтгах бусад мэргэжилтэн","3315":"Эд баялагийн үнэлгээчин, хохирол тогтоогч","3321":"Актуарч","3322":"Арилжаа, борлуулалтын төлөөлөгч","3323":"Худалдан авагч","3324":"Борлуулалтын брокер","3331":"Клирингийн, илгээмжийн агент","3332":"Хурал зөвлөгөөн зэрэг арга хэмжээ төлөвлөгч /зохион байгуулагч/","3333":"Хөдөлмөр эрхлэлтийн агент, ажилд зуучлагч","3334":"Үл хөдлөх хөрөнгийн агент, менежер","3339":"Аль нэг ангилалд ороогүй бизнес үйлчилгээний бусад агент","3341":"Албаны зааварлагч","3342":"Хуулийн нарийн бичгийн дарга","3343":"Захиргааны болон гүйцэтгэх нарийн бичгийн дарга","3344":"Анагаахын нарийн бичгийн дарга","3351":"Хил, гаалийн байцаагч","3352":"Улсын татвар, акцизын албаны ажилтан","3353":"Улсын нийгмийн даатгал, тэтгэвэр, тэтгэмжийн асуудал хариуцсан ажилтан","3354":"Тусгай зөвшөөрөл хариуцсан ажилтан","3355":"Цагдаагийн байцаагч, мөрдөн байцаагч","3359":"Аль нэг ангилалд ороогүй Засгийн газрын тохируулагч, хэрэгжүүлэгч байгууллагын холбогдох бусад ажилтан","3411":"Эрх зүйн болон холбогдох бусад ажилтан","3412":"Нийгмийн ажилтан холбогдох бусад ажилтан","3413":"Шашны болон холбогдох бусад ажилтан","3421":"Тамирчин, спортын тоглогч","3422":"Спортын дасгалжуулагч, зааварлагч","3423":"Фитнесс, чирэгжүүлэлтийн зааварлагч, хөтөлбөрийн удирдагч","3431":"Фото зурагч","3432":"Дотоод засал чимэглэлийн дизайнч, чимэглэгч","3433":"Галлерей, музей, номын сангийн техникч","3434":"Шеф тогооч (Chefs)","3435":"Соёл, урлагийн бусад мэргэжилтэн","3511":"Мэдээлэл, холбооны технологи ажиллагааны техникч","3512":"Мэдээлэл, холбооны технологи хэрэглэгчдэд туслах техникч","3513":"Компьютерийн сүлжээ, системийн техникч","3514":"Веб техникч","3521":"Өргөн нэвтрүүлэг, дуу, дүрс бичлэгийн техникч","3522":"Телехолбооны инженерийн техникч","4110":"Конторын үндсэн ажилтан","4120":"Нарийн бичгийн дарга","4131":"Бичээч","4132":"Баримт, мэдээлэл оруулагч операторч","4211":"Банкны теллер, холбогдох бусад ажилтан","4214":"Өр барагдуулагч, холбогдох бусад ажилтан","4221":"Аялал жуулчлалын зөвлөх, аялалын газрын ажилтан","4222":"Холбоо барих төвийн мэдээллийн ажилтан","4223":"Телефон холбоочин","4224":"Зочид буудлын хүлээн авагч","4225":"Лавлах ажилтан","4226":"Хүлээн авагч","4227":"Судлаач, зах зээл","4229":"Энэ ангилалд ороогүй хэрэглэгчийг мэдээллээр хангах бусад ажилтан","4311":"Нягтлан бодох, данс бүртгэлийн ажилтан","4312":"Статистикийн, санхүүгийн болон даатгалын ажилтан","4313":"Цалингийн бүртгэлийн ажилтан","4321":"Материалын нөөцийн ажилтан","4322":"Үйлдвэрлэлийн ажилтан","4323":"Тээврийн ажилтан /диспетчер/","4411":"Номын сангийн ажилтан","4412":"Шуудан зөөгч, ангилагч ажилтан","4413":"Кодлогч, хянан тохируулагч болон холбогдох бусад ажилтан","4414":"Бичээч холбогдох бусад ажилтан","4415":"Файлдагч, олшруулагч ажилтан","4416":"Хүмүүний нөөцийн ажилтан","4419":"Энэ ангилалд ороогүй конторын бусад туслах ажилтан","5111":"Аялал жуулчлалын үйлчлэх ажилтан, аялал жуулчлалын үйлчлэгч","5112":"Нийтийн тээврийн кондуктор","5113":"Аялал жуулчлалын хөтөч","5120":"Тогооч","5131":"Зөөгч","5132":"Бармен /Bartenders/","5141":"Үсчин","5142":"Гоо сайханч, холбогдох бусад ажилтан","5151":"Албан газар, зочид буудал зэрэг байгууллагын цэвэрлэгээ, ахуйн хариуцан хянагч","5152":"Гэрийн аж ахуй хариуцагч","5153":"Байшин арчлагч","5161":"Зурхайч, мэргэч, холбогдох бусад ажилтан","5162":"Үйлчилгээний ажилтан, туслах","5163":"Оршуулга зохион байгуулагч, занданшуулагч /шарил чандарлагч","5164":"Гэрийн тэжээвэр амьтан маллагч, тойлогч","5165":"Жолооны багш","5169":"Өөр ангилалд ороогүй хувь үйлчилгээний бусад ажилтан","5211":"Мухлаг, захын худалдаачин","5221":"Дэлгүүр ажиллуулагч","5222":"Дэлгүүрийн эрхлэгч","5223":"Дэлгүүрийн худалдааны туслах ажилтан","5230":"Кассчин, тасалбар олгогч","5241":"Загвар өмсөгч, жишиг үзүүлэгч","5242":"Бараа танилцуулан худалдаалагч","5244":"Утсаар захиалга авч худалдаалагч","5245":"Үйлчилгээний цэгийн ажилтан","5246":"Хүнсний лангууны худалдаачин","5249":"Аль нэг ангилалд ороогүй борлуулалтын бусад ажилтан","5311":"Хүүхэд асрамжлах ажилтан","5312":"Туслах багш","5321":"Эмнэлгийн сувилгааны туслах ажилтан","5322":"Гэрээр асрамжлах үйлчилгээний ажилтан","5329":"Энэ ангилалд ороогүй эмнэлгийн сувилгааны бусад ажилтан","5411":"Аврагч","5412":"Цагдаагийн ажилтан","5413":"Шоронгийн хуяг","5414":"Хамгаалалтын албаны ажилтан","5419":"Аль нэг ангилалд ороогүй хамгаалах үйлчилгээний бусад ажилтан","6111":"Тариаланч, ногоочин","6112":"Мод, бут тарьж ургуулагч","6113":"Цэцэрлэгч, цэцэрлэгт хүрээлэн, хүлэмжийн тариалагч","6114":"Холимог ургамал тариалагч","6121":"Мал маллагч, сүү, цагаан идээ үйлдвэрлэгч","6122":"Шувуу аж ахуйн ажилтан","6123":"Зөгий үржүүлэгч","6129":"Аль нэг ангилалд ороогүй бусад амьтан маллагч","6130":"Мал амьтан, газар тариалангийн холимог аж ахуй эрхлэгч","6210":"Ойн аж ахуй, холбогдох бусад ажилтан","6221":"Усны ургамал ургуулагч, амьтан үржүүлэгч","6222":"Газрын болон эргийн усны загасны аж ахуйн ажилтан","6224":"Анчин, урхичин","7111":"Барилгачин","7112":"Өрлөгчин, холбогдох бусад ажилтан","7113":"Чулуучин, чулуу зүсэгч, бутлагч, сийлбэрчин","7114":"Бетончин, бетон гадаргуу өнгөлөгч, түүнтэй холбогдох мэргэжлийн ажилтан","7115":"Барилга угсралтын мужаан","7119":"Энэ ангилалд ороогүй барилгын араг бүтээц /яс мод/ угсрагч түүнтэй адилтгах бусад ажилтан","7121":"Дээвэрчин","7122":"Шалчин, өнгөлгөөчин","7123":"Шаварчин, засалчин","7124":"Тусгаарлагч","7125":"Шилчин /Шиллэгч","7126":"Сантехникч, хоолой урсгагч","7127":"Агааржуулалт, агаар сэлгэлтийн механикч","7131":"Будагчин, түүнтэй адилтгах бусад ажилтан","7132":"Будаг шүршигч, лакдагч","7133":"Барилгын бүтээцийн цэвэрлэгч","7211":"Хэв, голлуур бэлтгэгч","7212":"Гагнуурчин","7213":"Нимгэн төмөрчин","7214":"Металл хийц бэлтгэгч, угсрагч","7215":"Хүнд, овортой эдлэхүүн зөөгч, оосорлогч","7221":"Дархан, гараар давтах болон шахуургын дархан","7222":"Багажны дархан түүнтэй адилтгах бусад ажилтан","7223":"Металл бүтээгдэхүүний машин механизм суурилуулагч /операторч/","7224":"Металл зүлгэгч, өнгөлөгч, багаж ирлэгч","7231":"Моторт тээврийн хэрэгслийн механикч, тохируулагч","7232":"Агаарын хөлгийн хөдөлгүүрийн механикч, тохируулагч","7233":"Хөдөө аж ахуй, аж үйлдвэрийн машин механизмын механикч, тохируулагч","7234":"Ундаг дугуйн засварчин","7311":"Нарийн хийцтэй багаж үйлдвэрлэгч, засварчин","7312":"Хөгжмийн зэмсэг хийгч, хөглөгч","7313":"Эрдэнийн чулуу, үнэт металлын ажилтан","7314":"Ваар, шавар эдлэлийн ажилтан","7315":"Шилэн эдлэл хийгч, зүсэгч, зүлгэгч, өнгөлөгч","7316":"Хаяг, зарлал, гоёл чимэглэлийн зураач, будагч, сийлбэрч, зураг хээ гаргагч","7317":"Модоор гар урлалын зүйл, сагс зэргийг хийгч","7318":"Нэхмэл, даавуу, арьс, бусад материалаар гар урлалын зүйлс хийгч","7319":"Энэ ангилалд ороогүй гар урлалын зүйл хийгч","7321":"Хэвлэхийн өмнөх ажиллагааны техникч","7322":"Хэвлэгч","7323":"Хэвлэлтийг төгс болгох, дэвтэрлэх ажилтан","7411":"Барилгын болон бусад цахилгаанчин","7412":"Цахилгаан төхөөрөмжийн механикч /тохируулагч/","7413":"Цахилгаан шугам тавигч /тохируулагч/","7421":"Цахим механикч, засварчин /тохируулагч/","7422":"Мэдээлэл, холбооны технологийн сул хүчний шугамын хэрэгсэл тавигч /тохируулагч/","7511":"Мах, загасны худалдаачин, холбогдох бусад хоол, хүнс бэлтгэгч","7512":"Гурлин бүтээгдэхүүн, бал бурам, бусад амттан үйлдвэрлэгч","7513":"Сүү, цагаан идээ боловсруулагч","7514":"Жимс, жимсгэнэ, ногоо, хүнсний бусад зүйл даршлагч","7515":"Хүнсний зүйл, ундаа амтлагч, зэрэглэл тогтоогч","7516":"Тамхи үйлдвэрлэгч","7521":"Мод боловсруулагч","7522":"Нарийн мужаан, холбогдох бусад ажилтан","7523":"Мод боловсруулах машин суурилуулагч, операторч","7531":"Оёдолчин, загварчин, үслэг эдлэл, малгай хийгч","7532":"Хувцас болон бусад төрлийн зүйлд үлгэр гаргагч, хувилагч, эсгүүрчин","7533":"Оёдолчин, хатгамалчин, бусад ажилтан","7534":"Тавилганы бүрээс хийгч, бусад холбогдох ажилтан","7535":"Ангийн үс, арьс шир боловсруулагч","7536":"Гуталчин, холбогдох бусад ажилтан","7541":"Усан доорхи төхөөрөмж дээр ажиллагч","7542":"Тэсэлгээний ажилтан /тэсэлгээчин/","7543":"Бүтээгдэхүүн зэрэглэгч, шалгагч (хоол хүнс болон ундаанаас бусад)","7544":"Ариутгагч, хортон шавьж, хогийн ургамал устгагч","7549":"Энэ ангилалд ороогүй адилтгах бусад ажил, үйлчилгээний ажилтан","8111":"Далд ба ил уурхайчин","8112":"Эрдэс, чулуулаг боловсруулах төхөөргийн операторч","8113":"Цооног өрөмдөгч, адилтгах бусад ажилтан","8114":"Цемент, бусад эрдэс бүтээгдэхүүн үйлдвэрлэлийн машины операторч","8121":"Металл боловсруулах төхөөргийн операторч","8122":"Металл өнгөлөх, цайрдах, бүрэх машины операторч","8131":"Химийн бүтээгдэхүүний машины операторч","8132":"Фото зургийн машин ажиллуулагч","8141":"Резин бүтээгдэхүүний машины операторч","8142":"Хуванцар бүтээгдэхүүний машины операторч","8143":"Цаасан бүтээгдэхүүний машины операторч","8151":"Утас бэлтгэх, томох, ээрэх машины операторч","8152":"Нэхэх, сүлжих машины операторч","8153":"Оёдлын машины операторч","8154":"Угаах, чанах, будах, цайруулах, сэгсрэх, цэвэрлэх, толбо арилгах, хатаах машины операторч","8155":"Үслэг эдлэл, арьс шир бэлтгэх машины операторч","8156":"Гутал, бусад ижил төрлийн ажлын машины операторч","8157":"Угаалгын машины операторч","8159":"Энэ ангилалд ороогүй даавуу, арьс шир, үслэг эдлэл ба арьс ширэн бусад бүтээгдэхүүний машины операторч","8160":"Хоол хүнс, бусад төрлийн хүнсний бүтээгдэхүүний машины операторч","8161":"Үр тариа боловсруулах үйлдвэрлэлийн операторч /аппаратчин/","8171":"Модны зутан, цаас үйлдвэрлэх төхөөргийн операторч","8172":"Мод боловсруулах төхөөрөгийн операторч","8181":"Шил болон керамикийн зуухны операторч","8182":"Уурын хөдөлгүүр, уурын тогооны операторч","8183":"Савлах, юүлэх, хаяглах машины операторч","8189":"Энэ ангилалд ороогүй суурь машин, төхөөрөг ажиллуулагч бусад операторч","8211":"Машин механизм угсрагч","8212":"Цахилгаан, цахим төхөөрөмж угсрагч","8219":"Энэ ангилалд ороогүй бусад угсрагч","8311":"Зүтгүүрийн машинч","8312":"Төмөр замын бэхэлгээчин, дохиочин, шилжүүлэгч","8321":"Мотоциклийн жолооч","8322":"Машин, такси болон бүхээгт тэрэгний жолооч","8331":"Автобус, троллейбус, трамвайны жолооч","8332":"Хүнд даацын машин, том тэрэгний жолооч","8341":"Зөөврийн ферм, ойн төхөөргийн операторч","8342":"Газар шороо, зам засварын болон түүнтэй адилтгах машины операторч","8343":"Операторч, кранч, өргөгч цамхаг түүнтэй адилтгах машины","8344":"Бусад өргөх, татах төхөөрөмжийн операторч","8350":"Усан онгоцны тавцангийн баг, түүнд холбогдох бусад ажилтан","9111":"Гэр ахуйн цэвэрлэгээний ажил эрхлэгч, туслагч","9112":"Зочид буудал, албан контор, бусад байгууллагын цэвэрлэгээний ажилтан, туслагч","9121":"Гар аргаар угаагч, индүүдэгч, хатаагч","9122":"Тээврийн хэрэгсэлийн цэвэрлэгээний ажилтан","9123":"Цонх цэвэрлэгч","9129":"Бусад цэвэрлэгээний ажилтан","9211":"Үр тарианы фермийн ажилтан","9212":"Малын фермийн ажилтан","9213":"Мал, тариалан хосолсон фермийн ажилтан","9214":"Цэцэрлэгт хүрээлэн, цэцэрлэгжүүлэлтийн ажилтан","9215":"Ойн аж ахуйн ажилтан","9216":"Загасны болон усны аж ахуйн ажилтан","9311":"Уурхай, карьерийн ажилтан","9312":"Иргэний барилгын туслах ажилтан","9313":"Барилга угсралтын туслах ажилтан","9321":"Гараар савлагч, баглагч ажилтан","9329":"Энэ ангилалд ороогүй үйлдвэрийн бусад ажилтан","9333":"Ачаа зөөгч","9411":"Түргэн хоол бэлтгэх ажилтан","9412":"Гал тогооны туслах ажилтан","9612":"Хог хаягдал ангилагч","9613":"Хог шүүрдэгч, адилтгах ажил, үйлчилгээний ажилтан","9621":"Илгээмж хүргэгч, зарлага, ачаа тээш зөөгч","9623":"Тоолуурын заалт тэмдэглэгч, худалдааны автомат мөнгө хураагчаас мөнгө цуглуулагч, түүнд бараа, бүтээгдэхүүн нэмж хийгч","9629":"Энэ ангилалд ороогүй бусад энгийн ажил, үйлчилгээний ажилтан"},"major":{"0":"Зэвсэгт хүчин","1":"Менежер","2":"Мэргэжилтэн","3":"Техникч/дэд мэргэжилтэн","4":"Контор, үйлчилгээ","5":"Худалдаа, үйлчилгээ","6":"ХАА, ой, загас","7":"Үйлдвэрлэл, барилга, урлал","8":"Машин механизм оператор","9":"Энгийн ажил"}};
+
+// ---- Ажил мэргэжлийн код -> нэр (ҮАМАТ-8) ----
+// НДШ тайлан дахь код "NNNN-NN". Эхний 4 орон = нэгж бүлэг (мэргэжлийн нэр),
+// эхний 1 орон = үндсэн бүлэг (10 том ангилал). Ямар ч компанид ажиллана.
+function occName(code){
+  if(!code) return 'Тодорхойгүй';
+  const unit=String(code).split('-')[0].trim();
+  return (typeof OCC_DICT!=='undefined' && OCC_DICT.unit[unit]) || 'Тодорхойгүй ('+code+')';
+}
+function occMajor(code){
+  if(!code) return 'Тодорхойгүй';
+  const fd=String(code).trim()[0];
+  return (typeof OCC_DICT!=='undefined' && OCC_DICT.major[fd]) || 'Тодорхойгүй';
+}
+
+const TYPE_DICT={"name":{"01001":"Хөдөлмөрийн гэрээний дагуу ажиллаж байгаа үндсэн ажилтан","02001":"Иргэний хуульд заасан ажил гүйцэтгэх, хөлсөөр ажиллах болон бусад  гэрээгээр ажиллагч","06002":"Хүүхэд асрах чөлөөтэй байгаа аж ахуйн нэгж, байгууллагын ажилтан эх/эцэг/","06012":"Хүүхэд асрах чөлөөтэй байгаа аж ахуйн нэгж, байгууллагын ажилтан эх/эцэг/ тэтгэвэр тогтоолгосон","08002":"Хугацаат цэргийн алба хаагч, цэргийн сургуулийн сонсогч","08012":"Хөдөлмөрийн чадвар алдсаны тэтгэвэр тогтоолгосон хугацаат цэргийн алба хаагч, цэргийн сургуулийн сонсогч","11001":"Цэргийн байгууллагын алба хаагч","14001":"Сул зогсолтын үеийн олговор авч байгаа ажилтан","17002":"Жирэмсний болон амаржсаны амралттай байгаа ажилтан","20002":"Ажил олгогчийн захиалгаар суралцаж байгаа ажилтан, төрийн албан хаагч","20012":"Ажил олгогчийн захиалгаар суралцаж байгаа хөдөлмөрийн чадвар алдсаны тэтгэвэр тогтоолгосон ажилтан төрийн албан хаагч","21002":"Нэг ба түүнээс дээш сарын хугацаагаар хөдөлмөрийн чадвараа түр алдсан ажилтан","22001":"Өндөр насны тэтгэвэр тогтоолгосон ажилтан (тэтгэврийн даатгалын шимтгэл төлнө)","22011":"Өндөр насны тэтгэвэр тогтоолгосон ажилтан (тэтгэврийн даатгалын шимтгэл төлөхгүй)","22021":"Цэргийн алба хаасны тэтгэвэр тогтоолгосон ажилтан (тэтгэврийн даатгалын шимтгэл төлнө)","22031":"Цэргийн алба хаасны тэтгэвэр тогтоолгосон ажилтан (тэтгэврийн даатгалын шимтгэл төлөхгүй)","23001":"Эрх бүхий байгууллагаас сетификат аваагүй БНСУ-ын иргэн","24001":"Эрх бүхий байгууллагаас сертификат авсан БНСУ-ын иргэн","25002":"Улирлын шинжтэй ажил үүргийг байнга эрхэлдэг ажилтан /ажил зогссон үед/","25012":"Улирлын шинжтэй ажил үүргийг байнга эрхэлдэг өндөр насны тэтгэвэр тогтоолгосон ажилтан /ажил зогссон үед/ тэтгэврийн даатгалын шимтгэл төлөх","25022":"Улирлын шинжтэй ажил үүргийг байнга эрхэлдэг өндөр насны тэтгэвэр тогтоолгосон ажилтан /ажил зогссон үед/ тэтгэврийн даатгалын шимтгэл төлөхгүй","25032":"Улирлын шинжтэй ажил үүргийг байнга эрхэлдэг хөдөлмөрийн чадвар алдсаны тэтгэвэр тогтоолгосон ажилтан /ажил зогссон үед/","28002":"Улсын хил дээр ажиллаж байгаа гаалийн улсын байцаагчийн ажилгүй байгаа эхнэр/ нөхөр","28012":"Улсын хил дээр ажиллаж байгаа гаалийн улсын байцаагчийн ажилгүй байгаа хөдөлмөрийн чадвар алдсаны тэтгэвэр тогтоолгосон эхнэр/ нөхөр","29002":"Улсын хил дээр алба хааж байгаа офицер, ахлагчийн ажилгүй байгаа эхнэр/нөхөр","29012":"Улсын хил дээр алба хааж байгаа офицер, ахлагчийн ажилгүй байгаа хөдөлмөрийн чадвар алдсаны тэтгэвэр тогтоолгосон эхнэр/нөхөр","30002":"Дипломат төлөөлөгчийн газрын ажилтны хөдөлмөр эрхлээгүй, өндөр насны тэтгэвэр тогтоолгоогүй эхнэр/нөхөр","30012":"Дипломат төлөөлөгчийн газрын ажилтны хөдөлмөр эрхлээгүй, хөдөлмөрийн чадвар алдсаны тэтгэвэр тогтоолгосон эхнэр/нөхөр","31002":"Гамшгаас хамгаалах болон бусад дайчилгаагаар ажилласан хүн","32001":"Хууль бусаар ажлаас халагдсан хүн","34001":"Сул зогсолтын үеийн олговор авч байгаа тэтгэвэр тогтоолгосон ажилтан (тэтгэврийн даатгалын шимтгэл төлнө)","34011":"Сул зогсолтын үеийн олговор авч байгаа тэтгэвэр тогтоолгосон ажилтан (тэтгэврийн даатгалын шимтгэл төлөхгүй)","37001":"Шашны байгууллагын лам, санваартан","38002":"Тэтгэвэр тогтоолгосны дараа ажиллаж байгаа жирэмсний болон амаржсаны амралттай ажилтан (тэтгэврийн даатгалын шимтгэл төлнө)","39002":"Тэтгэвэр тогтоолгосны дараа ажиллаж байгаа хөдөлмөрийн чадвараа 1  сараас дээш хугацаанд түр алдсан ажилтан (тэтгэврийн даатгалын шимтгэл төлнө)","39012":"Тэтгэвэр тогтоолгосны дараа ажиллаж байгаа хөдөлмөрийн чадвараа 1  сараас дээш хугацаанд түр алдсан ажилтан (тэтгэврийн даатгалын шимтгэл төлөхгүй)","40001":"Үндсэн ажлаас гадуур зэрэгцсэн хөдөлмөрийн гэрээгээр ажиллаж байгаа ажилтан","41002":"Жирэмсний болон амаржсаны амралттай байгаа цэргийн алба хаагч эх","41012":"Хүүхэд асрах чөлөөтэй байгаа цэргийн албан хаагч эх","42002":"Нэг сараас дээш хугацаагаар хөдөлмөрийн чадвараа алдсан цэргийн алба хаагч","50001":"Хууль зүйн туслалцаа үзүүлэх гэрээтэй өмгөөлөгч","51002":"Шилжин ажилласан Зэвсэгт хүчин, тагнуул, цагдаа, шүүхийн шийдвэр гүйцэтгэх байгууллагын алба хаагчийн хөдөлмөр эрхлээгүй эхнэр/нөхөр","53001":"Цэргийн гэрээт алба хаагч","61001":"Цэргийн цолны мөнгө авсан хүүхдээ асрах чөлөөтэй байгаа цэргийн алба хаагч эх","68001":"Хөдөлмөрийн хөлс, түүнтэй адилтгах орлого авсан хүүхдээ асрах чөлөөтөй байгаа эх/эцэг","69001":"Цэргийн алба хаасны болон хөдөлмөрийн чадвар алдсаны тэтгэвэр тогтоолгосны дараа цэргийн цолтой  ажиллаж байгаа алба хаагч","70001":"Хөдөлмөрийн чадвар алдсаны тэтгэвэр тогтоолгосон ажилтан (тэтгэврийн даатгалын шимтгэл төлнө)","70011":"Хөдөлмөрийн чадвар алдсаны тэтгэвэр тогтоолгосон ажилтан (тэтгэврийн даатгалын шимтгэл төлөхгүй)","71002":"Цэргийн байгууллагын захиалгаар суралцагч цэргийн цолтой алба хаагч","72001":"Хилс хэргээр мөрдөгдсөн, хилс хэргээр хорих ял эдэлсэн хүн","74002":"Дагалднаар суралцаж байгаа хөдөлмөрийн гэрээтэй ажилтан","75001":"Төлөөлөн удирдах зөвлөлийн гишүүн","76001":"Бүх шатны сонгуулийн хэсэг, хороонд ажиллахаар томилогдсон иргэн"},"cat":{"01001":"Үндсэн ажилтан","02001":"Гэрээт ажилтан","06002":"Хүүхэд асрах чөлөө","06012":"Хүүхэд асрах чөлөө","08002":"Цэрэг/алба хаагч","08012":"Тэтгэвэрийн насны","11001":"Цэрэг/алба хаагч","14001":"Сул зогсолт","17002":"Жирэмсэн/амаржсан","20002":"Суралцагч","20012":"Тэтгэвэрийн насны","21002":"ХЧА тэтгэвэр","22001":"Тэтгэвэрийн насны","22011":"Тэтгэвэрийн насны","22021":"Тэтгэвэрийн насны","22031":"Тэтгэвэрийн насны","23001":"Бусад","24001":"Бусад","25002":"Бусад","25012":"Тэтгэвэрийн насны","25022":"Тэтгэвэрийн насны","25032":"Тэтгэвэрийн насны","28002":"Бусад","28012":"Тэтгэвэрийн насны","29002":"Бусад","29012":"Тэтгэвэрийн насны","30002":"Бусад","30012":"Тэтгэвэрийн насны","31002":"Бусад","32001":"Бусад","34001":"Тэтгэвэрийн насны","34011":"Тэтгэвэрийн насны","37001":"Бусад","38002":"Жирэмсэн/амаржсан","39002":"ХЧА тэтгэвэр","39012":"ХЧА тэтгэвэр","40001":"Үндсэн ажилтан","41002":"Жирэмсэн/амаржсан","41012":"Хүүхэд асрах чөлөө","42002":"Цэрэг/алба хаагч","50001":"Бусад","51002":"Цэрэг/алба хаагч","53001":"Цэрэг/алба хаагч","61001":"Цэрэг/алба хаагч","68001":"Бусад","69001":"Цэрэг/алба хаагч","70001":"Тэтгэвэрийн насны","70011":"Тэтгэвэрийн насны","71002":"Цэрэг/алба хаагч","72001":"Бусад","74002":"Суралцагч","75001":"Бусад","76001":"Бусад"}};
+
+// ---- Даатгуулагчийн төрөл (5 оронтой код) -> ангилал ----
+// НДШ тайлангийн "даатгуулагчийн төрөл" баганаас ажилтны статусыг тогтооно.
+function typeName(code){
+  if(!code) return 'Тодорхойгүй';
+  return (typeof TYPE_DICT!=='undefined' && TYPE_DICT.name[String(code).trim()]) || 'Тодорхойгүй ('+code+')';
+}
+function typeCat(code){
+  if(!code) return 'Тодорхойгүй';
+  return (typeof TYPE_DICT!=='undefined' && TYPE_DICT.cat[String(code).trim()]) || 'Бусад';
+}
+
+// ---- Татварын аргачлал — etax маягттай ЯГ тааруулсан ----
+// ЭМД, НДШ-ийн хувь (etax маягт дээр тогтмол 11.5%)
+const EMD_RATE=11.5;
+
+// 21.1 Шатлалт татвар. Цалингийн хувьд бараг үргэлж 10% (120 саяас доош).
+// 120 саяас дээш бол шатлал хэрэгжинэ. Маягт дээр "Шатлал" багана 1 байна.
+function tierTax(taxable){
+  if(taxable<=0) return 0;
+  if(taxable<=120000000) return taxable*0.10;
+  if(taxable<=180000000) return 12000000+(taxable-120000000)*0.15;
+  return 21000000+(taxable-180000000)*0.20;
+}
+// Шатлалын дугаар (etax "Шатлал" багана)
+function tierNo(taxable){
+  if(taxable<=120000000) return 1;
+  if(taxable<=180000000) return 2;
+  return 3;
+}
+// 23.1 Сард ногдох хөнгөлөлт — цалин бодогчтой адил ОЗЦ (НДШ хассан сарын
+// орлого)-оор шатлалыг ШУУД тогтооно. ×12 хувиргахгүй.
+// Эх сурвалж: 2020.01.01-нээс мөрдөх хүснэгт.
+// Д/д | ОЗЦ (НДШ 11.5% хассан сарын дүн) | Сарын хөнгөлөлт
+// 1   | 0 – 500,000           | 20,000
+// 2   | 500,001 – 1,000,000   | 18,000
+// 3   | 1,000,001 – 1,500,000 | 16,000
+// 4   | 1,500,001 – 2,000,000 | 14,000
+// 5   | 2,000,001 – 2,500,000 | 12,000
+// 6   | 2,500,001 – 3,000,000 | 10,000
+// 7   | 3,000,001+            | хөнгөлөлтгүй (0)
+function monthlyCredit(ozc){
+  if(ozc<=500000)  return 20000;
+  if(ozc<=1000000) return 18000;
+  if(ozc<=1500000) return 16000;
+  if(ozc<=2000000) return 14000;
+  if(ozc<=2500000) return 12000;
+  if(ozc<=3000000) return 10000;
+  return 0;
+}
+
+// Шатлалын тайлбар (задаргаа хуудсанд харуулах)
+function creditTierLabel(ozc){
+  if(ozc<=500000)  return '0–500,000 → 20,000₮';
+  if(ozc<=1000000) return '500,001–1,000,000 → 18,000₮';
+  if(ozc<=1500000) return '1,000,001–1,500,000 → 16,000₮';
+  if(ozc<=2000000) return '1,500,001–2,000,000 → 14,000₮';
+  if(ozc<=2500000) return '2,000,001–2,500,000 → 12,000₮';
+  if(ozc<=3000000) return '2,500,001–3,000,000 → 10,000₮';
+  return '3,000,001+ → хөнгөлөлтгүй';
+}
+
+// ---- Регистрээр нэгтгэх (өссөн дүн) ----
+// Улирлын бүх орсон сарын мөрүүдийг регистрээр нэгтгэж, орсон сарын тоог тоолно.
+// Сар бүрийн орлогыг тусд нь хадгална — хөнгөлөлтийг сар бүрийн шатлалаар тооцоход хэрэгтэй.
+function aggregateByRegister(){
+  const months=ALL_MONTHS.filter(m=>state.data[m]&&!state.data[m].error);
+  const map={};
+  const order=[];
+  months.forEach(m=>{
+    state.data[m].rows.forEach(r=>{
+      if(!map[r.reg]){
+        map[r.reg]={
+          reg:r.reg, lastName:r.lastName, firstName:r.firstName,
+          type:r.type, occ:r.occ, nameSource:r.nameSource,
+          salary:0, totalNdsh:0, employer:0, employee:0,
+          months:new Set(), monthly:[]
+        };
+        order.push(r.reg);
+      }
+      const a=map[r.reg];
+      a.salary+=r.salary; a.totalNdsh+=r.totalNdsh;
+      a.employer+=r.employer; a.employee+=r.employee;
+      a.months.add(m);
+      a.monthly.push({month:m, salary:r.salary, employee:r.employee});
+      if(r.nameSource==='db'){a.lastName=r.lastName;a.firstName=r.firstName;a.nameSource='db';}
+    });
+  });
+  return {list:order.map(reg=>({...map[reg], monthCount:map[reg].months.size, months:[...map[reg].months].sort((a,b)=>a-b)})), monthsFilled:months.length};
+}
+
+// ---- etax маягтын бүх баганыг ЯГ тооцоолох ----
+// Орлого (G) = хөдөлмөрийн хөлс (7.1.1). ЭМД дүн (I) = G*11.5%.
+// ТНО (K=N) = G - I. Татвар (P) = шатлалаар (бараг үргэлж 10%).
+// Хөнгөлөлт горим:
+//  - 'monthly': сар бүрийн НИЙТ орлогыг жилд хувиргаж сарын хөнгөлөлт олоод нийлбэрлэнэ.
+//  - 'annual' : жилийн НИЙТ орлогыг нэг шатлалд оруулж жилийн хөнгөлөлтийг нэг удаа.
+//  - 'auto'   : 12 сар бүгд орвол 'annual', дутуу бол 'monthly'.
+// etax "сард ногдох хөнгөлөлт" баганын код. Зөвхөн тогтсон дүнгүүд:
+// 0→'0-0', 10000→'10000-1', 12000→'12000-2', 14000→'14000-3',
+// 16000→'16000-4', 18000→'18000-5', 20000→'20000-6'. Бусад бол '999-Бусад'.
+const CREDIT_CODE={0:'0-0',10000:'10000-1',12000:'12000-2',14000:'14000-3',16000:'16000-4',18000:'18000-5',20000:'20000-6'};
+function creditCode(amount){
+  return CREDIT_CODE[amount] || '999-Бусад';
+}
+// Орсон сарын хөнгөлөлт БҮГД ИЖИЛ бол тухайн дүнгийн код, өөр өөр бол '999-Бусад'.
+// Дунджилахгүй — etax зөвхөн тогтсон дүн хүлээж авдаг.
+function monthlyCreditCode(creditList){
+  if(!creditList.length) return '0-0';
+  const first=creditList[0];
+  const allSame=creditList.every(v=>v===first);
+  return allSame ? creditCode(first) : '999-Бусад';
+}
+
+function computeEtaxRow(r, useAnnual){
+  const G=r.salary;                          // 7.1.1 нийт орлого (өссөн)
+  const I=Math.round(G*EMD_RATE/100*100)/100; // ЭМД, НДШ дүн
+  const K=Math.round((G-I)*100)/100;          // татвар ногдуулах орлого (ОЗЦ нийт)
+  const P=Math.round(tierTax(K)*100)/100;     // ногдуулсан татвар
+  const tier=tierNo(K);
+  // Хөнгөлөлт — цалин бодогчтой адил: сар бүрийн ОЗЦ (gross − НДШ)-оор
+  // шатлал тогтоож, орсон сарын хөнгөлөлтийг нийлбэрлэнэ (өссөн дүн).
+  let S=0;
+  const creditList=[];
+  r.monthly.forEach(mo=>{
+    const ozc=mo.salary - mo.salary*EMD_RATE/100;  // тухайн сарын НДШ хассан дүн
+    const cr=monthlyCredit(ozc);
+    creditList.push(cr);
+    S+=cr;
+  });
+  const T=Math.round((P-S)*100)/100;          // хөнгөлөлтийн дараах татвар
+  const W=Math.round((T)*100)/100;            // нийт суутгуулсан (7.1.6, шууд бус энд 0)
+  // R багана: сард ногдох хөнгөлөлтийн КОД (дундаж биш — ижил бол дүн, өөр бол 999)
+  const rCode=monthlyCreditCode(creditList);
+  return {G,I,K,P,tier,S,T,W,rCode,creditList,months:r.monthCount,net:G-I-T};
+}
+
+// Жилийн хөнгөлөлт хэрэглэх эсэх — бүх 12 сар орсон үед (жилийн эцсийн тайлан)
+function useAnnualCredit(monthsFilled){
+  return detectQuarter().annual;
+}
+
+// ---- Summary + Dashboard ----
+let trendMetric='salary';
+let lastDemo=null;
+let occLevel='unit';
+
+function monthlyTotals(){
+  // Оруулсан сар бүрийн нийт цалин, НДШ (ажил олгогч), ажилтны тоо,
+  // мөн цалингийн бүрэлдэхүүн: ЭМД (ажилтан), ХХОАТ, гарт олгох цэвэр.
+  const out=[];
+  ALL_MONTHS.forEach(m=>{
+    const d=state.data[m];
+    if(!d||d.error) return;
+    let salary=0, ndshEmployer=0, count=d.rows.length;
+    let emd=0, hhoat=0;
+    d.rows.forEach(r=>{
+      salary+=r.salary; ndshEmployer+=r.employer;
+      const G=r.salary;
+      const I=Math.round(G*EMD_RATE/100*100)/100;       // ЭМД (ажилтан)
+      const K=Math.round((G-I)*100)/100;
+      const P=Math.round(tierTax(K)*100)/100;            // ХХОАТ (хөнгөлөлтгүй ойролцоо)
+      emd+=I; hhoat+=P;
+    });
+    const net=Math.max(0, salary-emd-hhoat);            // гарт олгох (ойролцоо)
+    out.push({month:m, salary, ndshEmployer, count, emd, hhoat, net});
+  });
+  return out;
+}
+
+function demographics(list){
+  const ages={'18-25':0,'26-35':0,'36-45':0,'46-55':0,'55+':0,'Тодорхойгүй':0};
+  let male=0, female=0, unknown=0;
+  const occ={};      // мэргэжлийн нэр -> тоо
+  const major={};    // үндсэн бүлэг -> тоо
+  const status={};   // ажилтны төрлийн ангилал -> тоо
+  list.forEach(r=>{
+    const b=regBirth(r.reg);
+    const age=regAge(r.reg, state.year);
+    ages[ageBand(age)]=(ages[ageBand(age)]||0)+1;
+    if(b&&b.gender==='M') male++; else if(b&&b.gender==='F') female++; else unknown++;
+    const on=occName(r.occ), mj=occMajor(r.occ);
+    occ[on]=(occ[on]||0)+1;
+    major[mj]=(major[mj]||0)+1;
+    const st=typeCat(r.type);
+    status[st]=(status[st]||0)+1;
+  });
+  return {ages, male, female, unknown, occ, major, status};
+}
+
+// ---- Хүний нөөцийн эргэц (orсон/гарсан) ----
+// Сар бүрийн ажилтны жагсаалтыг (регистрээр) дараалан харьцуулна.
+// Өмнөх сард байгаагүй → шинээр орсон. Өмнөх сард байсан, энэ сард алга → гарсан.
+// Анхаар: НДШ төлөөгүй (тайланд ороогүй) нь үргэлж "ажлаас гарсан" гэсэн үг биш —
+// чөлөө, амралт, эсвэл тухайн сард цалин аваагүй байж болно.
+function turnoverFlow(){
+  const months=ALL_MONTHS.filter(m=>state.data[m]&&!state.data[m].error);
+  const flow=[];
+  let prev=null;
+  months.forEach(m=>{
+    const set=new Set(state.data[m].rows.map(r=>r.reg));
+    let joined=0, left=0;
+    if(prev){
+      set.forEach(reg=>{ if(!prev.has(reg)) joined++; });
+      prev.forEach(reg=>{ if(!set.has(reg)) left++; });
+    }
+    flow.push({month:m, count:set.size, joined, left});
+    prev=set;
+  });
+  return flow;
+}
+
+function refreshSummary(){
+  const {list, monthsFilled}=aggregateByRegister();
+  const useAnnual=useAnnualCredit(monthsFilled);
+  let agg={salary:0,ndshEmp:0,ndshEmployer:0,taxable:0,gross:0,credit:0,hhoat:0,net:0,count:list.length};
+  list.forEach(r=>{
+    const c=computeEtaxRow(r, useAnnual);
+    agg.salary+=c.G; agg.ndshEmp+=c.I; agg.taxable+=c.K; agg.gross+=c.P;
+    agg.credit+=c.S; agg.hhoat+=c.T; agg.net+=c.net;
+    agg.ndshEmployer+=r.employer;
+  });
+
+  const ready=monthsFilled>=1;
+  $('dashEmpty').classList.toggle('hidden', ready);
+  $('dashBody').classList.toggle('hidden', !ready);
+  $('dlBtn').disabled=!ready;
+  const qinfo=detectQuarter();
+  if(ready){
+    $('dlBtn').textContent=`⬇ ${qinfo.label} (Excel) татах`;
+    $('dashTitle').textContent=qinfo.label;
+    $('dlHint').textContent=`${monthsFilled} сар орсон — ${qinfo.label}. Хөнгөлөлтийг сар бүрийн ОЗЦ шатлалаар тооцож байна.`
+      + (qinfo.complete?'':' (Бүрэн улирал болгохын тулд дутуу сарыг нэмж оруулна уу.)');
+  }else{
+    $('dlBtn').textContent='⬇ Excel файл татах';
+    $('dlHint').textContent='Дор хаяж нэг сарын тайлан оруулна уу.';
+  }
+  if(!ready){ return; }
+
+  // Сүүлийн орсон сарын ажилтны тоо
+  const filledMs=ALL_MONTHS.filter(m=>state.data[m]&&!state.data[m].error);
+  const lastM=filledMs.length?filledMs[filledMs.length-1]:null;
+  const lastMonthCount=lastM?state.data[lastM].rows.length:0;
+  const demo=demographics(list);
+  lastDemo=demo;
+  const avgSalary=agg.count?agg.salary/agg.count:0;
+
+  // 1. Гол KPI картууд (дугуй SVG icon + том тоо)
+  const ICN={
+    people:`<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+    money:`<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8l3 6c0 0 1 2-1 4s-3 8-6 8-5-6-6-8-1-4-1-4z"/><path d="M12 11v4"/><path d="M10.5 12.5h3"/></svg>`,
+    salary:`<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4"/><circle cx="18" cy="17" r="4"/><path d="M18 15.5v3M16.8 16.2h2"/></svg>`,
+    shield:`<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v6M9 11h6"/></svg>`,
+  };
+  const kpiCards=[
+    {ic:ICN.people, cls:'g', accent:'accent-green', lbl:'Нийт ажилтан', val:agg.count, unit:'', sub:lastM?`${lastM}-р сард ${lastMonthCount} ажилласан`:''},
+    {ic:ICN.money, cls:'g', accent:'accent-green', lbl:'Нийт цалингийн зардал', val:fmtMln(agg.salary), unit:'₮', sub:'Нийт олгосон цалин'},
+    {ic:ICN.salary, cls:'blue', accent:'accent-blue', lbl:'Дундаж цалин', val:fmtMln(avgSalary), unit:'₮', sub:'Ажилтанд ногдох'},
+    {ic:ICN.shield, cls:'gold', accent:'accent-gold', lbl:'Татвар ба НДШ', val:fmtMln(agg.hhoat+agg.ndshEmployer+agg.ndshEmp), unit:'₮', sub:'ХХОАТ + НДШ нийт'},
+  ];
+  $('kpiCards').innerHTML=kpiCards.map(k=>`
+    <div class="kpi-card ${k.accent}">
+      <div class="kpi-ic ${k.cls}">${k.ic}</div>
+      <div class="kpi-tx">
+        <div class="lbl">${k.lbl}</div>
+        <div class="val">${k.val} <span class="u">${k.unit}</span></div>
+        <div class="sub">${k.sub}</div>
+      </div>
+    </div>`).join('');
+
+  // 2. Бүрэлдэхүүн зурвар
+  drawStackBar('genderBar','genderLegend',
+    [['Эрэгтэй',demo.male],['Эмэгтэй',demo.female]].concat(demo.unknown?[['Тодорхойгүй',demo.unknown]]:[]),
+    agg.count, ['#216a4c','#b8862f','#bcc4bf']);
+  drawStackBar('statusBar','statusLegend', Object.entries(demo.status).sort((a,b)=>b[1]-a[1]), agg.count);
+
+  // 3. Графикууд
+  drawTrend();
+  drawAgeChart(demo.ages);
+  drawOccChart();
+
+  // 4. Гол дүгнэлт (insights)
+  drawInsights(agg, demo, monthlyTotals(), lastM, lastMonthCount);
+}
+
+// Сая/тэрбумаар товчилсон мөнгөн дүн
+function fmtMln(n){
+  if(n>=1e9) return (n/1e9).toFixed(1)+' тэрбум';
+  if(n>=1e6) return (n/1e6).toFixed(1)+' сая';
+  if(n>=1e3) return Math.round(n/1e3)+' мянга';
+  return fmt(Math.round(n));
+}
+
+// Гол дүгнэлтүүдийг автоматаар үүсгэх
+function drawInsights(agg, demo, mt, lastM, lastMonthCount){
+  const el=$('insights'); if(!el) return;
+  const I={
+    trend:`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>`,
+    people:`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>`,
+    age:`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M3 21a9 9 0 0 1 18 0"/></svg>`,
+    work:`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`,
+  };
+  const items=[];
+  // Цалингийн оргил сар
+  if(mt.length>1){
+    let peak=mt[0]; mt.forEach(m=>{ if(m.salary>peak.salary) peak=m; });
+    items.push([I.trend,'Цалингийн оргил',`Хамгийн их цалин ${peak.month}-р сард — ${fmtMln(peak.salary)}₮.`]);
+  }
+  // Ажилтны бүрэлдэхүүн
+  const topStatus=Object.entries(demo.status).sort((a,b)=>b[1]-a[1])[0];
+  if(topStatus){
+    const pct=Math.round(topStatus[1]/agg.count*100);
+    items.push([I.people,'Ажилтны бүрэлдэхүүн',`${topStatus[0]} ${topStatus[1]} хүн (${pct}%) — дийлэнх нь.`]);
+  }
+  // Насны бүтэц
+  const topAge=Object.entries(demo.ages).filter(([k])=>k!=='Тодорхойгүй').sort((a,b)=>b[1]-a[1])[0];
+  if(topAge && topAge[1]>0){
+    const pct=Math.round(topAge[1]/agg.count*100);
+    items.push([I.age,'Насны бүтэц',`${topAge[0]} насныхан зонхилно (${pct}%).`]);
+  }
+  // Мэргэжил
+  const topOcc=Object.entries(demo.occ).sort((a,b)=>b[1]-a[1])[0];
+  if(topOcc){
+    const pct=Math.round(topOcc[1]/agg.count*100);
+    items.push([I.work,'Гол мэргэжил',`${topOcc[0]} ${topOcc[1]} хүн (${pct}%) — хамгийн олон.`]);
+  }
+  el.innerHTML=items.slice(0,4).map(([ic,h,b])=>`
+    <div class="insight"><div class="insight-ic">${ic}</div>
+      <div class="insight-tx"><div class="h">${h}</div><div class="b">${b}</div></div></div>`).join('');
+}
+
+// Хэвтээ давхарласан зурвас (бүрэлдэхүүн харуулах) — захирлын тоймд тохиромжтой
+function drawStackBar(barId, legendId, entries, total, colors){
+  const cols=colors||['#216a4c','#2e8b62','#4aa57e','#6cbb98','#93cfb3','#bce2d2','#b8862f'];
+  entries=entries.filter(e=>e[1]>0);
+  const bar=document.getElementById(barId), leg=document.getElementById(legendId);
+  if(!total||entries.length===0){ bar.innerHTML=''; leg.innerHTML=''; return; }
+  bar.innerHTML=entries.map(([lab,v],i)=>{
+    const pct=v/total*100;
+    return `<span style="width:${pct}%;background:${cols[i%cols.length]}">${pct>10?v:''}</span>`;
+  }).join('');
+  leg.innerHTML=entries.map(([lab,v],i)=>{
+    const pct=Math.round(v/total*100);
+    return `<span><i style="background:${cols[i%cols.length]}"></i>${lab}: ${v} (${pct}%)</span>`;
+  }).join('');
+}
+
+// ---- SVG график зурах функцууд ----
+const PALETTE=['#1f5e44','#2e8b62','#c8943a','#7a9e6e','#b4754a','#9aa84d'];
+const fmtShort=n=>{
+  if(n>=1e9) return (n/1e9).toFixed(1)+' тэрбум';
+  if(n>=1e6) return (n/1e6).toFixed(1)+' сая';
+  if(n>=1e3) return (n/1e3).toFixed(0)+'мянга';
+  return String(Math.round(n));
+};
+
+function drawTrend(){
+  const data=monthlyTotals();
+  const el=$('trendChart');
+  if(data.length===0){ el.innerHTML=''; return; }
+  // Орсон/гарсан хөдөлгөөнийг сарын дарааллаар (data-тай ижил эрэмбэ) авна
+  const flowArr=turnoverFlow();
+  const flowByMonth={}; flowArr.forEach(f=>flowByMonth[f.month]=f);
+  const trendFlow=data.map(d=>flowByMonth[d.month]||{joined:0,left:0});
+  const W=900, H=230, padL=64, padR=30, padT=14, padB=44;
+  const n=data.length;
+  const iw=W-padL-padR, ih=H-padT-padB;
+
+  // Y тэнхлэгийн max утга — сонгосон метрикээс хамаарна
+  let maxV;
+  if(trendMetric==='count'){
+    // орсон/гарсан хамгийн их утгаар (нийт хүний тоо биш)
+    const fm=Math.max(...trendFlow.map(f=>Math.max(f.joined,f.left)),1);
+    maxV=fm*1.25;
+  }
+  else if(trendMetric==='ndshEmployer') maxV=Math.max(...data.map(d=>d.ndshEmployer),1)*1.12;
+  else maxV=Math.max(...data.map(d=>d.salary),1)*1.12;
+
+  const slot=iw/n;
+  const bw=Math.min(56, slot*0.66);
+  const cx=i=>padL+slot*i+slot/2;
+  const y=v=>padT+ih*(1-v/maxV);
+  const baseY=padT+ih;
+
+  // grid + y шошго (4 шугам)
+  let grid='';
+  for(let g=0; g<=3; g++){
+    const gy=padT+ih*g/3, gv=maxV*(1-g/3);
+    grid+=`<line x1="${padL}" y1="${gy}" x2="${W-padR}" y2="${gy}" stroke="#eef1ef" stroke-width="1"/>`;
+    grid+=`<text x="${padL-9}" y="${gy+4.5}" text-anchor="end" font-size="13" fill="#9aa39d">${trendMetric==='count'?Math.round(gv):fmtShort(gv)}</text>`;
+  }
+
+  // тодорхойлолтууд (defs) — градиент (нэгдсэн ногоон + алтан)
+  const defs=`<defs>
+    <linearGradient id="gNet" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#216a4c"/><stop offset="1" stop-color="#2e8b62"/></linearGradient>
+    <linearGradient id="gEmd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6cbb98"/><stop offset="1" stop-color="#8fcdb1"/></linearGradient>
+    <linearGradient id="gTax" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b8862f"/><stop offset="1" stop-color="#cda050"/></linearGradient>
+    <linearGradient id="gBar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#216a4c"/><stop offset="1" stop-color="#2e8b62"/></linearGradient>
+  </defs>`;
+
+  // дугуйрсан оройтой багана зурах туслах (top талыг л дугуйруулна)
+  const roundedBar=(x,yTop,w,h,fill,roundTop)=>{
+    if(h<=0) return '';
+    const r=Math.min(5, w/2, h);
+    if(!roundTop || h<r) return `<rect x="${x}" y="${yTop}" width="${w}" height="${h}" fill="${fill}"/>`;
+    return `<path d="M${x},${yTop+h} L${x},${yTop+r} Q${x},${yTop} ${x+r},${yTop} L${x+w-r},${yTop} Q${x+w},${yTop} ${x+w},${yTop+r} L${x+w},${yTop+h} Z" fill="${fill}"/>`;
+  };
+
+  let bars='', line='', dots='', xlabels='';
+  data.forEach((d,i)=>{
+    const bx=cx(i)-bw/2;
+    xlabels+=`<text x="${cx(i)}" y="${H-22}" text-anchor="middle" font-size="14" fill="#6b7670">${d.month}-р</text>`;
+    if(trendMetric==='salary'){
+      // давхарласан багана: цэвэр + ЭМД + ХХОАТ (доороос дээш)
+      let acc=0;
+      const segs=[['net',d.net,'url(#gNet)'],['emd',d.emd,'url(#gEmd)'],['hhoat',d.hhoat,'url(#gTax)']];
+      const total=d.salary;
+      segs.forEach(([k,v,fill],si)=>{
+        const yTop=y(acc+v), h=baseY-y(v)+ (y(acc)-baseY)*0; // өндөр
+        const segH=ih*(v/maxV);
+        const topY=y(acc+v);
+        bars+=roundedBar(bx, topY, bw, segH, fill, si===segs.length-1);
+        acc+=v;
+      });
+      // нийт дүнгийн шугам (orой дээр)
+      const ty=y(total);
+      if(i>0){const p=data[i-1]; line+=`<line x1="${cx(i-1)}" y1="${y(p.salary)}" x2="${cx(i)}" y2="${ty}" stroke="#14402e" stroke-width="2.2"/>`;}
+      dots+=`<circle cx="${cx(i)}" cy="${ty}" r="3.5" fill="#fff" stroke="#14402e" stroke-width="2.2"/>`;
+    }else if(trendMetric==='ndshEmployer'){
+      const v=d.ndshEmployer;
+      const h=ih*(v/maxV);
+      bars+=roundedBar(bx, y(v), bw, h, 'url(#gBar)', true);
+    }else{
+      // Ажилтан таб — 2 багана: орсон (ногоон) / гарсан (улаан)
+      const tf=trendFlow[i];
+      const gw=Math.min(bw*0.42, 22);      // нэг баганын өргөн
+      const gap2=4;
+      const jx=cx(i)-gap2/2-gw;            // орсон (зүүн)
+      const lx=cx(i)+gap2/2;               // гарсан (баруун)
+      const jh=ih*(tf.joined/maxV), lh=ih*(tf.left/maxV);
+      // hover дээр нийт хүний тоо харуулах title
+      const tip=`${d.month}-р сар: нийт ${d.count} ажилтан, +${tf.joined} орсон, −${tf.left} гарсан`;
+      bars+=`<g><title>${tip}</title>`;
+      if(i===0){
+        // эхний сар — харьцуулах өмнөх сар байхгүй (суурь)
+        bars+=`<text x="${cx(i)}" y="${baseY-6}" text-anchor="middle" font-size="11" fill="#bcc4bf">суурь</text>`;
+      }else{
+        if(tf.joined>0){ bars+=roundedBar(jx, y(tf.joined), gw, jh, '#2e8b62', true);
+          bars+=`<text x="${jx+gw/2}" y="${y(tf.joined)-6}" text-anchor="middle" font-size="12" font-weight="700" fill="#216a4c">+${tf.joined}</text>`; }
+        if(tf.left>0){ bars+=roundedBar(lx, y(tf.left), gw, lh, '#c0492b', true);
+          bars+=`<text x="${lx+gw/2}" y="${y(tf.left)-6}" text-anchor="middle" font-size="12" font-weight="700" fill="#c0492b">−${tf.left}</text>`; }
+      }
+      // нийт хүний тоог багананы суурьт бүдэг харуулах (hover биш ч гэсэн жижиг сэжүүр)
+      bars+=`<rect x="${cx(i)-bw/2}" y="${padT}" width="${bw}" height="${ih}" fill="transparent"/></g>`;
+    }
+  });
+
+  // legend — HTML текстээр (SVG-ийн оронд, тэгснээр хэмжээ бусадтай зохицно)
+  let leg='';
+  if(trendMetric==='salary'){
+    leg=`<span><i style="background:#216a4c"></i>Гарт олгох</span>`
+      +`<span><i style="background:#8fcdb1"></i>ЭМД</span>`
+      +`<span><i style="background:#cda050"></i>ХХОАТ</span>`
+      +`<span><i class="line"></i>Нийт цалин</span>`;
+  }else if(trendMetric==='count'){
+    leg=`<span><i style="background:#2e8b62"></i>Шинээр орсон</span>`
+      +`<span><i style="background:#c0492b"></i>Тайланд ороогүй</span>`
+      +`<span style="color:#9aa39d">(багана дээр хулганаа аваачихад нийт тоо харагдана)</span>`;
+  }else{
+    leg=`<span><i style="background:#216a4c"></i>НДШ — ажил олгогчоос төлж буй</span>`;
+  }
+  $('trendLegend').innerHTML=leg;
+
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}">
+    ${defs}${grid}${bars}${line}${dots}${xlabels}
+  </svg>`;
+}
+
+function drawAgeChart(ages){
+  const entries=Object.entries(ages).filter(([k,v])=>v>0 && k!=='Тодорхойгүй');
+  const unknown=ages['Тодорхойгүй']||0;
+  if(unknown>0) entries.push(['Тодорхойгүй',unknown]);
+  const el=$('ageChart');
+  if(entries.length===0){ el.innerHTML='<div style="font-size:11px;color:var(--muted)">Өгөгдөл алга</div>'; return; }
+  const W=380, barH=26, gap=12, padL=66, padR=40, padT=4;
+  const H=padT+entries.length*(barH+gap);
+  const maxV=Math.max(...entries.map(e=>e[1]),1);
+  const iw=W-padL-padR;
+  const shades=['#216a4c','#2e8b62','#4aa57e','#6cbb98','#93cfb3'];
+  let bars=entries.map((e,i)=>{
+    const [label,v]=e;
+    const by=padT+i*(barH+gap);
+    const bw=Math.max(3, iw*v/maxV);
+    return `<text x="${padL-9}" y="${by+barH/2+4.5}" text-anchor="end" font-size="13" fill="#1a2b25">${label}</text>
+      <rect x="${padL}" y="${by}" width="${bw}" height="${barH}" rx="4" fill="${shades[i%shades.length]}"/>
+      <text x="${padL+bw+8}" y="${by+barH/2+4.5}" font-size="13" font-weight="600" fill="#6b7670">${v}</text>`;
+  }).join('');
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}">${bars}</svg>`;
+}
+
+function drawGenderChart(demo){
+  const el=$('genderChart');
+  const total=demo.male+demo.female+demo.unknown;
+  if(total===0){ el.innerHTML='<div style="font-size:11px;color:var(--muted)">Өгөгдөл алга</div>'; return; }
+  const segs=[['Эрэгтэй',demo.male,'#216a4c'],['Эмэгтэй',demo.female,'#b8862f']];
+  if(demo.unknown>0) segs.push(['Тодорхойгүй',demo.unknown,'#bcc4bf']);
+  // donut
+  const W=210, H=120, cx=54, cy=58, r=42, rin=26;
+  let a0=-Math.PI/2, arcs='';
+  segs.forEach(([lab,v,col])=>{
+    if(v===0) return;
+    const a1=a0+2*Math.PI*v/total;
+    const big=(a1-a0)>Math.PI?1:0;
+    const x0=cx+r*Math.cos(a0), y0=cy+r*Math.sin(a0);
+    const x1=cx+r*Math.cos(a1), y1=cy+r*Math.sin(a1);
+    const xi1=cx+rin*Math.cos(a1), yi1=cy+rin*Math.sin(a1);
+    const xi0=cx+rin*Math.cos(a0), yi0=cy+rin*Math.sin(a0);
+    arcs+=`<path d="M${x0},${y0} A${r},${r} 0 ${big} 1 ${x1},${y1} L${xi1},${yi1} A${rin},${rin} 0 ${big} 0 ${xi0},${yi0} Z" fill="${col}"/>`;
+    a0=a1;
+  });
+  // голд нийт тоо
+  arcs+=`<text x="${cx}" y="${cy-2}" text-anchor="middle" font-size="17" font-weight="700" fill="#1a2b25">${total}</text>
+    <text x="${cx}" y="${cy+12}" text-anchor="middle" font-size="8.5" fill="#6b7670">ажилтан</text>`;
+  let legend=segs.map(([lab,v,col],i)=>{
+    const pct=Math.round(v/total*100);
+    return `<g transform="translate(108,${40+i*20})">
+      <rect width="10" height="10" rx="2.5" fill="${col}"/>
+      <text x="16" y="9" font-size="10" fill="#1a2b25">${lab}: ${v} (${pct}%)</text></g>`;
+  }).join('');
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}">${arcs}${legend}</svg>`;
+}
+
+function drawOccChart(){
+  const el=$('occChart');
+  if(!lastDemo){ el.innerHTML=''; return; }
+  const src=occLevel==='major'?lastDemo.major:lastDemo.occ;
+  let entries=Object.entries(src).sort((a,b)=>b[1]-a[1]);
+  // дашбоард урт болгохгүйн тулд дээд 6, бусдыг "Бусад"
+  const LIMIT=6;
+  if(entries.length>LIMIT){
+    const top=entries.slice(0,LIMIT);
+    const rest=entries.slice(LIMIT).reduce((s,e)=>s+e[1],0);
+    entries=top; if(rest>0) entries.push(['Бусад',rest]);
+  }
+  if(entries.length===0){ el.innerHTML='<div style="font-size:11px;color:var(--muted)">Өгөгдөл алга</div>'; return; }
+  const W=620, barH=24, gap=12, padL=240, padR=44, padT=4;
+  const H=padT+entries.length*(barH+gap);
+  const maxV=Math.max(...entries.map(e=>e[1]),1);
+  const iw=W-padL-padR;
+  const clip=s=>s.length>30?s.slice(0,29)+'…':s;
+  // нэг өнгөний сүүдрийн хувилбар — нэгдсэн харагдац
+  const shades=['#216a4c','#2e8b62','#4aa57e','#6cbb98','#93cfb3','#bce2d2'];
+  let bars=entries.map((e,i)=>{
+    const [label,v]=e;
+    const by=padT+i*(barH+gap);
+    const bw=Math.max(3, iw*v/maxV);
+    return `<text x="${padL-10}" y="${by+barH/2+4.5}" text-anchor="end" font-size="13" fill="#1a2b25">${clip(label)}</text>
+      <rect x="${padL}" y="${by}" width="${bw}" height="${barH}" rx="4" fill="${shades[i%shades.length]}"/>
+      <text x="${padL+bw+8}" y="${by+barH/2+4.5}" font-size="13" font-weight="600" fill="#6b7670">${v}</text>`;
+  }).join('');
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}">${bars}</svg>`;
+}
+
+function drawStatusChart(status){
+  const el=$('statusChart');
+  if(!status){ el.innerHTML=''; return; }
+  let entries=Object.entries(status).sort((a,b)=>b[1]-a[1]).filter(e=>e[1]>0);
+  if(entries.length===0){ el.innerHTML='<div style="font-size:11px;color:var(--muted)">Өгөгдөл алга</div>'; return; }
+  const W=440, barH=18, gap=9, padL=140, padR=30, padT=2;
+  const H=padT+entries.length*(barH+gap);
+  const maxV=Math.max(...entries.map(e=>e[1]),1);
+  const iw=W-padL-padR;
+  const shades=['#216a4c','#2e8b62','#4aa57e','#6cbb98','#93cfb3','#bce2d2','#cda050'];
+  const clip=s=>s.length>22?s.slice(0,21)+'…':s;
+  let bars=entries.map((e,i)=>{
+    const [label,v]=e;
+    const by=padT+i*(barH+gap);
+    const bw=Math.max(3, iw*v/maxV);
+    return `<text x="${padL-8}" y="${by+barH/2+3.5}" text-anchor="end" font-size="10.5" fill="#1a2b25">${clip(label)}</text>
+      <rect x="${padL}" y="${by}" width="${bw}" height="${barH}" rx="3.5" fill="${shades[i%shades.length]}"/>
+      <text x="${padL+bw+6}" y="${by+barH/2+3.5}" font-size="10.5" font-weight="600" fill="#6b7670">${v}</text>`;
+  }).join('');
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}">${bars}</svg>`;
+}
+
+function drawTurnover(){
+  const flow=turnoverFlow();
+  const el=$('turnoverChart');
+  const note=$('turnoverNote');
+  // Хөдөлгөөн харахын тулд дор хаяж 2 сар хэрэгтэй
+  if(flow.length<2){
+    el.innerHTML='';
+    note.textContent='Хүний нөөцийн хөдөлгөөн (орсон/гарсан) харахын тулд дор хаяж 2 сарын тайлан оруулна уу.';
+    return;
+  }
+  const W=480, H=180, padL=30, padR=14, padT=18, padB=40;
+  const n=flow.length, iw=W-padL-padR, ih=H-padT-padB;
+  const maxV=Math.max(...flow.map(f=>Math.max(f.joined,f.left)),1)*1.2;
+  const slot=iw/n, bw=Math.min(14, slot*0.3);
+  const baseY=padT+ih;
+  const y=v=>baseY-ih*(v/maxV);
+  // grid
+  let grid='';
+  for(let g=0; g<=2; g++){
+    const gy=padT+ih*g/2, gv=Math.round(maxV*(1-g/2));
+    grid+=`<line x1="${padL}" y1="${gy}" x2="${W-padR}" y2="${gy}" stroke="#eef1ef"/>`;
+    grid+=`<text x="${padL-6}" y="${gy+3.5}" text-anchor="end" font-size="9" fill="#9aa39d">${gv}</text>`;
+  }
+  const round=(x,yt,w,h,fill)=>{const r=Math.min(3,w/2,h); if(h<=0)return ''; if(h<r)return `<rect x="${x}" y="${yt}" width="${w}" height="${h}" fill="${fill}"/>`; return `<path d="M${x},${yt+h} L${x},${yt+r} Q${x},${yt} ${x+r},${yt} L${x+w-r},${yt} Q${x+w},${yt} ${x+w},${yt+r} L${x+w},${yt+h} Z" fill="${fill}"/>`;};
+  let bars='', xlabels='';
+  flow.forEach((f,i)=>{
+    const cx=padL+slot*i+slot/2;
+    xlabels+=`<text x="${cx}" y="${H-22}" text-anchor="middle" font-size="9.5" fill="#6b7670">${f.month}-р</text>`;
+    if(i===0){
+      // эхний сар — суурь, хөдөлгөөнгүй
+      xlabels+=`<text x="${cx}" y="${baseY+13}" text-anchor="middle" font-size="8" fill="#bcc4bf">суурь</text>`;
+      return;
+    }
+    const jx=cx-bw-2, lx=cx+2;
+    bars+=round(jx, y(f.joined), bw, baseY-y(f.joined), '#2e8b62');
+    bars+=round(lx, y(f.left), bw, baseY-y(f.left), '#c0492b');
+    if(f.joined>0) bars+=`<text x="${jx+bw/2}" y="${y(f.joined)-3}" text-anchor="middle" font-size="8.5" font-weight="600" fill="#216a4c">+${f.joined}</text>`;
+    if(f.left>0) bars+=`<text x="${lx+bw/2}" y="${y(f.left)-3}" text-anchor="middle" font-size="8.5" font-weight="600" fill="#c0492b">−${f.left}</text>`;
+  });
+  const legend=`<g font-size="9.5">
+    <rect x="${padL}" y="4" width="10" height="10" rx="2.5" fill="#2e8b62"/><text x="${padL+14}" y="12.5" fill="#1a2b25">Шинээр орсон</text>
+    <rect x="${padL+108}" y="4" width="10" height="10" rx="2.5" fill="#c0492b"/><text x="${padL+122}" y="12.5" fill="#1a2b25">Тайланд ороогүй</text>
+  </g>`;
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}">${grid}${bars}${xlabels}${legend}</svg>`;
+  // нийт дүгнэлт
+  const totalJoined=flow.reduce((s,f)=>s+f.joined,0);
+  const totalLeft=flow.reduce((s,f)=>s+f.left,0);
+  note.innerHTML=`Хугацаанд нийт <b>${totalJoined}</b> шинээр орж, <b>${totalLeft}</b> тайланд ороогүй. "Ороогүй" нь чөлөө, амралт, эсвэл цалин аваагүйгээс шалтгаалж болох тул бүгд ажлаас гарсан гэсэн үг биш.`;
+}
+
+// Trend tab clicks
+document.querySelectorAll('#trendTabs .ctab').forEach(b=>b.onclick=()=>{
+  trendMetric=b.dataset.metric;
+  document.querySelectorAll('#trendTabs .ctab').forEach(x=>x.classList.toggle('active',x===b));
+  drawTrend();
+});
+// Occupation tab clicks
+document.querySelectorAll('#occTabs .ctab').forEach(b=>b.onclick=()=>{
+  occLevel=b.dataset.occlevel;
+  document.querySelectorAll('#occTabs .ctab').forEach(x=>x.classList.toggle('active',x===b));
+  drawOccChart();
+});
+
+// ---- Excel export (4-sheet structure) ----
+$('dlBtn').onclick=()=>buildExcel();
+
+function buildExcel(){
+  const months=ALL_MONTHS;
+  const agg=aggregateByRegister();
+  const monthsFilled=agg.monthsFilled;
+  // ХХОАТ-аас хасах: улирлын турш ажилтнаас суутгасан НДШ (employee) = 0 бол
+  // тухайн хүнд хөдөлмөрийн хөлс олгоогүй (жирэмсний/амаржсаны амралт, чөлөө г.м.)
+  // → татвар ногдох орлого байхгүй тул татварын маягтад оруулахгүй.
+  // Анхаар: энэ шүүлт ЗӨВХӨН Excel-д үйлчилнэ. Dashboard бүх ажилтныг хэвээр харуулна.
+  const excludedList=agg.list.filter(r=>(r.employee||0)<=0);
+  const list=agg.list.filter(r=>(r.employee||0)>0);
+  const useAnnual=useAnnualCredit(monthsFilled);
+  if(list.length===0){
+    toast('Суутгал төлсөн ажилтан алга — Excel үүсгэх боломжгүй');
+    return;
+  }
+  const wb=XLSX.utils.book_new();
+  let meta={};
+  for(const m of months){ if(state.data[m]&&!state.data[m].error){meta=state.data[m].meta||{};break;} }
+  const company=meta.company||'';
+  const year=state.year||meta.year||new Date().getFullYear();
+  const filledMonths=months.filter(m=>state.data[m]&&!state.data[m].error);
+  const qLabel=filledMonths.join(', ')+'-р сар';
+  const modeLabel='сар бүрийн ОЗЦ шатлалаар';
+  const qinfo=detectQuarter();
+  const qName=qinfo.q===4?'жилийн_эцэс':(qinfo.q>0?`${qinfo.q}-р_улирал`:`${filledMonths.length}_сар`);
+
+  // ===== Sheet 1: Маягт — etax ХХОАТ суутгалын маягтын ЯГ загвар (23 багана) =====
+  const HDR=['Татвар төлөгчийн дугаар','Овог','Нэр',
+    'Хуулийн 7.1.1','Хуулийн 7.1.2, 7.1.3, 7.1.4, 7.1.5, 7.1.7','Хуулийн 7.1.6',
+    'Нийт (1+2+3)','ЭМД, НДШ Хувь','ЭМД, НДШ Дүн (Хуулийн 7,1,1-5, 7,1,7)','ЭМД, НДШ Дүн (Хуулийн 7,1,6)',
+    'Хуулийн 7.1-д заасан орлогод татвар ногдуулах орлого (4-6-7)','Орлогын төрөл','Орлого',
+    'Нийт татвар ногдуулах орлого','Шатлал','Хуулийн 7.1.1, 7.1.5, 7.1.7-д заасан орлогод Ногдуулсан татвар',
+    'Орлого хүлээн авсан сарын тоо /ажилласан сар/','Хуулийн 23.1-т заасан хөнгөлөлт сард ногдох',
+    'Хуулийн 23.1-т заасан хөнгөлөлт нийт','Хуулийн 7,1-д заасан орлогод ногдуулсан Хөнгөлөлтийн дараах татварын дүн',
+    'Хуулийн 7.1.6-д заасан орлогод ногдуулсан дүн','Шууд бус орлогод ногдуулсан албан татвар',
+    'Нийт суутгуулсан албан татварын дүн'];
+  const s1=[HDR];
+  list.forEach(r=>{
+    const c=computeEtaxRow(r, useAnnual);
+    // etax маягт бүх утгыг текст (string) хэлбэрээр хадгалдаг тул ижилхэн гаргана
+    s1.push([
+      r.reg,                       // A: Татвар төлөгчийн дугаар (регистр; etax дээр 12 оронт ТТД-ээр солино)
+      r.lastName,                  // B: Овог
+      r.firstName,                 // C: Нэр
+      r.salary,                    // D: 7.1.1 цалин
+      0,                           // E: 7.1.2-7
+      0,                           // F: 7.1.6
+      c.G,                         // G: Нийт (1+2+3)
+      EMD_RATE,                    // H: ЭМД хувь
+      c.I,                         // I: ЭМД дүн
+      0,                           // J: ЭМД (7.1.6)
+      c.K,                         // K: татвар ногдуулах орлого
+      0,                           // L: орлогын төрөл
+      0,                           // M: орлого
+      c.K,                         // N: нийт татвар ногдуулах орлого
+      c.tier,                      // O: шатлал
+      c.P,                         // P: ногдуулсан татвар
+      c.months,                    // Q: ажилласан сар
+      c.rCode,                     // R: хөнгөлөлт сард ногдох (код: 14000-3 / 999-Бусад)
+      c.S,                         // S: хөнгөлөлт нийт
+      c.T,                         // T: хөнгөлөлтийн дараах татвар
+      0,                           // U: 7.1.6 ногдуулсан
+      0,                           // V: шууд бус
+      c.W                          // W: нийт суутгуулсан
+    ]);
+  });
+  const ws1=XLSX.utils.aoa_to_sheet(s1);
+  ws1['!cols']=[{wch:20},{wch:14},{wch:16},{wch:14},{wch:18},{wch:12},{wch:14},{wch:10},{wch:18},{wch:14},{wch:18},{wch:11},{wch:10},{wch:16},{wch:8},{wch:18},{wch:12},{wch:14},{wch:14},{wch:18},{wch:14},{wch:14},{wch:16}];
+  XLSX.utils.book_append_sheet(wb,ws1,'Маягт');
+
+  // ===== Sheet 2: Хяналт — тооцооны задаргаа ба нэгдсэн дүн (ажилтнуудад зориулсан) =====
+  const fr=2, lr=1+list.length;
+  const s2=[
+    [`ХХОАТ суутгалын маягт — ${year} он (өссөн дүн)`],
+    [company?`Байгууллага: ${company}`:''],
+    [`Хамрах сар: ${qLabel} | Нэгтгэсэн ажилтан: ${list.length} | Хөнгөлөлт: ${modeLabel} | etax маягттай тулгасан`],
+    [excludedList.length?`Анхаар: суутгасан НДШ 0 байсан ${excludedList.length} ажилтныг (мөнгө аваагүй — жирэмсний амралт г.м.) татвараас хассан. Доорх "Хассан" хуудаснаас үзнэ үү.`:''],
+    [],
+    ['№','Овог','Нэр','Регистр','Мэргэжил','Төрөл','Нас','Хүйс','Орсон сар','Нийт орлого (G)','ЭМД дүн (I)','Татвар ногдох (K)','Шатлал','Ногдуулсан татвар (P)','Хөнгөлөлт нийт (S)','Суутгах татвар (T)','Гарт олгох цэвэр']
+  ];
+  list.forEach((r,i)=>{
+    const c=computeEtaxRow(r, useAnnual);
+    const b=regBirth(r.reg);
+    const age=regAge(r.reg, year);
+    const gender=b?(b.gender==='M'?'Эр':'Эм'):'';
+    s2.push([i+1, r.lastName, r.firstName, r.reg, occName(r.occ), typeCat(r.type), age!=null?age:'', gender, c.months, c.G, c.I, c.K, c.tier, c.P, c.S, c.T, c.net]);
+  });
+  // SUM мөр — мөнгөн баганууд (Excel баганаар J,K,L,N,O,P,Q)
+  s2.push(['ДҮН','','','','','','','','',
+    {f:`SUM(J${fr+5}:J${lr+5})`},{f:`SUM(K${fr+5}:K${lr+5})`},{f:`SUM(L${fr+5}:L${lr+5})`},'',
+    {f:`SUM(N${fr+5}:N${lr+5})`},{f:`SUM(O${fr+5}:O${lr+5})`},{f:`SUM(P${fr+5}:P${lr+5})`},{f:`SUM(Q${fr+5}:Q${lr+5})`}]);
+  const ws2=XLSX.utils.aoa_to_sheet(s2);
+  for(let i=0;i<=list.length;i++){
+    const rr=fr+5+i;
+    ['J','K','L','N','O','P','Q'].forEach(col=>{if(ws2[col+rr])ws2[col+rr].z='#,##0';});
+  }
+  ws2['!cols']=[{wch:5},{wch:14},{wch:16},{wch:12},{wch:28},{wch:18},{wch:6},{wch:6},{wch:9},{wch:16},{wch:14},{wch:16},{wch:7},{wch:18},{wch:16},{wch:16},{wch:16}];
+  XLSX.utils.book_append_sheet(wb,ws2,'Хяналт');
+
+  // ===== Sheet 3: Хассан — ХХОАТ-аас хассан ажилтнууд (суутгал 0, мөнгө аваагүй) =====
+  if(excludedList.length){
+    const s3=[
+      [`ХХОАТ-аас хассан ажилтнууд — ${year} он`],
+      ['Шалтгаан: улирлын турш ажилтнаас суутгасан НДШ 0 байсан = хөдөлмөрийн хөлс олгоогүй (жирэмсний/амаржсаны амралт, чөлөө г.м.) тул татвар ногдох орлогогүй.'],
+      [],
+      ['№','Овог','Нэр','Регистр','Мэргэжил','Төрөл','Орсон сар','Нийт орлого (G)','Суутгасан НДШ']
+    ];
+    excludedList.forEach((r,i)=>{
+      s3.push([i+1, r.lastName, r.firstName, r.reg, occName(r.occ), typeCat(r.type), r.months.length, r.salary, r.employee]);
+    });
+    const ws3=XLSX.utils.aoa_to_sheet(s3);
+    ws3['!cols']=[{wch:5},{wch:14},{wch:16},{wch:12},{wch:28},{wch:20},{wch:9},{wch:16},{wch:14}];
+    XLSX.utils.book_append_sheet(wb,ws3,'Хассан');
+  }
+
+  // ===== Sheet 4: Задаргаа — ажилтан бүрийн сар бүр + тооцооллын алхам (хүснэгт) =====
+  // Зорилго: "яаж ийм тоо гарав" гэдгийг нягтлан бодогч хүснэгтээр ойлгомжтой мөшгих.
+  {
+    const modeNote='Хөнгөлөлт горим: сар бүрийн ОЗЦ (НДШ хассан орлого)-оор шатлал тогтоож, орсон сарын хөнгөлөлтийг нийлбэрлэв (цалин бодогчтой нэгдсэн логик).';
+    // 6 баганатай тогтмол хүснэгт. Мөнгөн нүднүүдийг дараа нь #,##0-ээр форматлана.
+    const COLS=6;
+    const pad=row=>{const a=row.slice();while(a.length<COLS)a.push('');return a;};
+    const s4=[];
+    const money=[]; // {r, c} — мянгатын таслал тавих нүднүүд
+    const push=(row)=>{ s4.push(pad(row)); return s4.length-1; }; // 0-based мөрийн индекс буцаана
+    const markMoney=(rowIdx, colIdxs)=>{ colIdxs.forEach(c=>money.push({r:rowIdx, c})); };
+
+    push([`ХХОАТ ТООЦООЛЛЫН ЗАДАРГАА — ${year} он (${qLabel})`]);
+    push([modeNote]);
+    push([`ЭМД хувь: ${EMD_RATE}%   |   Татвар: 120 саяас доош 10%   |   Хамрах ажилтан: ${list.length}`]);
+    push([]);
+
+    list.forEach((r,idx)=>{
+      const c=computeEtaxRow(r, useAnnual);
+      const age=regAge(r.reg, year);
+      const b=regBirth(r.reg);
+      const gender=b?(b.gender==='M'?'Эрэгтэй':'Эмэгтэй'):'';
+
+      // --- Ажилтны толгой ---
+      push([`${idx+1}. ${r.lastName} ${r.firstName}`]);
+      push(['Регистр', r.reg, 'Мэргэжил', occName(r.occ), 'Төрөл', typeCat(r.type)]);
+      push(['Нас', age!=null?age:'—', 'Хүйс', gender||'—', 'Орсон сар', r.months.join(', ')]);
+      push([]);
+
+      // --- Хүснэгт 1: сар бүрийн орлого ба хөнгөлөлт (ОЗЦ суурьтай) ---
+      push(['Сар', 'Тухайн сарын орлого', 'НДШ хассан (ОЗЦ)', 'Сарын хөнгөлөлт']);
+      r.monthly.slice().sort((a,b)=>a.month-b.month).forEach(mo=>{
+        const ozc=Math.round((mo.salary - mo.salary*EMD_RATE/100)*100)/100;
+        const credit=monthlyCredit(ozc);
+        const ri=push([`${mo.month}-р сар`, mo.salary, ozc, credit]);
+        // мөнгөн баганууд: B(орлого), C(ОЗЦ), D(хөнгөлөлт)
+        markMoney(ri, [1,2,3]);
+      });
+      push([]);
+
+      // --- Хүснэгт 2: тооцооллын алхам ---
+      push(['Тооцооллын алхам', 'Томьёо', 'Дүн (₮)']);
+      let ri;
+      ri=push(['1. Нийт орлого (G)', 'сар бүрийн орлогын нийлбэр', c.G]);              markMoney(ri,[2]);
+      ri=push(['2. ЭМД, НДШ дүн (I)', `G × ${EMD_RATE}%`, c.I]);                        markMoney(ri,[2]);
+      ri=push(['3. Татвар ногдох орлого (K)', 'G − I', c.K]);                           markMoney(ri,[2]);
+      ri=push(['4. Шатлалт татвар (P)', `шатлал ${c.tier}: ТНО × 10%`, c.P]);           markMoney(ri,[2]);
+      ri=push(['5. Хөнгөлөлт нийт (S)', 'сар бүрийн ОЗЦ шатлалын хөнгөлөлтийн нийлбэр', c.S]); markMoney(ri,[2]);
+      push(['   Сард ногдох код (R)', c.creditList.every(v=>v===c.creditList[0])?'бүх сар ижил хөнгөлөлт':'сар бүр өөр → бусад', c.rCode]);
+      ri=push(['6. СУУТГАХ ТАТВАР (T)', 'P − S', c.T]);                                  markMoney(ri,[2]);
+      ri=push(['7. Гарт олгох цэвэр', 'G − I − T', c.net]);                             markMoney(ri,[2]);
+      push([]);
+      push(['']); // хоосон зайчлал блок хооронд
+    });
+
+    const ws4=XLSX.utils.aoa_to_sheet(s4);
+    ws4['!cols']=[{wch:30},{wch:30},{wch:22},{wch:18},{wch:14},{wch:22}];
+    // мянгатын таслал — зөвхөн тэмдэглэсэн мөнгөн нүднүүдэд
+    money.forEach(({r,c})=>{
+      const addr=XLSX.utils.encode_cell({r, c});
+      if(ws4[addr] && typeof ws4[addr].v==='number'){ ws4[addr].z='#,##0'; }
+    });
+    XLSX.utils.book_append_sheet(wb,ws4,'Задаргаа');
+  }
+
+  const fname=`ХХОАТ_маягт_${year}_${qName}.xlsx`;
+  XLSX.writeFile(wb,fname);
+  toast('Excel файл татагдлаа ✓');
+}
+</script>
+</body>
+</html>
