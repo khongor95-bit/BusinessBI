@@ -116,10 +116,10 @@ header{display:contents}
 .request{background:#fff;padding:0 0 80px}
 .section-title{font-size:48px;font-weight:800;margin-bottom:14px;letter-spacing:-.02em}
 .section-sub{font-size:18px;color:#666;margin-bottom:50px;max-width:60ch}
-.product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:0 3%}
 .product{display:block;background:#f4f4f4;border-radius:22px;overflow:hidden;transition:.3s;text-decoration:none;color:inherit}
 .product:hover{transform:translateY(-4px)}
-.product img{width:100%;height:230px;object-fit:cover;object-position:left top;transition:transform .4s ease;display:block}
+.product img{width:100%;height:210px;object-fit:cover;object-position:left top;transition:transform .4s ease;display:block}
 .product .thumb{overflow:hidden;position:relative;background:#eef1f0}
 .product:hover .thumb img{transform:scale(1.04)}
 .product h4{font-size:20px;font-weight:800;letter-spacing:-.02em;color:#111;text-align:center;padding:18px 10px 20px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -288,9 +288,8 @@ footer{background:#111;color:#fff;padding:60px 0 40px;margin-top:0}
 </section>
 
 <section class="request" id="tools">
-  <div class="container">
-    <div class="product-grid">
-      <a class="product" href="ndsh_hhoat_converter.html">
+  <div class="product-grid">
+    <a class="product" href="ndsh_hhoat_converter.html">
         <div class="thumb"><img src="img/tool-ndsh.jpg" alt="НДШ тайлан dashboard"></div>
         <h4>НДШ / ХХОАТ хөрвүүлэгч</h4>
       </a>
@@ -307,7 +306,6 @@ footer{background:#111;color:#fff;padding:60px 0 40px;margin-top:0}
         <h4>Санхүүгийн шинжилгээ</h4>
       </a>
     </div>
-  </div>
 </section>
 
 <section class="container steps" id="how">
@@ -377,7 +375,8 @@ footer{background:#111;color:#fff;padding:60px 0 40px;margin-top:0}
   function next(){idx++;place(true);updateDots();}
   function goReal(i){idx=i+1;place(true);updateDots();}
   // clone дээр буусан үед transition-гүйгээр жинхэнэ байрлал руу үсрэх
-  track.addEventListener('transitionend',()=>{
+  track.addEventListener('transitionend',(e)=>{
+    if(e.target!==track||e.propertyName!=='transform') return;
     if(idx===0){idx=n;place(false);}
     else if(idx===n+1){idx=1;place(false);}
   });
