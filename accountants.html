@@ -2,6 +2,7 @@
 <html lang="mn">
 <head>
 <meta charset="UTF-8">
+<script src="gate.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Нягтлан холбох — BusinessBI.mn</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -330,7 +331,18 @@ function closeModal(){
 
 grid.addEventListener('click', e=>{
   const card = e.target.closest('.acc-card');
-  if(card){ const a = ACCOUNTANTS.find(x=>x.id==card.dataset.id); openModal(a); }
+  if(card){
+    const a = ACCOUNTANTS.find(x=>x.id==card.dataset.id);
+    // Нягтлангийн холбоо барих мэдээлэл харахын тулд нэвтрэлт шаардана
+    if(BBIGate.isLoggedIn()){
+      BBIGate.logActivity('tool_open', { toolName:'Нягтлан холбох', accountant:a.name });
+      openModal(a);
+    } else {
+      window.__bbiPendingAcc = a;
+      BBIGate.openLogin();
+      const iv = setInterval(()=>{ if(BBIGate.isLoggedIn()){ clearInterval(iv); const acc=window.__bbiPendingAcc; window.__bbiPendingAcc=null; if(acc){ BBIGate.logActivity('tool_open',{toolName:'Нягтлан холбох',accountant:acc.name}); openModal(acc); } } }, 400);
+    }
+  }
 });
 document.getElementById('modalBg').addEventListener('click', e=>{ if(e.target.id==='modalBg') closeModal(); });
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });

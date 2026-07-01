@@ -2,1319 +2,601 @@
 <html lang="mn">
 <head>
 <meta charset="UTF-8">
+<script src="gate.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Санхүүгийн шинжилгээ — BusinessBI</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600&family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 :root{
-  --sb:#1f2937;--sb2:#263445;--sbh:#2d3748;--sba:#0f5e57;
-  --bg:#f0f2f5;--panel:#fff;--line:#e5e7eb;--line2:#d1d5db;
-  --ink:#111827;--mu:#6b7280;--mu2:#9ca3af;
-  --br:#0f5e57;--br2:#0a443f;--brl:#e6f4f2;
-  --gd:#b79a63;--gdl:#fdf8ee;
-  --red:#dc2626;--redbg:#fef2f2;--redb:#fecaca;
-  --yel:#d97706;--yelbg:#fffbeb;--yelb:#fde68a;
-  --grn:#16a34a;--grnbg:#f0fdf4;--grnb:#bbf7d0;
+  --bg:#f8f8f8;--bg2:#f0f0f0;--panel:#fff;--panel2:#f5f5f5;
+  --ink:#111;--muted:#777;--line:#e5e5e5;
+  --brand:#0f5e57;--brand2:#0a443f;--accent:#b79a63;--accent2:#9a7d3f;
+  --red:#dc2626;--red-bg:#fef2f2;--red-border:#fecaca;
+  --yellow:#d97706;--yellow-bg:#fffbeb;--yellow-border:#fde68a;
+  --green:#16a34a;--green-bg:#f0fdf4;--green-border:#bbf7d0;
 }
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
-html,body{height:100%;overflow:hidden;display:flex;flex-direction:column}
 body{background:var(--bg);color:var(--ink)}
 
-/* SIDEBAR */
-.sb{width:210px;background:var(--sb);display:flex;flex-direction:column;flex-shrink:0;border-right:1px solid #2d3748}
-.sb-logo{display:flex;align-items:center;gap:10px}
-.sb-logo-icon{width:34px;height:34px;background:#1a2a4a;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.sb-logo-icon svg{width:20px;height:20px}
-.sb-logo-text{font-size:15px;font-weight:800;color:#fff;letter-spacing:-.02em}
-.sb-logo-text span{color:var(--gd)}
-.sb-logo-sub{font-size:10px;color:#3d5070;margin-top:1px}
-.sb-nav{flex:1;padding:4px 8px;overflow-y:auto}
-.sb-sec{font-size:9px;font-weight:700;color:#4b6080;text-transform:uppercase;letter-spacing:.1em;padding:12px 8px 5px}
-.sb-i{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;cursor:pointer;color:#8fa3b8;font-size:12.5px;font-weight:500;transition:.12s;margin-bottom:1px;border:none;background:none;width:100%;text-align:left;font-family:inherit}
-.sb-i:hover{background:#2d3748;color:#a0b4cc}
-.sb-i.active{background:var(--sba);color:#fff;font-weight:600}
-.sb-i .ic{width:15px;height:15px;flex-shrink:0;opacity:.7}
-.sb-i.active .ic{opacity:1}
-.sb-badge{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:1px 6px;border-radius:10px}
-.sb-div{height:1px;background:#2d3748;margin:6px 8px}
-.sb-user{padding:12px 14px;border-top:1px solid #2d3748;display:flex;align-items:center;gap:9px}
-.sb-av{width:30px;height:30px;border-radius:8px;background:var(--br);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.sb-un{font-size:12px;font-weight:600;color:#c0d0e0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px}
-.sb-ur{font-size:10px;color:#5a7090}
-.sb-out{margin-left:auto;border:none;background:none;color:#5a7090;cursor:pointer;padding:3px;flex-shrink:0}
-.sb-out:hover{color:#8fa3b8}
+/* NAV */
+.s-nav{position:sticky;top:0;z-index:200;background:#fff;border-bottom:1px solid var(--line)}
+.s-nav-inner{max-width:1480px;margin:0 auto;padding:0 5%;display:flex;align-items:center;justify-content:space-between;height:69px}
+.s-logo{font-size:26px;font-weight:800;color:var(--accent);text-decoration:none;letter-spacing:-.02em;display:flex;align-items:center;gap:16px}
+.s-logo-main span{color:#111}
+.s-logo-sep{width:1px;height:22px;background:var(--line)}
+.s-logo-title{font-size:15px;font-weight:600;color:var(--muted);letter-spacing:0}
+.s-links{display:flex;gap:38px;align-items:center}
+.s-links a{text-decoration:none;color:#111;font-weight:500;font-size:15px;transition:color .2s}
+.s-links a:hover,.s-links a.active{color:var(--accent)}
+.s-cta{background:#111;color:#fff!important;padding:11px 22px;border-radius:50px;font-size:14px;font-weight:500}
+.s-cta:hover{color:#fff;background:#333}
 
 /* MAIN */
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.wrap{max-width:1480px;margin:0 auto;padding:28px 5% 60px}
 
-/* TOPBAR */
-.top{background:#fff;border-bottom:1px solid var(--line);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.top-l{display:flex;align-items:center;gap:12px}
-.top-title{font-size:16px;font-weight:700}
-.top-meta{font-size:12px;color:var(--mu)}
-.top-r{display:flex;gap:8px}
-.tbtn{display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;border:none}
-.tbtn-o{background:#fff;border:1px solid var(--line2);color:var(--ink)}
-.tbtn-o:hover{background:var(--bg)}
-.tbtn-b{background:var(--br);color:#fff}
-.tbtn-b:hover{background:var(--br2)}
-
-/* UPLOAD */
-.upload{display:flex;align-items:center;justify-content:center;flex:1}
-.upload-card{background:#fff;border-radius:18px;padding:48px 40px;text-align:center;border:1px solid var(--line);max-width:460px;width:100%;box-shadow:0 4px 20px rgba(0,0,0,.06)}
-.upload-card h2{font-size:20px;font-weight:800;margin-bottom:8px}
-.upload-card p{font-size:13px;color:var(--mu);line-height:1.7;margin-bottom:24px}
-.upload-zone{border:2px dashed var(--line2);border-radius:12px;padding:28px;cursor:pointer;transition:.2s;margin-bottom:12px}
-.upload-zone:hover,.upload-zone.drag{border-color:var(--br);background:var(--brl)}
-.upload-lbl{display:inline-flex;align-items:center;gap:6px;background:var(--br);color:#fff;padding:10px 24px;border-radius:50px;font-size:13px;font-weight:600;cursor:pointer;transition:.15s}
-.upload-lbl:hover{background:var(--br2)}
-#pdfInput{display:none}
-.upload-note{font-size:11px;color:var(--mu2);margin-top:10px}
+/* UPLOAD ZONE */
+.upload-zone{background:var(--panel);border:2px dashed var(--line);border-radius:20px;padding:70px 40px;text-align:center;cursor:pointer;transition:.2s;margin-bottom:28px}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:#fdfaf5}
+.upload-zone .icon{font-size:52px;margin-bottom:18px;display:block}
+.upload-zone h2{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:10px;color:var(--ink)}
+.upload-zone p{font-size:14px;color:var(--muted);max-width:44ch;margin:0 auto}
+.upload-zone input{display:none}
+.upload-btn{display:inline-block;margin-top:20px;background:var(--accent);color:#fff;padding:12px 28px;border-radius:50px;font-size:14px;font-weight:600;cursor:pointer;transition:.15s}
+.upload-btn:hover{background:var(--accent2)}
 
 /* LOADING */
-.loading{display:none;align-items:center;justify-content:center;flex:1}
-.spin{width:36px;height:36px;border:3px solid var(--line);border-top-color:var(--br);border-radius:50%;animation:sp .7s linear infinite;margin:0 auto 12px}
-@keyframes sp{to{transform:rotate(360deg)}}
+.loading{display:none;text-align:center;padding:60px;color:var(--muted)}
+.spinner{display:inline-block;width:36px;height:36px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:14px}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-/* DASH */
-.dash{display:none;flex:1;flex-direction:column;overflow:hidden;padding:14px 16px;gap:10px}
-.sec-page{display:flex;flex-direction:column;gap:10px;flex:1;overflow:hidden;min-height:0}
+/* DASHBOARD */
+.dashboard{display:none}
+.dash-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.dash-header h1{font-size:24px;font-weight:800;letter-spacing:-.02em;color:var(--ink)}
+.dash-header .meta{font-size:13px;color:var(--muted);margin-top:4px}
+.dash-header .meta strong{color:var(--ink)}
+.new-btn{background:none;color:var(--muted);border:1px solid var(--line);padding:9px 18px;border-radius:50px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s}
+.new-btn:hover{border-color:#111;color:#111}
 
-/* KPI ROW */
-.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;flex-shrink:0}
-.kpi{background:#fff;border-radius:12px;padding:14px 16px;border:1px solid var(--line);position:relative;overflow:hidden;display:flex;flex-direction:column}
-.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0}
-.kpi.cb::before{background:var(--br)}
-.kpi.cr::before{background:var(--red)}
-.kpi.cg::before{background:var(--grn)}
-.kpi.cy::before{background:var(--yel)}
-.kpi.cd::before{background:#3b82f6}
-.kpi-lbl{font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
-.kpi-val{font-size:22px;font-weight:800;letter-spacing:-.03em;font-family:'Roboto Mono',monospace;line-height:1.1}
-.kpi-val.neg{color:var(--red)}
-.kpi-val.pos{color:var(--grn)}
-.kpi-chg{font-size:10px;font-weight:600;margin-top:3px}
-.kpi-chg.up{color:var(--grn)}
-.kpi-chg.dn{color:var(--red)}
-.kpi-badge{display:inline-block;font-size:9px;font-weight:800;padding:2px 7px;border-radius:10px;margin-top:4px;text-transform:uppercase;letter-spacing:.04em}
-.kpi-badge.danger{background:var(--redbg);color:var(--red);border:1px solid var(--redb)}
-.kpi-badge.ok{background:var(--grnbg);color:var(--grn);border:1px solid var(--grnb)}
-.kpi-badge.warn{background:var(--yelbg);color:var(--yel);border:1px solid var(--yelb)}
-/* Score card */
-.score-wrap{display:flex;align-items:center;gap:10px;margin-top:4px}
-.score-bar{flex:1;height:4px;background:var(--line);border-radius:4px;overflow:hidden}
-.score-fill{height:100%;border-radius:4px}
-/* Sparkline */
-.spark{margin-top:6px}
-.spark svg{display:block}
+/* KPI GRID */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px}
+@media(max-width:900px){.kpi-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:500px){.kpi-grid{grid-template-columns:1fr}}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 24px;position:relative}
+.kpi::after{content:'';position:absolute;bottom:0;left:24px;right:24px;height:2px;border-radius:0 0 2px 2px}
+.kpi.brand::after{background:var(--accent)}
+.kpi.red::after{background:var(--red)}
+.kpi.green::after{background:var(--green)}
+.kpi.yellow::after{background:var(--yellow)}
+.kpi .label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.kpi .val{font-size:28px;font-weight:800;letter-spacing:-.03em;font-family:'Roboto Mono',monospace;margin-bottom:6px;line-height:1.1;color:var(--ink)}
+.kpi .change{font-size:11px;font-weight:600}
+.kpi .val.red{color:var(--red)}
+.kpi .val.green{color:var(--green)}
+.change.up{color:var(--green)}
+.change.dn{color:var(--red)}
 
-/* MIDDLE ROW */
-.mid-row{display:none}
-.panel{background:#fff;border-radius:12px;padding:14px 16px;border:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden}
-.p-title{font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:6px;flex-shrink:0}
-.p-title::before{content:'';display:inline-block;width:3px;height:10px;border-radius:2px;background:var(--gd)}
-.p-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-shrink:0}
-.p-title-row .p-title{margin-bottom:0}
-.p-date{font-size:10px;color:var(--mu2)}
+/* GRID */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+@media(max-width:900px){.row2{grid-template-columns:1fr}}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+@media(max-width:900px){.row3{grid-template-columns:1fr}}
 
-/* BAR CHART */
-.bar-chart{display:flex;align-items:flex-end;gap:6px;flex:1;padding-bottom:4px;min-height:0}
-.bg{flex:1;display:flex;flex-direction:column;align-items:center}
-.bv{font-size:9px;font-family:'Roboto Mono',monospace;color:var(--mu);text-align:center;margin-bottom:2px;white-space:nowrap}
-.br-row{display:flex;gap:2px;align-items:flex-end;width:100%;flex:1}
-.bar{border-radius:4px 4px 0 0;flex:1;min-height:2px;cursor:default;transition:.3s}
-.bar:hover{filter:brightness(1.1)}
-.bl{font-size:9px;color:var(--mu);text-align:center;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
-.chart-legend{display:flex;gap:10px;justify-content:flex-end;flex-shrink:0}
-.leg-i{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--mu)}
-.leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
-
-/* DONUT */
-.donut-wrap{display:flex;align-items:center;gap:12px;flex:1;min-height:0}
-.donut-legend{flex:1;overflow:hidden}
-.di{display:flex;align-items:center;gap:6px;margin-bottom:7px}
-.dd{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.dn{font-size:11px;color:var(--mu);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dv{font-size:10px;color:var(--mu2);white-space:nowrap}
-.dp{font-size:11px;font-weight:700;margin-left:6px;font-family:'Roboto Mono',monospace;white-space:nowrap}
+/* CARD */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 24px}
+.card h3{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;display:flex;align-items:center;gap:7px}
+.card h3::before{content:'';display:inline-block;width:3px;height:11px;border-radius:2px;background:var(--accent)}
 
 /* RATIO TABLE */
-.rt{width:100%;border-collapse:collapse;flex:1}
-.rt tr{border-bottom:1px solid var(--line)}
-.rt tr:last-child{border-bottom:none}
-.rt td{padding:3px 0;font-size:11px;vertical-align:middle}
-.rt td:first-child{color:var(--mu);padding-right:6px}
-.rt td:nth-child(2){font-family:'Roboto Mono',monospace;font-weight:700;text-align:right;color:var(--red);white-space:nowrap}
-.rt td:nth-child(2).ok-v{color:var(--grn)}
-.rt td:nth-child(3){text-align:right;padding-left:4px;white-space:nowrap;color:var(--mu2)}
-.rt td:nth-child(4){text-align:right;padding-left:4px;white-space:nowrap}
-.badge{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;letter-spacing:.02em}
-.badge.ok{background:var(--grnbg);color:var(--grn);border:1px solid var(--grnb)}
-.badge.warn{background:var(--yelbg);color:var(--yel);border:1px solid var(--yelb)}
-.badge.danger{background:var(--redbg);color:var(--red);border:1px solid var(--redb)}
-/* Ratio progress bar */
-.rbar-wrap{display:flex;align-items:center;gap:6px}
-.rbar{height:4px;border-radius:3px;background:var(--line);width:60px;flex-shrink:0;overflow:hidden}
-.rbar-fill{height:100%;border-radius:3px;transition:.4s}
+.ratio-table{width:100%;border-collapse:collapse}
+.ratio-table tr{border-bottom:1px solid var(--line)}
+.ratio-table tr:last-child{border-bottom:none}
+.ratio-table td{padding:9px 0;font-size:13px;color:var(--muted)}
+.ratio-table td:nth-child(2){font-family:'Roboto Mono',monospace;font-weight:700;text-align:right;color:var(--ink)}
+.ratio-table td:nth-child(3){text-align:right;padding-left:10px}
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;letter-spacing:.02em}
+.badge.ok{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.badge.warn{background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow-border)}
+.badge.danger{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
 
-/* AI PANEL */
-.ai-panel{background:#fff;border-radius:12px;padding:0;border:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden}
-.ai-panel-head{background:#f8fafc;border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;gap:8px;flex-shrink:0}
-.ai-panel-head-title{font-size:11px;font-weight:700;color:var(--ink);text-transform:uppercase;letter-spacing:.06em}
-.ai-score{display:flex;align-items:center;gap:14px;padding:14px 16px 12px;flex-shrink:0;border-bottom:1px solid var(--line)}
-.ai-score-gauge{flex-shrink:0;position:relative}
-.ai-score-info{flex:1}
-.ai-score-num{font-size:26px;font-weight:800;font-family:'Roboto Mono',monospace;line-height:1;letter-spacing:-.03em}
-.ai-score-of{font-size:11px;color:var(--mu);font-weight:500}
-.ai-score-lbl{font-size:11px;font-weight:700;margin-top:4px}
-.ai-score-bar{margin-top:8px;height:4px;background:var(--line);border-radius:4px;overflow:hidden}
-.ai-score-bar-fill{height:100%;border-radius:4px}
-.ai-alerts{display:flex;flex-direction:column;gap:4px;flex:1;overflow-y:auto;padding:10px 14px}
-.ai-a{border-radius:8px;padding:8px 10px;font-size:11px;line-height:1.55;display:flex;gap:8px;border:1px solid}
-.ai-a.r{background:#fef9f9;border-color:#fde8e8}
-.ai-a.y{background:#fffdf5;border-color:#fef3c7}
-.ai-a.g{background:#f6fef9;border-color:#d1fae5}
-.ai-a strong{display:block;font-size:11px;font-weight:700;margin-bottom:2px}
-.ai-a.r strong{color:#c0392b}
-.ai-a.y strong{color:#b45309}
-.ai-a.g strong{color:#15803d}
-.ai-a-icon{font-size:13px;flex-shrink:0;margin-top:1px}
-.ai-conf{background:#f8fafc;border-top:1px solid var(--line);padding:10px 14px;font-size:10px;color:var(--mu);flex-shrink:0}
-.ai-conf-bar{background:var(--line);border-radius:3px;height:3px;margin-top:4px}
-.ai-conf-fill{background:var(--br);height:100%;border-radius:3px}
+/* BAR CHART */
+.bar-chart{display:flex;align-items:flex-end;gap:10px;height:160px}
+.bar-group{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar-row{display:flex;gap:3px;align-items:flex-end;width:100%;height:140px}
+.bar{border-radius:4px 4px 0 0;transition:opacity .2s;flex:1;min-height:2px;cursor:default}
+.bar:hover{opacity:.7}
+.bar-label{font-size:10px;color:var(--muted);text-align:center;margin-top:6px;white-space:nowrap}
+.bar-val{font-size:9px;color:var(--muted);font-family:'Roboto Mono',monospace;text-align:center;margin-bottom:2px}
 
-/* BOTTOM ROW */
-.bot-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;flex-shrink:0}
-.bot-card{background:#fff;border-radius:10px;padding:10px 14px;border:1px solid var(--line)}
-.bc-lbl{font-size:9px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;display:flex;align-items:center;gap:5px}
-.bc-ico{font-size:12px}
-.bc-val{font-size:18px;font-weight:800;font-family:'Roboto Mono',monospace;letter-spacing:-.02em}
-.bc-chg{font-size:10px;color:var(--mu2);margin-top:2px}
-.bc-chg span{font-weight:600}
-.bc-chg .up{color:var(--grn)}
-.bc-chg .dn{color:var(--red)}
+/* DONUT */
+.donut-wrap{display:flex;align-items:center;gap:22px}
+.donut-legend{flex:1}
+.donut-legend-item{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.donut-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 
-.bbi-nav{background:#fff;border-bottom:1px solid #e5e7eb;height:56px;display:flex;align-items:center;flex-shrink:0}
-.bbi-nav-inner{max-width:100%;padding:0 28px;display:flex;justify-content:space-between;align-items:center;width:100%}
-.bbi-logo{font-size:20px;font-weight:800;color:#b79a63;text-decoration:none;letter-spacing:-.02em;display:flex;align-items:center;gap:12px}
-.bbi-logo span{color:#111}
-.bbi-logo-sep{width:1px;height:20px;background:#e5e7eb;flex-shrink:0}
-.bbi-logo-title{font-size:14px;font-weight:600;color:#6b7280}
-.bbi-nav-links{display:flex;gap:24px;align-items:center}
-.bbi-nav-links a{text-decoration:none;color:#374151;font-weight:500;font-size:13px;transition:color .15s}
-.bbi-nav-links a:hover{color:#b79a63}
-.bbi-back{display:flex;align-items:center;gap:5px;color:#6b7280!important}
+/* ALERTS */
+.alerts{display:flex;flex-direction:column;gap:8px}
+.alert{display:flex;gap:10px;padding:12px 14px;border-radius:10px;font-size:12px;line-height:1.6;border:1px solid}
+.alert.danger{background:var(--red-bg);border-color:var(--red-border)}
+.alert.warn{background:var(--yellow-bg);border-color:var(--yellow-border)}
+.alert.ok{background:var(--green-bg);border-color:var(--green-border)}
+.alert-icon{font-size:14px;flex-shrink:0;margin-top:2px}
+.alert strong{display:block;font-weight:700;margin-bottom:2px;font-size:12px;color:var(--ink)}
 
+/* FOOTER */
+.s-footer{border-top:1px solid var(--line);margin-top:40px;padding:46px 0}
+.s-footer-inner{max-width:1480px;margin:0 auto;padding:0 5%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.s-foot-logo{font-size:22px;font-weight:800;color:var(--accent);text-decoration:none;letter-spacing:-.02em}
+.s-foot-logo span{color:#111}
+.s-foot-links{display:flex;gap:22px}
+.s-foot-links a{color:var(--muted);text-decoration:none;font-size:14px;transition:color .15s}
+.s-foot-links a:hover{color:var(--accent)}
+
+/* CARD */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+.card h3{font-size:14px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:16px}
+
+/* RATIO TABLE */
+.ratio-table{width:100%;border-collapse:collapse}
+.ratio-table tr{border-bottom:1px solid var(--line)}
+.ratio-table tr:last-child{border-bottom:none}
+.ratio-table td{padding:10px 0;font-size:13px}
+.ratio-table td:first-child{color:var(--muted)}
+.ratio-table td:nth-child(2){font-family:'Roboto Mono',monospace;font-weight:700;text-align:right}
+.ratio-table td:nth-child(3){text-align:right;padding-left:8px}
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.03em}
+.badge.ok{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.badge.warn{background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow-border)}
+.badge.danger{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+
+/* CHART */
+.chart-wrap{position:relative;height:200px}
+canvas{max-width:100%}
+
+/* BAR CHART */
+.bar-chart{display:flex;align-items:flex-end;gap:12px;height:160px;padding-bottom:8px}
+.bar-group{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar-row{display:flex;gap:3px;align-items:flex-end;width:100%}
+.bar{border-radius:4px 4px 0 0;transition:.3s;flex:1;min-height:2px}
+.bar-label{font-size:10px;color:var(--muted);text-align:center;margin-top:4px}
+.bar-val{font-size:9px;color:var(--muted);font-family:'Roboto Mono',monospace;text-align:center}
+
+/* DONUT */
+.donut-wrap{display:flex;align-items:center;gap:20px}
+.donut-legend{flex:1}
+.donut-legend-item{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:13px}
+.donut-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* ALERTS */
+.alerts{display:flex;flex-direction:column;gap:10px}
+.alert{display:flex;gap:12px;padding:12px 14px;border-radius:10px;font-size:13px;line-height:1.5}
+.alert.danger{background:var(--red-bg);border:1px solid var(--red-border)}
+.alert.warn{background:var(--yellow-bg);border:1px solid var(--yellow-border)}
+.alert.ok{background:var(--green-bg);border:1px solid var(--green-border)}
+.alert-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.alert strong{display:block;font-weight:700;margin-bottom:2px}
+
+/* FOOTER */
+.s-footer{border-top:1px solid var(--line);margin-top:40px;padding:36px 0}
+.s-footer-inner{max-width:1480px;margin:0 auto;padding:0 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.s-foot-logo{font-family:'Fraunces',serif;font-weight:600;font-size:19px;color:var(--ink);text-decoration:none}
+.s-foot-logo span{color:var(--brand)}
+.s-foot-links{display:flex;gap:22px}
+.s-foot-links a{color:var(--muted);text-decoration:none;font-size:14px}
 </style>
 </head>
 <body>
 
-<div class="top">
-    <div class="top-l">
-      <a href="index.html" style="font-size:18px;font-weight:800;color:#b79a63;text-decoration:none;letter-spacing:-.02em;flex-shrink:0">Business<span style="color:#111">BI</span></a>
-      <div style="width:1px;height:18px;background:var(--line);flex-shrink:0"></div>
-      <div class="top-title" id="topTitle">Компани санхүүгийн ерөнхий тойм</div>
-      <div class="top-meta" id="topMeta"></div>
-    </div>
-    <div class="top-r">
-      <div id="yearTags" style="display:flex;gap:4px;align-items:center"></div>
-      <button class="tbtn tbtn-o" id="addYearBtn" style="display:none" onclick="document.getElementById('addYearInput').click()">
-        + Тайлан нэмэх
-        <input type="file" id="addYearInput" accept=".pdf" style="display:none">
-      </button>
-      <button class="tbtn tbtn-o" onclick="resetDash()">↩ Дахин эхлэх</button>
-      <button class="tbtn tbtn-b" onclick="window.print()">⬇ PDF тайлан</button>
+<nav class="s-nav">
+  <div class="s-nav-inner">
+    <a href="index.html" class="s-logo">
+      <span class="s-logo-main">Business<span>BI</span></span>
+      <div class="s-logo-sep"></div>
+      <span class="s-logo-title">Санхүүгийн шинжилгээ</span>
+    </a>
+    <div class="s-links">
+      <a href="tools.html" class="active">Хэрэгслүүд</a>
+      <a href="index.html#custom">Захиалгат Dashboard</a>
+      <a href="accountants.html">Нягтлан холбох</a>
+      <a href="index.html#courses">Сургалт</a>
+      <a href="index.html#contact" class="s-cta">Холбогдох</a>
     </div>
   </div>
-<div style="display:flex;flex:1;min-height:0;overflow:hidden;min-height:0">
-<aside class="sb">
-  <nav class="sb-nav">
-    <div class="sb-sec">Үндсэн цэс</div>
-    <button class="sb-i active" onclick="showSection('overview')">
-      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      Ерөнхий тойм
-    </button>
-    <button class="sb-i" onclick="showSection('income')">
-      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-      Санхүүгийн тайлан
-    </button>
-    <button class="sb-i" onclick="showSection('ratio')">
-      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      Харьцааны шинжилгаэ
-    </button>
-    <button class="sb-i" onclick="showSection('cash')">
-      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      Мөнгөн урсгал
-    </button>
-    <button class="sb-i" onclick="showSection('trend')">
-      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-      Тренд шинжилгаэ
-    </button>
-    <button class="sb-i" onclick="showSection('ai')">
-      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-      AI дүгнэлт
-    </button>
+</nav>
 
-    <div class="sb-div"></div>
-    <button class="sb-i" onclick="window.print()">
-      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Тайлан гаргах
-    </button>
-    <button class="sb-i" onclick="sbClick(this)">
-      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      Мэдэгдэл
-      <span class="sb-badge">3</span>
-    </button>
-    <button class="sb-i" onclick="sbClick(this)">
-      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-      Тохиргоо
-    </button>
-  </nav>
-  <div class="sb-user">
-    <div class="sb-av" id="sbAv">B</div>
-    <div style="min-width:0">
-      <div class="sb-un" id="sbName">BusinessBI Demo</div>
-      <div class="sb-ur">CFO Dashboard</div>
-    </div>
-    <button class="sb-out" onclick="resetDash()" title="Тайлан солих">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-    </button>
-  </div>
-</aside>
+<div class="wrap">
 
-<!-- MAIN -->
-<div class="main">
   <!-- UPLOAD -->
-  <div class="upload" id="upScreen">
-    <div class="upload-card">
-      <div style="font-size:48px;margin-bottom:16px">📊</div>
-      <h2>E-balance PDF тайлан оруулах</h2>
-      <p>МБС/НБОУС стандарт баланс, орлогын тайлан дэмжинэ.<br>Нэг буюу олон оны PDF оруулж тренд шинжилгээ хийнэ.</p>
-      <div class="upload-zone" id="upZone">
-        <label class="upload-lbl">📁 PDF файл сонгох<input type="file" id="pdfInput" accept=".pdf"></label>
-        <div class="upload-note">эсвэл файлаа энд чирж тавь</div>
-      </div>
-      <p style="font-size:11px;color:var(--mu2)">✓ Олон он оруулах боломжтой · ✓ Аюулгүй</p>
-    </div>
+  <div class="upload-zone" id="uploadZone">
+    <div class="icon">📊</div>
+    <h2>E-balance PDF тайлан оруулах</h2>
+    <p>Монголын нягтлан бодох бүртгэлийн стандарт (МБС/НБОУС) баланс, орлогын тайлан дэмжинэ</p>
+    <label class="upload-btn">
+      PDF файл сонгох
+      <input type="file" id="pdfInput" accept=".pdf">
+    </label>
+    <p style="margin-top:12px;font-size:12px;color:#9ca3af">Өгөгдлийг зөвхөн таны браузер дотор боловсруулна — гадагш илгээхгүй</p>
   </div>
 
-  <!-- LOADING -->
-  <div class="loading" id="ldScreen">
-    <div><div class="spin"></div><p style="color:var(--mu);font-size:13px">PDF уншиж байна...</p></div>
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p>PDF уншиж байна...</p>
   </div>
 
   <!-- DASHBOARD -->
-  <div class="dash" id="dash">
-    <!-- SECTION: Ерөнхий тойм -->
-    <div id="sec-overview" class="sec-page">
-      <!-- KPI -->
-      <div class="kpi-row">
-        <div class="kpi cb" id="k0"></div>
-        <div class="kpi cd" id="k1"></div>
-        <div class="kpi cr" id="k2"></div>
-        <div class="kpi" id="k3"></div>
-        <div class="kpi" id="k4"></div>
+  <div class="dashboard" id="dashboard">
+    <div class="dash-header">
+      <div>
+        <h1 id="companyName">Компанийн нэр</h1>
+        <div class="meta">Тайлант үе: <strong id="reportYear">—</strong> · Регистр: <strong id="regNum">—</strong></div>
       </div>
-      <!-- MIDDLE + AI -->
-      <div style="display:grid;grid-template-columns:1fr 320px;gap:10px;flex:1;min-height:0">
-        <div style="display:flex;flex-direction:column;gap:10px;min-height:0">
-          <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:10px;flex:1;min-height:0">
-            <div class="panel" id="pChart"></div>
-            <div class="panel" id="pDonut"></div>
-          </div>
-          <div class="panel" id="pRatio" style="flex-shrink:0;padding:10px 14px"></div>
-        </div>
-        <div class="ai-panel" id="pAI"></div>
-      </div>
-      <!-- BOTTOM -->
-      <div class="bot-row" id="botRow"></div>
+      <button class="new-btn" onclick="resetDash()">↩ Шинэ тайлан</button>
     </div>
 
-    <!-- SECTION: Санхүүгийн тайлан -->
-    <div id="sec-income" class="sec-page" style="display:none;overflow-y:auto">
-      <div id="si-income"></div>
-      <div id="si-balance"></div>
-      <div id="si-equity"></div>
-      <div id="si-cashflow"></div>
-    </div>
-
-    <!-- SECTION: Харьцааны шинжилгаэ -->
-    <div id="sec-ratio" class="sec-page" style="display:none">
-      <div class="panel" id="sr-table" style="flex-shrink:0"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1;min-height:0">
-        <div class="panel" id="sr-chart"></div>
-        <div class="panel" id="sr-bench"></div>
+    <!-- KPI -->
+    <div class="kpi-grid">
+      <div class="kpi brand">
+        <div class="label">Нийт хөрөнгө</div>
+        <div class="val" id="kpiAsset">—</div>
+        <div class="change" id="kpiAssetChg"></div>
+      </div>
+      <div class="kpi" id="kpiDebtCard">
+        <div class="label">Нийт өр төлбөр</div>
+        <div class="val" id="kpiDebt">—</div>
+        <div class="change" id="kpiDebtChg"></div>
+      </div>
+      <div class="kpi" id="kpiEquityCard">
+        <div class="label">Эздийн өмч</div>
+        <div class="val" id="kpiEquity">—</div>
+        <div class="change" id="kpiEquityChg"></div>
+      </div>
+      <div class="kpi" id="kpiProfitCard">
+        <div class="label">Цэвэр ашиг/алдагдал</div>
+        <div class="val" id="kpiProfit">—</div>
+        <div class="change" id="kpiRevChg"></div>
       </div>
     </div>
 
-    <!-- SECTION: Мөнгөн урсгал -->
-    <div id="sec-cash" class="sec-page" style="display:none">
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;flex-shrink:0">
-        <div class="kpi cb" id="sc-k1"></div>
-        <div class="kpi" id="sc-k2"></div>
-        <div class="kpi" id="sc-k3"></div>
+    <div class="row2">
+      <!-- Орлого vs Зардал -->
+      <div class="card">
+        <h3>Орлого · Зардал · Ашиг (₮ сая)</h3>
+        <div class="bar-chart" id="incomeChart"></div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1;min-height:0">
-        <div class="panel" id="sc-flow"></div>
-        <div class="panel" id="sc-detail"></div>
-      </div>
-    </div>
-
-    <!-- SECTION: Тренд -->
-    <div id="sec-trend" class="sec-page" style="display:none">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1;min-height:0">
-        <div class="panel" id="st-chart1"></div>
-        <div class="panel" id="st-chart2"></div>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;flex-shrink:0">
-        <div class="kpi cb" id="st-k1"></div>
-        <div class="kpi" id="st-k2"></div>
-        <div class="kpi" id="st-k3"></div>
-        <div class="kpi" id="st-k4"></div>
-      </div>
-    </div>
-    </div>
-
-    <!-- SECTION: Мөнгөн гүйлгээ -->
-    <div id="sec-cashflow" class="sec-page" style="display:none;overflow-y:auto">
-      <div id="scf-main"></div>
-    </div>
-
-    <!-- SECTION: AI дүгнэлт -->
-    <div id="sec-ai" class="sec-page" style="display:none">
-      <div style="display:grid;grid-template-columns:340px 1fr;gap:10px;flex:1;min-height:0">
-        <div class="ai-panel" id="sai-panel"></div>
-        <div style="display:flex;flex-direction:column;gap:10px;min-height:0">
-          <div class="panel" id="sai-signals" style="flex-shrink:0"></div>
-          <div class="panel" id="sai-recs" style="flex:1;overflow:hidden"></div>
+      <!-- Хөрөнгийн бүтэц -->
+      <div class="card">
+        <h3>Хөрөнгийн бүтэц</h3>
+        <div class="donut-wrap">
+          <svg id="donutSvg" width="140" height="140" viewBox="0 0 140 140"></svg>
+          <div class="donut-legend" id="donutLegend"></div>
         </div>
       </div>
     </div>
 
+    <div class="row2">
+      <!-- Харьцааны шинжилгээ -->
+      <div class="card">
+        <h3>Санхүүгийн харьцаа</h3>
+        <table class="ratio-table" id="ratioTable"></table>
+      </div>
+      <!-- Анхааруулга -->
+      <div class="card">
+        <h3>Дүгнэлт ба анхааруулга</h3>
+        <div class="alerts" id="alertsBox"></div>
+      </div>
+    </div>
+
+    <!-- Өр төлбөрийн задаргаа -->
+    <div class="row3">
+      <div class="card">
+        <h3>Эргэлтийн хөрөнгө</h3>
+        <table class="ratio-table" id="currentAssetsTable"></table>
+      </div>
+      <div class="card">
+        <h3>Богино хугацаат өр</h3>
+        <table class="ratio-table" id="currentLiabTable"></table>
+      </div>
+      <div class="card">
+        <h3>Орлогын задаргаа</h3>
+        <table class="ratio-table" id="incomeTable"></table>
+      </div>
+    </div>
   </div>
 </div>
 
+<footer class="s-footer">
+  <div class="s-footer-inner">
+    <div>
+      <a href="index.html" class="s-foot-logo">Business<span>BI</span></a>
+      <p style="font-size:13px;color:var(--muted);margin-top:6px">Тоо баримтыг шийдвэр болгоно. © 2026</p>
+    </div>
+    <div class="s-foot-links">
+      <a href="tools.html">Хэрэгслүүд</a>
+      <a href="accountants.html">Нягтлан</a>
+      <a href="index.html#contact">Холбоо барих</a>
+    </div>
+  </div>
+</footer>
+
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-// Multi-year state
-// DB.years = ['2023','2024','2025'] sorted
-// DB.data[year] = parsed object
-// G = сүүлийн оны өгөгдөл (render-д ашиглана)
-let DB = {years:[], data:{}};
-let G = {};
 
-// Drag & drop
-const uz=document.getElementById('upZone');
-uz.addEventListener('dragover',e=>{e.preventDefault();uz.classList.add('drag')});
-uz.addEventListener('dragleave',()=>uz.classList.remove('drag'));
-uz.addEventListener('drop',e=>{e.preventDefault();uz.classList.remove('drag');const f=e.dataTransfer.files[0];if(f)go(f)});
-document.getElementById('pdfInput').addEventListener('change',e=>{if(e.target.files[0])go(e.target.files[0])});
+// ── Drag & drop ──
+const zone=document.getElementById('uploadZone');
+zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag');});
+zone.addEventListener('dragleave',()=>zone.classList.remove('drag'));
+zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('drag');const f=e.dataTransfer.files[0];if(f&&f.type==='application/pdf')processPDF(f);});
+document.getElementById('pdfInput').addEventListener('change',e=>{if(e.target.files[0])processPDF(e.target.files[0]);});
 
-async function go(file){
-  // Upload screen нуух (эхний удаа), loading харуулах
-  document.getElementById('upScreen').style.display='none';
-  document.getElementById('ldScreen').style.display='flex';
+async function processPDF(file){
+  // Нэвтрэлт шаардах — нэвтрээгүй бол modal нээгээд, нэвтэрсний дараа үргэлжлүүлнэ
+  if(!BBIGate.isLoggedIn()){
+    BBIGate.onReady(()=>{});
+    const resume = ()=>processPDF(file);
+    if(!BBIGate.isLoggedIn()){
+      window.__bbiResumePDF = resume;
+      BBIGate.openLogin();
+      const iv = setInterval(()=>{ if(BBIGate.isLoggedIn()){ clearInterval(iv); const r=window.__bbiResumePDF; window.__bbiResumePDF=null; if(r) r(); } }, 400);
+      return;
+    }
+  }
+  BBIGate.logActivity('tool_open', { toolName:'Санхүүгийн шинжилгээ' });
+  zone.style.display='none';
+  document.getElementById('loading').style.display='block';
   const buf=await file.arrayBuffer();
   const pdf=await pdfjsLib.getDocument({data:buf}).promise;
   let text='';
-  for(let i=1;i<=Math.min(pdf.numPages,30);i++){
-    const p=await pdf.getPage(i);
-    const c=await p.getTextContent();
-    text+=c.items.map(s=>s.str).join(' ')+'\n';
+  for(let i=1;i<=Math.min(pdf.numPages,25);i++){
+    const page=await pdf.getPage(i);
+    const content=await page.getTextContent();
+    text+=content.items.map(s=>s.str).join(' ')+'\n';
   }
-  document.getElementById('ldScreen').style.display='none';
-  // DEBUG — он болон үндсэн утгуудыг console-д харуулах
-  console.log('=== PDF DEBUG ===');
-  console.log('Text sample (first 500):', text.substring(0,500));
-  console.log('Year matches:', text.match(/(\d{4})/g)?.slice(0,10));
-  const parsed=parseOne(text);
-  console.log('Parsed yrKey:', parsed.yrKey, '| rv:', parsed.rv, '| ta:', parsed.ta);
-  const yr=parsed.yrKey;
-  // Тайлант он хадгалах
-  DB.data[yr]=parsed;
-  if(!DB.years.includes(yr)) DB.years.push(yr);
-  // Өмнөх он автоматаар нэмэх (PDF-д prev утгууд байгаа)
-  const prevYrKey=yr!=='unknown'?String(parseInt(yr)-1):null;
-  if(prevYrKey && !DB.data[prevYrKey]){
-    // Өмнөх оны объект үүсгэх — prev утгуудаас
-    const p=parsed;
-    const prevCr=p.sd&&p.sd>0&&p.ca?p.ca/p.sd:null; // ca нь cur, pa нь prev
-    // Prev оны бүрэн өгөгдөл — cur оны parsed объектоос prev утгуудыг авна
-    const pCr=p.psd&&p.psd>0&&p.pca?p.pca/p.psd:null;
-    const pDr=p.pa&&p.pa>0&&p.ptd?p.ptd/p.pa:null;
-    const pGm=p.pr&&p.pr>0&&p.pg?p.pg/p.pr*100:null;
-    const pNm=p.pr&&p.pr>0&&p.pp?p.pp/p.pr*100:null;
-    const pRoa=p.pa&&p.pa>0&&p.pp?p.pp/p.pa*100:null;
-    const pSc=(()=>{let s=50;if(pCr!==null){s+=pCr>=2?10:pCr>=1?5:-10}if(pDr!==null){s+=pDr<=0.5?10:pDr<=0.7?0:-10}if(pNm!==null){s+=pNm>=10?10:pNm>=0?5:-15}return Math.max(0,Math.min(100,Math.round(s)));})();
-    DB.data[prevYrKey]={
-      co:p.co,rg:p.rg,yr:prevYrKey+' он',yrKey:prevYrKey,
-      // Баланс — prev утгууд
-      ta:p.pa,pa:null,
-      ca:p.pca,nca:p.pnca,
-      td:p.ptd,eq:p.peq,
-      sd:p.psd,ld:p.pld,
-      cash:p.pcash,recv:p.precv,trec:p.ptrec,orec:p.porec,
-      inv:p.pinv,prep:p.pprep,
-      apay:p.papay,spay:p.pspay,tpay:p.ptpay,
-      // Орлого — prev утгууд
-      rv:p.pr,pr:null,cg:p.pc,pc:null,gr:p.pg,pg:null,
-      ox1:p.pox1,ox2:p.pox2,fx:p.pfx,pf:p.pp,pp:null,tx:p.ptx,
-      busad:p.pbusad,ox3:p.pox3,
-      tax_before:p.pg?((p.pg||0)-(p.pox1||0)-(p.pox2||0)-(p.pfx||0)-(p.pox3||0)):null,
-      // Харьцаанууд
-      cr:pCr,dr:pDr,gm:pGm,nm:pNm,
-      roe:null,roa:pRoa,de:null,sc:pSc
-    };
-    if(!DB.years.includes(prevYrKey)) DB.years.push(prevYrKey);
-  }
-  DB.years.sort();
-  // Сүүлийн оныг G болгох
-  G=DB.data[DB.years[DB.years.length-1]];
-  // Topbar шинэчлэх
-  const yrs=DB.years.join(', ');
-  document.getElementById('topTitle').textContent=G.co+' санхүүгийн ерөнхий тойм';
-  document.getElementById('topMeta').textContent='Тайлант үе: '+yrs+' · Регистр: '+G.rg;
-  document.getElementById('sbName').textContent=G.co.substring(0,18);
-  document.getElementById('sbAv').textContent=G.co.charAt(0);
-  // Dashboard харуулах
-  document.getElementById('dash').style.display='flex';
-  render();
-  updateAddBtn();
+  document.getElementById('loading').style.display='none';
+  parseAndRender(text);
 }
 
-function fv(t,lbl){
-  const e=lbl.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-  const r=new RegExp(e+'[^\\d\\-]*(-?\\s?[\\d,]+\\.\\d+)\\s+(-?\\s?[\\d,]+\\.\\d+)');
-  const m=t.match(r);
+function parseNum(text,pattern){
+  const m=text.match(pattern);
+  if(!m)return null;
+  // сөрөг тоо: "- 663,041,330.23" хэлбэр
+  const raw=m[1].replace(/,/g,'').replace(/\s/g,'');
+  return parseFloat(raw);
+}
+
+function findVal(text,label){
+  // label-ийн ард байгаа хоёр тоог олно: эхний ба эцсийн үлдэгдэл
+  const escaped=label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const re=new RegExp(escaped+'[^\\d\\-]*(-?\\s?[\\d,]+\\.\\d+)\\s+(-?\\s?[\\d,]+\\.\\d+)');
+  const m=text.match(re);
   if(!m)return[null,null];
   return[parseFloat(m[1].replace(/[,\s]/g,'')),parseFloat(m[2].replace(/[,\s]/g,''))];
 }
 
-function parseOne(t){
-  const co=t.match(/"([^"]{5,80}(?:компани|ХХК|LLC)[^"]{0,20})"/i);
-  const rg=t.match(/Регистрийн дугаар\s*:\s*(\d+)/);
-  // Он олох — олон формат дэмжих
-  const yr=t.match(/(\d{4})\s*оны\s*(\d+)\s*сар/) ||
-            t.match(/(\d{4})\s*он\s*(?:ы|ийн)?\s*(\d+)?\s*сар?/) ||
-            t.match(/тайлант\s*үе[^\d]*(\d{4})/) ||
-            t.match(/(\d{4})\s*оны\s*(?:жилийн\s*эцсийн|12\s*дугаар\s*сарын)/) ||
-            t.match(/(\d{4})[^\d]*он/);
-  const yrKey=yr?yr[1]:'unknown';
-  // Debug: console.log('yr match:', yr, 'yrKey:', yrKey);
-
-  // Тайлант он (cur) болон өмнөх он (prev) хоёуланг авах
-  const [pa,ta]=fv(t,'НИЙТ ХӨРӨНГИЙН ДҮН');
-  const [pca,ca]=fv(t,'Эргэлтийн хөрөнгийн дүн');
-  const [pnca,nca]=fv(t,'Эргэлтийн бус хөрөнгийн дүн');
-  const [ptd,td]=fv(t,'Өр төлбөрийн нийт дүн');
-  const [peq,eq]=fv(t,'Эздийн өмчийн дүн');
-  const [psd,sd]=fv(t,'Богино хугацаат өр төлбөрийн дүн');
-  const [pld,ld]=fv(t,'Урт хугацаат өр төлбөрийн дүн');
-  const [pcash,cash]=fv(t,'Мөнгө,түүнтэй адилтгах хөрөнгө');
-  const [precv,recv]=fv(t,'Дансны авлага');
-  const [ptrec,trec]=fv(t,'Татвар, НДШ – ийн авлага');
-  const [porec,orec]=fv(t,'Бусад авлага');
-  const [pinv,inv]=fv(t,'Бараа материал');
-  const [pprep,prep]=fv(t,'Урьдчилж төлсөн зардал');
-  const [papay,apay]=fv(t,'Дансны өглөг');
-  const [pspay,spay]=fv(t,'Цалингийн өглөг');
-  const [ptpay,tpay]=fv(t,'Татварын өр');
-  const [pr,rv]=fv(t,'Борлуулалтын орлого (цэвэр)');
-  const [pc,cg]=fv(t,'Борлуулсан бүтээгдэхүүний өртөг');
-  const [pg,gr]=fv(t,'Нийт ашиг');
-  const [pox1,ox1]=fv(t,'Борлуулалт, маркетингийн зардал');
-  const [pox2,ox2]=fv(t,'Ерөнхий ба удирдлагын зардал');
-  const [pfx,fx]=fv(t,'Санхүүгийн зардал');
-  const [pp,pf]=fv(t,'Тайлант үеийн цэвэр ашиг');
-  const [ptx,tx]=fv(t,'Орлогын татварын зардал');
-  // Нэмэлт орлогын тайланы мөрүүд — e-balance жинхэнэ label
-  const [pbusad,busad]=fv(t,'8. Бусад орлого');
-  const [pox3,ox3]=fv(t,'12. Бусад зардал');
-  const [ptax_before,tax_before]=fv(t,'18. Татвар төлөхийн өмнөх ашиг');
-
-  const cr=sd&&sd>0&&ca?ca/sd:null;
-  const dr=ta&&ta>0&&td?td/ta:null;
-  const gm=rv&&rv>0&&gr?gr/rv*100:null;
-  const nm=rv&&rv>0&&pf?pf/rv*100:null;
-  const roe=eq&&eq>0&&pf?pf/eq*100:null;
-  const roa=ta&&ta>0&&pf?pf/ta*100:null;
-  const de=eq&&eq!==0&&td?td/eq:null;
-
-  let sc=50;
-  if(cr!==null){sc+=cr>=2?10:cr>=1?5:-10}
-  if(dr!==null){sc+=dr<=0.5?10:dr<=0.7?0:-10}
-  if(nm!==null){sc+=nm>=10?10:nm>=0?5:-15}
-  if(roe!==null){sc+=roe>=15?10:roe>=0?3:-5}
-  if(gm!==null){sc+=gm>=30?7:gm>=20?3:-5}
-  sc=Math.max(0,Math.min(100,Math.round(sc)));
-
-  return {co:co?co[1].trim():'Компани',rg:rg?rg[1]:'—',
-    yr:yr?yr[1]+' оны '+yr[2]+' сар':'—', yrKey,
-    // Тайлант оны утгууд
-    ta,pa,ca,nca,td,eq,sd,ld,cash,recv,trec,orec,inv,prep,apay,spay,tpay,
-    rv,pr,cg,pc,gr,pg,ox1,ox2,fx,pf,pp,tx,
-    busad,ox3,tax_before,
-    // Prev оны баланс утгууд (prev year object үүсгэхэд хэрэглэнэ)
-    pca,pnca,ptd,peq,psd,pld,pcash,precv,ptrec,porec,pinv,pprep,papay,pspay,ptpay,
-    pox1,pox2,pfx,ptx,pbusad,pox3,
-    cr,dr,gm,nm,roe,roa,de,sc};
-}
-// Хуучин parse нэр хадгалах (ашиглагдахгүй болсон)
-function parse(t){G=parseOne(t);}
-
-function f(n){
-  if(n===null||n===undefined||isNaN(n))return'—';
-  const a=Math.abs(n);
+function fmt(n,unit=''){
+  if(n===null||isNaN(n))return'—';
+  const abs=Math.abs(n);
   let s,u;
-  if(a>=1e9){s=(n/1e9).toFixed(2);u=' тэрбум';}
-  else if(a>=1e6){s=(n/1e6).toFixed(1);u=' сая';}
-  else if(a>=1e3){s=(n/1e3).toFixed(0);u=' мянга';}
+  if(abs>=1e9){s=(n/1e9).toFixed(2);u='тэрбум';}
+  else if(abs>=1e6){s=(n/1e6).toFixed(1);u='сая';}
+  else if(abs>=1e3){s=(n/1e3).toFixed(0);u='мянга';}
   else{s=n.toFixed(0);u='';}
-  return(n<0?'-':'')+Math.abs(parseFloat(s)).toLocaleString()+u;
-}
-function fm(n){return n===null?'—':((n||0)/1e6).toFixed(1)}
-function px(v,d=1){return v===null?'—':v.toFixed(d)+'%'}
-function xx(v){return v===null?'—':v.toFixed(2)+'x'}
-function chg(c,p){
-  if(!c||!p||p===0)return null;
-  const r=((c-p)/Math.abs(p)*100).toFixed(1);
-  return(c>p?'▲ +':'▼ ')+r+'% өмнөх оноос';
-}
-function bdg(v,ok,wn,inv=false){
-  if(v===null)return'<span class="badge warn">—</span>';
-  let s;
-  if(inv)s=v<=ok?'ok':v<=wn?'warn':'danger';
-  else s=v>=ok?'ok':v>=wn?'warn':'danger';
-  const l=s==='ok'?'Хэвийн':s==='warn'?'Анхааруулга':'Эрсдэлтэй';
-  return'<span class="badge '+s+'">'+l+'</span>';
+  return(n<0?'-':'')+Math.abs(parseFloat(s)).toLocaleString()+(u?' '+u:'')+(unit?' '+unit:'');
 }
 
-function spark(vals,color,w=80,h=28){
-  // 3+ цэг байх үед л sparkline харуулна
-  const valid=vals.filter(v=>v!==null&&!isNaN(v)&&v!==0);
-  if(valid.length<3) return'';
-  const pad=3;
-  const mn=Math.min(...vals),mx=Math.max(...vals),rng=mx-mn||1;
-  const pts=vals.map((v,i)=>{
-    const x=pad+i*(w-pad*2)/(vals.length-1);
-    const y=h-pad-(((v||0)-mn)/rng*(h-pad*2));
-    return x.toFixed(1)+','+y.toFixed(1);
-  }).join(' ');
-  // Сүүлийн цэг тэмдэглэх
-  const lv=vals[vals.length-1]||0;
-  const lx=w-pad,ly=h-pad-((lv-mn)/rng*(h-pad*2));
-  return'<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg">'+
-    '<polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>'+
-    '<circle cx="'+lx.toFixed(1)+'" cy="'+ly.toFixed(1)+'" r="2.5" fill="'+color+'"/>'+
-    '</svg>';
-}
-// Multi-year sparkline өгөгдөл авах
-function getSparkVals(key){
-  return DB.years.map(y=>DB.data[y]?DB.data[y][key]:null);
+function fmtM(n){return n===null?'—':(n/1e6).toFixed(1);}
+
+function badge(val,okMin,warnMin,label){
+  // okMin дээш = ok, warnMin дунд = warn, доош = danger
+  if(val===null)return'<span class="badge warn">—</span>';
+  if(val>=okMin)return`<span class="badge ok">${label||'Хэвийн'}</span>`;
+  if(val>=warnMin)return`<span class="badge warn">Анхааруулга</span>`;
+  return`<span class="badge danger">Эрсдэлтэй</span>`;
 }
 
-function render(){
-  const d=G;
-  const sc=d.sc;
-  const scC=sc>=70?'var(--grn)':sc>=40?'var(--yel)':'var(--red)';
-  const scL=sc>=70?'Эрүүл':sc>=40?'Анхааруулга':'Эрсдэлтэй';
-  const scB=sc>=70?'ok':sc>=40?'warn':'danger';
-  const chgC=c=>c&&c.startsWith('▲')?'up':'dn';
+function parseAndRender(text){
+  // ── Компаний мэдээлэл ──
+  const compMatch=text.match(/"([^"]+(?:Хязгаарлагдмал|ХХК|ХК|LLC|компани)[^"]*)"/) ||
+                  text.match(/компани"\-ийн/i);
+  const company=text.match(/"([^"]{5,80}(?:компани|ХХК|LLC)[^"]{0,20})"/i);
+  document.getElementById('companyName').textContent=company?company[1].trim():'Компани';
 
-  // KPI 0 — Score gauge (stroke-dasharray аргаар)
-  // 180deg semi-circle, r=26, circumference=PI*r=81.7, эхлэл зүүн доод
-  const gR=26, gCX=36, gCY=34;
-  const gCirc=Math.PI*gR; // хагас тойргийн урт
-  const gDash=(sc/100)*gCirc;
-  const gGap=gCirc-gDash;
-  document.getElementById('k0').innerHTML=
-    '<div class="kpi-lbl">Санхүүгийн үнэлгээ</div>'+
-    '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'+
-      '<div>'+
-        '<div style="font-size:22px;font-weight:800;font-family:Roboto Mono,monospace;letter-spacing:-.03em;line-height:1.1">'+
-          '<span style="color:'+scC+'">'+sc+'</span>'+
-          '<span style="font-size:13px;font-weight:600;color:var(--mu)"> / 100</span>'+
-        '</div>'+
-        '<div class="kpi-badge '+scB+'" style="margin-top:7px">'+scL+'</div>'+
-      '</div>'+
-      '<svg width="72" height="44" viewBox="0 0 72 44" style="flex-shrink:0">'+
-        // Арын саарал хагас тойрог
-        '<path d="M '+(gCX-gR)+','+gCY+' A '+gR+' '+gR+' 0 0 1 '+(gCX+gR)+' '+gCY+'" fill="none" stroke="#f0f0f0" stroke-width="7" stroke-linecap="round"/>'+
-        // Урдаа score хагас тойрог
-        '<path d="M '+(gCX-gR)+','+gCY+' A '+gR+' '+gR+' 0 0 1 '+(gCX+gR)+' '+gCY+'" fill="none" stroke="'+scC+'" stroke-width="7" stroke-linecap="round"'+
-          ' stroke-dasharray="'+gDash+' '+gGap+'" stroke-dashoffset="0"/>'+
-      '</svg>'+
-    '</div>';
+  const regMatch=text.match(/Регистрийн дугаар\s*:\s*(\d+)/);
+  document.getElementById('regNum').textContent=regMatch?regMatch[1]:'—';
 
-  // KPI 1 — Нийт хөрөнгө
-  const c1=chg(d.ta,d.pa);
-  document.getElementById('k1').innerHTML=
-    '<div class="kpi-lbl">Нийт хөрөнгө</div>'+
-    '<div class="kpi-val">'+f(d.ta)+'</div>'+
-    (c1?'<div class="kpi-chg '+chgC(c1)+'">'+c1+'</div>':'')+
-    (d.pa?'<div style="font-size:10px;color:var(--mu2);margin-top:2px">Өмнөх: '+f(d.pa)+'</div>':'')+
-    '<div class="spark">'+spark(getSparkVals('ta'),'#3b82f6')+'</div>';
+  const yearMatch=text.match(/(\d{4})\s*оны\s*жилийн\s*эцсийн/);
+  document.getElementById('reportYear').textContent=yearMatch?yearMatch[1]+' он':'—';
 
-  // KPI 2 — Нийт өр
-  document.getElementById('k2').innerHTML=
-    '<div class="kpi-lbl">Нийт өр төлбөр</div>'+
-    '<div class="kpi-val '+(d.td>0?'neg':'')+'">'+f(d.td)+'</div>'+
-    (d.dr!==null?'<div class="kpi-chg dn">▲ '+px(d.dr*100)+' өмнөх оноос</div>':'')+
-    (d.td?'<div style="font-size:10px;color:var(--mu2);margin-top:2px">Өмнөх: '+f(d.td)+'</div>':'')+
-    '<div class="spark">'+spark(getSparkVals('td'),'#dc2626')+'</div>';
+  // ── Баланс ──
+  const [,totalAsset]=findVal(text,'НИЙТ ХӨРӨНГИЙН ДҮН');
+  const [prevAsset]=findVal(text,'НИЙТ ХӨРӨНГИЙН ДҮН');
+  const [,curAsset]=findVal(text,'Эргэлтийн хөрөнгийн дүн');
+  const [,ncurAsset]=findVal(text,'Эргэлтийн бус хөрөнгийн дүн');
+  const [,totalDebt]=findVal(text,'Өр төлбөрийн нийт дүн');
+  const [,equity]=findVal(text,'Эздийн өмчийн дүн');
+  const [,stDebt]=findVal(text,'Богино хугацаат өр төлбөрийн дүн');
+  const [,ltDebt]=findVal(text,'Урт хугацаат өр төлбөрийн дүн');
 
-  // KPI 3 — Эздийн өмч
-  const e3=d.eq&&d.eq<0;
-  document.getElementById('k3').className='kpi '+(e3?'cr':'cg');
-  document.getElementById('k3').innerHTML=
-    '<div class="kpi-lbl">Эздийн өмч</div>'+
-    '<div class="kpi-val '+(e3?'neg':'pos')+'">'+f(d.eq)+'</div>'+
-    (e3?'<div class="kpi-badge danger" style="margin-top:3px">Сөрөг</div>':'<div class="kpi-badge ok" style="margin-top:3px">Эерэг</div>')+
-    '<div style="font-size:10px;color:var(--mu2);margin-top:4px">Өр/Өмч: '+(d.de!==null?d.de.toFixed(2)+'x':'—')+'</div>'+
-    '<div class="spark">'+spark(getSparkVals('eq'),e3?'#dc2626':'#16a34a')+'</div>';
+  // Эргэлтийн хөрөнгийн задаргаа
+  const [,cash]=findVal(text,'Мөнгө,түүнтэй адилтгах хөрөнгө');
+  const [,recv]=findVal(text,'Дансны авлага');
+  const [,taxRecv]=findVal(text,'Татвар, НДШ – ийн авлага');
+  const [,otherRecv]=findVal(text,'Бусад авлага');
+  const [,invent]=findVal(text,'Бараа материал');
+  const [,prepaid]=findVal(text,'Урьдчилж төлсөн зардал');
 
-  // KPI 4 — Цэвэр ашиг
-  const e4=d.pf&&d.pf<0;
-  const c4=chg(d.pf,d.pp);
-  document.getElementById('k4').className='kpi '+(e4?'cr':'cg');
-  document.getElementById('k4').innerHTML=
-    '<div class="kpi-lbl">Цэвэр ашиг / алдагдал</div>'+
-    '<div class="kpi-val '+(e4?'neg':'pos')+'">'+f(d.pf)+'</div>'+
-    (c4?'<div class="kpi-chg '+chgC(c4)+'">'+c4+'</div>':'')+
-    (d.pp?'<div style="font-size:10px;color:var(--mu2);margin-top:2px">Өмнөх: '+f(d.pp)+'</div>':'')+
-    '<div class="spark">'+spark(getSparkVals('pf'),e4?'#dc2626':'#16a34a')+'</div>';
+  // Богино хугацаат өр задаргаа
+  const [,apay]=findVal(text,'Дансны өглөг');
+  const [,salPay]=findVal(text,'Цалингийн өглөг');
+  const [,taxPay]=findVal(text,'Татварын өр');
+  const [,stLoan]=findVal(text,'Богино хугацаат зээл');
+  const [,advInc]=findVal(text,'Урьдчилж орсон');
 
-  // CHART панел — multi-year дэмжинэ
-  function fBar(n){
-    if(n===null||isNaN(n))return'—';
-    const a=Math.abs(n);
-    if(a>=1e9)return(n<0?'-':'')+Math.abs(n/1e9).toFixed(2)+' тэрбум';
-    if(a>=1e6)return(n<0?'-':'')+Math.abs(n/1e6).toFixed(0)+' сая';
-    return f(n);
-  }
-  const CHART_METRICS=[
-    {key:'rv',l:'Борлуулалт',co:'#0f5e57'},
-    {key:'cg',l:'Өртөг',co:'#b79a63'},
-    {key:'gr',l:'Нийт ашиг',co:'#3b82f6'},
-    {key:'pf',l:'Цэвэр ашиг',co:'#16a34a'},
-  ];
-  const YR_COLORS=['#c7d9f5','#7eb5f4','#2563eb','#0f5e57'];
-  const yrs=DB.years;
-  // Бүх утгын max
-  let allVals=[];
-  CHART_METRICS.forEach(m=>yrs.forEach(y=>{const v=DB.data[y]?DB.data[y][m.key]:null;if(v)allVals.push(Math.abs(v));}));
-  const mx=Math.max(...allVals,1);
-  const chHTML='<div class="p-title-row"><div class="p-title">Орлого · зардал · ашиг</div>'+
-    '<div style="display:flex;gap:8px">'+yrs.map((y,i)=>'<div class="leg-i"><div class="leg-dot" style="background:'+YR_COLORS[Math.min(i,YR_COLORS.length-1)]+'"></div>'+y+'</div>').join('')+'</div></div>'+
-    '<div class="bar-chart">'+
-    CHART_METRICS.map(m=>{
-      const topVal=DB.data[yrs[yrs.length-1]]?DB.data[yrs[yrs.length-1]][m.key]:null;
-      return'<div class="bg">'+
-        '<div class="bv">'+fBar(topVal)+'</div>'+
-        '<div class="br-row">'+
-        yrs.map((y,i)=>{
-          const v=DB.data[y]?DB.data[y][m.key]:null;
-          const h=mx>0?Math.max(2,Math.abs((v||0)/mx*110)):2;
-          const col=(v||0)<0?'#dc2626':YR_COLORS[Math.min(i,YR_COLORS.length-1)];
-          return'<div class="bar" style="height:'+h+'px;background:'+col+'" title="'+y+': '+fBar(v)+'"></div>';
-        }).join('')+
-        '</div>'+
-        '<div class="bl">'+m.l+'</div>'+
-        '</div>';
-    }).join('')+
-    '</div>';
-  document.getElementById('pChart').innerHTML=chHTML;
+  // ── Орлого ──
+  const [prevRev,rev]=findVal(text,'Борлуулалтын орлого (цэвэр)');
+  const [prevCogs,cogs]=findVal(text,'Борлуулсан бүтээгдэхүүний өртөг');
+  const [prevGross,gross]=findVal(text,'Нийт ашиг');
+  const [,opEx1]=findVal(text,'Борлуулалт, маркетингийн зардал');
+  const [,opEx2]=findVal(text,'Ерөнхий ба удирдлагын зардал');
+  const [,finEx]=findVal(text,'Санхүүгийн зардал');
+  const [,otherEx]=findVal(text,'Бусад зардал');
+  const [prevProfit,profit]=findVal(text,'Тайлант үеийн цэвэр ашиг');
+  const [,taxEx]=findVal(text,'Орлогын татварын зардал');
 
-  // DONUT
-  const dd=[
-    {n:'Мөнгө',v:d.cash||0,c:'#0f5e57'},
-    {n:'Авлага',v:(d.recv||0)+(d.trec||0)+(d.orec||0),c:'#b79a63'},
-    {n:'Бараа материал',v:d.inv||0,c:'#3b82f6'},
-    {n:'Урьдчилгаа',v:d.prep||0,c:'#f59e0b'},
-    {n:'Эргэлтийн бус',v:d.nca||0,c:'#6b7280'},
-  ].filter(x=>x.v>0);
-  const tot=dd.reduce((a,b)=>a+b.v,0);
-  const CX=90,CY=90,R=78,ri=44;
-  let ang=0,paths='',labels='';
-  dd.forEach(x=>{
-    const sw=tot>0?(x.v/tot)*2*Math.PI:0;
-    if(sw<0.01){ang+=sw;return;}
-    const x1=CX+R*Math.sin(ang),y1=CY-R*Math.cos(ang);
-    const x2=CX+R*Math.sin(ang+sw),y2=CY-R*Math.cos(ang+sw);
-    const x3=CX+ri*Math.sin(ang+sw),y3=CY-ri*Math.cos(ang+sw);
-    const x4=CX+ri*Math.sin(ang),y4=CY-ri*Math.cos(ang);
-    const lg=sw>Math.PI?1:0;
-    paths+='<path d="M'+x1+','+y1+' A'+R+','+R+' 0 '+lg+',1 '+x2+','+y2+' L'+x3+','+y3+' A'+ri+','+ri+' 0 '+lg+',0 '+x4+','+y4+' Z" fill="'+x.c+'"/>';
-    // Хувийн label — slice голд байрлуул
-    if(sw>0.2){
-      const mid=ang+sw/2;
-      const lr=ri+(R-ri)*0.55;
-      const lx=CX+lr*Math.sin(mid);
-      const ly=CY-lr*Math.cos(mid);
-      const pct=(x.v/tot*100).toFixed(1);
-      labels+='<text x="'+lx+'" y="'+ly+'" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#fff">'+pct+'%</text>';
+  // ── KPI дүүргэх ──
+  setKPI('kpiAsset',totalAsset,prevAsset,'brand');
+  setKPI('kpiDebt',totalDebt,null,'red');
+  setKPI('kpiEquity',equity,null,equity&&equity<0?'red':'green');
+  setKPI('kpiProfit',profit,prevProfit,profit&&profit<0?'red':'green');
+
+  function setKPI(id,val,prev,color){
+    const el=document.getElementById(id);
+    const chgEl=document.getElementById(id+'Chg');
+    const cardEl=document.getElementById(id+'Card');
+    if(el)el.textContent=val!==null?fmt(val):'—';
+    if(el)el.className='val '+(val<0?'red':color==='red'?'red':color==='green'?'green':'');
+    if(cardEl)cardEl.className='kpi '+(color||'brand');
+    if(chgEl&&prev!==null&&val!==null&&prev!==0){
+      const pct=((val-prev)/Math.abs(prev)*100).toFixed(1);
+      const up=val>prev;
+      chgEl.textContent=(up?'▲ +':'▼ ')+pct+'% өмнөх оноос';
+      chgEl.className='change '+(up?'up':'dn');
     }
-    ang+=sw;
+  }
+
+  // ── Орлого/зардал бар чарт ──
+  const ic=document.getElementById('incomeChart');
+  const bars=[
+    {label:'Борлуулалт',prev:prevRev,cur:rev,color:'#0f5e57'},
+    {label:'Өртөг',prev:prevCogs,cur:cogs,color:'#b79a63'},
+    {label:'Нийт ашиг',prev:prevGross,cur:gross,color:'#4e9af1'},
+    {label:'Цэвэр ашиг',prev:prevProfit,cur:profit,color:profit<0?'#dc2626':'#16a34a'},
+  ];
+  const maxVal=Math.max(...bars.map(b=>Math.max(Math.abs(b.prev||0),Math.abs(b.cur||0))));
+  ic.innerHTML=bars.map(b=>{
+    const ph=Math.max(2,Math.abs((b.prev||0)/maxVal*140));
+    const ch=Math.max(2,Math.abs((b.cur||0)/maxVal*140));
+    const pneg=(b.prev||0)<0,cneg=(b.cur||0)<0;
+    return`<div class="bar-group">
+      <div class="bar-val">${fmtM(b.cur||0)}M</div>
+      <div class="bar-row">
+        <div class="bar" style="height:${ph}px;background:${b.color};opacity:.45" title="Өмнөх он: ${fmt(b.prev)}"></div>
+        <div class="bar" style="height:${ch}px;background:${cneg?'#dc2626':b.color}" title="Тайлант он: ${fmt(b.cur)}"></div>
+      </div>
+      <div class="bar-label">${b.label}</div>
+    </div>`;
+  }).join('');
+
+  // ── Donut чарт ──
+  const donutData=[
+    {label:'Мөнгө',val:cash||0,color:'#0f5e57'},
+    {label:'Авлага',val:(recv||0)+(taxRecv||0)+(otherRecv||0),color:'#b79a63'},
+    {label:'Бараа материал',val:invent||0,color:'#4e9af1'},
+    {label:'Урьдчилгаа',val:prepaid||0,color:'#f59e0b'},
+    {label:'Эргэлтийн бус',val:ncurAsset||0,color:'#6b7280'},
+  ].filter(d=>d.val>0);
+  const total=donutData.reduce((a,b)=>a+b.val,0);
+  let angle=0;const cx=70,cy=70,r=55,ri=32;
+  let paths='';
+  donutData.forEach(d=>{
+    const sweep=total>0?(d.val/total)*2*Math.PI:0;
+    const x1=cx+r*Math.sin(angle),y1=cy-r*Math.cos(angle);
+    const x2=cx+r*Math.sin(angle+sweep),y2=cy-r*Math.cos(angle+sweep);
+    const x3=cx+ri*Math.sin(angle+sweep),y3=cy-ri*Math.cos(angle+sweep);
+    const x4=cx+ri*Math.sin(angle),y4=cy-ri*Math.cos(angle);
+    const large=sweep>Math.PI?1:0;
+    paths+=`<path d="M${x1},${y1} A${r},${r} 0 ${large},1 ${x2},${y2} L${x3},${y3} A${ri},${ri} 0 ${large},0 ${x4},${y4} Z" fill="${d.color}"/>`;
+    angle+=sweep;
   });
-  document.getElementById('pDonut').innerHTML=
-    '<div class="p-title">Хөрөнгийн бүтэц (нийт хөрөнгийн %)</div>'+
-    '<div class="donut-wrap" style="align-items:center;gap:14px">'+
-    '<svg width="160" height="160" viewBox="0 0 180 180" style="flex-shrink:0">'+paths+labels+'</svg>'+
-    '<div class="donut-legend" style="padding-top:4px;overflow-y:auto;max-height:160px">'+
-    dd.map(x=>{
-      const pct=tot>0?(x.v/tot*100).toFixed(1):0;
-      return '<div class="di" style="margin-bottom:10px">'+
-        '<div class="dd" style="background:'+x.c+';width:10px;height:10px;border-radius:50%"></div>'+
-        '<div>'+
-          '<div style="font-size:12px;font-weight:600;color:var(--ink)">'+x.n+'</div>'+
-          '<div style="font-size:11px;color:var(--mu2)">'+f(x.v)+' ('+pct+'%)</div>'+
-        '</div>'+
-      '</div>';
-    }).join('')+
-    '</div></div>';
+  document.getElementById('donutSvg').innerHTML=paths;
+  document.getElementById('donutLegend').innerHTML=donutData.map(d=>`
+    <div class="donut-legend-item">
+      <div class="donut-dot" style="background:${d.color}"></div>
+      <div><div style="font-size:12px;font-weight:600">${d.label}</div>
+      <div style="font-size:11px;color:var(--muted)">${fmt(d.val)} (${total>0?(d.val/total*100).toFixed(1):0}%)</div></div>
+    </div>`).join('');
 
-  // RATIO TABLE
+  // ── Харьцаанууд ──
+  const curRatio=stDebt&&stDebt>0&&curAsset?(curAsset/stDebt):null;
+  const debtRatio=totalAsset&&totalAsset>0&&totalDebt?(totalDebt/totalAsset):null;
+  const grossMargin=rev&&rev>0&&gross?(gross/rev*100):null;
+  const netMargin=rev&&rev>0&&profit?(profit/rev*100):null;
+  const roe=equity&&equity>0&&profit?(profit/equity*100):null;
+  const roa=totalAsset&&totalAsset>0&&profit?(profit/totalAsset*100):null;
+  const debtEquity=equity&&equity!==0&&totalDebt?(totalDebt/equity):null;
+
   const ratios=[
-    {n:'Эргэлтийн харьцаа (Current Ratio)',v:d.cr,b:'1.50x',f:'x',ok:2,wn:1,iv:false},
-    {n:'Өрийн харьцаа (Debt Ratio)',v:d.dr,b:'0.60x',f:'x',ok:0.6,wn:0.8,iv:true},
-    {n:'Нийт ашгийн маржин (Gross Margin)',v:d.gm,b:'25.0%',f:'%',ok:25,wn:10,iv:false},
-    {n:'Цэвэр ашгийн маржин (Net Margin)',v:d.nm,b:'5.0%',f:'%',ok:5,wn:0,iv:false},
-    {n:'Хөрөнгийн өгөөж (ROA)',v:d.roa,b:'6.0%',f:'%',ok:6,wn:0,iv:false},
-    {n:'Өмчийн өгөөж (ROE)',v:d.roe,b:'10.0%',f:'%',ok:10,wn:0,iv:false},
+    {name:'Эргэлтийн харьцаа',val:curRatio,fmt:'x',ok:2,warn:1,lbl:curRatio>=2?'Хэвийн':''},
+    {name:'Өрийн харьцаа',val:debtRatio,fmt:'x',ok:0,warn:0.5,invert:true,lbl:''},
+    {name:'Нийт ашгийн маржин',val:grossMargin,fmt:'%',ok:20,warn:10,lbl:''},
+    {name:'Цэвэр ашгийн маржин',val:netMargin,fmt:'%',ok:5,warn:0,lbl:''},
+    {name:'Хөрөнгийн өгөөж (ROA)',val:roa,fmt:'%',ok:5,warn:0,lbl:''},
+    {name:'Өмчийн өгөөж (ROE)',val:roe,fmt:'%',ok:10,warn:0,lbl:''},
+    {name:'Өр/Өмч харьцаа',val:debtEquity,fmt:'x',ok:0,warn:2,invert:true,lbl:''},
   ];
-  document.getElementById('pRatio').innerHTML=
-    '<table class="rt" style="width:100%">'+
-    '<colgroup><col style="width:auto"><col style="width:160px"><col style="width:160px"><col style="width:90px"></colgroup>'+
-    '<thead><tr style="border-bottom:2px solid var(--line2)">'+
-      '<th style="text-align:left;font-size:9px;color:var(--mu2);font-weight:700;padding-bottom:6px;padding-top:0">ҮЗҮҮЛЭЛТ</th>'+
-      '<th style="text-align:left;font-size:9px;color:var(--mu2);font-weight:700;padding-bottom:6px">ТАНЫ ҮЗҮҮЛЭЛТ</th>'+
-      '<th style="text-align:left;font-size:9px;color:var(--mu2);font-weight:700;padding-bottom:6px">САЛБАРЫН ДУНДАЖ</th>'+
-      '<th style="text-align:right;font-size:9px;color:var(--mu2);font-weight:700;padding-bottom:6px">ҮНЭЛГЭЭ</th>'+
-    '</tr></thead>'+
-    '<tbody>'+
-    ratios.map(r=>{
-      const disp=r.v===null?'—':(r.f==='%'?r.v.toFixed(1)+'%':r.v.toFixed(2)+'x');
-      const isOk=r.v!==null&&(r.iv?r.v<=r.ok:r.v>=r.ok);
-      const isWn=r.v!==null&&!isOk&&(r.iv?r.v<=r.wn:r.v>=r.wn);
-      const barC=r.v===null?'var(--mu2)':isOk?'var(--grn)':isWn?'var(--yel)':'var(--red)';
-      let pct=0;
-      if(r.v!==null){pct=r.f==='%'?Math.min(100,Math.max(0,Math.abs(r.v)/50*100)):Math.min(100,Math.max(0,Math.abs(r.v)/3*100));}
-      return'<tr>'+
-        '<td>'+r.n+'</td>'+
-        '<td><div style="display:flex;align-items:center;gap:6px">'+
-          '<span style="font-family:Roboto Mono,monospace;font-weight:700;font-size:11px;color:'+barC+';min-width:46px;display:inline-block">'+disp+'</span>'+
-          '<div style="flex:1;height:4px;background:var(--line);border-radius:3px;overflow:hidden;max-width:64px"><div style="height:100%;width:'+pct+'%;background:'+barC+';border-radius:3px"></div></div>'+
-        '</div></td>'+
-        '<td><div style="display:flex;align-items:center;gap:6px">'+
-          '<span style="font-family:Roboto Mono,monospace;font-size:11px;color:var(--mu);min-width:40px;display:inline-block">'+r.b+'</span>'+
-          '<div style="flex:1;height:4px;background:var(--line);border-radius:3px;overflow:hidden;max-width:64px"><div style="height:100%;width:50%;background:var(--mu2);border-radius:3px"></div></div>'+
-        '</div></td>'+
-        '<td style="text-align:right">'+bdg(r.v,r.ok,r.wn,r.iv)+'</td>'+
-      '</tr>';
-    }).join('')+
-    '</tbody></table>';
 
-  // AI панел
-  const als=buildAls();
-  const conf=Math.min(95,70+sc/10);
-  const scR=sc/100;const cir=2*Math.PI*28;
-  // Gauge SVG (цагаан дэвсгэр дээр)
-  const gaugeR2=28,gaugeCX2=35,gaugeCY2=35;
-  const gCirc2=2*Math.PI*gaugeR2;
-  const gDash2=(sc/100)*gCirc2;
-  const gaugeSvg=
-    '<svg width="70" height="70" viewBox="0 0 70 70" style="transform:rotate(-90deg)">'+
-    '<circle cx="35" cy="35" r="28" fill="none" stroke="#f0f0f0" stroke-width="7"/>'+
-    '<circle cx="35" cy="35" r="28" fill="none" stroke="'+scC+'" stroke-width="7" stroke-dasharray="'+gDash2+' '+gCirc2+'" stroke-linecap="round"/>'+
-    '</svg>';
-  document.getElementById('pAI').innerHTML=
-    '<div class="ai-panel-head">'+
-      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--br)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>'+
-      '<span class="ai-panel-head-title">AI Дүгнэлт</span>'+
-    '</div>'+
-    '<div class="ai-score">'+
-      '<div class="ai-score-gauge" style="position:relative">'+
-        gaugeSvg+
-        '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">'+
-          '<span class="ai-score-num" style="color:'+scC+'">'+sc+'</span>'+
-        '</div>'+
-      '</div>'+
-      '<div class="ai-score-info">'+
-        '<div class="ai-score-of">/ 100 оноо</div>'+
-        '<div class="ai-score-lbl" style="color:'+scC+'">'+scL+'</div>'+
-        '<div class="ai-score-bar"><div class="ai-score-bar-fill" style="width:'+sc+'%;background:'+scC+'"></div></div>'+
-      '</div>'+
-    '</div>'+
-    '<div class="ai-alerts">'+
-    als.map(a=>{
-      const cls=a.t==='danger'?'r':a.t==='warn'?'y':'g';
-      const ico=a.t==='danger'?'🔴':a.t==='warn'?'🟡':'🟢';
-      return'<div class="ai-a '+cls+'"><span class="ai-a-icon">'+ico+'</span><div><strong>'+a.ti+'</strong>'+a.m+'</div></div>';
-    }).join('')+
-    '</div>'+
-    '<div class="ai-conf">AI шинжилгээний итгэлцлийн түвшин <strong style="color:var(--ink)">'+conf+'%</strong>'+
-    '<div class="ai-conf-bar"><div class="ai-conf-fill" style="width:'+conf+'%"></div></div></div>';
+  document.getElementById('ratioTable').innerHTML=ratios.map(r=>{
+    const disp=r.val===null?'—':(r.fmt==='%'?r.val.toFixed(1)+'%':r.val.toFixed(2)+'x');
+    let b;
+    if(r.val===null){b='<span class="badge warn">—</span>';}
+    else if(r.invert){
+      // өр харьцаа: бага = сайн
+      b=r.val<=0.6?'<span class="badge ok">Хэвийн</span>':r.val<=1?'<span class="badge warn">Анхааруулга</span>':'<span class="badge danger">Эрсдэлтэй</span>';
+    }else{
+      b=r.val>=r.ok?'<span class="badge ok">Хэвийн</span>':r.val>=r.warn?'<span class="badge warn">Анхааруулга</span>':'<span class="badge danger">Эрсдэлтэй</span>';
+    }
+    return`<tr><td>${r.name}</td><td>${disp}</td><td>${b}</td></tr>`;
+  }).join('');
 
-  // BOTTOM — зөвхөн найдвартай тооцооны метрикүүд
-  const bots=[
-    {ico:'🕐',l:'Авлагын эргэлт (хоногоор)',v:d.rv&&d.recv?(d.recv/(d.rv/360)).toFixed(0)+' өдөр':'—',chg:d.pr&&d.recv?'Өмнөх: '+(d.recv/(d.pr/360)).toFixed(0)+' өдөр':'',neg:false},
-    {ico:'💧',l:'Эргэлтийн харьцаа',v:d.cr!==null?d.cr.toFixed(2)+'x':'—',chg:d.cr!==null?(d.cr>=1?'Хэвийн':'Эрсдэлтэй'):'',neg:d.cr!==null&&d.cr<1},
-    {ico:'💰',l:'Цэвэр ашиг / алдагдал',v:f(d.pf),chg:d.pp?'Өмнөх: '+f(d.pp):'',neg:d.pf&&d.pf<0},
-    {ico:'📊',l:'Нийт ашгийн маржин',v:d.gm!==null?d.gm.toFixed(1)+'%':'—',chg:'Салбарын дундаж: 25%',neg:d.gm!==null&&d.gm<0},
-    {ico:'🏛',l:'Татварын өрийн үлдэгдэл',v:f(d.tpay),chg:'',neg:false},
-  ];
-  document.getElementById('botRow').innerHTML=bots.map(b=>'<div class="bot-card">'+
-    '<div class="bc-lbl"><span class="bc-ico">'+b.ico+'</span>'+b.l+'</div>'+
-    '<div class="bc-val" style="color:'+(b.neg?'var(--red)':'var(--ink)')+'">'+b.v+'</div>'+
-    '<div class="bc-chg">'+b.chg+'</div>'+
-    '</div>').join('');
+  // ── Анхааруулга ──
+  const alerts=[];
+  if(equity!==null&&equity<0)alerts.push({type:'danger',title:'Сөрөг эздийн өмч',msg:`Эздийн өмч ${fmt(equity)} байна. Компани технически дампуурлын нөхцөлд байна.`});
+  if(profit!==null&&profit<0)alerts.push({type:'danger',title:'Алдагдалтай тайлант он',msg:`${fmt(profit)} алдагдал гарсан. Зардлын хяналт, орлогын өсөлтөд анхаарах шаардлагатай.`});
+  if(curRatio!==null&&curRatio<1)alerts.push({type:'danger',title:'Хөрвөх чадварын эрсдэл',msg:`Эргэлтийн харьцаа ${curRatio.toFixed(2)}x — богино хугацаат өр хөрөнгөөс их байна.`});
+  if(debtRatio!==null&&debtRatio>0.8)alerts.push({type:'warn',title:'Өндөр өрийн түвшин',msg:`Өрийн харьцаа ${(debtRatio*100).toFixed(0)}% — нийт хөрөнгийн ${(debtRatio*100).toFixed(0)}%-г өр эзэлж байна.`});
+  if(grossMargin!==null&&grossMargin>30)alerts.push({type:'ok',title:'Нийт ашгийн маржин сайн',msg:`${grossMargin.toFixed(1)}% нийт ашгийн маржин — борлуулалтын бүтэц эрүүл байна.`});
+  if(rev!==null&&prevRev!==null&&rev>prevRev)alerts.push({type:'ok',title:'Борлуулалт өссөн',msg:`Борлуулалт ${((rev-prevRev)/prevRev*100).toFixed(1)}%-ийн өсөлттэй.`});
+  if(alerts.length===0)alerts.push({type:'ok',title:'Тайлан уншигдлаа',msg:'Анхаарал татахаар тодорхой эрсдэл илрээгүй байна.'});
+
+  document.getElementById('alertsBox').innerHTML=alerts.map(a=>`
+    <div class="alert ${a.type}">
+      <div class="alert-icon">${a.type==='danger'?'🔴':a.type==='warn'?'🟡':'🟢'}</div>
+      <div><strong>${a.title}</strong>${a.msg}</div>
+    </div>`).join('');
+
+  // ── Задаргаа хүснэгтүүд ──
+  const caRows=[
+    ['Мөнгө',cash],['Дансны авлага',recv],['Татвар/НДШ авлага',taxRecv],
+    ['Бусад авлага',otherRecv],['Бараа материал',invent],['Урьдчилгаа',prepaid]
+  ].filter(r=>r[1]);
+  document.getElementById('currentAssetsTable').innerHTML=caRows.map(r=>`<tr><td>${r[0]}</td><td>${fmt(r[1])}</td></tr>`).join('')+
+    `<tr style="font-weight:700;border-top:2px solid var(--line)"><td>Нийт</td><td>${fmt(curAsset)}</td></tr>`;
+
+  const clRows=[
+    ['Дансны өглөг',apay],['Цалингийн өглөг',salPay],['Татварын өр',taxPay],
+    ['Богино хугацаат зээл',stLoan],['Урьдчилж орсон орлого',advInc]
+  ].filter(r=>r[1]);
+  document.getElementById('currentLiabTable').innerHTML=clRows.map(r=>`<tr><td>${r[0]}</td><td>${fmt(r[1])}</td></tr>`).join('')+
+    `<tr style="font-weight:700;border-top:2px solid var(--line)"><td>Нийт</td><td>${fmt(stDebt)}</td></tr>`;
+
+  const incRows=[
+    ['Борлуулалт',rev],['Борлуулалтын өртөг',cogs?-cogs:null],['Нийт ашиг',gross],
+    ['Маркетинг/борлуулалтын зардал',opEx1?-opEx1:null],['Удирдлагын зардал',opEx2?-opEx2:null],
+    ['Санхүүгийн зардал',finEx?-finEx:null],['Бусад зардал',otherEx?-otherEx:null],
+    ['Татварын зардал',taxEx?-taxEx:null],['Цэвэр ашиг/алдагдал',profit]
+  ].filter(r=>r[1]!==null&&r[1]!==undefined);
+  document.getElementById('incomeTable').innerHTML=incRows.map(r=>`
+    <tr><td>${r[0]}</td><td style="color:${r[1]<0?'var(--red)':r[0]==='Цэвэр ашиг/алдагдал'&&r[1]<0?'var(--red)':''}">${fmt(r[1])}</td></tr>`).join('');
+
+  document.getElementById('dashboard').style.display='block';
 }
 
-function renderEquity(){
-  const yrs=DB.years;
-  if(!yrs.length) return;
-  function fT(n){
-    if(n===null||n===undefined||isNaN(n))return'—';
-    const v=n/1e9;
-    return n<0?'('+Math.abs(v).toFixed(3)+')':v.toFixed(3);
-  }
-  function row(lbl,keys,isSub,isBold){
-    const vals=yrs.map(y=>{const d=DB.data[y];if(!d)return null;return typeof keys==='string'?d[keys]:keys[y]||null;});
-    if(vals.every(v=>v===null))return'';
-    const bs=isBold?'font-weight:700;':'font-weight:400;';
-    const nc=isBold?'color:var(--br);':'color:var(--ink);';
-    let cells='';
-    vals.forEach((v,i)=>{
-      if(v===null){cells+='<td style="padding:7px 10px;text-align:right;font-size:12px;'+bs+'color:var(--mu2)">—</td>';}
-      else{
-        const col=isBold?(v<0?'var(--red)':'var(--br)'):(v<0?'var(--red)':'var(--ink)');
-        cells+='<td style="padding:7px 10px;text-align:right;font-size:12px;'+bs+'color:'+col+'">'+fT(v)+'</td>';
-      }
-      if(i>0){
-        if(v!==null&&vals[i-1]!==null&&vals[i-1]!==0){
-          const pct=(v-vals[i-1])/Math.abs(vals[i-1])*100;
-          const up=v>vals[i-1];
-          cells+='<td style="padding:4px 8px;text-align:center"><span style="font-size:10px;font-weight:700;color:'+(up?'#16a34a':'#dc2626')+';background:'+(up?'#f0fdf4':'#fef2f2')+';padding:2px 7px;border-radius:20px">'+(up?'▲':'▼')+' '+Math.abs(pct).toFixed(1)+'%</span></td>';
-        } else cells+='<td style="padding:4px 8px"></td>';
-      }
-    });
-    return'<tr style="border-bottom:1px solid var(--line2)"><td style="padding:7px 0;font-size:12px;'+(isSub?'padding-left:20px;':'')+bs+nc+'">'+lbl+'</td>'+cells+'</tr>';
-  }
-  function hdr(){
-    let cols='<col style="width:auto">',ths='<th style="padding:8px 0;text-align:left;font-size:11px;color:var(--mu);font-weight:500"></th>';
-    yrs.forEach((y,i)=>{cols+='<col style="width:110px">';ths+='<th style="padding:8px 10px;text-align:right;font-size:13px;font-weight:800;color:var(--ink)">'+y+'<br><span style="font-size:10px;color:var(--mu2);font-weight:400">/аудитлагдсан/</span></th>';if(i>0){cols+='<col style="width:80px">';ths+='<th style="padding:8px 6px;text-align:center;font-size:10px;color:var(--mu2);font-weight:500">Өөрчлөлт</th>';}});
-    return'<colgroup>'+cols+'</colgroup><thead><tr style="border-bottom:2px solid var(--line2)">'+ths+'</tr></thead>';
-  }
-  function secH(lbl,cols){return'<tr><td colspan="'+cols+'" style="padding:10px 0 4px;font-size:13px;font-weight:700;color:var(--ink);border-top:2px solid var(--line2)">'+lbl+'</td></tr>';}
-  const nc=1+yrs.length+(yrs.length>1?yrs.length-1:0);
-  // Өмчийн өөрчлөлтийн тайлан — key утгуудыг parseOne-с авна
-  // Хуримтлагдсан ашиг = roe (хуримтлагдсан), эздийн өмчийн дүн = eq
-  const tbl='<table style="width:100%;border-collapse:collapse">'+hdr()+'<tbody>'+
-    secH('Эздийн өмч',nc)+
-    row('Өмч (хувийн)','eq',true,false)+
-    secH('Хуримтлагдсан ашиг',nc)+
-    row('Тайлант үеийн цэвэр ашиг (алдагдал)','pf',true,false)+
-    row('Эздийн өмчийн дүн','eq',false,true)+
-    row('Нийт дүн','eq',false,true)+
-    '</tbody></table>';
-  document.getElementById('si-equity').innerHTML=
-    '<div style="background:var(--panel);border-radius:14px;border:1px solid var(--line);padding:28px 32px">'+
-    '<h2 style="font-size:18px;font-weight:800;letter-spacing:-.02em;color:var(--br);margin-bottom:4px">Өмчийн өөрчлөлтийн тайлан</h2>'+
-    '<p style="font-size:12px;color:var(--mu);margin-bottom:16px">/тэрбум төгрөг/</p>'+tbl+'</div>';
-}
-
-function renderCashflow2(){
-  const yrs=DB.years;
-  if(!yrs.length) return;
-  function fT(n){
-    if(n===null||n===undefined||isNaN(n))return'—';
-    const v=n/1e9;
-    return n<0?'('+Math.abs(v).toFixed(2)+')':v.toFixed(2);
-  }
-  function row(lbl,keys,isSub,isBold){
-    const vals=yrs.map(y=>{const d=DB.data[y];if(!d)return null;return typeof keys==='string'?d[keys]:keys[y]||null;});
-    if(vals.every(v=>v===null))return'';
-    const bs=isBold?'font-weight:700;':'font-weight:400;';
-    const nc2=isBold?'color:var(--br);':'color:var(--ink);';
-    let cells='';
-    vals.forEach((v,i)=>{
-      if(v===null){cells+='<td style="padding:7px 10px;text-align:right;font-size:12px;'+bs+'color:var(--mu2)">—</td>';}
-      else{const col=isBold?(v<0?'var(--red)':'var(--br)'):(v<0?'var(--red)':'var(--ink)');cells+='<td style="padding:7px 10px;text-align:right;font-size:12px;'+bs+'color:'+col+'">'+fT(v)+'</td>';}
-      if(i>0){
-        if(v!==null&&vals[i-1]!==null&&vals[i-1]!==0){
-          const pct=(v-vals[i-1])/Math.abs(vals[i-1])*100;const up=v>vals[i-1];
-          cells+='<td style="padding:4px 8px;text-align:center"><span style="font-size:10px;font-weight:700;color:'+(up?'#16a34a':'#dc2626')+';background:'+(up?'#f0fdf4':'#fef2f2')+';padding:2px 7px;border-radius:20px">'+(up?'▲':'▼')+' '+Math.abs(pct).toFixed(1)+'%</span></td>';
-        } else cells+='<td style="padding:4px 8px"></td>';
-      }
-    });
-    return'<tr style="border-bottom:1px solid var(--line2)"><td style="padding:7px 0;font-size:12px;'+(isSub?'padding-left:20px;':'')+bs+nc2+'">'+lbl+'</td>'+cells+'</tr>';
-  }
-  function hdr(){
-    let cols='<col style="width:auto">',ths='<th style="padding:8px 0;text-align:left;font-size:11px;color:var(--mu);font-weight:500"></th>';
-    yrs.forEach((y,i)=>{cols+='<col style="width:110px">';ths+='<th style="padding:8px 10px;text-align:right;font-size:13px;font-weight:800;color:var(--ink)">'+y+'<br><span style="font-size:10px;color:var(--mu2);font-weight:400">/аудитлагдсан/</span></th>';if(i>0){cols+='<col style="width:80px">';ths+='<th style="padding:8px 6px;text-align:center;font-size:10px;color:var(--mu2);font-weight:500">Өөрчлөлт</th>';}});
-    return'<colgroup>'+cols+'</colgroup><thead><tr style="border-bottom:2px solid var(--line2)">'+ths+'</tr></thead>';
-  }
-  const nc=1+yrs.length+(yrs.length>1?yrs.length-1:0);
-  function secH(lbl){return'<tr><td colspan="'+nc+'" style="padding:10px 0 4px;font-size:13px;font-weight:700;color:var(--ink);border-top:2px solid var(--line2)">'+lbl+'</td></tr>';}
-  // Мөнгөн гүйлгээ — parseOne-с авах утгууд:
-  // Үндсэн үйл ажиллагааны цэвэр мөнгөн гүйлгээ: pf-тэй холбоотой
-  // Санхүүгийн үйл ажиллагаа: sd (зээл)
-  // Эцсийн мөнгөн үлдэгдэл: cash
-  const tbl='<table style="width:100%;border-collapse:collapse">'+hdr()+'<tbody>'+
-    secH('1. Үндсэн үйл ажиллагааны мөнгөн гүйлгээ')+
-    row('Мөнгөн орлогын дүн','rv',true,false)+
-    row('Мөнгөн зарлагын дүн','cg',true,false)+
-    row('Үндсэн үйл ажиллагааны цэвэр мөнгөн гүйлгээ','pf',false,true)+
-    secH('2. Хөрөнгө оруулалтын үйл ажиллагааны мөнгөн гүйлгээ')+
-    row('Мөнгөн зарлагын дүн (хөрөнгө оруулалт)','nca',true,false)+
-    secH('3. Санхүүгийн үйл ажиллагааны мөнгөн гүйлгээ')+
-    row('Мөнгөн орлого (зээл авсан)','sd',true,false)+
-    row('Мөнгөн зарлага (зээл төлсөн)','ld',true,false)+
-    secH('Мөнгөн үлдэгдэл')+
-    row('Эцсийн мөнгөн үлдэгдэл','cash',false,true)+
-    '</tbody></table>';
-  document.getElementById('si-cashflow').innerHTML=
-    '<div style="background:var(--panel);border-radius:14px;border:1px solid var(--line);padding:28px 32px">'+
-    '<h2 style="font-size:18px;font-weight:800;letter-spacing:-.02em;color:var(--br);margin-bottom:4px">Мөнгөн гүйлгээний тайлан</h2>'+
-    '<p style="font-size:12px;color:var(--mu);margin-bottom:16px">/тэрбум төгрөг/</p>'+tbl+
-    '<div style="margin-top:14px;padding:12px 16px;background:var(--yelbg);border:1px solid var(--yelb);border-radius:10px;font-size:12px;color:var(--yel)">'+
-    '⚠️ Мөнгөн гүйлгээний тайланд нарийвчилсан мэдээллийг оруулахын тулд мөнгөн гүйлгээний PDF тайлан тусдаа оруулах шаардлагатай.'+
-    '</div></div>';
-}
-
-function buildAls(){
-  const d=G,a=[];
-  if(d.eq!==null&&d.eq<0)a.push({t:'danger',ti:'Сөрөг эздийн өмч',m:'Эздийн өмч '+f(d.eq)+' байна. Компани технически дампуурлын нөхцөлд байна.'});
-  if(d.pf!==null&&d.pf<0)a.push({t:'danger',ti:'Алдагдалтай тайлант он',m:f(d.pf)+' алдагдал гарсан. Зардлын хяналт шаардлагатай.'});
-  if(d.cr!==null&&d.cr<1)a.push({t:'danger',ti:'Хөрвөх чадварын эрсдэл',m:'Эргэлтийн харьцаа '+xx(d.cr)+' — өр хөрөнгөөс их байна.'});
-  if(d.dr!==null&&d.dr>0.8)a.push({t:'warn',ti:'Өндөр өрийн түвшин',m:'Өрийн харьцаа '+px(d.dr*100)+'.'});
-  if(d.cr!==null&&d.cr>=2)a.push({t:'ok',ti:'Хөрвөх чадвар сайн',m:'Эргэлтийн харьцаа '+xx(d.cr)+'.'});
-  if(d.gm!==null&&d.gm>25)a.push({t:'ok',ti:'Нийт ашгийн маржин сайн',m:px(d.gm)+' нийт ашгийн маржин.'});
-  if(d.rv!==null&&d.pr!==null&&d.rv>d.pr)a.push({t:'ok',ti:'Борлуулалт өссөн',m:px((d.rv-d.pr)/d.pr*100)+' өсөлттэй.'});
-  if(a.length===0)a.push({t:'ok',ti:'Тайлан уншигдлаа',m:'Анхаарал татахаар эрсдэл илрээгүй.'});
-  return a;
-}
-
-function sbClick(el){document.querySelectorAll('.sb-i').forEach(e=>e.classList.remove('active'));el.classList.add('active')}
-
-// Section navigation
-const SECTIONS=['overview','income','ratio','cash','trend','ai'];
-function showSection(name){
-  SECTIONS.forEach(s=>{
-    const el=document.getElementById('sec-'+s);
-    if(el) el.style.display=s===name?'flex':'none';
-  });
-  // Sidebar active
-  const idx={overview:0,income:1,ratio:2,cash:3,trend:4,ai:5}[name];
-  const btns=document.querySelectorAll('.sb-i');
-  btns.forEach(b=>b.classList.remove('active'));
-  if(btns[idx]) btns[idx].classList.add('active');
-  // Section-д тохирох render дуудах
-  if(name==='income') renderIncome();
-  if(name==='ratio') renderRatio();
-  if(name==='cash') renderCash();
-  if(name==='trend') renderTrend();
-  if(name==='ai') renderAIFull();
-}
-
-function renderIncome(){
-  const yrs=DB.years;
-  if(!yrs.length) return;
-
-  // Тэрбумаар форматлах — зурагтай адил (сөрөг → хаалт)
-  function fT(n){
-    if(n===null||n===undefined||isNaN(n))return'—';
-    const v=n/1e9;
-    if(n<0) return'('+Math.abs(v).toFixed(2)+')';
-    return v.toFixed(2);
-  }
-
-  // Он бүрийн утга авах, өгөгдөл байвал мөр үүсгэх
-  function row(lbl,keys,isSub,isBold){
-    const vals=yrs.map(y=>{
-      const d=DB.data[y]; if(!d) return null;
-      if(typeof keys==='string') return d[keys]!==undefined?d[keys]:null;
-      return keys[y]!==undefined?keys[y]:null;
-    });
-    if(vals.every(v=>v===null)) return'';
-    const boldStyle=isBold?'font-weight:700;':'font-weight:400;';
-    const nameColor=isBold?'color:var(--br);':'color:var(--ink);';
-    const pl=isSub?'padding-left:20px;':'padding-left:0;';
-    // Он бүрийн утга + өсөлт багана
-    let cells='';
-    vals.forEach((v,i)=>{
-      // Утгын багана
-      if(v===null){
-        cells+='<td style="padding:7px 10px;text-align:right;font-size:13px;'+boldStyle+'color:var(--mu2)">—</td>';
-      } else {
-        const disp=fT(v);
-        const col=isBold?(v<0?'var(--red)':'var(--br)'):(v<0?'var(--red)':'var(--ink)');
-        cells+='<td style="padding:7px 10px;text-align:right;font-size:13px;'+boldStyle+'color:'+col+'">'+disp+'</td>';
-      }
-      // Өсөлт багана — зөвхөн 2-р он ба түүнээс хойш
-      if(i>0){
-        if(v!==null && vals[i-1]!==null && vals[i-1]!==0){
-          const pct=(v-vals[i-1])/Math.abs(vals[i-1])*100;
-          const up=v>vals[i-1];
-          const col=up?'#16a34a':'#dc2626';
-          const bg=up?'#f0fdf4':'#fef2f2';
-          cells+='<td style="padding:4px 8px;text-align:center;white-space:nowrap">'+
-            '<span style="display:inline-flex;align-items:center;gap:2px;font-size:10.5px;font-weight:700;color:'+col+';background:'+bg+';padding:2px 7px;border-radius:20px">'+
-            (up?'▲':'▼')+' '+Math.abs(pct).toFixed(1)+'%'+
-            '</span></td>';
-        } else {
-          cells+='<td style="padding:4px 8px"></td>';
-        }
-      }
-    });
-    return'<tr style="border-bottom:1px solid var(--line2)">'+
-      '<td style="padding:7px 0;font-size:13px;'+pl+boldStyle+nameColor+'">'+lbl+'</td>'+
-      cells+
-    '</tr>';
-  }
-
-  function secHeader(label){
-    // colspan = нэр багана + он бүрийн утга + өсөлт (эхнийхээс бусад)
-    const cols=1+yrs.length+(yrs.length>1?yrs.length-1:0);
-    return'<tr><td colspan="'+cols+'" style="padding:12px 0 6px;font-size:14px;font-weight:700;color:var(--ink);border-top:2px solid var(--line2)">'+label+'</td></tr>';
-  }
-
-  function tblHeader(){
-    // Он бүрийн дараа өсөлт багана (эхний оноос бусад)
-    let cols='<col style="width:auto">';
-    let ths='<th style="padding:8px 0;text-align:left;font-size:11px;color:var(--mu);font-weight:500"></th>';
-    yrs.forEach((y,i)=>{
-      cols+='<col style="width:120px">';
-      ths+='<th style="padding:8px 10px;text-align:right;font-size:13px;font-weight:800;color:var(--ink)">'+y+'<br><span style="font-size:10px;color:var(--mu2);font-weight:400">/аудитлагдсан/</span></th>';
-      if(i>0){
-        cols+='<col style="width:80px">';
-        ths+='<th style="padding:8px 6px;text-align:center;font-size:10px;color:var(--mu2);font-weight:500">Өөрчлөлт</th>';
-      }
-    });
-    return'<colgroup>'+cols+'</colgroup>'+
-    '<thead><tr style="border-bottom:2px solid var(--line2)">'+ths+'</tr></thead>';
-  }
-
-  // ── ОРЛОГО, ҮР ДҮНГИЙН ТАЙЛАН — e-balance жинхэнэ бүтэц ──
-  const incTbl='<table style="width:100%;border-collapse:collapse">'+
-    tblHeader()+
-    '<tbody>'+
-    row('1. Борлуулалтын орлого (цэвэр)','rv',false,false)+
-    row('2. Борлуулсан бүтээгдэхүүний өртөг','cg',true,false)+
-    row('3. Нийт ашиг (алдагдал)','gr',false,true)+
-    row('8. Бусад орлого','busad',true,false)+
-    row('9. Борлуулалт, маркетингийн зардал','ox1',true,false)+
-    row('10. Ерөнхий ба удирдлагын зардал','ox2',true,false)+
-    row('11. Санхүүгийн зардал','fx',true,false)+
-    row('12. Бусад зардал','ox3',true,false)+
-    row('18. Татвар төлөхийн өмнөх ашиг','tax_before',false,true)+
-    row('19. Орлогын татварын зардал','tx',true,false)+
-    row('22. Тайлант үеийн цэвэр ашиг (алдагдал)','pf',false,true)+
-    '</tbody></table>';
-
-  // ── САНХҮҮ БАЙДЛЫН ТАЙЛАН — e-balance жинхэнэ бүтэц ──
-  const balTbl='<table style="width:100%;border-collapse:collapse">'+
-    tblHeader()+
-    '<tbody>'+
-    secHeader('1. ХӨРӨНГӨ')+
-    secHeader('1.1 Эргэлтийн хөрөнгө')+
-    row('1.1.1 Мөнгө, түүнтэй адилтгах хөрөнгө','cash',true,false)+
-    row('1.1.2 Дансны авлага','recv',true,false)+
-    row('1.1.3 Татвар, НДШ-ийн авлага','trec',true,false)+
-    row('1.1.4 Бусад авлага','orec',true,false)+
-    row('1.1.6 Бараа материал','inv',true,false)+
-    row('1.1.7 Урьдчилж төлсөн зардал/тооцоо','prep',true,false)+
-    row('1.1.11 Эргэлтийн хөрөнгийн дүн','ca',false,true)+
-    secHeader('1.2 Эргэлтийн бус хөрөнгө')+
-    row('1.2.10 Эргэлтийн бус хөрөнгийн дүн','nca',false,true)+
-    row('1.3 НИЙТ ХӨРӨНГИЙН ДҮН','ta',false,true)+
-    secHeader('2. ӨР ТӨЛБӨР БА ЭЗДИЙН ӨМЧ')+
-    secHeader('2.1.1 Богино хугацаат өр төлбөр')+
-    row('2.1.1.1 Дансны өглөг','apay',true,false)+
-    row('2.1.1.3 Татварын өр','tpay',true,false)+
-    row('2.1.1.5 Богино хугацаат зээл','sd',true,false)+
-    row('2.1.1.13 Богино хугацаат өр төлбөрийн дүн','sd',false,true)+
-    row('2.1.2.6 Урт хугацаат өр төлбөрийн дүн','ld',false,true)+
-    row('2.2 Өр төлбөрийн нийт дүн','td',false,true)+
-    row('2.3.9 Эздийн өмчийн дүн','eq',false,true)+
-    row('2.4 ӨР ТӨЛБӨР БА ЭЗДИЙН ӨМЧИЙН ДҮН','ta',false,true)+
-    '</tbody></table>';
-
-  document.getElementById('si-income').innerHTML=
-    '<div style="background:var(--white);border-radius:14px;border:1px solid var(--line);padding:28px 32px">'+
-      '<h2 style="font-size:18px;font-weight:800;letter-spacing:-.02em;color:var(--br);margin-bottom:4px">Орлого, үр дүнгийн нэгтгэсэн тайлан</h2>'+
-      '<p style="font-size:12px;color:var(--mu);margin-bottom:16px">/тэрбум төгрөг/</p>'+
-      incTbl+'</div>';
-  document.getElementById('si-balance').innerHTML=
-    '<div style="background:var(--white);border-radius:14px;border:1px solid var(--line);padding:28px 32px">'+
-      '<h2 style="font-size:18px;font-weight:800;letter-spacing:-.02em;color:var(--br);margin-bottom:4px">Санхүү байдлын нэгтгэсэн тайлан</h2>'+
-      '<p style="font-size:12px;color:var(--mu);margin-bottom:16px">/тэрбум төгрөг/</p>'+
-      balTbl+'</div>';
-  renderEquity();
-  renderCashflow2();
-}
-
-function renderRatio(){
-  const d=G;
-  if(!d.cr&&!d.dr) return;
-  const ratios=[
-    {n:'Эргэлтийн харьцаа',en:'Current Ratio',v:d.cr,b:1.5,fmt:'x',ok:2,wn:1,iv:false},
-    {n:'Өрийн харьцаа',en:'Debt Ratio',v:d.dr,b:0.6,fmt:'x',ok:0.6,wn:0.8,iv:true},
-    {n:'Өр/Өмч харьцаа',en:'D/E Ratio',v:d.de,b:1.0,fmt:'x',ok:1,wn:2,iv:true},
-    {n:'Нийт ашгийн маржин',en:'Gross Margin',v:d.gm,b:25,fmt:'%',ok:25,wn:10,iv:false},
-    {n:'Цэвэр ашгийн маржин',en:'Net Margin',v:d.nm,b:5,fmt:'%',ok:5,wn:0,iv:false},
-    {n:'Хөрөнгийн өгөөж',en:'ROA',v:d.roa,b:6,fmt:'%',ok:6,wn:0,iv:false},
-    {n:'Өмчийн өгөөж',en:'ROE',v:d.roe,b:10,fmt:'%',ok:10,wn:0,iv:false},
-  ];
-  function fmtV(v,fmt){return v===null?'—':(fmt==='%'?v.toFixed(1)+'%':v.toFixed(2)+'x');}
-  function getC(v,ok,wn,iv){if(v===null)return'var(--mu2)';const ok2=iv?v<=ok:v>=ok;const wn2=!ok2&&(iv?v<=wn:v>=wn);return ok2?'var(--grn)':wn2?'var(--yel)':'var(--red)';}
-  function getBadge(v,ok,wn,iv){if(v===null)return'<span class="badge warn">—</span>';const isOk=iv?v<=ok:v>=ok;const isWn=!isOk&&(iv?v<=wn:v>=wn);const s=isOk?'ok':isWn?'warn':'danger';const l=s==='ok'?'Хэвийн':s==='warn'?'Анхааруулга':'Эрсдэлтэй';return'<span class="badge '+s+'">'+l+'</span>';}
-  document.getElementById('sr-table').innerHTML=
-    '<div class="p-title">Санхүүгийн харьцаа — Benchmark харьцуулалт</div>'+
-    '<table style="width:100%;border-collapse:collapse">'+
-    '<thead><tr style="border-bottom:2px solid var(--line2)"><th style="text-align:left;font-size:9px;color:var(--mu2);font-weight:700;padding-bottom:6px">ҮЗҮҮЛЭЛТ</th><th style="text-align:left;font-size:9px;color:var(--mu2);font-weight:700;padding-bottom:6px">ТАНЫ ҮЗҮҮЛЭЛТ</th><th style="text-align:left;font-size:9px;color:var(--mu2);font-weight:700;padding-bottom:6px">САЛБАРЫН ДУНДАЖ</th><th style="text-align:center;font-size:9px;color:var(--mu2);font-weight:700;padding-bottom:6px">ҮНЭЛГЭЭ</th></tr></thead><tbody>'+
-    ratios.map(r=>{
-      const disp=fmtV(r.v,r.fmt),bench=r.fmt==='%'?r.b.toFixed(1)+'%':r.b.toFixed(2)+'x';
-      const bc=getC(r.v,r.ok,r.wn,r.iv);
-      let pct=r.v!==null?(r.fmt==='%'?Math.min(100,Math.abs(r.v)/50*100):Math.min(100,Math.abs(r.v)/3*100)):0;
-      return'<tr style="border-bottom:1px solid var(--line)"><td style="padding:8px 0;font-size:12px">'+r.n+' <span style="color:var(--mu2);font-size:11px">'+r.en+'</span></td>'+
-        '<td style="padding:8px 0"><div style="display:flex;align-items:center;gap:6px"><span style="font-family:Roboto Mono,monospace;font-weight:700;font-size:12px;color:'+bc+';min-width:46px">'+disp+'</span><div style="width:64px;height:4px;background:var(--line);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+bc+'"></div></div></div></td>'+
-        '<td style="padding:8px 0;font-size:12px;color:var(--mu2)">'+bench+'</td>'+
-        '<td style="padding:8px 0;text-align:center">'+getBadge(r.v,r.ok,r.wn,r.iv)+'</td></tr>';
-    }).join('')+'</tbody></table>';
-  // Bench chart
-  document.getElementById('sr-chart').innerHTML='<div class="p-title">Харьцааны визуал харьцуулалт</div>'+
-    '<div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">'+
-    ratios.map(r=>{
-      const disp=r.v===null?'—':(r.fmt==='%'?r.v.toFixed(1)+'%':r.v.toFixed(2)+'x');
-      const bc=getC(r.v,r.ok,r.wn,r.iv);
-      const pct=r.v!==null?Math.min(100,r.fmt==='%'?Math.abs(r.v)/50*100:Math.abs(r.v)/3*100):0;
-      return'<div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;color:var(--mu)">'+r.n+'</span><span style="font-size:11px;font-weight:700;font-family:Roboto Mono,monospace;color:'+bc+'">'+disp+'</span></div>'+
-        '<div style="height:6px;background:var(--line);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+bc+';border-radius:4px"></div></div></div>';
-    }).join('')+'</div>';
-  document.getElementById('sr-bench').innerHTML='<div class="p-title">Дэлгэрэнгүй тайлбар</div>'+
-    '<div style="display:flex;flex-direction:column;gap:8px;overflow-y:auto">'+
-    ratios.filter(r=>r.v!==null).map(r=>{
-      const isOk=r.iv?r.v<=r.ok:r.v>=r.ok;
-      const isWn=!isOk&&(r.iv?r.v<=r.wn:r.v>=r.wn);
-      const s=isOk?'ok':isWn?'warn':'danger';
-      const c={'ok':'var(--grn)','warn':'var(--yel)','danger':'var(--red)'}[s];
-      const msg={'ok':'Салбарын дундажаас дээш байна.','warn':'Анхааруулгын түвшинд байна.','danger':'Эрсдэлтэй түвшинд байна.'}[s];
-      return'<div style="padding:8px 10px;background:'+(s==='ok'?'var(--grnbg)':s==='warn'?'var(--yelbg)':'var(--redbg)')+';border-radius:8px;border:1px solid '+(s==='ok'?'var(--grnb)':s==='warn'?'var(--yelb)':'var(--redb)')+'"><div style="font-size:11px;font-weight:700;color:'+c+'">'+r.n+'</div><div style="font-size:10.5px;color:var(--mu);margin-top:2px">'+msg+'</div></div>';
-    }).join('')+'</div>';
-}
-
-function renderCash(){
-  const d=G;
-  function sk(id,lbl,val,cls,sub){const el=document.getElementById(id);if(!el)return;el.className='kpi '+cls;el.innerHTML='<div class="kpi-lbl">'+lbl+'</div><div class="kpi-val '+(val&&val<0?'neg':'')+'">'+f(val)+'</div><div style="font-size:10px;color:var(--mu2);margin-top:3px">'+sub+'</div>';}
-  sk('sc-k1','Мөнгөн хөрөнгө',d.cash,'cb','Эргэлтийн хөрөнгийн '+((d.cash&&d.ca)?((d.cash/d.ca*100).toFixed(1)+'%'):'—'));
-  sk('sc-k2','Эргэлтийн харьцаа',d.cr!==null?d.cr:null,d.cr&&d.cr<1?'cr':'cg',(d.cr!==null?(d.cr>=2?'Сайн':d.cr>=1?'Хэвийн':'Эрсдэлтэй'):'—'));
-  sk('sc-k3','Богино хугацаат өр',d.sd,'cr','Нийт өрийн '+((d.sd&&d.td)?((d.sd/d.td*100).toFixed(0)+'%'):'—'));
-  // Cash flow detail
-  document.getElementById('sc-flow').innerHTML=
-    '<div class="p-title">Мөнгөн урсгалын хураангуй</div>'+
-    '<table style="width:100%;border-collapse:collapse">'+
-    [['Борлуулалтын орлого',d.rv,true],['Борлуулалтын өртөг',d.cg,-1],['Маркетинг/борлуулалт',d.ox1,-1],['Удирдлагын зардал',d.ox2,-1],['Санхүүгийн зардал',d.fx,-1],['Татварын зардал',d.tx,-1],['Цэвэр мөнгөн урсгал',d.pf,true]]
-    .filter(r=>r[1]!==null)
-    .map((r,i,a)=>{
-      const v=r[2]===-1&&r[1]?-r[1]:r[1];
-      const isTotal=i===a.length-1;
-      return'<tr style="border-bottom:1px solid var(--line);font-weight:'+(isTotal?700:400)+'"><td style="padding:7px 0;font-size:12px;color:var(--mu)">'+r[0]+'</td><td style="padding:7px 0;font-size:12px;text-align:right;color:'+(v<0?'var(--red)':'var(--ink)')+'">'+f(v)+'</td></tr>';
-    }).join('')+'</table>';
-  // Asset breakdown
-  document.getElementById('sc-detail').innerHTML=
-    '<div class="p-title">Эргэлтийн хөрөнгийн задаргаа</div>'+
-    '<table style="width:100%;border-collapse:collapse">'+
-    [['Мөнгөн хөрөнгө',d.cash],['Дансны авлага',d.recv],['Татвар/НДШ авлага',d.trec],['Бусад авлага',d.orec],['Бараа материал',d.inv],['Урьдчилгаа',d.prep]]
-    .filter(r=>r[1])
-    .map(r=>'<tr style="border-bottom:1px solid var(--line)"><td style="padding:7px 0;font-size:12px;color:var(--mu)">'+r[0]+'</td><td style="padding:7px 0;font-size:12px;text-align:right">'+f(r[1])+'</td></tr>').join('')+
-    '<tr style="font-weight:700;border-top:2px solid var(--line2)"><td style="padding:7px 0;font-size:12px">Нийт</td><td style="padding:7px 0;font-size:12px;text-align:right">'+f(d.ca)+'</td></tr></table>';
-}
-
-function renderTrend(){
-  const d=G;
-  function sk(id,lbl,cur,prev,cls){const el=document.getElementById(id);if(!el)return;el.className='kpi '+cls;const dt=prev&&prev!==0?((cur-prev)/Math.abs(prev)*100).toFixed(1):null;el.innerHTML='<div class="kpi-lbl">'+lbl+'</div><div class="kpi-val '+(cur&&cur<0?'neg':'')+'">'+f(cur)+'</div>'+(dt?'<div class="kpi-chg '+(cur>prev?'up':'dn')+'">'+(cur>prev?'▲ +':'▼ ')+Math.abs(dt)+'%</div>':'')+'<div style="font-size:10px;color:var(--mu2);margin-top:2px">Өмнөх: '+f(prev)+'</div>';}
-  sk('st-k1','Борлуулалт',d.rv,d.pr,'cd');
-  sk('st-k2','Нийт ашиг',d.gr,d.pg,d.gr<0?'cr':'cg');
-  sk('st-k3','Цэвэр ашиг',d.pf,d.pp,d.pf<0?'cr':'cg');
-  sk('st-k4','Нийт хөрөнгө',d.ta,d.pa,'cb');
-  // Trend charts
-  function trendBarChart(elId,title,data){
-    const el=document.getElementById(elId);if(!el)return;
-    const mx=Math.max(...data.map(b=>Math.max(Math.abs(b.p||0),Math.abs(b.c||0))));
-    el.innerHTML='<div class="p-title">'+title+'</div><div class="bar-chart">'+
-    data.map(b=>{const ph=mx>0?Math.max(2,Math.abs((b.p||0)/mx*110)):2;const ch=mx>0?Math.max(2,Math.abs((b.c||0)/mx*110)):2;return'<div class="bg"><div class="bv">'+f(b.c)+'</div><div class="br-row"><div class="bar" style="height:'+ph+'px;background:'+b.co+';opacity:.25"></div><div class="bar" style="height:'+ch+'px;background:'+((b.c||0)<0?'#dc2626':b.co)+'"></div></div><div class="bl">'+b.l+'</div></div>';}).join('')+'</div>'+
-    '<div class="chart-legend"><div class="leg-i"><div class="leg-dot" style="background:#9ca3af;opacity:.5"></div>Өмнөх он</div><div class="leg-i"><div class="leg-dot" style="background:#0f5e57"></div>Тайлант он</div></div>';
-  }
-  trendBarChart('st-chart1','Орлого ба ашгийн тренд',[{l:'Борлуулалт',p:d.pr,c:d.rv,co:'#0f5e57'},{l:'Нийт ашиг',p:d.pg,c:d.gr,co:'#3b82f6'},{l:'Цэвэр ашиг',p:d.pp,c:d.pf,co:d.pf<0?'#dc2626':'#16a34a'}]);
-  trendBarChart('st-chart2','Хөрөнгө ба өрийн тренд',[{l:'Нийт хөрөнгө',p:d.pa,c:d.ta,co:'#0f5e57'},{l:'Нийт өр',p:d.td,c:d.td,co:'#dc2626'},{l:'Эздийн өмч',p:d.eq,c:d.eq,co:d.eq<0?'#dc2626':'#16a34a'}]);
-}
-
-function renderAIFull(){
-  const d=G;if(!d.sc) return;
-  const sc=d.sc,scC=sc>=70?'var(--grn)':sc>=40?'var(--yel)':'var(--red)',scL=sc>=70?'Эрүүл':sc>=40?'Анхааруулга':'Эрсдэлтэй';
-  const als=buildAls();
-  const conf=Math.min(95,70+sc/10);
-  const scR=sc/100,cir=2*Math.PI*28;
-  const el=document.getElementById('sai-panel');
-  if(el){
-    el.innerHTML=
-      '<div class="ai-panel-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--br)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg><span class="ai-panel-head-title">AI Дүгнэлт</span></div>'+
-      '<div class="ai-score"><div class="ai-score-gauge" style="position:relative"><svg width="70" height="70" viewBox="0 0 70 70" style="transform:rotate(-90deg)"><circle cx="35" cy="35" r="28" fill="none" stroke="#f0f0f0" stroke-width="7"/><circle cx="35" cy="35" r="28" fill="none" stroke="'+scC+'" stroke-width="7" stroke-dasharray="'+(scR*cir)+' '+cir+'" stroke-linecap="round"/></svg><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><span class="ai-score-num" style="color:'+scC+'">'+sc+'</span></div></div>'+
-      '<div class="ai-score-info"><div class="ai-score-of">/ 100 оноо</div><div class="ai-score-lbl" style="color:'+scC+'">'+scL+'</div><div class="ai-score-bar"><div class="ai-score-bar-fill" style="width:'+sc+'%;background:'+scC+'"></div></div></div></div>'+
-      '<div class="ai-alerts">'+als.map(a=>'<div class="ai-a '+(a.t==='danger'?'r':a.t==='warn'?'y':'g')+'"><span class="ai-a-icon">'+(a.t==='danger'?'🔴':a.t==='warn'?'🟡':'🟢')+'</span><div><strong>'+a.ti+'</strong>'+a.m+'</div></div>').join('')+'</div>'+
-      '<div class="ai-conf">AI шинжилгээний итгэлцлийн түвшин <strong style="color:var(--ink)">'+conf+'%</strong><div class="ai-conf-bar"><div class="ai-conf-fill" style="width:'+conf+'%"></div></div></div>';
-  }
-  const ss=document.getElementById('sai-signals');
-  if(ss){
-    ss.innerHTML='<div class="p-title">Үндсэн эрсдэлүүд ба давуу талууд</div>'+
-      '<div style="display:flex;flex-wrap:wrap;gap:6px">'+
-      als.map(a=>'<div style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;background:'+(a.t==='danger'?'var(--redbg)':a.t==='warn'?'var(--yelbg)':'var(--grnbg)')+';color:'+(a.t==='danger'?'var(--red)':a.t==='warn'?'var(--yel)':'var(--grn)')+';border:1px solid '+(a.t==='danger'?'var(--redb)':a.t==='warn'?'var(--yelb)':'var(--grnb)')+'"><span>'+(a.t==='danger'?'●':a.t==='warn'?'●':'●')+'</span>'+a.ti+'</div>').join('')+
-      '</div>';
-  }
-  const sr=document.getElementById('sai-recs');
-  if(sr){
-    const recs=[];
-    if(d.eq&&d.eq<0)recs.push({t:'danger',r:'Эздийн өмч сэргээх — нэмэлт хөрөнгө оруулалт татах эсвэл өрийг буцаан төлөх стратеги боловсруулах'});
-    if(d.pf&&d.pf<0)recs.push({t:'danger',r:'Зардлын хяналт нэмэгдүүлэх — зардлын бүтцийг шинжилж бууруулах боломж хайх'});
-    if(d.cr&&d.cr<1)recs.push({t:'danger',r:'Хөрвөх чадвар сайжруулах — богино хугацаат өрийн дарамтыг бууруулах'});
-    if(d.dr&&d.dr>0.8)recs.push({t:'warn',r:'Өрийн ачааллыг бууруулах — урт хугацааны өрийг дахин бүтцийлэх'});
-    if(d.gm&&d.gm>25)recs.push({t:'ok',r:'Нийт ашгийн маржин сайн байна — энэ давуу талыг хадгалах'});
-    if(d.rv&&d.pr&&d.rv>d.pr)recs.push({t:'ok',r:'Борлуулалтын өсөлтийг дэмжих — маркетинг болон борлуулалтын стратегиа үргэлжлүүлэх'});
-    if(recs.length===0)recs.push({t:'ok',r:'Санхүүгийн байдал хэвийн — одоогийн стратегийг хадгалах'});
-    sr.innerHTML='<div class="p-title">Санал зөвлөмж</div>'+
-      '<div style="display:flex;flex-direction:column;gap:7px;overflow-y:auto">'+
-      recs.map((r,i)=>'<div style="display:flex;gap:10px;padding:10px 12px;border-radius:8px;background:'+(r.t==='danger'?'var(--redbg)':r.t==='warn'?'var(--yelbg)':'var(--grnbg)')+';border:1px solid '+(r.t==='danger'?'var(--redb)':r.t==='warn'?'var(--yelb)':'var(--grnb)')+'"><span style="font-size:14px;flex-shrink:0">'+(r.t==='danger'?'🔴':r.t==='warn'?'🟡':'✅')+'</span><span style="font-size:12px;color:var(--ink);line-height:1.5">'+(i+1)+'. '+r.r+'</span></div>').join('')+
-      '</div>';
-  }
-}
-function updateAddBtn(){
-  const btn=document.getElementById('addYearBtn');
-  const tags=document.getElementById('yearTags');
-  if(DB.years.length>0){
-    btn.style.display='flex';
-    tags.innerHTML=DB.years.map(y=>'<span style="background:var(--brl);color:var(--br);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid var(--br)">' +y+ '</span>').join('');
-  } else {
-    btn.style.display='none';
-    tags.innerHTML='';
-  }
-}
-document.getElementById('addYearInput').addEventListener('change',async function(e){
-  if(!e.target.files[0]) return;
-  await go(e.target.files[0]);
-  e.target.value='';
-});
 function resetDash(){
-  DB={years:[],data:{}};
-  G={};
-  document.getElementById('dash').style.display='none';
-  document.getElementById('upScreen').style.display='flex';
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('uploadZone').style.display='block';
   document.getElementById('pdfInput').value='';
-  document.getElementById('yearTags').innerHTML='';
-  document.getElementById('addYearBtn').style.display='none';
 }
 </script>
-</div>
 </body>
 </html>
