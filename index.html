@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BusinessBI.mn — Санхүүгийн бэлэн системүүд ба нягтлан бодогчдын platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+body{background:#f8f8f8;color:#111}
+.container{width:90%;max-width:1400px;margin:auto}
+
+/* HEADER */
+header{display:contents}
+.topbar{background:#1f1f1f;color:#fff}
+.topbar-in{display:flex;align-items:flex-start;justify-content:space-between;height:76px;padding-top:14px}
+.socials{display:flex;gap:18px;align-items:center;flex:1}
+.socials a{color:#e8e8e8;display:flex;transition:color .2s,transform .2s}
+.socials a:hover{color:#fff;transform:translateY(-1px)}
+.topbar-msg{flex:0 0 auto;font-size:13px;font-weight:400;letter-spacing:.01em;color:#b8b8b8;display:flex;align-items:center;gap:8px}
+.topbar-right{flex:1}
+.navbar-wrap{background:#fff;border-radius:28px 28px 0 0;margin-top:-28px;position:sticky;top:0;z-index:120;transition:transform .35s ease,box-shadow .25s ease}
+.navbar-wrap.hide{transform:translateY(-110%)}
+.navbar-wrap.stuck{border-radius:0;box-shadow:0 6px 24px -14px rgba(0,0,0,.25)}
+/* гадагшаа муруй булан — хар топбараас цагаан navbar руу гөлгөр шилжих */
+.navbar-wrap::before,.navbar-wrap::after{content:"";position:absolute;top:0;width:28px;height:28px;background:#1f1f1f;pointer-events:none;transition:opacity .25s}
+.navbar-wrap::before{left:0;border-top-left-radius:28px}
+.navbar-wrap::after{right:0;border-top-right-radius:28px}
+/* квадрат харыг дугуй цагаанаар хайчилж inverted corner гаргах */
+.navbar-wrap::before{background:radial-gradient(circle at bottom right,transparent 28px,#1f1f1f 29px)}
+.navbar-wrap::after{background:radial-gradient(circle at bottom left,transparent 28px,#1f1f1f 29px)}
+.navbar-wrap.stuck::before,.navbar-wrap.stuck::after{opacity:0}
+.navbar{display:flex;justify-content:space-between;align-items:center;padding:24px 3% 14px;position:relative}
+.logo{font-size:30px;font-weight:800;color:#b79a63;text-decoration:none;letter-spacing:-.02em}
+.logo span{color:#111}
+.menu{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:44px;align-items:center}
+.menu>a,.menu>.has-mega{display:flex;align-items:center;line-height:1}
+.has-mega>a{display:flex;align-items:center;line-height:1}
+.menu a{position:relative;text-decoration:none;color:#444;font-weight:500;font-size:17px;transition:color .2s;padding-bottom:3px}
+.menu a:not(.cta)::after{content:"";position:absolute;left:0;bottom:0;width:0;height:2px;background:#b79a63;transition:width .25s ease}
+.menu a:not(.cta):hover::after{width:100%}
+.menu a:hover{color:#b79a63}
+.nav-right{display:flex;align-items:center;gap:18px}
+.login-btn{display:flex;align-items:center;gap:8px;color:#111;text-decoration:none;border:1.5px solid #1a1a1a;border-radius:50px;padding:9px 20px;font-size:15px;font-weight:600;transition:background .2s,color .2s}
+.login-btn svg{width:19px;height:19px}
+.login-btn:hover{background:#111;color:#fff}
+
+/* MEGA MENU — Хэрэгслүүд дээр hover хийхэд доош гарч ирэх панель */
+.has-mega{position:relative}
+.mega{
+  position:absolute;top:calc(100% + 18px);left:50%;transform:translateX(-50%) translateY(8px);
+  width:680px;max-width:92vw;background:#fff;border:1px solid #ececec;border-radius:18px;
+  box-shadow:0 24px 60px -20px rgba(0,0,0,.28);padding:18px;
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  opacity:0;visibility:hidden;pointer-events:none;transition:opacity .22s ease,transform .22s ease;z-index:200;
+}
+/* hover гүүр — цэс ба панелийн хооронд хулгана алдагдахгүй */
+.has-mega::after{content:"";position:absolute;top:100%;left:0;width:100%;height:24px}
+.has-mega:hover .mega{opacity:1;visibility:visible;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+.mega-item{display:flex;gap:13px;align-items:flex-start;padding:13px 14px;border-radius:12px;text-decoration:none;transition:background .18s}
+.mega-item:hover{background:#f6f4ef}
+.mega-item:hover::after{width:0!important}
+.mega-ic{flex-shrink:0;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;background:#f1f0ec}
+.mega-tx .mt{font-size:15px;font-weight:700;color:#111;letter-spacing:-.01em}
+.mega-tx .md{font-size:12.5px;color:#777;margin-top:2px;line-height:1.4}
+.burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:6px}
+.burger span{display:block;width:24px;height:2px;background:#111;transition:.3s}
+.burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.burger.open span:nth-child(2){opacity:0}
+.burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* HERO */
+.hero{margin-top:10px;position:relative}
+.hero-viewport{width:100%;overflow:hidden}
+.hero-track{display:flex;transition:transform .55s cubic-bezier(.4,0,.2,1);will-change:transform}
+.hero-slide{position:relative;flex:0 0 94%;margin:0 .5%;border-radius:24px;overflow:hidden;height:400px}
+.hero-slide img{width:100%;height:100%;object-fit:cover;display:block}
+.hero-slide .overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.72) 0%,rgba(0,0,0,.4) 60%,rgba(0,0,0,.25) 100%)}
+.hero-content{position:absolute;left:56px;top:50%;transform:translateY(-50%);color:#fff;max-width:580px}
+.hero-content .tag{font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#e9d6a8;margin-bottom:12px}
+.hero-content h1{font-size:44px;line-height:1.05;font-weight:800;letter-spacing:-.02em}
+.hero-content p{margin-top:14px;font-size:16px;color:#e8e8e8;line-height:1.55}
+.hero-content .btns{margin-top:24px;display:flex;gap:12px;flex-wrap:wrap}
+.hero-content button,.hero-content a.btn{padding:13px 30px;border:none;border-radius:50px;font-size:15px;font-weight:600;cursor:pointer;text-decoration:none;transition:transform .15s}
+.btn-light{background:#fff;color:#111}
+.btn-line{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.6)!important}
+.hero-content button:hover,.hero-content a.btn:hover{transform:translateY(-2px)}
+.dots{position:absolute;bottom:22px;left:0;right:0;display:flex;gap:8px;justify-content:center;z-index:5}
+.dots span{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.45);cursor:pointer;transition:.3s}
+.dots span.active{background:#fff;width:26px;border-radius:5px}
+
+/* INTRO */
+.intro{display:grid;grid-template-columns:1.4fr 1fr;gap:90px;padding:10px 0 22px;align-items:start}
+.intro-left{text-align:center}
+.intro-eyebrow{font-size:15px;color:#777;margin-bottom:6px;font-weight:400}
+.intro h2{font-size:38px;line-height:1.08;font-weight:700;letter-spacing:-.02em;color:#1a1a1a;position:relative;display:inline-block;max-width:26ch}
+.intro h2 em{font-style:normal;color:#1a1a1a}
+.intro h2::after{content:"";position:absolute;left:1%;right:6%;bottom:-10px;height:15px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='16' viewBox='0 0 260 16'%3E%3Cpath d='M3 9 C50 3, 90 14, 140 7 S210 2, 257 8' stroke='%23e0bd7e' stroke-width='3.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center/100% 100%}
+.intro p{color:#3a3a3a;font-size:13.5px;line-height:1.5;font-weight:400}
+.intro p b{font-weight:600;color:#1a1a1a}
+.intro p u{text-decoration:underline;text-underline-offset:3px;font-weight:600;color:#1a1a1a}
+
+/* CARDS */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:25px;margin-bottom:90px;align-items:stretch}
+.card{background:#fff;border-radius:20px;overflow:hidden;transition:.3s;box-shadow:0 4px 16px -8px rgba(0,0,0,.18);text-decoration:none;color:#111;display:flex;flex-direction:column}
+.card:hover{transform:translateY(-6px);box-shadow:0 22px 44px -20px rgba(0,0,0,.45)}
+.card img{width:100%;aspect-ratio:3/2;object-fit:cover;display:block}
+.card-foot{padding:16px 22px;display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:600}
+.card-foot .label{color:#111}
+.card-foot .go{color:#b79a63}
+.card.free{background:#fff}
+
+/* REQUEST / PRODUCTS */
+.request{background:#fff;padding:0 0 20px}
+.section-title{font-size:48px;font-weight:800;margin-bottom:14px;letter-spacing:-.02em}
+.section-sub{font-size:18px;color:#666;margin-bottom:50px;max-width:60ch}
+.product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:0 3%}
+.product{display:block;background:#f4f4f4;border-radius:22px;overflow:hidden;transition:.3s;text-decoration:none;color:inherit}
+.product:hover{transform:translateY(-4px)}
+.product img{width:100%;height:210px;object-fit:cover;object-position:left top;transition:transform .4s ease;display:block}
+.product .thumb{overflow:hidden;position:relative;background:#eef1f0}
+.product:hover .thumb img{transform:scale(1.04)}
+.product h4{font-size:20px;font-weight:800;letter-spacing:-.02em;color:#111;text-align:center;padding:18px 10px 20px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* MARQUEE BANNER */
+.marquee{overflow:hidden;white-space:nowrap;padding:30px 0}
+.marquee-track{display:inline-flex;animation:marquee 55s linear infinite}
+.marquee-track span{font-size:74px;font-weight:800;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:1.5px #9a9a9a;padding-right:20px}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* PREMIUM PRODUCTS */
+.premium{background:#fff;padding:20px 3% 40px}
+.premium-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:36px}
+.premium-sub{font-size:15px;color:#777;margin-bottom:8px}
+.premium-title{font-size:40px;font-weight:800;letter-spacing:-.025em;color:#111;position:relative;display:inline-block}
+.premium-title em{font-style:normal;color:#b79a63}
+.premium-title::after{content:"";position:absolute;left:1%;right:20%;bottom:-8px;height:14px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='14' viewBox='0 0 200 14'%3E%3Cpath d='M2 8 C40 2, 70 12, 110 6 S170 2, 198 7' stroke='%23e0bd7e' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center/100% 100%}
+.premium-viewall{flex-shrink:0;display:inline-flex;align-items:center;gap:8px;border:1.5px solid #1a1a1a;border-radius:50px;padding:11px 24px;font-size:14px;font-weight:600;color:#111;text-decoration:none;transition:background .2s,color .2s}
+.premium-viewall:hover{background:#111;color:#fff}
+.premium-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.pcard{display:block;background:#f4f4f4;border-radius:20px;overflow:hidden;text-decoration:none;color:inherit;transition:.3s}
+.pcard:hover{transform:translateY(-4px);box-shadow:0 18px 40px -22px rgba(0,0,0,.3)}
+.pthumb{height:230px;background:linear-gradient(135deg,#e8ebef,#dfe3e8);position:relative}
+.pbadge{position:absolute;top:14px;left:14px;background:#b79a63;color:#fff;font-size:11px;font-weight:700;letter-spacing:.04em;padding:5px 12px;border-radius:50px}
+.pinfo{padding:20px 22px 24px}
+.pcat{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#b79a63;margin-bottom:6px}
+.pinfo h4{font-size:22px;font-weight:800;letter-spacing:-.02em;color:#111;margin-bottom:10px}
+.pprice{font-size:20px;font-weight:700;color:#111}
+.pprice span{font-size:14px;font-weight:500;color:#888}
+
+/* STEPS */
+.steps{padding:90px 0}
+.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:50px}
+.step{background:#fff;border-radius:18px;padding:34px;position:relative}
+.step .n{font-size:14px;font-weight:700;color:#b79a63;letter-spacing:.08em}
+.step h4{font-size:23px;font-weight:700;margin:14px 0 10px;letter-spacing:-.01em}
+.step p{color:#666;font-size:15px;line-height:1.6}
+
+
+/* FOOTER */
+footer{background:#111;color:#fff;padding:60px 0 40px;margin-top:0}
+.foot-grid{display:flex;justify-content:space-between;flex-wrap:wrap;gap:30px;align-items:flex-start}
+.foot-grid .logo{color:#b79a63}
+.foot-grid .logo span{color:#fff}
+.foot-col h5{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:16px}
+.foot-col a{display:block;color:#ddd;text-decoration:none;font-size:15px;margin-bottom:10px}
+.foot-col a:hover{color:#b79a63}
+.foot-bottom{border-top:1px solid #2a2a2a;margin-top:40px;padding-top:24px;text-align:center;color:#777;font-size:14px}
+
+@media(max-width:1100px){
+  .cards,.product-grid{grid-template-columns:repeat(2,1fr)}
+  .intro{grid-template-columns:1fr;gap:30px}
+  .steps-grid{grid-template-columns:1fr}
+  .hero-content h1{font-size:48px}
+}
+@media(max-width:768px){
+  .topbar-msg{font-size:11.5px}
+  .login-btn span{display:none}
+  .login-btn{padding:8px;border-radius:50%}
+  .navbar-wrap.hide{transform:none}
+  .menu{position:fixed;top:103px;left:0;right:0;transform:translateX(0) translateY(-130%);background:#fff;flex-direction:column;gap:0;padding:10px 0;transition:transform .3s;border-bottom:1px solid #e5e5e5;box-shadow:0 12px 30px -18px rgba(0,0,0,.3)}
+  .menu.open{transform:translateX(0) translateY(0)}
+  .menu a{padding:14px 5%;width:100%}
+  .burger{display:flex}
+  .cards,.product-grid{grid-template-columns:1fr}
+  .premium-grid{grid-template-columns:1fr}
+  .premium-head{flex-direction:column;align-items:flex-start;gap:16px}
+  .premium-title{font-size:32px}
+  .marquee-track span{font-size:44px}
+  .hero-slider{height:380px}
+  .hero-content{left:30px;right:30px;top:auto;bottom:50px;transform:none}
+  .hero-content h1{font-size:34px}
+  .dots{right:24px;left:auto}
+  /* mobile дээр mega-г энгийн жагсаалт болгох */
+  .has-mega{width:100%}
+  .mega{position:static;transform:none;opacity:1;visibility:visible;pointer-events:auto;
+    width:auto;border:none;box-shadow:none;padding:0 5%;grid-template-columns:1fr;gap:0;display:none}
+  .has-mega:hover .mega{transform:none}
+  .mega-item{padding:10px 0}
+  .mega-ic{display:none}
+  .intro h2{font-size:38px}
+  .section-title{font-size:34px}
+}
+*:focus-visible{outline:2px solid #b79a63;outline-offset:3px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="topbar">
+    <div class="container topbar-in">
+      <div class="socials">
+        <a href="https://facebook.com" target="_blank" rel="noopener" aria-label="Facebook">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.52 1.49-3.91 3.78-3.91 1.1 0 2.24.2 2.24.2v2.47h-1.26c-1.24 0-1.63.78-1.63 1.57v1.88h2.78l-.44 2.9h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94z"/></svg>
+        </a>
+        <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+        </a>
+      </div>
+      <div class="topbar-msg">Нягтлан бодох бүртгэлийн автоматжуулалт</div>
+      <div class="topbar-right"></div>
+    </div>
+  </div>
+  <div class="navbar-wrap">
+    <div class="navbar">
+      <a href="#" class="logo">Business<span>BI</span></a>
+      <nav class="menu" id="menu">
+        <span class="has-mega">
+          <a href="#tools">Templates</a>
+          <div class="mega">
+            <a class="mega-item" href="ndsh_hhoat_converter.html">
+              <div class="mega-ic">🧾</div>
+              <div class="mega-tx"><div class="mt">НДШ / ХХОАТ хөрвүүлэгч</div><div class="md">НДШ тайланг ХХОАТ маягт болгон хувиргана</div></div>
+            </a>
+            <a class="mega-item" href="noat_matcher.html">
+              <div class="mega-ic">🔗</div>
+              <div class="mega-tx"><div class="mt">НӨАТ тулгагч</div><div class="md">eBarimt падааныг дотоод бүртгэлтэй тулгана</div></div>
+            </a>
+            <a class="mega-item" href="invoice_generator_12.html">
+              <div class="mega-ic">📄</div>
+              <div class="mega-tx"><div class="mt">Автомат нэхэмжлэх</div><div class="md">Нэхэмжлэхийг хурдан үүсгэж хэвлэнэ</div></div>
+            </a>
+            <a class="mega-item" href="financial_dashboard.html">
+              <div class="mega-ic">📊</div>
+              <div class="mega-tx"><div class="mt">Санхүүгийн шинжилгээ</div><div class="md">Тайлан балансыг олон жилээр задлан шинжилнэ</div></div>
+            </a>
+          </div>
+        </span>
+        <a href="accountants.html">Тайлан гаргах үйлчилгээ</a>
+        <a href="#contact">Холбогдох</a>
+      </nav>
+      <div class="nav-right">
+        <a href="auth.html" class="login-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Нэвтрэх</span>
+        </a>
+        <button class="burger" id="burger" aria-label="Цэс"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-viewport">
+    <div class="hero-track" id="track">
+      <div class="hero-slide">
+        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1600&q=80" alt="dashboard">
+        <div class="overlay"></div>
+        <div class="hero-content">
+          <div class="tag">Бизнесийн оюун ухаан · Монгол</div>
+          <h1>Тоо баримтаа шийдвэр болгоё</h1>
+          <p>Нягтлан бодогчдод зориулсан үнэгүй хэрэгслүүд — eBarimt тулгалт, НДШ/ХХОАТ тооцоо, нэхэмжлэх, санхүүгийн шинжилгээ.</p>
+          <div class="btns">
+            <a href="#tools" class="btn btn-light">Templates үзэх</a>
+            <a href="accountants.html" class="btn btn-line">Тайлан гаргах үйлчилгээ</a>
+          </div>
+        </div>
+      </div>
+      <div class="hero-slide">
+        <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1600&q=80" alt="tax">
+        <div class="overlay"></div>
+        <div class="hero-content">
+          <div class="tag">eBarimt · НӨАТ</div>
+          <h1>Татварын тулгалт хормын дотор</h1>
+          <p>eBarimt падааныг дотоод бүртгэлтэй автоматаар тулгаж, зөрүүг шууд илрүүлнэ.</p>
+          <div class="btns">
+            <a href="noat_matcher.html" class="btn btn-light">НӨАТ тулгагч нээх</a>
+          </div>
+        </div>
+      </div>
+      <div class="hero-slide">
+        <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&q=80" alt="analytics">
+        <div class="overlay"></div>
+        <div class="hero-content">
+          <div class="tag">Санхүүгийн шинжилгээ</div>
+          <h1>Тайлангаа гүн задлан шинжил</h1>
+          <p>Балансаа олон жилээр харьцуулж, харьцаа үзүүлэлт, чиг хандлагыг нэг дороос.</p>
+          <div class="btns">
+            <a href="financial_dashboard.html" class="btn btn-light">Шинжилгээ нээх</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="dots" id="dots"></div>
+</section>
+
+<section class="container intro" id="templates">
+  <div class="intro-left">
+    <h2>Нягтлан бодогч нарт зориулсан автоматжуулсан систем</h2>
+  </div>
+  <div>
+    <p><b>BusinessBI.mn</b> нь санхүүгийн тайлан, дашбоард, <u>автоматжуулалтын онлайн платформ</u>. Нягтлан, санхүүчдийн өдөр тутмын тооцоолол, тайлан бэлтгэл болон мэдээлэл боловсруулах ажлыг хялбаршуулна. Санхүүгийн өгөгдлийг цэгцтэй дашбоард болгон харуулж, ажлыг илүү хурдан, ойлгомжтой, үр дүнтэй болгоно.</p>
+  </div>
+</section>
+
+<section class="request" id="tools">
+  <div class="product-grid">
+    <a class="product" href="ndsh_hhoat_converter.html">
+        <div class="thumb"><img src="img/tool-ndsh.jpg" alt="НДШ тайлан dashboard"></div>
+        <h4>НДШ / ХХОАТ хөрвүүлэгч</h4>
+      </a>
+      <a class="product" href="noat_matcher.html">
+        <div class="thumb"><img src="img/tool-noat.jpg" alt="НӨАТ тулгагч"></div>
+        <h4>НӨАТ тулгагч</h4>
+      </a>
+      <a class="product" href="invoice_generator_12.html">
+        <div class="thumb"><img src="img/tool-invoice.jpg" alt="Автомат нэхэмжлэх"></div>
+        <h4>Автомат нэхэмжлэх</h4>
+      </a>
+      <a class="product" href="financial_dashboard.html">
+        <div class="thumb"><img src="img/tool-financial.jpg" alt="Санхүүгийн шинжилгээ dashboard"></div>
+        <h4>Санхүүгийн шинжилгээ</h4>
+      </a>
+    </div>
+</section>
+
+<!-- PREMIUM PRODUCTS -->
+<section class="premium" id="premium">
+  <div class="premium-head">
+    <div>
+      <h2 class="premium-title">Мэргэжлийн <em>шийдлүүд</em></h2>
+    </div>
+    <a href="#contact" class="premium-viewall">Бүгдийг үзэх</a>
+  </div>
+  <div class="premium-grid">
+    <a class="pcard" href="#contact">
+      <div class="pthumb"><span class="pbadge">Шинэ</span></div>
+      <div class="pinfo">
+        <div class="pcat">Цалин</div>
+        <h4>Цалин бодогч систем</h4>
+        <div class="pprice">₮149,000 <span>/ сар</span></div>
+      </div>
+    </a>
+    <a class="pcard" href="#contact">
+      <div class="pthumb"></div>
+      <div class="pinfo">
+        <div class="pcat">Төсөв</div>
+        <h4>Төсөв боловсруулагч</h4>
+        <div class="pprice">₮199,000 <span>/ сар</span></div>
+      </div>
+    </a>
+    <a class="pcard" href="#contact">
+      <div class="pthumb"><span class="pbadge">Эрэлттэй</span></div>
+      <div class="pinfo">
+        <div class="pcat">Санхүү</div>
+        <h4>Санхүүгийн програм</h4>
+        <div class="pprice">Үнийн санал</div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- MARQUEE BANNER -->
+<div class="marquee">
+  <div class="marquee-track">
+    <span>Бэлэн хэрэгслүүд · Автоматжуулалт · Бэлэн хэрэгслүүд · Автоматжуулалт · Бэлэн хэрэгслүүд · Автоматжуулалт · </span>
+    <span>Бэлэн хэрэгслүүд · Автоматжуулалт · Бэлэн хэрэгслүүд · Автоматжуулалт · Бэлэн хэрэгслүүд · Автоматжуулалт · </span>
+  </div>
+</div>
+
+<section class="container steps" id="how">
+  <h2 class="section-title">Хэрхэн ажилладаг</h2>
+  <div class="steps-grid">
+    <div class="step"><div class="n">01</div><h4>Хэрэгцээгээ хэл</h4><p>Бизнес, өгөгдөл, хүсэж буй үр дүнгээ товч тайлбарла.</p></div>
+    <div class="step"><div class="n">02</div><h4>Хэрэгслээ сонго</h4><p>Хэрэгтэй хэрэгслээ нээх эсвэл нягтлан бодогчтой холбогдох.</p></div>
+    <div class="step"><div class="n">03</div><h4>Үр дүнг хар</h4><p>Өгөгдлөө холбоод л шийдвэр гаргахуйц самбараа ашигла.</p></div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-col">
+        <a href="#" class="logo">Business<span>BI</span></a>
+        <p style="color:#999;margin-top:14px;max-width:32ch;font-size:15px;line-height:1.6">Санхүүгийн автоматжуулсан бэлэн системүүд, нягтлан бодогчдыг холбосон Монголын platform.</p>
+      </div>
+      <div class="foot-col">
+        <h5>Үйлчилгээ</h5>
+        <a href="#tools">Templates</a>
+        <a href="accountants.html">Тайлан гаргах үйлчилгээ</a>
+      </div>
+      <div class="foot-col">
+        <h5>Холбоо барих</h5>
+        <a href="tel:+97699112233">+976 9911-2233</a>
+        <a href="mailto:hello@businessbi.mn">hello@businessbi.mn</a>
+        <a href="#">Facebook</a>
+      </div>
+    </div>
+    <div class="foot-bottom">© 2026 BusinessBI.mn. Бүх эрх хуулиар хамгаалагдсан.</div>
+  </div>
+</footer>
+
+<script>
+  const burger=document.getElementById('burger'), menu=document.getElementById('menu');
+  burger.addEventListener('click',()=>{burger.classList.toggle('open');menu.classList.toggle('open');});
+  menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{burger.classList.remove('open');menu.classList.remove('open');}));
+
+  // hero peek carousel — хязгааргүй тойрог
+  const track=document.getElementById('track');
+  const vp=track.parentElement; // hero-viewport
+  const realSlides=[...track.querySelectorAll('.hero-slide')];
+  const n=realSlides.length;
+  // clone: эхэнд сүүлийн, төгсгөлд эхний
+  track.insertBefore(realSlides[n-1].cloneNode(true),realSlides[0]);
+  track.appendChild(realSlides[0].cloneNode(true));
+  const allSlides=[...track.querySelectorAll('.hero-slide')];
+
+  const dotsBox=document.getElementById('dots');
+  realSlides.forEach((_,i)=>{const d=document.createElement('span');if(i===0)d.className='active';d.addEventListener('click',()=>goReal(i));dotsBox.appendChild(d);});
+  const dots=[...dotsBox.children];
+
+  let idx=1;
+  let animating=false;
+  function step(){ // нэг slide+margin-ийн px өргөн
+    const s=allSlides[0];
+    const style=getComputedStyle(s);
+    return s.offsetWidth + parseFloat(style.marginLeft) + parseFloat(style.marginRight);
+  }
+  function center(){ // идэвхтэй slide-ийг голлуулах нэмэлт шилжилт (px)
+    return (vp.offsetWidth - allSlides[0].offsetWidth)/2 - parseFloat(getComputedStyle(allSlides[0]).marginLeft);
+  }
+  function place(animate){
+    track.style.transition=animate?'transform .55s cubic-bezier(.4,0,.2,1)':'none';
+    track.style.transform=`translateX(${center() - idx*step()}px)`;
+  }
+  function updateDots(){const real=(idx-1+n)%n;dots.forEach((d,k)=>d.classList.toggle('active',k===real));}
+  function go(i){if(animating)return;animating=true;idx=i;place(true);updateDots();}
+  function next(){go(idx+1);}
+  function goReal(i){go(i+1);}
+  track.addEventListener('transitionend',(e)=>{
+    if(e.target!==track||e.propertyName!=='transform')return;
+    animating=false;
+    if(idx===0){idx=n;place(false);}
+    else if(idx===n+1){idx=1;place(false);}
+  });
+  window.addEventListener('resize',()=>place(false));
+  // зураг ачаалсны дараа байрлалыг дахин тооцох
+  window.addEventListener('load',()=>place(false));
+  place(false);
+  updateDots();
+  setInterval(next,6000);
+
+  // Толгойн скролл эффект:
+  // - топбар хэвийн гүйж дээшээ алга болно (sticky биш)
+  // - navbar дээд талд наалдана (sticky), наалдмагц дугуй булан арилна (.stuck)
+  // - hero-н 70%-д хүрэхэд navbar дээшээ нуугдана (.hide)
+  const navWrap=document.querySelector('.navbar-wrap');
+  const topbar=document.querySelector('.topbar');
+  const hero=document.querySelector('.hero');
+  function onScroll(){
+    const y=window.scrollY;
+    const topbarH=topbar?topbar.offsetHeight:0;
+    // топбар бүрэн гарсны дараа navbar наалдсан төлөв
+    navWrap.classList.toggle('stuck', y>topbarH-12);
+    // hero-н 70%-д хүрэхэд цэс хураах (hero дотор 70% гүйлгэхэд)
+    const heroTop=hero?hero.offsetTop:0;
+    const heroH=hero?hero.offsetHeight:600;
+    const hidePoint=heroTop+heroH*0.70;
+    navWrap.classList.toggle('hide', y>hidePoint);
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  onScroll();
+</script>
+</body>
+</html>
