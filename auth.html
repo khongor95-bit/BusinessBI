@@ -145,6 +145,18 @@ auth.languageCode = 'mn';
 const params = new URLSearchParams(location.search);
 const next   = params.get('next') || 'index.html';
 
+// ─── Modal (iframe) дотор ажиллаж байгаа эсэх ──────────────────────────────
+const inModal = window.self !== window.top;
+// Нэвтэрсний дараа: iframe дотор бол эцэг цонхонд мэдэгдээд modal хаалгана,
+// эс бөгөөс энгийн хуудас шиг next руу шилжинэ.
+function afterAuth() {
+  if (inModal) {
+    try { window.parent.postMessage({ type: 'bbi-auth-success' }, '*'); } catch(e){}
+  } else {
+    location.href = next;
+  }
+}
+
 // ─── Хэрэгсэл функцүүд ──────────────────────────────────────────────────────
 const $   = id => document.getElementById(id);
 const msg = $('msg');
@@ -202,7 +214,7 @@ $('submitBtn').onclick = async () => {
       await signInWithEmailAndPassword(auth, email, pass);
       showMsg('Амжилттай нэвтэрлээ!', 'ok');
     }
-    setTimeout(() => location.href = next, 800);
+    setTimeout(afterAuth, 800);
   } catch(e) {
     showMsg(mnError(e.code), 'err');
     $('submitBtn').disabled = false;
@@ -216,7 +228,7 @@ $('googleBtn').onclick = async () => {
     const result = await signInWithPopup(auth, provider);
     await saveUser(result.user);
     showMsg('Амжилттай нэвтэрлээ!', 'ok');
-    setTimeout(() => location.href = next, 800);
+    setTimeout(afterAuth, 800);
   } catch(e) {
     showMsg(mnError(e.code), 'err');
   }
@@ -251,7 +263,7 @@ onAuthStateChanged(auth, user => {
     $('loggedEmail').textContent = user.email;
     $('avatarInitial').textContent = displayName.charAt(0).toUpperCase();
 
-    $('continueBtn').onclick = () => location.href = next;
+    $('continueBtn').onclick = () => afterAuth();
     $('signOutBtn').onclick  = () => signOut(auth);
   } else {
     $('authSection').style.display    = 'block';

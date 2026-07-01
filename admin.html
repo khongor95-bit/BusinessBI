@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BusinessBI — Хэрэглэгчийн үйлдлийн тайлан</title>
+<style>
+  :root{
+    --ink:#0d1b2a; --ink-soft:#415a77; --paper:#f5f3ee; --card:#ffffff;
+    --line:#e0dcd3; --accent:#c1121f; --accent-soft:#fdf0f0;
+    --gold:#d4a017; --teal:#2a9d8f; --violet:#6a4c93;
+    --ok:#2a9d8f; --warn:#e07a1c; --err:#c1121f;
+    --mono:'SFMono-Regular',ui-monospace,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Segoe UI',-apple-system,'Noto Sans',Roboto,sans-serif;
+    background:var(--paper); color:var(--ink); line-height:1.5;
+    padding:24px; max-width:1280px; margin:0 auto;
+  }
+  header{
+    display:flex; align-items:flex-end; justify-content:space-between;
+    border-bottom:2px solid var(--ink); padding-bottom:16px; margin-bottom:24px;
+    flex-wrap:wrap; gap:16px;
+  }
+  .brand h1{font-size:22px; letter-spacing:-.5px}
+  .brand .sub{font-size:13px; color:var(--ink-soft); margin-top:2px}
+  .status{font-size:12px; color:var(--ink-soft); font-family:var(--mono)}
+  .status b{color:var(--teal)}
+
+  .controls{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; align-items:center}
+  .controls select, .controls input, .controls button{
+    font:inherit; font-size:13px; padding:8px 12px; border:1px solid var(--line);
+    border-radius:8px; background:var(--card); color:var(--ink);
+  }
+  .controls button{background:var(--ink); color:#fff; border:none; cursor:pointer; font-weight:600}
+  .controls button:hover{background:var(--accent)}
+  .controls button.ghost{background:transparent; color:var(--ink); border:1px solid var(--line)}
+
+  .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:24px}
+  .kpi{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px 18px; position:relative; overflow:hidden}
+  .kpi::before{content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--accent)}
+  .kpi.k2::before{background:var(--teal)} .kpi.k3::before{background:var(--gold)} .kpi.k4::before{background:var(--violet)}
+  .kpi .lbl{font-size:12px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.5px}
+  .kpi .val{font-size:32px; font-weight:700; margin-top:4px; letter-spacing:-1px}
+  .kpi .delta{font-size:12px; color:var(--ink-soft); margin-top:2px}
+
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:24px}
+  @media(max-width:820px){.grid{grid-template-columns:1fr}}
+  .panel{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px}
+  .panel h2{font-size:14px; text-transform:uppercase; letter-spacing:.5px; color:var(--ink-soft); margin-bottom:14px; font-weight:700}
+
+  .bar-row{display:flex; align-items:center; gap:10px; margin-bottom:9px; font-size:13px}
+  .bar-row .name{width:150px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .bar-row .track{flex:1; background:#eee; border-radius:5px; height:14px; overflow:hidden}
+  .bar-row .fill{height:100%; background:var(--teal); border-radius:5px}
+  .bar-row .num{width:44px; text-align:right; font-family:var(--mono); font-size:12px; color:var(--ink-soft)}
+
+  .spark{display:flex; align-items:flex-end; gap:3px; height:120px; padding-top:8px}
+  .spark .col{flex:1; background:var(--accent); border-radius:3px 3px 0 0; min-height:2px; position:relative}
+  .spark .col:hover::after{content:attr(data-v); position:absolute; top:-20px; left:50%; transform:translateX(-50%); background:var(--ink); color:#fff; font-size:10px; padding:2px 5px; border-radius:4px; white-space:nowrap}
+  .spark-labels{display:flex; gap:3px; margin-top:6px}
+  .spark-labels span{flex:1; text-align:center; font-size:10px; color:var(--ink-soft); font-family:var(--mono)}
+
+  table{width:100%; border-collapse:collapse; font-size:13px}
+  th{text-align:left; padding:8px 10px; border-bottom:2px solid var(--ink); font-size:11px; text-transform:uppercase; letter-spacing:.5px; color:var(--ink-soft)}
+  td{padding:8px 10px; border-bottom:1px solid var(--line)}
+  tr:hover td{background:#faf9f6}
+  .tag{display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:600}
+  .tag.login{background:#e8f5f3; color:var(--teal)} .tag.tool_open{background:#f3edfa; color:var(--violet)}
+  .tag.download{background:#fdf6e3; color:#a8790a} .tag.payment{background:var(--accent-soft); color:var(--accent)}
+  .tag.error{background:#fdecec; color:var(--err)} .tag.logout{background:#eee; color:var(--ink-soft)}
+  .empty{text-align:center; color:var(--ink-soft); padding:40px; font-size:14px}
+  .full{grid-column:1/-1}
+  footer{margin-top:24px; padding-top:16px; border-top:1px solid var(--line); font-size:12px; color:var(--ink-soft)}
+  .setup{background:#fffbea; border:1px solid var(--gold); border-radius:12px; padding:16px 18px; margin-bottom:24px; font-size:13px; display:none}
+  .setup.show{display:block}
+  .setup code{background:#00000010; padding:1px 5px; border-radius:4px; font-family:var(--mono)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1>Хэрэглэгчийн үйлдлийн тайлан</h1>
+    <div class="sub">BusinessBI.mn — activity analytics</div>
+  </div>
+  <div class="status" id="status">● Firebase холбогдож байна...</div>
+  <button onclick="doLogout()" id="logoutBtn" style="display:none;font:inherit;font-size:12px;padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card);cursor:pointer;margin-left:12px">Гарах</button>
+</header>
+
+<div class="setup" id="setup">
+  <b>⚙️ Тохиргоо шаардлагатай:</b> Доорх <code>firebaseConfig</code>-д businessbi.mn-ий Firebase төслийн тохиргоогоо бичнэ үү.
+  Firebase Console → Project Settings → General → Your apps хэсгээс аваарай.
+</div>
+
+<!-- Нэвтрэх хэсэг -->
+<div id="loginBox" style="max-width:380px;margin:60px auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:32px;display:none;text-align:center">
+  <h2 id="loginTitle" style="font-size:18px;margin-bottom:6px">Админаар нэвтрэх</h2>
+  <p id="loginDesc" style="font-size:13px;color:var(--ink-soft);margin-bottom:24px">Тайлан харахын тулд админ Google хаягаараа нэвтэрнэ үү.</p>
+  <div id="loginBtnWrap">
+    <button onclick="doLogin()" style="width:100%;font:inherit;font-size:14px;font-weight:600;padding:12px;background:#fff;color:#3c4043;border:1px solid var(--line);border-radius:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Google-ээр нэвтрэх
+    </button>
+  </div>
+  <a id="backHome" href="index.html" style="display:none;font:inherit;font-size:14px;font-weight:600;padding:12px;background:var(--ink);color:#fff;border-radius:9px;text-decoration:none;margin-top:4px">← Нүүр хуудас руу буцах</a>
+  <div id="loginErr" style="color:var(--err);font-size:13px;margin-top:16px;min-height:18px"></div>
+</div>
+
+<!-- Дашбоардын бүх агуулга энд боож, нэвтэрсний дараа л харагдана -->
+<div id="dashWrap" style="display:none">
+
+<div class="controls">
+  <label style="font-size:13px;color:var(--ink-soft)">Хугацаа:</label>
+  <select id="range">
+    <option value="7">Сүүлийн 7 хоног</option>
+    <option value="30" selected>Сүүлийн 30 хоног</option>
+    <option value="90">Сүүлийн 90 хоног</option>
+    <option value="0">Бүх хугацаа</option>
+  </select>
+  <select id="actionFilter">
+    <option value="">Бүх үйлдэл</option>
+    <option value="login">Нэвтрэлт</option>
+    <option value="tool_open">Хэрэгсэл нээх</option>
+    <option value="download">Файл татах</option>
+    <option value="payment">Худалдан авалт</option>
+    <option value="error">Алдаа</option>
+  </select>
+  <button onclick="loadData()">🔄 Шинэчлэх</button>
+  <button class="ghost" onclick="exportCSV()">⬇ CSV татах</button>
+</div>
+
+<div class="kpis" id="kpis"></div>
+
+<div class="grid">
+  <div class="panel full">
+    <h2>Өдөр тутмын идэвх</h2>
+    <div class="spark" id="spark"></div>
+    <div class="spark-labels" id="sparkLabels"></div>
+  </div>
+  <div class="panel">
+    <h2>Хамгийн их ашиглагдсан хэрэгсэл</h2>
+    <div id="topTools"></div>
+  </div>
+  <div class="panel">
+    <h2>Хамгийн идэвхтэй хэрэглэгч</h2>
+    <div id="topUsers"></div>
+  </div>
+  <div class="panel full">
+    <h2>Сүүлийн үйлдлүүд</h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Огноо/цаг</th><th>Хэрэглэгч</th><th>Үйлдэл</th><th>Дэлгэрэнгүй</th><th>Төхөөрөмж</th></tr></thead>
+        <tbody id="logRows"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<footer>
+  BusinessBI.mn activity dashboard · Firestore <code>activityLogs</code> collection-оос уншиж байна ·
+  Нийт бичлэг: <b id="totalCount">—</b>
+</footer>
+</div><!-- /dashWrap -->
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+<script>
+/* ============================================================
+   1) FIREBASE ТОХИРГОО — энд өөрийн businessbi.mn-ий утгаа бичнэ
+   ============================================================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyAXslBVU1__Ibhk3P7TEeJRS2oi-8fi6Jc",
+  authDomain: "businessbi.firebaseapp.com",
+  projectId: "businessbi",
+  storageBucket: "businessbi.firebasestorage.app",
+  messagingSenderId: "84765528435",
+  appId: "1:84765528435:web:edf7066e6399dbc76af506",
+  measurementId: "G-R1PJ3P6FHM"
+};
+
+let db = null, auth = null, allLogs = [];
+const ADMIN_EMAIL = "khongor95@gmail.com";
+const notConfigured = firebaseConfig.apiKey.startsWith("ТАНЫ");
+
+if(notConfigured){
+  document.getElementById('setup').classList.add('show');
+  document.getElementById('status').innerHTML='● Тохиргоо хийгээгүй — <b style="color:var(--warn)">demo горим</b>';
+  document.getElementById('dashWrap').style.display='block';
+  seedDemo();
+} else {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+  auth = firebase.auth();
+
+  auth.onAuthStateChanged(user => {
+    if(user && user.email === ADMIN_EMAIL){
+      // Админ нэвтэрсэн — дашбоард харуулна
+      document.getElementById('loginBox').style.display='none';
+      document.getElementById('dashWrap').style.display='block';
+      document.getElementById('logoutBtn').style.display='inline-block';
+      document.getElementById('status').innerHTML='● <b>'+user.email+'</b>';
+      loadData();
+    } else if(user){
+      // Сайтад нэвтэрсэн ч админ биш — гаргахгүй, зөвхөн эрхгүй гэж мэдэгдэнэ
+      document.getElementById('loginBox').style.display='block';
+      document.getElementById('dashWrap').style.display='none';
+      document.getElementById('logoutBtn').style.display='none';
+      document.getElementById('status').innerHTML='● Админ эрхгүй';
+      document.getElementById('loginTitle').textContent='Хандах эрхгүй';
+      document.getElementById('loginDesc').innerHTML='"'+user.email+'" хаягт админ эрх байхгүй байна. Энэ хуудас зөвхөн админд зориулагдсан.';
+      document.getElementById('loginBtnWrap').style.display='none';
+      document.getElementById('backHome').style.display='block';
+    } else {
+      // Нэвтрээгүй
+      showLogin();
+    }
+  });
+}
+
+function showLogin(){
+  document.getElementById('loginBox').style.display='block';
+  document.getElementById('dashWrap').style.display='none';
+  document.getElementById('logoutBtn').style.display='none';
+  document.getElementById('status').innerHTML='● Нэвтрээгүй';
+  document.getElementById('loginTitle').textContent='Админаар нэвтрэх';
+  document.getElementById('loginDesc').textContent='Тайлан харахын тулд админ Google хаягаараа нэвтэрнэ үү.';
+  document.getElementById('loginBtnWrap').style.display='block';
+  document.getElementById('backHome').style.display='none';
+  document.getElementById('loginErr').textContent='';
+}
+
+async function doLogin(){
+  const err=document.getElementById('loginErr');
+  err.textContent='';
+  try{
+    const provider = new firebase.auth.GoogleAuthProvider();
+    await auth.signInWithPopup(provider);
+    // onAuthStateChanged автоматаар шалгаж, дашбоард харуулна
+  }catch(e){
+    err.textContent = e.code==='auth/popup-closed-by-user' ? 'Цонх хаагдсан. Дахин оролдоно уу.'
+                    : 'Алдаа: '+e.message;
+  }
+}
+
+function doLogout(){ if(auth) auth.signOut(); }
+
+/* ============================================================
+   2) ДАШБОАРД: Firestore-оос уншиж, анализ хийж, зурна
+   ============================================================ */
+async function loadData(){
+  if(notConfigured){ render(filterDemo()); return; }
+  const days = parseInt(document.getElementById('range').value);
+  const actionF = document.getElementById('actionFilter').value;
+  document.getElementById('status').innerHTML='● Уншиж байна...';
+
+  try{
+    let q = db.collection('activityLogs').orderBy('timestamp','desc').limit(3000);
+    if(days>0){
+      const from = new Date(); from.setDate(from.getDate()-days);
+      q = db.collection('activityLogs')
+             .where('timestamp','>=', firebase.firestore.Timestamp.fromDate(from))
+             .orderBy('timestamp','desc').limit(3000);
+    }
+    const snap = await q.get();
+    allLogs = snap.docs.map(d=>{
+      const x = d.data();
+      return {
+        userEmail: x.userEmail || x.userId || 'anonymous',
+        action: x.action || 'unknown',
+        details: x.details || {},
+        device: x.device || '',
+        ts: x.timestamp?.toDate ? x.timestamp.toDate() : new Date()
+      };
+    });
+    if(actionF) allLogs = allLogs.filter(l=>l.action===actionF);
+    document.getElementById('status').innerHTML='● Firebase <b>холбогдсон</b>';
+    render(allLogs);
+  }catch(e){
+    console.error(e);
+    document.getElementById('status').innerHTML='● <b style="color:var(--err)">Алдаа:</b> '+e.message;
+  }
+}
+
+function render(logs){
+  document.getElementById('totalCount').textContent = logs.length.toLocaleString();
+
+  // --- KPI-ууд ---
+  const uniqUsers = new Set(logs.map(l=>l.userEmail)).size;
+  const logins = logs.filter(l=>l.action==='login').length;
+  const downloads = logs.filter(l=>l.action==='download').length;
+  const errors = logs.filter(l=>l.action==='error').length;
+  document.getElementById('kpis').innerHTML = `
+    <div class="kpi"><div class="lbl">Идэвхтэй хэрэглэгч</div><div class="val">${uniqUsers}</div><div class="delta">тухайн хугацаанд</div></div>
+    <div class="kpi k2"><div class="lbl">Нэвтрэлт</div><div class="val">${logins}</div><div class="delta">нийт login</div></div>
+    <div class="kpi k3"><div class="lbl">Файл татсан</div><div class="val">${downloads}</div><div class="delta">download үйлдэл</div></div>
+    <div class="kpi k4"><div class="lbl">Алдаа</div><div class="val">${errors}</div><div class="delta">error event</div></div>`;
+
+  // --- Өдөр тутмын идэвх (spark) ---
+  const byDay = {};
+  logs.forEach(l=>{ const k=l.ts.toISOString().slice(0,10); byDay[k]=(byDay[k]||0)+1; });
+  const days = Object.keys(byDay).sort().slice(-30);
+  const max = Math.max(1, ...days.map(d=>byDay[d]));
+  document.getElementById('spark').innerHTML = days.map(d=>
+    `<div class="col" style="height:${(byDay[d]/max*100)}%" data-v="${d.slice(5)}: ${byDay[d]}"></div>`).join('');
+  document.getElementById('sparkLabels').innerHTML = days.map((d,i)=>
+    (i%Math.ceil(days.length/8)===0)?`<span>${d.slice(5)}</span>`:`<span></span>`).join('');
+
+  // --- Топ хэрэгслүүд ---
+  const tools = {};
+  logs.filter(l=>l.action==='tool_open').forEach(l=>{
+    const n=l.details.toolName||'тодорхойгүй'; tools[n]=(tools[n]||0)+1; });
+  document.getElementById('topTools').innerHTML = barChart(tools, 'var(--violet)') || emptyMsg();
+
+  // --- Топ хэрэглэгч ---
+  const users = {};
+  logs.forEach(l=>{ users[l.userEmail]=(users[l.userEmail]||0)+1; });
+  document.getElementById('topUsers').innerHTML = barChart(users, 'var(--teal)') || emptyMsg();
+
+  // --- Сүүлийн үйлдлүүд ---
+  const rows = logs.slice(0,50).map(l=>{
+    const dt=l.ts.toLocaleString('mn-MN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+    const dev=parseDevice(l.device);
+    const det=Object.entries(l.details).map(([k,v])=>`${k}: ${v}`).join(', ')||'—';
+    return `<tr><td>${dt}</td><td>${esc(l.userEmail)}</td>
+      <td><span class="tag ${l.action}">${actionLabel(l.action)}</span></td>
+      <td>${esc(det)}</td><td>${dev}</td></tr>`;
+  }).join('');
+  document.getElementById('logRows').innerHTML = rows || `<tr><td colspan="5" class="empty">Өгөгдөл алга</td></tr>`;
+}
+
+function barChart(obj, color){
+  const arr = Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,7);
+  if(!arr.length) return '';
+  const max = arr[0][1];
+  return arr.map(([n,v])=>`
+    <div class="bar-row">
+      <span class="name" title="${esc(n)}">${esc(n)}</span>
+      <span class="track"><span class="fill" style="width:${v/max*100}%;background:${color}"></span></span>
+      <span class="num">${v}</span>
+    </div>`).join('');
+}
+function emptyMsg(){ return '<div class="empty" style="padding:20px">Өгөгдөл алга</div>'; }
+function actionLabel(a){return {login:'Нэвтрэлт',logout:'Гарсан',tool_open:'Хэрэгсэл',download:'Татсан',payment:'Худ.авалт',error:'Алдаа'}[a]||a;}
+function parseDevice(ua){ if(/Mobile|Android|iPhone/.test(ua))return '📱 Утас'; if(/Tablet|iPad/.test(ua))return '📲 Таблет'; if(ua)return '💻 Компьютер'; return '—'; }
+function esc(s){return String(s).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));}
+
+function exportCSV(){
+  const rows=[['Огноо','Хэрэглэгч','Үйлдэл','Дэлгэрэнгүй','Төхөөрөмж']];
+  (notConfigured?filterDemo():allLogs).forEach(l=>{
+    rows.push([l.ts.toISOString(), l.userEmail, l.action,
+      Object.entries(l.details).map(([k,v])=>`${k}=${v}`).join('; '), parseDevice(l.device)]);
+  });
+  const csv='\uFEFF'+rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='activity_logs_'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
+}
+
+document.getElementById('range').onchange = loadData;
+document.getElementById('actionFilter').onchange = loadData;
+
+/* ============================================================
+   3) DEMO ӨГӨГДӨЛ (тохиргоо хийгээгүй үед л ажиллана)
+   ============================================================ */
+function seedDemo(){
+  const users=['bat@gmail.com','saraa@yahoo.com','tur@bbi.mn','anon-9f3x','ganaa@gmail.com','dulmaa@company.mn'];
+  const tools=['НӨАТ тулгалт','Цалингийн журнал','НДШ/ХХОАТ хөрвүүлэгч','Санхүүгийн дашбоард','Торгууль шалгагч'];
+  const acts=['login','login','login','tool_open','tool_open','tool_open','download','payment','error','logout'];
+  const uas=['Mozilla/5.0 (Windows)','Mozilla/5.0 (iPhone Mobile)','Mozilla/5.0 (Macintosh)','Mozilla/5.0 (Android Mobile)'];
+  allLogs=[];
+  for(let i=0;i<420;i++){
+    const daysAgo=Math.floor(Math.random()*30);
+    const ts=new Date(); ts.setDate(ts.getDate()-daysAgo); ts.setHours(Math.floor(Math.random()*14)+8);
+    const a=acts[Math.floor(Math.random()*acts.length)];
+    let det={};
+    if(a==='tool_open')det={toolName:tools[Math.floor(Math.random()*tools.length)]};
+    if(a==='download')det={file:'export.xlsx'};
+    if(a==='payment')det={amount:'49000₮',plan:'Pro'};
+    if(a==='error')det={message:'null reference'};
+    allLogs.push({userEmail:users[Math.floor(Math.random()*users.length)],action:a,details:det,device:uas[Math.floor(Math.random()*uas.length)],ts});
+  }
+  allLogs.sort((a,b)=>b.ts-a.ts);
+  render(filterDemo());
+}
+function filterDemo(){
+  const days=parseInt(document.getElementById('range').value);
+  const actionF=document.getElementById('actionFilter').value;
+  let out=allLogs;
+  if(days>0){const from=new Date();from.setDate(from.getDate()-days);out=out.filter(l=>l.ts>=from);}
+  if(actionF)out=out.filter(l=>l.action===actionF);
+  return out;
+}
+</script>
+</body>
+</html>
