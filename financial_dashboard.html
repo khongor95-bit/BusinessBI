@@ -186,23 +186,49 @@ canvas{max-width:100%}
 .s-foot-links{display:flex;gap:22px}
 .s-foot-links a{color:var(--muted);text-decoration:none;font-size:14px}
 </style>
+
+<style id="bbi-unified-nav-css">
+.ubbi-nav{position:sticky;top:0;z-index:1000;background:#fff;border-bottom:1px solid #ececec}
+.ubbi-nav-inner{max-width:1480px;margin:0 auto;padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.ubbi-logo{display:flex;align-items:center;gap:12px;text-decoration:none;font-size:22px;font-weight:800;letter-spacing:-.02em;color:#b79a63;white-space:nowrap}
+.ubbi-logo span{color:#111}
+.ubbi-logo-sep{width:1px;height:24px;background:#ddd}
+.ubbi-logo-title{font-size:15px;font-weight:600;color:#555;letter-spacing:0}
+.ubbi-menu{display:flex;align-items:center;gap:30px}
+.ubbi-menu a{text-decoration:none;color:#444;font-size:15px;font-weight:500;transition:color .2s;white-space:nowrap}
+.ubbi-menu a:hover{color:#b79a63}
+.ubbi-menu a.ubbi-cta{background:#111;color:#fff;padding:9px 20px;border-radius:50px;font-size:14px}
+.ubbi-menu a.ubbi-cta:hover{background:#333;color:#fff}
+.ubbi-burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:6px}
+.ubbi-burger span{display:block;width:24px;height:2px;background:#111;transition:.3s}
+.ubbi-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.ubbi-burger.open span:nth-child(2){opacity:0}
+.ubbi-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+@media(max-width:820px){
+  .ubbi-logo-sep,.ubbi-logo-title{display:none}
+  .ubbi-menu{position:fixed;top:64px;left:0;right:0;background:#fff;flex-direction:column;gap:0;align-items:stretch;padding:8px 0;transform:translateY(-130%);transition:transform .3s;border-bottom:1px solid #ececec;box-shadow:0 12px 30px -18px rgba(0,0,0,.3)}
+  .ubbi-menu.open{transform:translateY(0)}
+  .ubbi-menu a{padding:14px 28px}
+  .ubbi-menu a.ubbi-cta{margin:8px 28px;text-align:center;border-radius:8px}
+  .ubbi-burger{display:flex}
+}
+</style>
 </head>
 <body>
 
-<nav class="s-nav">
-  <div class="s-nav-inner">
-    <a href="index.html" class="s-logo">
-      <span class="s-logo-main">Business<span>BI</span></span>
-      <div class="s-logo-sep"></div>
-      <span class="s-logo-title">Санхүүгийн шинжилгээ</span>
+<nav class="ubbi-nav">
+  <div class="ubbi-nav-inner">
+    <a href="index.html" class="ubbi-logo">Business<span>BI</span>
+      <div class="ubbi-logo-sep"></div>
+      <span class="ubbi-logo-title">Санхүүгийн шинжилгээ</span>
     </a>
-    <div class="s-links">
-      <a href="tools.html" class="active">Хэрэгслүүд</a>
-      <a href="index.html#custom">Захиалгат Dashboard</a>
-      <a href="accountants.html">Нягтлан холбох</a>
-      <a href="index.html#courses">Сургалт</a>
-      <a href="index.html#contact" class="s-cta">Холбогдох</a>
-    </div>
+    <nav class="ubbi-menu" id="ubbiMenu">
+      <a href="index.html#tools">Хэрэгслүүд</a>
+      <a href="accountants.html">Тайлан гаргах үйлчилгээ</a>
+      <a href="index.html#contact">Холбогдох</a>
+      <a href="index.html#contact" class="ubbi-cta">Захиалга өгөх</a>
+    </nav>
+    <button class="ubbi-burger" id="ubbiBurger" aria-label="Цэс"><span></span><span></span><span></span></button>
   </div>
 </nav>
 
@@ -313,8 +339,8 @@ canvas{max-width:100%}
       <p style="font-size:13px;color:var(--muted);margin-top:6px">Тоо баримтыг шийдвэр болгоно. © 2026</p>
     </div>
     <div class="s-foot-links">
-      <a href="tools.html">Хэрэгслүүд</a>
-      <a href="accountants.html">Нягтлан</a>
+      <a href="index.html#tools">Хэрэгслүүд</a>
+      <a href="accountants.html">Тайлан гаргах үйлчилгээ</a>
       <a href="index.html#contact">Холбоо барих</a>
     </div>
   </div>
@@ -597,6 +623,11 @@ function resetDash(){
   document.getElementById('uploadZone').style.display='block';
   document.getElementById('pdfInput').value='';
 }
+</script>
+
+<script>
+(function(){var b=document.getElementById('ubbiBurger'),m=document.getElementById('ubbiMenu');
+if(b&&m)b.addEventListener('click',function(){b.classList.toggle('open');m.classList.toggle('open');});})();
 </script>
 </body>
 </html>
