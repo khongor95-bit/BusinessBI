@@ -123,6 +123,7 @@ header{display:contents}
 .product .thumb{overflow:hidden;position:relative;background:#eef1f0;aspect-ratio:16/10}
 .product .thumb img{position:absolute;inset:0;width:100%;height:100%}
 .product:hover .thumb img{transform:scale(1.04)}
+.free-badge{position:absolute;top:14px;left:14px;z-index:2;background:#1e9e5a;color:#fff;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:5px 13px;border-radius:50px;box-shadow:0 4px 12px -4px rgba(30,158,90,.55)}
 .product h4{font-size:20px;font-weight:800;letter-spacing:-.02em;color:#111;text-align:center;padding:18px 10px 20px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* MARQUEE BANNER */
@@ -150,6 +151,7 @@ header{display:contents}
 .pthumb{aspect-ratio:16/10;background:linear-gradient(135deg,#e8ebef,#dfe3e8);position:relative;overflow:hidden}
 .pthumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .pbadge{position:absolute;top:14px;left:14px;z-index:2;background:#b79a63;color:#fff;font-size:11px;font-weight:700;letter-spacing:.04em;padding:5px 12px;border-radius:50px}
+.soon-badge{position:absolute;top:14px;right:14px;z-index:2;background:rgba(17,17,17,.88);color:#fff;font-size:11px;font-weight:700;letter-spacing:.05em;padding:5px 13px;border-radius:50px;backdrop-filter:blur(4px)}
 .pinfo{text-align:center;padding:16px 10px 4px}
 .pcat{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#b79a63;margin-bottom:4px}
 .pinfo h4{font-size:16px;font-weight:600;letter-spacing:-.01em;color:#333;margin-bottom:5px}
@@ -325,19 +327,19 @@ footer{background:#111;color:#fff;padding:60px 0 40px;margin-top:0}
 <section class="request" id="tools">
   <div class="product-grid">
     <a class="product" href="ndsh_hhoat_converter.html">
-        <div class="thumb"><img src="img/tool-ndsh.jpg" alt="НДШ тайлан dashboard"></div>
+        <div class="thumb"><span class="free-badge">Үнэгүй</span><img src="img/tool-ndsh.jpg" alt="НДШ тайлан dashboard"></div>
         <h4>НДШ / ХХОАТ хөрвүүлэгч</h4>
       </a>
       <a class="product" href="noat_matcher.html">
-        <div class="thumb"><img src="img/tool-noat.jpg" alt="НӨАТ тулгагч"></div>
+        <div class="thumb"><span class="free-badge">Үнэгүй</span><img src="img/tool-noat.jpg" alt="НӨАТ тулгагч"></div>
         <h4>НӨАТ тулгагч</h4>
       </a>
       <a class="product" href="invoice_generator_12.html">
-        <div class="thumb"><img src="img/tool-invoice.jpg" alt="Автомат нэхэмжлэх"></div>
+        <div class="thumb"><span class="free-badge">Үнэгүй</span><img src="img/tool-invoice.jpg" alt="Автомат нэхэмжлэх"></div>
         <h4>Автомат нэхэмжлэх</h4>
       </a>
       <a class="product" href="financial_dashboard.html">
-        <div class="thumb"><img src="img/tool-financial.jpg" alt="Санхүүгийн шинжилгээ dashboard"></div>
+        <div class="thumb"><span class="free-badge">Үнэгүй</span><img src="img/tool-financial.jpg" alt="Санхүүгийн шинжилгээ dashboard"></div>
         <h4>Санхүүгийн шинжилгээ</h4>
       </a>
     </div>
@@ -356,7 +358,7 @@ footer{background:#111;color:#fff;padding:60px 0 40px;margin-top:0}
     <a class="pcard" href="#contact">
       <div class="pcard-box">
         <div class="pcard-title">Цалин бодогч систем</div>
-        <div class="pthumb"><span class="pbadge">Шинэ</span><img src="img/salary.jpg" alt="Цалин бодогч систем" loading="lazy"></div>
+        <div class="pthumb"><span class="soon-badge">Тун удахгүй</span><span class="pbadge">Шинэ</span><img src="img/salary.jpg" alt="Цалин бодогч систем" loading="lazy"></div>
       </div>
       <div class="pinfo">
         <div class="pcat">Цалин</div>
@@ -367,7 +369,7 @@ footer{background:#111;color:#fff;padding:60px 0 40px;margin-top:0}
     <a class="pcard" href="#contact">
       <div class="pcard-box">
         <div class="pcard-title">Төсөв боловсруулагч</div>
-        <div class="pthumb"><img src="img/budget.jpg" alt="Төсөв боловсруулагч" loading="lazy"></div>
+        <div class="pthumb"><span class="soon-badge">Тун удахгүй</span><img src="img/budget.jpg" alt="Төсөв боловсруулагч" loading="lazy"></div>
       </div>
       <div class="pinfo">
         <div class="pcat">Төсөв</div>
@@ -378,7 +380,7 @@ footer{background:#111;color:#fff;padding:60px 0 40px;margin-top:0}
     <a class="pcard" href="#contact">
       <div class="pcard-box">
         <div class="pcard-title">Санхүүгийн програм</div>
-        <div class="pthumb"><span class="pbadge">Эрэлттэй</span><img src="img/finance.jpg" alt="Санхүүгийн програм" loading="lazy"></div>
+        <div class="pthumb"><span class="soon-badge">Тун удахгүй</span><span class="pbadge">Эрэлттэй</span><img src="img/finance.jpg" alt="Санхүүгийн програм" loading="lazy"></div>
       </div>
       <div class="pinfo">
         <div class="pcat">Санхүү</div>
