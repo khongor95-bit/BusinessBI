@@ -42,15 +42,17 @@
   }
   .panel h2{font-size:17px; margin-bottom:16px; color:var(--ink); font-weight:700}
   /* month cards — нягт, цомхон хэвтээ хэлбэр */
-  .m-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-top:8px}
+  .m-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; margin-top:8px}
   .m-card{
     border:1.5px dashed var(--line); border-radius:10px; padding:10px 8px;
     text-align:center; cursor:pointer; transition:.15s; background:#fafbfa;
-    position:relative; min-height:74px; display:flex; flex-direction:column;
+    position:relative; min-height:74px; min-width:0; overflow:hidden;
+    display:flex; flex-direction:column;
     align-items:center; justify-content:center; gap:4px;
   }
   .m-card:hover{border-color:var(--green-bright); background:var(--green-soft)}
   .m-card.done{border-style:solid; border-color:#bfe0cc; background:var(--green-soft)}
+  .m-card.done .mtitle{color:var(--green); font-weight:700}
   .m-card .mtitle{font-size:13px; font-weight:600}
   .m-card .micon{font-size:18px; line-height:1; color:var(--muted)}
   .m-card .mhint{font-size:10px; color:var(--muted)}
@@ -421,11 +423,10 @@ function renderMonths(){
         <div class="micon">⚠</div><div class="mtitle">${MONTH_NAMES[m]}</div>
         <div class="merr">${d.error}</div><div class="mhint">дахин оролдох</div></div>`;
     if(d)
-      return `<div class="m-card done" data-m="${m}"><span class="badge-num">✓</span>
+      return `<div class="m-card done" data-m="${m}" title="${(d.fileName||'').replace(/"/g,'&quot;')}"><span class="badge-num">✓</span>
         <button class="m-del" data-del="${m}" title="Устгах">×</button>
         <div class="micon">📄</div><div class="mtitle">${MONTH_NAMES[m]}</div>
-        <div class="mcount">${d.rows.length} ажилтан</div>
-        <div class="mname">${d.fileName}</div></div>`;
+        <div class="mcount">${d.rows.length} ажилтан</div></div>`;
     return `<div class="m-card" data-m="${m}"><span class="badge-num">${m}</span>
       <div class="micon">＋</div><div class="mtitle">${MONTH_NAMES[m]}</div>
       <div class="mhint">PDF оруулах</div></div>`;
@@ -744,19 +745,32 @@ function monthlyCreditCode(creditList){
   return allSame ? creditCode(first) : '999-Бусад';
 }
 
+// Зэрэгцсэн хөдөлмөрийн гэрээ (2 дахь байгууллага) — ХХОАТ-ын хөнгөлөлтийг
+// үндсэн ажил олгогч эдлүүлдэг тул эдгээр төрөлд хөнгөлөлт тооцохгүй.
+const SECONDARY_TYPES=new Set(['40001']);
+
 function computeEtaxRow(r, useAnnual){
   const G=r.salary;                          // 7.1.1 нийт орлого (өссөн)
-  const I=Math.round(G*EMD_RATE/100*100)/100; // ЭМД, НДШ дүн
+  // ЭМД, НДШ дүн — НДШ тайлангийн PDF-ээс уншсан БОДИТ "даатгуулагч" баганын
+  // дүнг ашиглана. Ингэснээр 40001 (зэрэгцсэн гэрээ), тэтгэвэр тогтоолгосон,
+  // шимтгэлийн дээд хязгаар давсан зэрэг бүх тохиолдолд зөв гарна.
+  // PDF-ээс дүн уншигдаагүй (0) бол хуучин 11.5%-руу fallback хийнэ.
+  const actualEmp=r.employee||0;
+  const I=actualEmp>0
+    ? Math.round(actualEmp*100)/100
+    : Math.round(G*EMD_RATE/100*100)/100;
   const K=Math.round((G-I)*100)/100;          // татвар ногдуулах орлого (ОЗЦ нийт)
   const P=Math.round(tierTax(K)*100)/100;     // ногдуулсан татвар
   const tier=tierNo(K);
-  // Хөнгөлөлт — цалин бодогчтой адил: сар бүрийн ОЗЦ (gross − НДШ)-оор
-  // шатлал тогтоож, орсон сарын хөнгөлөлтийг нийлбэрлэнэ (өссөн дүн).
+  // Хөнгөлөлт — сар бүрийн ОЗЦ = тухайн сарын цалин − тухайн сарын БОДИТ НДШ.
+  // 40001 (зэрэгцсэн гэрээ) → хөнгөлөлт 0 (үндсэн ажил олгогч дээр эдлүүлнэ).
   let S=0;
   const creditList=[];
+  const isSecondary=SECONDARY_TYPES.has(String(r.type||'').trim());
   r.monthly.forEach(mo=>{
-    const ozc=mo.salary - mo.salary*EMD_RATE/100;  // тухайн сарын НДШ хассан дүн
-    const cr=monthlyCredit(ozc);
+    const moNdsh=(mo.employee&&mo.employee>0)?mo.employee:mo.salary*EMD_RATE/100;
+    const ozc=mo.salary - moNdsh;              // тухайн сарын НДШ хассан дүн
+    const cr=isSecondary?0:monthlyCredit(ozc);
     creditList.push(cr);
     S+=cr;
   });
@@ -764,7 +778,7 @@ function computeEtaxRow(r, useAnnual){
   const W=Math.round((T)*100)/100;            // нийт суутгуулсан (7.1.6, шууд бус энд 0)
   // R багана: сард ногдох хөнгөлөлтийн КОД (дундаж биш — ижил бол дүн, өөр бол 999)
   const rCode=monthlyCreditCode(creditList);
-  return {G,I,K,P,tier,S,T,W,rCode,creditList,months:r.monthCount,net:G-I-T};
+  return {G,I,K,P,tier,S,T,W,rCode,creditList,months:r.monthCount,net:G-I-T,secondary:isSecondary};
 }
 
 // Жилийн хөнгөлөлт хэрэглэх эсэх — бүх 12 сар орсон үед (жилийн эцсийн тайлан)
@@ -789,7 +803,10 @@ function monthlyTotals(){
     d.rows.forEach(r=>{
       salary+=r.salary; ndshEmployer+=r.employer;
       const G=r.salary;
-      const I=Math.round(G*EMD_RATE/100*100)/100;       // ЭМД (ажилтан)
+      // ЭМД (ажилтан) — PDF-ээс уншсан бодит дүн, байхгүй бол 11.5% fallback
+      const I=(r.employee&&r.employee>0)
+        ? Math.round(r.employee*100)/100
+        : Math.round(G*EMD_RATE/100*100)/100;
       const K=Math.round((G-I)*100)/100;
       const P=Math.round(tierTax(K)*100)/100;            // ХХОАТ (хөнгөлөлтгүй ойролцоо)
       emd+=I; hhoat+=P;
@@ -1323,6 +1340,8 @@ function buildExcel(){
   const s1=[HDR];
   list.forEach(r=>{
     const c=computeEtaxRow(r, useAnnual);
+    // H багана: бодит НДШ ашигласан үед I/G харьцаагаар бодит хувийг гаргана
+    const hPct=c.G>0?Math.round(c.I/c.G*10000)/100:EMD_RATE;
     // etax маягт бүх утгыг текст (string) хэлбэрээр хадгалдаг тул ижилхэн гаргана
     s1.push([
       r.reg,                       // A: Татвар төлөгчийн дугаар (регистр; etax дээр 12 оронт ТТД-ээр солино)
@@ -1332,7 +1351,7 @@ function buildExcel(){
       0,                           // E: 7.1.2-7
       0,                           // F: 7.1.6
       c.G,                         // G: Нийт (1+2+3)
-      EMD_RATE,                    // H: ЭМД хувь
+      hPct,                        // H: ЭМД, НДШ хувь (бодит)
       c.I,                         // I: ЭМД дүн
       0,                           // J: ЭМД (7.1.6)
       c.K,                         // K: татвар ногдуулах орлого
@@ -1429,13 +1448,15 @@ function buildExcel(){
       push([]);
 
       // --- Хүснэгт 1: сар бүрийн орлого ба хөнгөлөлт (ОЗЦ суурьтай) ---
-      push(['Сар', 'Тухайн сарын орлого', 'НДШ хассан (ОЗЦ)', 'Сарын хөнгөлөлт']);
+      if(c.secondary) push(['⚠ Зэрэгцсэн гэрээ (40001) — хөнгөлөлтийг үндсэн ажил олгогч эдлүүлэх тул энд 0']);
+      push(['Сар', 'Тухайн сарын орлого', 'Бодит НДШ', 'НДШ хассан (ОЗЦ)', 'Сарын хөнгөлөлт']);
       r.monthly.slice().sort((a,b)=>a.month-b.month).forEach(mo=>{
-        const ozc=Math.round((mo.salary - mo.salary*EMD_RATE/100)*100)/100;
-        const credit=monthlyCredit(ozc);
-        const ri=push([`${mo.month}-р сар`, mo.salary, ozc, credit]);
-        // мөнгөн баганууд: B(орлого), C(ОЗЦ), D(хөнгөлөлт)
-        markMoney(ri, [1,2,3]);
+        const moNdsh=(mo.employee&&mo.employee>0)?mo.employee:mo.salary*EMD_RATE/100;
+        const ozc=Math.round((mo.salary - moNdsh)*100)/100;
+        const credit=c.secondary?0:monthlyCredit(ozc);
+        const ri=push([`${mo.month}-р сар`, mo.salary, Math.round(moNdsh*100)/100, ozc, credit]);
+        // мөнгөн баганууд: B(орлого), C(НДШ), D(ОЗЦ), E(хөнгөлөлт)
+        markMoney(ri, [1,2,3,4]);
       });
       push([]);
 
@@ -1443,7 +1464,7 @@ function buildExcel(){
       push(['Тооцооллын алхам', 'Томьёо', 'Дүн (₮)']);
       let ri;
       ri=push(['1. Нийт орлого (G)', 'сар бүрийн орлогын нийлбэр', c.G]);              markMoney(ri,[2]);
-      ri=push(['2. ЭМД, НДШ дүн (I)', `G × ${EMD_RATE}%`, c.I]);                        markMoney(ri,[2]);
+      ri=push(['2. ЭМД, НДШ дүн (I)', (r.employee&&r.employee>0)?'НДШ тайлангийн бодит суутгасан дүн':`G × ${EMD_RATE}%`, c.I]);  markMoney(ri,[2]);
       ri=push(['3. Татвар ногдох орлого (K)', 'G − I', c.K]);                           markMoney(ri,[2]);
       ri=push(['4. Шатлалт татвар (P)', `шатлал ${c.tier}: ТНО × 10%`, c.P]);           markMoney(ri,[2]);
       ri=push(['5. Хөнгөлөлт нийт (S)', 'сар бүрийн ОЗЦ шатлалын хөнгөлөлтийн нийлбэр', c.S]); markMoney(ri,[2]);
