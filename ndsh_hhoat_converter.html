@@ -107,6 +107,36 @@
   .dl-btn:disabled{background:#d2d6d3; color:#fff; cursor:not-allowed}
   .hint{font-size:12px; color:var(--muted); margin-top:13px; line-height:1.55}
   .hidden{display:none}
+  /* ТТД (татвар төлөгчийн дугаар) panel */
+  .ttd-actions{display:flex; flex-direction:column; gap:8px; margin-top:12px}
+  .ttd-btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    background:#fff; color:var(--green); border:1.5px solid var(--green);
+    padding:10px 14px; border-radius:9px; font-size:13px; font-weight:600;
+    cursor:pointer; transition:.15s;
+  }
+  .ttd-btn:hover{background:var(--green-soft)}
+  .ttd-status{font-size:12.5px; line-height:1.5; border-radius:8px; padding:9px 12px; border:1px solid var(--line-soft)}
+  .ttd-status.ok{background:var(--green-soft); color:var(--green); border-color:#bfe0cc}
+  .ttd-status.warn{background:#fcf2ee; color:var(--danger); border-color:#e6c0b5}
+  .ttd-status.idle{background:#fafbfa; color:var(--muted)}
+  /* ТТД modal */
+  .ttd-overlay{position:fixed; inset:0; background:rgba(15,30,23,.45); z-index:60; display:flex; align-items:center; justify-content:center; padding:20px}
+  .ttd-overlay.hidden{display:none}
+  .ttd-modal{background:#fff; border-radius:14px; box-shadow:0 20px 60px rgba(0,0,0,.25); width:min(780px,100%); max-height:86vh; display:flex; flex-direction:column; overflow:hidden}
+  .ttd-modal header{display:flex; align-items:center; justify-content:space-between; padding:15px 20px; border-bottom:1px solid var(--line); background:#fff}
+  .ttd-modal header h3{font-size:16px; color:var(--ink)}
+  .ttd-close{background:none; border:none; font-size:19px; cursor:pointer; color:var(--muted); line-height:1; padding:2px 6px}
+  .ttd-close:hover{color:var(--ink)}
+  .ttd-body{overflow:auto; padding:0 20px 14px}
+  .ttd-t{width:100%; border-collapse:collapse; font-size:13px}
+  .ttd-t th{position:sticky; top:0; background:#fff; text-align:left; font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; padding:12px 8px 8px; border-bottom:1px solid var(--line); z-index:1}
+  .ttd-t td{padding:7px 8px; border-bottom:1px solid var(--line-soft); vertical-align:middle}
+  .ttd-t input{width:152px; padding:7px 9px; border:1.5px solid var(--line); border-radius:7px; font-size:13px; letter-spacing:.6px; font-family:monospace}
+  .ttd-t input:focus{outline:none; border-color:var(--green-bright)}
+  .ttd-t tr.miss input{border-color:var(--danger); background:#fdf5f2}
+  .ttd-foot{padding:12px 20px; border-top:1px solid var(--line); display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+  .ttd-mini{background:none; border:none; color:var(--green); font-size:12.5px; font-weight:600; cursor:pointer; text-decoration:underline; padding:0; white-space:nowrap}
   .toast{
     position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
     background:var(--ink); color:#fff; padding:12px 22px; border-radius:10px;
@@ -253,7 +283,7 @@
   </div>
 </nav>
 <div class="wrap">
-<details class="bbi-guide" style="max-width:1100px;margin:16px auto;background:#f2f7f4;border:1px solid #d7e5dc;border-radius:10px;"><summary style="cursor:pointer;padding:13px 18px;font-weight:600;color:#0e3b2e;display:flex;align-items:center;gap:8px;">📖 Ашиглах заавар <span style="font-weight:400;font-size:13px;color:#5b7365;">— 1 минут уншаад эхлээрэй</span></summary><ol style="margin:0;padding:4px 22px 14px 40px;color:#243b30;font-size:14.5px;line-height:1.75;"><li style="margin:4px 0;">Нийгмийн даатгалын цахим системээс сарын <b>НДШ тайлангаа PDF</b> хэлбэрээр татаж авна.</li><li style="margin:4px 0;">PDF файлаа энэ хуудсанд чирж оруулах эсвэл сонгоно — тайлант сар автоматаар танигдана.</li><li style="margin:4px 0;">Хэд хэдэн сарын тайланг дараалан нэмж болно; сар бүр жагсаалтад харагдах ба × товчоор устгаж болно.</li><li style="margin:4px 0;">Тойм самбараас Цалин / Ажилтан / НДШ үзүүлэлтүүдээ шалгана.</li><li style="margin:4px 0;"><b>«⬇ Excel файл татах»</b> товчоор ХХОАТ тайланд бэлэн хүснэгтээ авна.</li></ol><p style="margin:0;padding:0 22px 14px;font-size:13px;color:#5b7365;">💡 PDF тань браузер дээр уншигдана. Нэг дор олон сар оруулбал улирал, жилийн харьцуулалт автоматаар гарна.</p></details>
+<details class="bbi-guide" style="max-width:1100px;margin:16px auto;background:#f2f7f4;border:1px solid #d7e5dc;border-radius:10px;"><summary style="cursor:pointer;padding:13px 18px;font-weight:600;color:#0e3b2e;display:flex;align-items:center;gap:8px;">📖 Ашиглах заавар <span style="font-weight:400;font-size:13px;color:#5b7365;">— 1 минут уншаад эхлээрэй</span></summary><ol style="margin:0;padding:4px 22px 14px 40px;color:#243b30;font-size:14.5px;line-height:1.75;"><li style="margin:4px 0;">Нийгмийн даатгалын цахим системээс сарын <b>НДШ тайлангаа PDF</b> хэлбэрээр татаж авна.</li><li style="margin:4px 0;">PDF файлаа энэ хуудсанд чирж оруулах эсвэл сонгоно — тайлант сар автоматаар танигдана.</li><li style="margin:4px 0;">Хэд хэдэн сарын тайланг дараалан нэмж болно; сар бүр жагсаалтад харагдах ба × товчоор устгаж болно.</li><li style="margin:4px 0;">Алхам 2-т ажилтнуудын <b>12 оронт ТТД</b> (татвар төлөгчийн дугаар)-г тулгана — өмнөх улирлын ХХОАТ маягт эсвэл etax-ийн ажилтны жагсаалтыг оруулбал автоматаар танигдана. Нэг удаа оруулсан ТТД хөтөчид хадгалагдаж дараагийн тайланд өөрөө бөглөгдөнө.</li><li style="margin:4px 0;">Тойм самбараас Цалин / Ажилтан / НДШ үзүүлэлтүүдээ шалгана.</li><li style="margin:4px 0;"><b>«⬇ Excel файл татах»</b> товчоор ХХОАТ тайланд бэлэн хүснэгтээ авна.</li></ol><p style="margin:0;padding:0 22px 14px;font-size:13px;color:#5b7365;">💡 PDF тань браузер дээр уншигдана. Нэг дор олон сар оруулбал улирал, жилийн харьцуулалт автоматаар гарна.</p></details>
 
  <div class="layout">
   <!-- LEFT: month input + download -->
@@ -265,8 +295,19 @@
       <p class="hint">Сар бүр дээр дарж тухайн сарын НДШ тайлангийн PDF-ийг оруулна уу. Оруулсан сараар улирлын тайлан автоматаар бэлдэнэ.</p>
     </div>
 
+    <div class="panel" id="ttdPanel">
+      <div class="step-label">Алхам 2 — ТТД тулгах</div>
+      <h2>Татвар төлөгчийн дугаар</h2>
+      <div class="ttd-status idle" id="ttdStatus">Сарын тайлан оруулмагц ажилтнуудын 12 оронт ТТД энд шалгагдана.</div>
+      <div class="ttd-actions">
+        <button class="ttd-btn" id="ttdImportBtn">📥 Файлаас ТТД унших</button>
+        <button class="ttd-btn" id="ttdEditBtn">✏ ТТД шалгах, гараар оруулах</button>
+      </div>
+      <p class="hint">Өмнөх улирлын ХХОАТ маягт (Excel/CSV) эсвэл etax-ийн ажилтны жагсаалтыг оруулбал регистр + ТТД хосыг автоматаар танина. Оруулсан ТТД энэ хөтөчид хадгалагдаж, дараагийн улирал/жилд автоматаар бөглөгдөнө — зөвхөн шинэ ажилтных л дутна.</p>
+    </div>
+
     <div class="panel" id="dlPanel">
-      <div class="step-label">Алхам 2 — Татах</div>
+      <div class="step-label">Алхам 3 — Татах</div>
       <button class="dl-btn" id="dlBtn" disabled>⬇ Excel файл татах</button>
       <p class="hint" id="dlHint">Дор хаяж нэг сарын тайлан оруулна уу.</p>
     </div>
@@ -370,6 +411,22 @@
 <div class="toast" id="toast"></div>
 
 <input type="file" id="fileInput" accept="application/pdf" class="hidden">
+<input type="file" id="ttdFileInput" accept=".xlsx,.xls,.csv" class="hidden">
+
+<!-- ТТД шалгах, оруулах модал -->
+<div class="ttd-overlay hidden" id="ttdOverlay">
+  <div class="ttd-modal">
+    <header>
+      <h3>ТТД шалгах, оруулах</h3>
+      <button class="ttd-close" id="ttdClose" title="Хаах">✕</button>
+    </header>
+    <div class="ttd-body"><table class="ttd-t" id="ttdTable"></table></div>
+    <div class="ttd-foot">
+      <span class="hint" style="margin:0" id="ttdFootHint"></span>
+      <button class="ttd-mini" id="ttdExportBtn">⬇ Толь экспортлох (CSV)</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // Worker-ийг идэвхгүй болгож үндсэн thread дээр ажиллуулна — ингэснээр
@@ -386,6 +443,22 @@ pdfjsLib.GlobalWorkerOptions.workerSrc='';
 const NAME_DB={
   // Жишээ: "АА00112233":["БАТБАЯР","ДОРЖ"],
 }
+
+// ───────────────────────────────────────────────────────────
+// ТТД толь: регистр -> 12 оронт татвар төлөгчийн дугаар.
+// НДШ тайланд зөвхөн регистр байдаг, etax ХХОАТ маягт ТТД шаарддаг.
+// Регистрээс ТТД-г томьёогоор гаргах боломжгүй (ТТД-г татварын алба олгодог)
+// тул хоёрыг холбосон толийг хөтчийн localStorage-д БАЙНГА хадгална:
+// нэг удаа оруулсан ТТД дараагийн улирал, жилд автоматаар ашиглагдана.
+const TTD_KEY='bbi_ttd_db_v1';
+let TTD_DB={};
+try{ TTD_DB=JSON.parse(localStorage.getItem(TTD_KEY)||'{}')||{}; }catch(e){ TTD_DB={}; }
+function saveTTD(){ try{ localStorage.setItem(TTD_KEY, JSON.stringify(TTD_DB)); }catch(e){} }
+const normRegKey=s=>String(s||'').replace(/[\s\-]/g,'').toUpperCase();
+const normTTD=s=>String(s||'').replace(/\D/g,'');
+const TTD_FULL_RE=/^\d{12}$/;                 // ТТД: яг 12 орон
+const REG_FULL_RE=/^[А-ЯӨҮЁ]{2}\d{8}$/;      // регистр: 2 кирилл + 8 орон
+const ttdOf=reg=>TTD_DB[normRegKey(reg)]||'';
 
 const ALL_MONTHS=[1,2,3,4,5,6,7,8,9,10,11,12];
 const state={year:new Date().getFullYear(), data:{}}; // data[month] = {rows, meta, fileName}
@@ -857,6 +930,7 @@ function refreshSummary(){
   });
 
   const ready=monthsFilled>=1;
+  refreshTTD();
   $('dashEmpty').classList.toggle('hidden', ready);
   $('dashBody').classList.toggle('hidden', !ready);
   $('dlBtn').disabled=!ready;
@@ -1281,6 +1355,128 @@ document.querySelectorAll('#occTabs .ctab').forEach(b=>b.onclick=()=>{
   drawOccChart();
 });
 
+// ═══════════════════════════════════════════════════════════
+// ТТД UI: статус, файлаас import, гар засварын хүснэгт
+// ═══════════════════════════════════════════════════════════
+function ttdStats(){
+  const list=aggregateByRegister().list;
+  const missing=list.filter(r=>!TTD_FULL_RE.test(ttdOf(r.reg)));
+  return {list, missing};
+}
+
+function refreshTTD(){
+  const el=$('ttdStatus');
+  if(!el) return;
+  const {list, missing}=ttdStats();
+  if(!list.length){
+    el.className='ttd-status idle';
+    el.textContent='Сарын тайлан оруулмагц ажилтнуудын 12 оронт ТТД энд шалгагдана.';
+  }else if(missing.length===0){
+    el.className='ttd-status ok';
+    el.textContent=`✓ ${list.length} ажилтан бүгд ТТД-тэй — Excel шууд etax-д бэлэн.`;
+  }else{
+    el.className='ttd-status warn';
+    el.textContent=`⚠ ${list.length} ажилтнаас ${missing.length}-ийн ТТД дутуу байна. «ТТД шалгах» дээр дарж нөхнө үү — эс бөгөөс тэр мөрүүд регистрээр гарна.`;
+  }
+  // модал нээлттэй бол хөлийн текстийг мөн шинэчилнэ
+  const fh=$('ttdFootHint');
+  if(fh && !$('ttdOverlay').classList.contains('hidden')){
+    fh.textContent = list.length
+      ? (missing.length
+          ? `${missing.length} ажилтны ТТД дутуу. Ажилтан ТТД-гээ e-Mongolia эсвэл etax.mta.mn профайлаасаа харж болно.`
+          : 'Бүгд бүрэн ✓ Толь энэ хөтөчид хадгалагдлаа — дараагийн улиралд автоматаар бөглөгдөнө.')
+      : '';
+  }
+}
+
+// ---- Файлаас ТТД унших: өмнөх ХХОАТ маягт / etax ажилтны жагсаалт / өөрийн CSV ----
+// Аль ч мөрөнд регистр (2 кирилл + 8 орон) ба 12 оронт тоо ХАМТ байвал хос гэж танина.
+$('ttdImportBtn').onclick=()=>$('ttdFileInput').click();
+$('ttdFileInput').onchange=async e=>{
+  const f=e.target.files[0]; e.target.value='';
+  if(!f) return;
+  try{
+    const buf=await f.arrayBuffer();
+    const wb=XLSX.read(buf,{type:'array'});
+    let pairs=0, changed=0;
+    wb.SheetNames.forEach(sn=>{
+      const rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,raw:true,defval:''});
+      rows.forEach(row=>{
+        let reg='', ttd='';
+        row.forEach(cell=>{
+          const s=String(cell).trim();
+          if(!reg){ const k=normRegKey(s); if(REG_FULL_RE.test(k)) reg=k; }
+          if(!ttd){ const d=s.replace(/[\s\-]/g,''); if(TTD_FULL_RE.test(d)) ttd=d; }
+        });
+        if(reg&&ttd){ pairs++; if(TTD_DB[reg]!==ttd){ TTD_DB[reg]=ttd; changed++; } }
+      });
+    });
+    if(pairs===0){
+      toast('Регистр + 12 оронт ТТД хос олдсонгүй. Нэг мөрөнд хоёулаа байх файл оруулна уу.');
+    }else{
+      saveTTD();
+      toast(`${pairs} хос танигдаж, ${changed} ТТД шинээр хадгалагдлаа ✓`);
+    }
+  }catch(err){
+    toast('Файл уншигдсангүй: '+(err.message||'алдаа'));
+  }
+  refreshTTD();
+  if(!$('ttdOverlay').classList.contains('hidden')) renderTTDTable();
+};
+
+// ---- Гар засварын хүснэгт (модал) ----
+$('ttdEditBtn').onclick=()=>{ renderTTDTable(); $('ttdOverlay').classList.remove('hidden'); refreshTTD(); };
+$('ttdClose').onclick=()=>$('ttdOverlay').classList.add('hidden');
+$('ttdOverlay').onclick=e=>{ if(e.target===$('ttdOverlay')) $('ttdOverlay').classList.add('hidden'); };
+
+function renderTTDTable(){
+  const {list}=ttdStats();
+  const t=$('ttdTable');
+  if(!list.length){
+    t.innerHTML='<tr><td style="padding:24px 8px;color:var(--muted);font-size:13px">Эхлээд Алхам 1-д сарын НДШ тайлан (PDF) оруулна уу — ажилтнууд эндээс автоматаар гарч ирнэ.</td></tr>';
+    return;
+  }
+  const body=list.map((r,i)=>{
+    const v=ttdOf(r.reg);
+    const miss=!TTD_FULL_RE.test(v);
+    return `<tr class="${miss?'miss':''}">
+      <td style="color:var(--muted)">${i+1}</td>
+      <td>${r.lastName||''}</td><td><b>${r.firstName||''}</b></td>
+      <td style="font-family:monospace">${r.reg}</td>
+      <td><input maxlength="12" inputmode="numeric" placeholder="12 оронт ТТД" value="${v}" data-reg="${r.reg}"></td>
+    </tr>`;
+  }).join('');
+  t.innerHTML=`<thead><tr><th>№</th><th>Овог</th><th>Нэр</th><th>Регистр</th><th>ТТД (12 орон)</th></tr></thead><tbody>${body}</tbody>`;
+  t.querySelectorAll('input').forEach(inp=>{
+    inp.oninput=()=>{
+      const reg=normRegKey(inp.dataset.reg);
+      const v=normTTD(inp.value);
+      if(inp.value!==v) inp.value=v;
+      const tr=inp.closest('tr');
+      if(TTD_FULL_RE.test(v)){
+        TTD_DB[reg]=v; saveTTD(); tr.classList.remove('miss');
+      }else{
+        if(!v && TTD_DB[reg]){ delete TTD_DB[reg]; saveTTD(); }
+        tr.classList.add('miss');
+      }
+      refreshTTD();
+    };
+  });
+}
+
+// ---- Толийг CSV болгож экспортлох (нөөцлөх / өөр компьютерт зөөх / хуваалцах) ----
+// Гарсан CSV-г «Файлаас ТТД унших»-аар буцааж оруулахад л толь сэргэнэ.
+$('ttdExportBtn').onclick=()=>{
+  const keys=Object.keys(TTD_DB).sort();
+  if(!keys.length){ toast('Толь хоосон байна — эхлээд ТТД оруулна уу'); return; }
+  const csv='\ufeff'+'Регистр,ТТД\n'+keys.map(k=>`${k},${TTD_DB[k]}`).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='TTD_tol.csv'; a.click();
+  URL.revokeObjectURL(a.href);
+  toast(`${keys.length} бичлэгтэй толь татагдлаа ✓`);
+};
+
 // ---- Excel export (4-sheet structure) ----
 $('dlBtn').onclick = BBIGate.protect(() => buildExcel(), {
   tool: 'НДШ/ХХОАТ хөрвүүлэгч',
@@ -1328,7 +1524,7 @@ function buildExcel(){
     const c=computeEtaxRow(r, useAnnual);
     // etax маягт бүх утгыг текст (string) хэлбэрээр хадгалдаг тул ижилхэн гаргана
     s1.push([
-      r.reg,                       // A: Татвар төлөгчийн дугаар (регистр; etax дээр 12 оронт ТТД-ээр солино)
+      ttdOf(r.reg)||r.reg,         // A: Татвар төлөгчийн дугаар — толиос 12 оронт ТТД; байхгүй бол регистрээр (etax дээр гараар солино)
       r.lastName,                  // B: Овог
       r.firstName,                 // C: Нэр
       r.salary,                    // D: 7.1.1 цалин
@@ -1469,7 +1665,12 @@ function buildExcel(){
 
   const fname=`ХХОАТ_маягт_${year}_${qName}.xlsx`;
   XLSX.writeFile(wb,fname);
-  toast('Excel файл татагдлаа ✓');
+  const missingTTD=list.filter(r=>!TTD_FULL_RE.test(ttdOf(r.reg)));
+  if(missingTTD.length){
+    toast(`Excel татагдлаа — анхаар: ${missingTTD.length} ажилтны ТТД дутуу тул регистрээр орсон. Алхам 2-оос нөхөж болно.`);
+  }else{
+    toast('Excel файл татагдлаа ✓ Бүх ажилтан 12 оронт ТТД-тэй.');
+  }
 }
 </script>
 
