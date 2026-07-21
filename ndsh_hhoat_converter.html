@@ -337,7 +337,7 @@
           </table>
         </div>
       </div>
-      <p class="hint">ЭМД, НДШ дүн = нийт орлого × 11.5%. Татвар ногдох орлого = нийт орлого − ЭМД дүн. Ногдуулсан татвар = ТНО × 10%. Хөнгөлөлт: улирлын тайланд сар бүрээр, жилийн эцэст жилийн нийт орлогоор. etax маягттай тулгасан.</p>
+      <p class="hint">ЭМД, НДШ дүн = НД тайлангаас уншсан даатгуулагчийн БОДИТ шимтгэл (тайлангаас гараагүй үед л кодоос хамаарсан хувиар: ердийн 11.5%, тэтгэврийн шимтгэл төлөхгүй 0.8%, төлдөг 9.3%). Татвар ногдох орлого = нийт орлого − ЭМД дүн. 70 кодтой (ХЧА тэтгэвэртэй) ажилтны орлогыг ХХОАТ-аас чөлөөлнө (22.1.2, ХБ үнэмлэх шаардлагатай). 40 кодтой (давхар ажил, 7.1.6) ажилтанд сарын хөнгөлөлт тооцохгүй (23.1). Ногдуулсан татвар = ТНО × 10%. Хөнгөлөлт: улирлын тайланд сар бүрээр, жилийн эцэст жилийн нийт орлогоор. etax маягттай тулгасан.</p>
       </div>
     </details>
   </div><!-- /col-left -->
@@ -356,6 +356,7 @@
 
         <!-- 1. Гол KPI картууд (дугуй icon-той) -->
         <div class="kpi-cards" id="kpiCards"></div>
+        <div id="codeWarn" style="display:none;margin:10px 0;padding:10px 14px;border:1px solid #e0a800;background:rgba(224,168,0,.08);border-radius:10px;font-size:12.5px;line-height:1.55"></div>
 
         <!-- 2. Чиг хандлага -->
         <div class="chart-card span3" style="margin-bottom:14px">
@@ -719,8 +720,22 @@ function typeCat(code){
 }
 
 // ---- Татварын аргачлал — etax маягттай ЯГ тааруулсан ----
-// ЭМД, НДШ-ийн хувь (etax маягт дээр тогтмол 11.5%)
-const EMD_RATE=11.5;
+// ЭМД, НДШ-ийн хувь — даатгуулагчийн ТӨРЛИЙН КОДООС хамаарна.
+// Ердийн даатгуулагч: тэтгэврийн 8.5 + тэтгэмжийн 0.8 + ажилгүйдлийн 0.2 + ЭМД 2.0 = 11.5%
+// Тэтгэвэр тогтоолгосон, тэтгэврийн даатгалын шимтгэл ТӨЛӨХГҮЙ: зөвхөн тэтгэмжийн 0.8%
+// Тэтгэвэр тогтоолгосон, тэтгэврийн даатгалын шимтгэл ТӨЛНӨ: 8.5 + 0.8 = 9.3%
+const EMD_RATE=11.5; // default (танигдаагүй код)
+const NDSH_RATE_BY_CODE={
+  // "тэтгэврийн даатгалын шимтгэл төлөхгүй" гэсэн кодууд → 0.8%
+  "22011":0.8, "22031":0.8, "25022":0.8, "34011":0.8, "39012":0.8, "70011":0.8,
+  // "тэтгэвэр тогтоолгосон ... шимтгэл төлнө" гэсэн кодууд → 9.3%
+  // ⚠ БАТАЛГААЖУУЛАХ: НДЕГ/нягтлангаар шалгуулж баталгаажуулна уу
+  "22001":9.3, "22021":9.3, "25012":9.3, "34001":9.3, "38002":9.3, "39002":9.3, "70001":9.3
+};
+function ndshRate(code){
+  const r=NDSH_RATE_BY_CODE[String(code||'').trim()];
+  return (r===undefined)?EMD_RATE:r;
+}
 
 // 21.1 Шатлалт татвар. Цалингийн хувьд бараг үргэлж 10% (120 саяас доош).
 // 120 саяас дээш бол шатлал хэрэгжинэ. Маягт дээр "Шатлал" багана 1 байна.
@@ -821,17 +836,34 @@ function monthlyCreditCode(creditList){
 }
 
 function computeEtaxRow(r, useAnnual){
+  const code=String(r.type||'').trim();
+  // 70xxx — ХЧА тэтгэвэр тогтоолгосон: ХХОАТ хуулийн 22.1.2 (хөгжлийн
+  //         бэрхшээлтэй хувь хүний орлого) — татвараас ЧӨЛӨӨЛНӨ.
+  //         Анхаар: ЭХМК дүгнэлт + ХБ үнэмлэх үндэслэнэ (журам 2.3).
+  const exempt=code.startsWith('70');
+  // 40xxx — үндсэн ажлаас гадуур зэрэгцсэн гэрээт: 7.1.6 орлого тул
+  //         23.1-ийн сарын хөнгөлөлт ЭДЛЭХГҮЙ (хөнгөлөлтийг 7.1.6-аас
+  //         бусад орлогод эдлүүлнэ).
+  const noCredit=code.startsWith('40');
+  const rate=ndshRate(r.type);               // fallback хувь (кодоор)
   const G=r.salary;                          // 7.1.1 нийт орлого (өссөн)
-  const I=Math.round(G*EMD_RATE/100*100)/100; // ЭМД, НДШ дүн
+  // ЭМД, НДШ дүн — НД тайлангаас уншсан ДААТГУУЛАГЧИЙН БОДИТ шимтгэлийг ашиглана.
+  // Тайлангаас гараагүй (0/хоосон) үед л хувиар бодно.
+  const I=(r.employee>0) ? Math.round(r.employee*100)/100
+                         : Math.round(G*rate/100*100)/100;
   const K=Math.round((G-I)*100)/100;          // татвар ногдуулах орлого (ОЗЦ нийт)
-  const P=Math.round(tierTax(K)*100)/100;     // ногдуулсан татвар
+  const P=exempt ? 0 : Math.round(tierTax(K)*100)/100; // ногдуулсан татвар (70 код → чөлөөлөх)
   const tier=tierNo(K);
   // Хөнгөлөлт — цалин бодогчтой адил: сар бүрийн ОЗЦ (gross − НДШ)-оор
   // шатлал тогтоож, орсон сарын хөнгөлөлтийг нийлбэрлэнэ (өссөн дүн).
+  // 70 (татваргүй) ба 40 (7.1.6 орлого) кодтой бол хөнгөлөлт 0.
   let S=0;
   const creditList=[];
   r.monthly.forEach(mo=>{
-    const ozc=mo.salary - mo.salary*EMD_RATE/100;  // тухайн сарын НДШ хассан дүн
+    if(exempt||noCredit){ creditList.push(0); return; }
+    // тухайн сарын НДШ хассан дүн — тайлангийн бодит шимтгэлээр, байхгүй бол хувиар
+    const ozc=(mo.employee>0) ? mo.salary - mo.employee
+                              : mo.salary - mo.salary*rate/100;
     const cr=monthlyCredit(ozc);
     creditList.push(cr);
     S+=cr;
@@ -840,7 +872,7 @@ function computeEtaxRow(r, useAnnual){
   const W=Math.round((T)*100)/100;            // нийт суутгуулсан (7.1.6, шууд бус энд 0)
   // R багана: сард ногдох хөнгөлөлтийн КОД (дундаж биш — ижил бол дүн, өөр бол 999)
   const rCode=monthlyCreditCode(creditList);
-  return {G,I,K,P,tier,S,T,W,rCode,creditList,months:r.monthCount,net:G-I-T};
+  return {G,I,K,P,tier,S,T,W,rCode,creditList,months:r.monthCount,net:G-I-T,exempt,noCredit};
 }
 
 // Жилийн хөнгөлөлт хэрэглэх эсэх — бүх 12 сар орсон үед (жилийн эцсийн тайлан)
@@ -865,9 +897,11 @@ function monthlyTotals(){
     d.rows.forEach(r=>{
       salary+=r.salary; ndshEmployer+=r.employer;
       const G=r.salary;
-      const I=Math.round(G*EMD_RATE/100*100)/100;       // ЭМД (ажилтан)
+      const I=(r.employee>0) ? Math.round(r.employee*100)/100
+                             : Math.round(G*ndshRate(r.type)/100*100)/100; // ЭМД: бодит, fallback кодоор
       const K=Math.round((G-I)*100)/100;
-      const P=Math.round(tierTax(K)*100)/100;            // ХХОАТ (хөнгөлөлтгүй ойролцоо)
+      const P=String(r.type||'').startsWith('70') ? 0
+             : Math.round(tierTax(K)*100)/100;             // ХХОАТ (хөнгөлөлтгүй ойролцоо, 70 код чөлөөлөх)
       emd+=I; hhoat+=P;
     });
     const net=Math.max(0, salary-emd-hhoat);            // гарт олгох (ойролцоо)
@@ -976,6 +1010,23 @@ function refreshSummary(){
         <div class="sub">${k.sub}</div>
       </div>
     </div>`).join('');
+
+  // 40/70 кодтой ажилтны анхааруулга
+  (function(){
+    const el=$('codeWarn'); if(!el) return;
+    const ex=list.filter(r=>String(r.type||'').startsWith('70'));
+    const nc=list.filter(r=>String(r.type||'').startsWith('40'));
+    if(!ex.length && !nc.length){ el.style.display='none'; el.innerHTML=''; return; }
+    const nm=r=>r.name||r.reg||'?';
+    let html='';
+    if(ex.length){
+      html+=`<div><b>⚠ 70 кодтой ${ex.length} ажилтан</b> — ХЧА тэтгэвэр тогтоолгосон тул ХХОАТ-аас <b>чөлөөлж</b> тооцлоо (хуулийн 22.1.2). ЭХМК-ын дүгнэлт, ХБ үнэмлэхтэй эсэхийг заавал шалгана уу: ${ex.map(nm).join(', ')}</div>`;
+    }
+    if(nc.length){
+      html+=`<div style="${ex.length?'margin-top:6px':''}"><b>⚠ 40 кодтой ${nc.length} ажилтан</b> — давхар ажлын (7.1.6) орлого тул сарын <b>хөнгөлөлт тооцоогүй</b> (хуулийн 23.1): ${nc.map(nm).join(', ')}</div>`;
+    }
+    el.innerHTML=html; el.style.display='block';
+  })();
 
   // 2. Бүрэлдэхүүн зурвар
   drawStackBar('genderBar','genderLegend',
@@ -1531,7 +1582,7 @@ function buildExcel(){
       0,                           // E: 7.1.2-7
       0,                           // F: 7.1.6
       c.G,                         // G: Нийт (1+2+3)
-      EMD_RATE,                    // H: ЭМД хувь
+      c.G>0 ? Math.round(c.I/c.G*1000)/10 : ndshRate(r.type), // H: ЭМД хувь — бодит I/G-ээс (1 бутархай), G=0 бол кодоор
       c.I,                         // I: ЭМД дүн
       0,                           // J: ЭМД (7.1.6)
       c.K,                         // K: татвар ногдуулах орлого
@@ -1612,7 +1663,7 @@ function buildExcel(){
 
     push([`ХХОАТ ТООЦООЛЛЫН ЗАДАРГАА — ${year} он (${qLabel})`]);
     push([modeNote]);
-    push([`ЭМД хувь: ${EMD_RATE}%   |   Татвар: 120 саяас доош 10%   |   Хамрах ажилтан: ${list.length}`]);
+    push([`ЭМД хувь: даатгуулагчийн кодоор (ердийн ${EMD_RATE}%, тэтгэврийн шимтгэл төлөхгүй 0.8%, төлдөг 9.3%)   |   Татвар: 120 саяас доош 10%   |   Хамрах ажилтан: ${list.length}`]);
     push([]);
 
     list.forEach((r,idx)=>{
@@ -1630,7 +1681,8 @@ function buildExcel(){
       // --- Хүснэгт 1: сар бүрийн орлого ба хөнгөлөлт (ОЗЦ суурьтай) ---
       push(['Сар', 'Тухайн сарын орлого', 'НДШ хассан (ОЗЦ)', 'Сарын хөнгөлөлт']);
       r.monthly.slice().sort((a,b)=>a.month-b.month).forEach(mo=>{
-        const ozc=Math.round((mo.salary - mo.salary*EMD_RATE/100)*100)/100;
+        const ozc=Math.round(((mo.employee>0) ? mo.salary - mo.employee
+                                              : mo.salary - mo.salary*ndshRate(r.type)/100)*100)/100;
         const credit=monthlyCredit(ozc);
         const ri=push([`${mo.month}-р сар`, mo.salary, ozc, credit]);
         // мөнгөн баганууд: B(орлого), C(ОЗЦ), D(хөнгөлөлт)
@@ -1642,10 +1694,10 @@ function buildExcel(){
       push(['Тооцооллын алхам', 'Томьёо', 'Дүн (₮)']);
       let ri;
       ri=push(['1. Нийт орлого (G)', 'сар бүрийн орлогын нийлбэр', c.G]);              markMoney(ri,[2]);
-      ri=push(['2. ЭМД, НДШ дүн (I)', `G × ${EMD_RATE}%`, c.I]);                        markMoney(ri,[2]);
+      ri=push(['2. ЭМД, НДШ дүн (I)', (r.employee>0)?'НД тайлангийн даатгуулагчийн бодит шимтгэл':`G × ${ndshRate(r.type)}% (fallback)`, c.I]); markMoney(ri,[2]);
       ri=push(['3. Татвар ногдох орлого (K)', 'G − I', c.K]);                           markMoney(ri,[2]);
-      ri=push(['4. Шатлалт татвар (P)', `шатлал ${c.tier}: ТНО × 10%`, c.P]);           markMoney(ri,[2]);
-      ri=push(['5. Хөнгөлөлт нийт (S)', 'сар бүрийн ОЗЦ шатлалын хөнгөлөлтийн нийлбэр', c.S]); markMoney(ri,[2]);
+      ri=push(['4. Шатлалт татвар (P)', c.exempt?'70 код — ХБ орлого, ХХОАТ-аас чөлөөлөх (22.1.2, ХБ үнэмлэх шалгах)':`шатлал ${c.tier}: ТНО × 10%`, c.P]); markMoney(ri,[2]);
+      ri=push(['5. Хөнгөлөлт нийт (S)', c.exempt?'татваргүй тул хөнгөлөлт хамаарахгүй':(c.noCredit?'40 код — 7.1.6 давхар ажлын орлого, 23.1 хөнгөлөлт эдлэхгүй':'сар бүрийн ОЗЦ шатлалын хөнгөлөлтийн нийлбэр'), c.S]); markMoney(ri,[2]);
       push(['   Сард ногдох код (R)', c.creditList.every(v=>v===c.creditList[0])?'бүх сар ижил хөнгөлөлт':'сар бүр өөр → бусад', c.rCode]);
       ri=push(['6. СУУТГАХ ТАТВАР (T)', 'P − S', c.T]);                                  markMoney(ri,[2]);
       ri=push(['7. Гарт олгох цэвэр', 'G − I − T', c.net]);                             markMoney(ri,[2]);
