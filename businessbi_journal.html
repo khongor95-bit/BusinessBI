@@ -184,6 +184,24 @@ table.tbl{width:100%;border-collapse:collapse;font-size:var(--fz-md);background:
 .tbl tr:hover td{background:var(--bg-hover);}
 .tbl tr.total td{background:var(--bg-row);font-weight:700;border-top:2px solid var(--txt-accent);}
 .tbl tr.section-row td{background:var(--bg-row);font-weight:700;color:var(--txt-accent);font-size:var(--fz-sm);text-transform:uppercase;letter-spacing:.3px;}
+/* ── Bulk сонголт + задаргаа (тооцоо, журнал) ── */
+.tbl th.chk,.tbl td.chk{width:28px;text-align:center;padding:4px 5px;}
+.tbl .chk input{cursor:pointer;accent-color:var(--txt-accent);}
+.bulkbar{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
+.bulkbar .cnt{font-size:11px;color:var(--txt-muted);}
+.settle-partner{cursor:pointer;user-select:none;}
+.settle-partner:hover{color:var(--txt-accent);}
+.settle-partner .caret{display:inline-block;width:13px;color:var(--txt-muted);transition:transform .15s;font-size:9px;}
+tr.set-open td{background:var(--acc-soft)!important;}
+tr.set-open .caret{transform:rotate(90deg);}
+tr.set-detail>td{background:var(--bg-row)!important;padding:8px 10px 12px 34px;}
+.set-sub{width:100%;border-collapse:collapse;font-size:11px;background:var(--bg-surface);border:1px solid #eae6de;}
+.set-sub th{background:var(--bg-row);color:var(--txt-sub);padding:4px 8px;text-align:left;font-size:10px;font-weight:700;border-bottom:1px solid #eae6de;white-space:nowrap;}
+.set-sub th.num,.set-sub td.num{text-align:right;font-family:'Courier New',monospace;}
+.set-sub td{padding:3px 8px;border-bottom:1px solid #f0ede6;}
+.set-sub tr:last-child td{border-bottom:none;}
+.set-sub tr.paidrow td{color:var(--txt-muted);}
+.set-sub .subnote{font-size:10px;color:var(--txt-muted);padding:4px 8px;}
 .badge{display:inline-block;padding:2px 6px;border-radius:var(--r-sm);font-size:9px;font-weight:600;}
 .badge.ok{background:var(--green-soft);color:var(--green);}
 .badge.err{background:var(--red-soft);color:var(--red);}
@@ -470,6 +488,9 @@ table.tbl{width:100%;border-collapse:collapse;font-size:var(--fz-md);background:
       <option value="">Бүх эх сурвалж</option><option value="import">Импорт — хуулга</option><option value="vatbuy">НӨАТ падаан — ХА</option><option value="vatsale">НӨАТ падаан — Борл</option><option value="manual">Гар бичилт</option><option value="salary">Цалин</option><option value="depr">Элэгдэл</option><option value="closing">Хаалт</option>
     </select>
     <input class="pill-input" style="width:200px;" id="jFltSearch" placeholder="Хайх — утга, данс, харилцагч" oninput="renderJournal()">
+    <div class="spacer"></div>
+    <button class="btn sm" id="jBulkStorno" disabled onclick="bulkStornoDocs()">Сонгосныг сторно</button>
+    <button class="btn sm danger" id="jBulkDel" disabled onclick="bulkDeleteDocs()">Сонгосныг устгах</button>
   </div>
   <div id="jStats" style="font-size:12px;color:var(--muted);margin-bottom:8px;"></div>
   <div class="tbl-wrap" style="max-height:600px;overflow-y:auto;"><table class="tbl" id="jTable"></table></div>
@@ -518,10 +539,20 @@ table.tbl{width:100%;border-collapse:collapse;font-size:var(--fz-md);background:
 
 <!-- ═══════════ ТООЦОО ═══════════ -->
 <section class="page" id="page-settle">
-  <div class="page-head"><h1>Өглөг, авлагын тооцоо</h1><p>Харилцагч бүрээр: падаанаар үүссэн дүн, төлөлт, үлдэгдэл. Банкаар дамжаагүй төлбөрийг (хувийн данснаас төлсөн гэх мэт) «Хаах» товчоор гараар хаана.</p></div>
+  <div class="page-head"><h1>Өглөг, авлагын тооцоо</h1><p>Харилцагч бүрээр: падаанаар үүссэн дүн, төлөлт, үлдэгдэл. Харилцагчийн нэр дээр дарвал падаан бүрийн задаргаа нээгдэж, падаан тус бүрээр хэсэгчилж хааж болно. Олон харилцагчийг чагтаар сонгоод нэг дор хааж болно. Банкаар дамжаагүй төлбөрийг (хувийн данснаас төлсөн гэх мэт) «Хаах» товчоор гараар хаана.</p></div>
   <div class="grid2">
-    <div class="card"><h3>Дансны өглөг — нийлүүлэгчээр</h3><div class="tbl-wrap"><table class="tbl" id="setPayTable"></table></div></div>
-    <div class="card"><h3>Дансны авлага — худалдан авагчаар</h3><div class="tbl-wrap"><table class="tbl" id="setRecTable"></table></div></div>
+    <div class="card"><h3>Дансны өглөг — нийлүүлэгчээр</h3>
+      <div class="bulkbar">
+        <button class="btn primary sm" id="bulkBtn-payable" disabled onclick="openBulkSettle('payable')">Сонгосныг хаах</button>
+        <span class="cnt" id="bulkCnt-payable"></span>
+      </div>
+      <div class="tbl-wrap"><table class="tbl" id="setPayTable"></table></div></div>
+    <div class="card"><h3>Дансны авлага — худалдан авагчаар</h3>
+      <div class="bulkbar">
+        <button class="btn primary sm" id="bulkBtn-receivable" disabled onclick="openBulkSettle('receivable')">Сонгосныг хаах</button>
+        <span class="cnt" id="bulkCnt-receivable"></span>
+      </div>
+      <div class="tbl-wrap"><table class="tbl" id="setRecTable"></table></div></div>
   </div>
 </section>
 
@@ -763,7 +794,7 @@ table.tbl{width:100%;border-collapse:collapse;font-size:var(--fz-md);background:
 
 <div class="modal-bg" id="settleModal"><div class="modal">
   <h3 id="setModalTitle">Тооцоо хаах</h3>
-  <input type="hidden" id="smKind"><input type="hidden" id="smPartner">
+  <input type="hidden" id="smKind"><input type="hidden" id="smPartner"><input type="hidden" id="smRef">
   <div id="smInfo" class="note"></div>
   <div class="grid2">
     <div class="field"><label>Огноо</label><input type="date" id="smDate"></div>
@@ -774,6 +805,23 @@ table.tbl{width:100%;border-collapse:collapse;font-size:var(--fz-md);background:
   <div style="display:flex;gap:8px;margin-top:10px;">
     <button class="btn primary" onclick="postSettle()">Журналд бичих</button>
     <button class="btn" onclick="closeModal('settleModal')">Болих</button>
+  </div>
+</div></div>
+
+<div class="modal-bg" id="bulkSettleModal"><div class="modal" style="max-width:560px;">
+  <h3 id="bsTitle">Сонгосон тооцоог хаах</h3>
+  <input type="hidden" id="bsKind">
+  <div id="bsInfo" class="note"></div>
+  <div class="grid2">
+    <div class="field"><label>Огноо</label><input type="date" id="bsDate"></div>
+    <div class="field"><label>Нийт дүн</label><input id="bsTotal" disabled></div>
+  </div>
+  <div class="field"><label>Харьцсан данс (бүх сонгогдсонд ижил)</label><select id="bsAcc"></select></div>
+  <div class="note warn" id="bsWarn" style="display:none;">Кассаар хаахад касс дансанд бодит мөнгө байхгүй бол касс кредит (сөрөг) үлдэгдэлтэй болно — эзэн хувиасаа төлсөн бол «Эзэнтэй хийх тооцоо» дансыг сонгохыг зөвлөж байна.</div>
+  <div class="tbl-wrap" style="max-height:220px;overflow-y:auto;margin-top:8px;"><table class="tbl" id="bsList"></table></div>
+  <div style="display:flex;gap:8px;margin-top:10px;">
+    <button class="btn primary" onclick="postBulkSettle()">Журналд бичих</button>
+    <button class="btn" onclick="closeModal('bulkSettleModal')">Болих</button>
   </div>
 </div></div>
 
@@ -2117,6 +2165,15 @@ function fillMonthFilter(selId){
   sel.innerHTML='<option value="">Бүх сар</option>'+months.map(m=>`<option value="${m}">${m}</option>`).join('');
   if(months.includes(cur)) sel.value=cur;
 }
+const JSEL=new Set(); // журналын bulk сонголт — баримтын дугаараар
+function jBulkRefresh(visibleDocs){
+  // сонголтыг зөвхөн харагдаж буй баримтуудаар цэвэрлэнэ
+  if(visibleDocs) for(const d of [...JSEL]) if(!visibleDocs.has(d)) JSEL.delete(d);
+  const n=JSEL.size;
+  const st=document.getElementById('jBulkStorno'), del=document.getElementById('jBulkDel');
+  if(st){ st.disabled=!n; st.textContent=n?`Сонгосныг сторно (${n})`:'Сонгосныг сторно'; }
+  if(del){ del.disabled=!n; del.textContent=n?`Сонгосныг устгах (${n})`:'Сонгосныг устгах'; }
+}
 function renderJournal(){
   fillMonthFilter('jFltMonth');
   const m=document.getElementById('jFltMonth').value;
@@ -2127,13 +2184,16 @@ function renderJournal(){
     (!q||j.desc.toLowerCase().includes(q)||String(j.partner||'').toLowerCase().includes(q)||j.dt.includes(q)||j.kt.includes(q)||j.doc.includes(q))
   );
   rows=rows.slice().sort((a,b)=> a.date===b.date ? a.doc.localeCompare(b.doc,undefined,{numeric:true}) : a.date.localeCompare(b.date));
-  let html='<thead><tr><th>Баримт №</th><th>Огноо</th><th>Гүйлгээний утга</th><th>Харилцагч</th><th>Дебит данс</th><th>Кредит данс</th><th class="num">Дүн</th><th>Эх</th><th></th></tr></thead><tbody>';
-  if(!rows.length) html+='<tr><td colspan="9"><div class="empty"><b>Бичилт алга</b>Импорт хийх эсвэл гар бичилт нэмнэ үү</div></td></tr>';
+  const visibleDocs=new Set(rows.map(r=>r.doc));
+  jBulkRefresh(visibleDocs);
+  let html='<thead><tr><th class="chk"><input type="checkbox" class="j-chk-all" title="Бүгдийг сонгох"></th><th>Баримт №</th><th>Огноо</th><th>Гүйлгээний утга</th><th>Харилцагч</th><th>Дебит данс</th><th>Кредит данс</th><th class="num">Дүн</th><th>Эх</th><th></th></tr></thead><tbody>';
+  if(!rows.length) html+='<tr><td colspan="10"><div class="empty"><b>Бичилт алга</b>Импорт хийх эсвэл гар бичилт нэмнэ үү</div></td></tr>';
   let total=0, lastDoc='';
   for(const j of rows){
     total+=j.amt;
     const newDoc=j.doc!==lastDoc; lastDoc=j.doc;
     html+=`<tr>
+      <td class="chk">${newDoc?`<input type="checkbox" class="j-chk" data-doc="${esc(j.doc)}" ${JSEL.has(j.doc)?'checked':''}>`:''}</td>
       <td class="mono">${newDoc?esc(j.doc):''}</td>
       <td class="mono">${newDoc?esc(j.date):''}</td>
       <td style="max-width:280px;">${esc(j.desc)}</td>
@@ -2146,9 +2206,66 @@ function renderJournal(){
     </tr>`;
   }
   html+='</tbody>';
-  document.getElementById('jTable').innerHTML=html;
-  const docs=new Set(rows.map(r=>r.doc)).size;
+  const tbl=document.getElementById('jTable');
+  tbl.innerHTML=html;
+  const all=tbl.querySelector('.j-chk-all');
+  if(all){ all.checked=visibleDocs.size>0 && [...visibleDocs].every(d=>JSEL.has(d)); all.disabled=!visibleDocs.size; }
+  tbl.onclick=ev=>{
+    const chkAll=ev.target.closest('.j-chk-all');
+    if(chkAll){
+      if(chkAll.checked) visibleDocs.forEach(d=>JSEL.add(d)); else JSEL.clear();
+      renderJournal(); return;
+    }
+    const chk=ev.target.closest('.j-chk');
+    if(chk){
+      if(chk.checked) JSEL.add(chk.dataset.doc); else JSEL.delete(chk.dataset.doc);
+      if(all){ all.checked=visibleDocs.size>0 && [...visibleDocs].every(d=>JSEL.has(d)); }
+      jBulkRefresh(); return;
+    }
+  };
+  const docs=visibleDocs.size;
   document.getElementById('jStats').textContent='Нийт: '+docs+' баримт, '+rows.length+' бичилт, гүйлгээний дүн '+fmtZ(total);
+}
+/* Bulk-д зориулсан чимээгүй шалгалт: хамгаалагдсан эх сурвалжтай баримтыг
+   алгасаад тоолно (guardMutable шиг nav хийхгүй). */
+function bulkMutableDocs(){
+  if(periodClosed()){ toast('Тайлант үе хаагдсан тул бичилт өөрчлөх боломжгүй — эхлээд Хаалт хуудаснаас хаалтыг буцаана уу', true); return null; }
+  const ok=[], skipped=[];
+  for(const doc of JSEL){
+    const es=docEntries(doc);
+    if(!es.length) continue;
+    if(SOURCE_HOME[es[0].source]) skipped.push(doc); else ok.push(doc);
+  }
+  return {ok, skipped};
+}
+function bulkDeleteDocs(){
+  const r=bulkMutableDocs(); if(!r) return;
+  const {ok, skipped}=r;
+  if(!ok.length){ toast('Сонгосон баримтууд бүгд хамгаалагдсан эх сурвалжтай (цалин/элэгдэл/хаалт) — тухайн хуудаснаас нь засна', true); return; }
+  const lines=ok.reduce((x,d)=>x+docEntries(d).length,0);
+  if(!confirm(ok.length+' баримтын '+lines+' бичилтийг устгах уу?'+(skipped.length?'\n('+skipped.length+' хамгаалагдсан баримт алгасагдана)':''))) return;
+  const okSet=new Set(ok);
+  DB.journal=DB.journal.filter(j=>!okSet.has(j.doc));
+  JSEL.clear();
+  save(); renderJournal();
+  toast(ok.length+' баримт устгагдлаа'+(skipped.length?' — '+skipped.length+' хамгаалагдсан баримт алгасав':''));
+}
+function bulkStornoDocs(){
+  const r=bulkMutableDocs(); if(!r) return;
+  const {ok, skipped}=r;
+  if(!ok.length){ toast('Сонгосон баримтууд бүгд хамгаалагдсан эх сурвалжтай (цалин/элэгдэл/хаалт) — тухайн хуудаснаас нь засна', true); return; }
+  if(!confirm(ok.length+' баримтыг сторно (урвуу бичилтээр цуцлах) хийх үү? Анхны бичилтүүд хэвээр үлдэж, урвуу баримтууд шинээр үүснэ.'+(skipped.length?'\n('+skipped.length+' хамгаалагдсан баримт алгасагдана)':''))) return;
+  const batch=nextBatch();
+  for(const doc of ok){
+    const newDoc=nextDocNo();
+    for(const e of docEntries(doc)){
+      DB.journal.push({doc:newDoc, date:todayISO(), desc:'СТОРНО №'+doc+' — '+(e.desc||''), partner:e.partner||'',
+        dt:e.kt, kt:e.dt, amt:e.amt, source:'manual', batch});
+    }
+  }
+  JSEL.clear();
+  save(); renderJournal();
+  toast(ok.length+' баримт сторно хийгдлээ'+(skipped.length?' — '+skipped.length+' хамгаалагдсан баримт алгасав':''));
 }
 function periodClosed(){ return DB.journal.some(j=>j.source==='closing'); }
 const SOURCE_HOME={
@@ -2583,32 +2700,158 @@ function undoDepr(){
 }
 
 /* ═══════════════ SETTLE (ӨГЛӨГ, АВЛАГЫН ТООЦОО) ═══════════════ */
+/* Сонголт (bulk) ба нээлттэй задаргааны төлөв — харилцагчийн нэрээр */
+const SETTLE_UI={
+  payable:{sel:new Set(), open:new Set(), rows:[]},
+  receivable:{sel:new Set(), open:new Set(), rows:[]}
+};
+/* Харилцагчийн падаан бүрийн задаргаа + төлөлтийн хуваарилалт.
+   Төлөлтийг эхлээд ref-ээр нь (тухайн падааныг зориуд хаасан бичилт),
+   дараа нь FIFO-гоор (огнооны дарааллаар) падаануудад хуваарилна. */
+function partnerDocs(kind, partner){
+  const s=DB.settings;
+  const acc = kind==='payable'? s.accPayable : s.accReceivable;
+  const credit = kind==='payable';
+  const invs={}; const pays=[];
+  for(const j of DB.journal){
+    if((j.partner||'').trim()!==partner) continue;
+    const isInv = credit ? j.kt===acc : j.dt===acc;
+    const isPay = credit ? j.dt===acc : j.kt===acc;
+    if(isInv){
+      const d=invs[j.doc]||(invs[j.doc]={doc:j.doc, date:j.date, desc:j.desc||'', total:0, paid:0});
+      d.total=r2(d.total+j.amt);
+      if(j.date<d.date) d.date=j.date;
+    }else if(isPay){
+      pays.push({date:j.date, desc:j.desc||'', amt:j.amt, ref:j.ref||''});
+    }
+  }
+  const list=Object.values(invs).sort((a,b)=> a.date===b.date ? String(a.doc).localeCompare(String(b.doc),undefined,{numeric:true}) : a.date.localeCompare(b.date));
+  let pool=0;
+  for(const p of pays){
+    const t=p.ref ? list.find(d=>String(d.doc)===String(p.ref)) : null;
+    if(t){
+      const take=Math.min(p.amt, r2(t.total-t.paid));
+      t.paid=r2(t.paid+take);
+      pool=r2(pool+p.amt-take);
+    }else pool=r2(pool+p.amt);
+  }
+  for(const d of list){
+    if(pool<=0.004) break;
+    const need=r2(d.total-d.paid);
+    if(need<=0.004) continue;
+    const take=Math.min(need, pool);
+    d.paid=r2(d.paid+take); pool=r2(pool-take);
+  }
+  list.forEach(d=>d.rem=r2(d.total-d.paid));
+  return {list, overpay:pool, payTotal:r2(pays.reduce((x,p)=>x+p.amt,0)), payCount:pays.length};
+}
+function settleDetailHTML(kind, partner, colspan){
+  const {list, overpay, payTotal, payCount}=partnerDocs(kind, partner);
+  let sub='<table class="set-sub"><thead><tr><th>Падаан №</th><th>Огноо</th><th>Утга</th><th class="num">Дүн</th><th class="num">Төлөгдсөн</th><th class="num">Үлдэгдэл</th><th></th></tr></thead><tbody>';
+  if(!list.length) sub+='<tr><td colspan="7" class="subnote">Падаан олдсонгүй — энэ үлдэгдэл гар бичилт/эхний үлдэгдлээс үүссэн байж болно.</td></tr>';
+  for(let i=0;i<list.length;i++){
+    const d=list[i];
+    const closed=d.rem<=0.004;
+    sub+=`<tr class="${closed?'paidrow':''}">
+      <td class="mono">${esc(String(d.doc))}</td><td class="mono">${esc(d.date)}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(d.desc)}">${esc(d.desc)}</td>
+      <td class="num">${fmtZ(d.total)}</td><td class="num">${fmtZ(d.paid)}</td>
+      <td class="num" style="font-weight:700;">${closed?'0':fmtZ(d.rem)}</td>
+      <td>${closed?'<span class="badge ok">хаагдсан</span>':`<span class="link set-doc-close" data-kind="${kind}" data-i="${i}">хаах</span>`}</td></tr>`;
+  }
+  sub+='</tbody></table>';
+  sub+=`<div class="subnote">Нийт төлөлт: ${fmtZ(payTotal)} (${payCount} гүйлгээ) — төлөлтийг падаан руу нь эхлээд зориулалтаар нь, дараа нь огнооны дарааллаар (FIFO) хуваарилав.${overpay>0.004?' <b>Хуваарилагдаагүй/илүү төлөлт: '+fmtZ(overpay)+'</b>':''}</div>`;
+  return `<tr class="set-detail" data-p="${encodeURIComponent(partner)}"><td colspan="${colspan}">${sub}</td></tr>`;
+}
+function settleBulkRefresh(kind){
+  const ui=SETTLE_UI[kind];
+  const btn=document.getElementById('bulkBtn-'+kind);
+  const cnt=document.getElementById('bulkCnt-'+kind);
+  if(!btn) return;
+  const rows=ui.rows.filter(r=>ui.sel.has(r.p));
+  const total=r2(rows.reduce((x,r)=>x+r.bal,0));
+  btn.disabled=!rows.length;
+  btn.textContent=rows.length?`Сонгосныг хаах (${rows.length})`:'Сонгосныг хаах';
+  cnt.textContent=rows.length?('нийт '+fmtZ(total)):'';
+}
 function renderSettle(){
   const s=DB.settings;
   const draw=(kind, tblId)=>{
+    const ui=SETTLE_UI[kind];
     const acc = kind==='payable'? s.accPayable : s.accReceivable;
     const led=partnerLedger(acc, kind==='payable');
     const rows=Object.entries(led).map(([p,e])=>({p, inv:e.inv, pay:e.pay, bal:r2(e.inv-e.pay)}))
       .filter(r=>r.inv||r.pay).sort((a,b)=>b.bal-a.bal);
-    let html='<thead><tr><th>Харилцагч</th><th class="num">'+(kind==='payable'?'Падаан':'Падаан')+'</th><th class="num">Төлөлт</th><th class="num">Үлдэгдэл</th><th></th></tr></thead><tbody>';
-    if(!rows.length) html+='<tr><td colspan="5"><div class="empty"><b>Тооцоо алга</b>НӨАТ падаан импортлосны дараа энд харагдана</div></td></tr>';
+    ui.rows=rows;
+    // сонголтыг зөвхөн үлдэгдэлтэй харилцагчид хязгаарлаж цэвэрлэнэ
+    const openBal=new Set(rows.filter(r=>r.bal>0.004).map(r=>r.p));
+    ui.sel=new Set([...ui.sel].filter(p=>openBal.has(p)));
+    const COLS=6;
+    let html='<thead><tr><th class="chk"><input type="checkbox" class="set-chk-all" title="Бүгдийг сонгох"></th><th>Харилцагч</th><th class="num">Падаан</th><th class="num">Төлөлт</th><th class="num">Үлдэгдэл</th><th></th></tr></thead><tbody>';
+    if(!rows.length) html+=`<tr><td colspan="${COLS}"><div class="empty"><b>Тооцоо алга</b>НӨАТ падаан импортлосны дараа энд харагдана</div></td></tr>`;
     let tInv=0,tPay=0,tBal=0;
-    for(const r of rows){
+    for(let i=0;i<rows.length;i++){
+      const r=rows[i];
       tInv=r2(tInv+r.inv); tPay=r2(tPay+r.pay); tBal=r2(tBal+r.bal);
-      html+=`<tr><td>${esc(r.p)}</td><td class="num mono">${fmtZ(r.inv)}</td><td class="num mono">${fmtZ(r.pay)}</td>
+      const isOpen=ui.open.has(r.p);
+      html+=`<tr class="${isOpen?'set-open':''}">
+        <td class="chk">${r.bal>0.004?`<input type="checkbox" class="set-chk" data-i="${i}" ${ui.sel.has(r.p)?'checked':''}>`:''}</td>
+        <td class="settle-partner" data-i="${i}"><span class="caret">▶</span>${esc(r.p)}</td>
+        <td class="num mono">${fmtZ(r.inv)}</td><td class="num mono">${fmtZ(r.pay)}</td>
         <td class="num mono" style="font-weight:700;${r.bal>0.004?'':'color:var(--txt-muted);'}">${fmtZ(r.bal)}</td>
-        <td>${r.bal>0.004?`<span class="link" onclick="openSettleModal('${kind}','${esc(r.p).replace(/'/g,"&#39;")}',${r.bal})">хаах</span>`:''}</td></tr>`;
+        <td>${r.bal>0.004?`<span class="link set-close" data-i="${i}">хаах</span>`:''}</td></tr>`;
+      if(isOpen) html+=settleDetailHTML(kind, r.p, COLS);
     }
-    html+=`<tr class="total"><td>НИЙТ</td><td class="num">${fmtZ(tInv)}</td><td class="num">${fmtZ(tPay)}</td><td class="num">${fmtZ(tBal)}</td><td></td></tr></tbody>`;
-    document.getElementById(tblId).innerHTML=html;
+    html+=`<tr class="total"><td></td><td>НИЙТ</td><td class="num">${fmtZ(tInv)}</td><td class="num">${fmtZ(tPay)}</td><td class="num">${fmtZ(tBal)}</td><td></td></tr></tbody>`;
+    const tbl=document.getElementById(tblId);
+    tbl.innerHTML=html;
+    // select-all төлөв
+    const all=tbl.querySelector('.set-chk-all');
+    const selectable=rows.filter(r=>r.bal>0.004);
+    if(all){ all.checked=selectable.length>0 && selectable.every(r=>ui.sel.has(r.p)); all.disabled=!selectable.length; }
+    // үйлдлүүд — event delegation (нэрэн доторх quote-оос үл хамаарна)
+    tbl.onclick=ev=>{
+      const chkAll=ev.target.closest('.set-chk-all');
+      if(chkAll){
+        if(chkAll.checked) selectable.forEach(r=>ui.sel.add(r.p)); else ui.sel.clear();
+        renderSettle(); return;
+      }
+      const chk=ev.target.closest('.set-chk');
+      if(chk){
+        const p=rows[+chk.dataset.i].p;
+        if(chk.checked) ui.sel.add(p); else ui.sel.delete(p);
+        if(all){ all.checked=selectable.length>0 && selectable.every(r=>ui.sel.has(r.p)); }
+        settleBulkRefresh(kind); return;
+      }
+      const closeLink=ev.target.closest('.set-close');
+      if(closeLink){
+        const r=rows[+closeLink.dataset.i];
+        openSettleModal(kind, r.p, r.bal); return;
+      }
+      const docClose=ev.target.closest('.set-doc-close');
+      if(docClose){
+        const detailTr=docClose.closest('tr.set-detail');
+        const partner=decodeURIComponent(detailTr.dataset.p);
+        const d=partnerDocs(kind, partner).list[+docClose.dataset.i];
+        if(d) openSettleModal(kind, partner, d.rem, String(d.doc)); return;
+      }
+      const pcell=ev.target.closest('.settle-partner');
+      if(pcell){
+        const p=rows[+pcell.dataset.i].p;
+        if(ui.open.has(p)) ui.open.delete(p); else ui.open.add(p);
+        renderSettle(); return;
+      }
+    };
+    settleBulkRefresh(kind);
   };
   draw('payable','setPayTable');
   draw('receivable','setRecTable');
 }
-function openSettleModal(kind, partner, bal){
+function openSettleModal(kind, partner, bal, ref){
   document.getElementById('smKind').value=kind;
   document.getElementById('smPartner').value=partner;
-  document.getElementById('setModalTitle').textContent=(kind==='payable'?'Өглөг хаах — ':'Авлага хаах — ')+partner;
+  document.getElementById('smRef').value=ref||'';
+  document.getElementById('setModalTitle').textContent=(kind==='payable'?'Өглөг хаах — ':'Авлага хаах — ')+partner+(ref?' (падаан №'+ref+')':'');
   document.getElementById('smInfo').textContent= kind==='payable'
     ? 'Банкаар дамжаагүй төлбөр (хувийн данснаас, бэлнээр гэх мэт) хааж байна. Банкаар төлсөн бол хуулгын импортын «Өглөгийн төлөлт» төрлийг ашиглаарай — давхардлаас сэргийлнэ.'
     : 'Банкаар дамжаагүй орлого (бэлнээр авсан гэх мэт) хааж байна. Банкаар орсон бол хуулгын импортын «Авлагын орлого» төрлийг ашиглаарай.';
@@ -2632,13 +2875,65 @@ function postSettle(){
   const s=DB.settings;
   if(!date||amt<=0){ toast('Огноо болон дүнгээ шалгана уу', true); return; }
   if(!accByCode(acc)){ toast('Харьцсан данс сонгоно уу', true); return; }
+  const ref=document.getElementById('smRef').value||'';
   const doc=nextDocNo(); const batch=nextBatch();
   const via=accByCode(acc).cat==='11'?(acc==='100101'?'кассаар':'мөнгөн дансаар'):'эзний тооцоогоор';
+  const refTxt=ref?' (падаан №'+ref+')':'';
   if(kind==='payable')
-    DB.journal.push({doc, date, desc:'Өглөг хаалт — '+via, partner, dt:s.accPayable, kt:acc, amt, source:'manual', batch});
+    DB.journal.push({doc, date, desc:'Өглөг хаалт — '+via+refTxt, partner, dt:s.accPayable, kt:acc, amt, source:'manual', batch, ...(ref?{ref}:{})});
   else
-    DB.journal.push({doc, date, desc:'Авлага хаалт — '+via, partner, dt:acc, kt:s.accReceivable, amt, source:'manual', batch});
+    DB.journal.push({doc, date, desc:'Авлага хаалт — '+via+refTxt, partner, dt:acc, kt:s.accReceivable, amt, source:'manual', batch, ...(ref?{ref}:{})});
   save(); closeModal('settleModal'); renderSettle(); toast('Тооцоо хаагдлаа — баримт №'+doc);
+}
+/* ── Бөөнөөр хаах ── */
+function openBulkSettle(kind){
+  const ui=SETTLE_UI[kind];
+  const rows=ui.rows.filter(r=>ui.sel.has(r.p) && r.bal>0.004);
+  if(!rows.length){ toast('Хаах харилцагчаа чагтаар сонгоно уу', true); return; }
+  document.getElementById('bsKind').value=kind;
+  document.getElementById('bsTitle').textContent=(kind==='payable'?'Өглөг':'Авлага')+' бөөнөөр хаах — '+rows.length+' харилцагч';
+  document.getElementById('bsInfo').textContent= kind==='payable'
+    ? 'Сонгосон харилцагч бүрийн үлдэгдлийг бүтнээр нь хааж, харилцагч тус бүрд тусдаа баримт үүсгэнэ. Банкаар төлсөн бол хуулгын импортын «Өглөгийн төлөлт» төрлийг ашиглаарай — давхардлаас сэргийлнэ.'
+    : 'Сонгосон харилцагч бүрийн үлдэгдлийг бүтнээр нь хааж, харилцагч тус бүрд тусдаа баримт үүсгэнэ. Банкаар орсон бол хуулгын импортын «Авлагын орлого» төрлийг ашиглаарай.';
+  document.getElementById('bsDate').value=todayISO();
+  const total=r2(rows.reduce((x,r)=>x+r.bal,0));
+  document.getElementById('bsTotal').value=fmtZ(total);
+  const sel=document.getElementById('bsAcc');
+  const money=DB.accounts.filter(a=>a.cat==='11');
+  const owner=DB.accounts.filter(a=>a.code==='315101');
+  sel.innerHTML=[...owner, ...money].map(a=>`<option value="${esc(a.code)}">${esc(a.code)} — ${esc(a.name)}</option>`).join('');
+  sel.onchange=()=>{ const a=accByCode(sel.value); document.getElementById('bsWarn').style.display=(a&&a.cat==='11')?'':'none'; };
+  sel.onchange();
+  let html='<thead><tr><th>Харилцагч</th><th class="num">Хаах дүн</th></tr></thead><tbody>';
+  rows.forEach(r=>{ html+=`<tr><td>${esc(r.p)}</td><td class="num mono">${fmtZ(r.bal)}</td></tr>`; });
+  html+=`<tr class="total"><td>НИЙТ</td><td class="num">${fmtZ(total)}</td></tr></tbody>`;
+  document.getElementById('bsList').innerHTML=html;
+  openModal('bulkSettleModal');
+}
+function postBulkSettle(){
+  const kind=document.getElementById('bsKind').value;
+  const date=document.getElementById('bsDate').value;
+  const acc=document.getElementById('bsAcc').value;
+  const s=DB.settings;
+  if(!date){ toast('Огноогоо шалгана уу', true); return; }
+  if(!accByCode(acc)){ toast('Харьцсан данс сонгоно уу', true); return; }
+  const ui=SETTLE_UI[kind];
+  const rows=ui.rows.filter(r=>ui.sel.has(r.p) && r.bal>0.004);
+  if(!rows.length){ closeModal('bulkSettleModal'); return; }
+  const batch=nextBatch();
+  const via=accByCode(acc).cat==='11'?(acc==='100101'?'кассаар':'мөнгөн дансаар'):'эзний тооцоогоор';
+  let total=0;
+  for(const r of rows){
+    const doc=nextDocNo();
+    if(kind==='payable')
+      DB.journal.push({doc, date, desc:'Өглөг хаалт — '+via, partner:r.p, dt:s.accPayable, kt:acc, amt:r.bal, source:'manual', batch});
+    else
+      DB.journal.push({doc, date, desc:'Авлага хаалт — '+via, partner:r.p, dt:acc, kt:s.accReceivable, amt:r.bal, source:'manual', batch});
+    total=r2(total+r.bal);
+  }
+  ui.sel.clear();
+  save(); closeModal('bulkSettleModal'); renderSettle();
+  toast(rows.length+' харилцагчийн тооцоо хаагдлаа — нийт '+fmtZ(total));
 }
 
 /* ═══════════════ TRIAL BALANCE ═══════════════ */
