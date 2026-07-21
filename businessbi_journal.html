@@ -1487,15 +1487,20 @@ async function impLoadPdf(buf){
     const s=DB.settings;
     IMP.mapped=rows.map(r=>{
       const known=DB.employees[r.reg]||{};
-      return {
+      const e={
         include:true,
+        lastName:r.lastName||'', firstName:r.firstName||'',
         name:(r.lastName+' '+r.firstName).replace(/\s+/g,' ').trim(),
         reg:r.reg,
+        type:r.type||'',                    // даатгуулагчийн төрлийн код (НДШ хувь, 70/40 кодод хэрэгтэй)
         tin:known.tin||'',
         gross:r.salary,
-        ndshE: r.employee>0? r.employee : r2(r.salary*s.ndshEmpPct/100),
-        credit:r2(s.hhoatCredit)
+        // НДШ — тайлангийн БОДИТ шимтгэл; байхгүй үед кодоор нь хувилж бодно (хөрвүүлэгчтэй ижил)
+        ndshE: r.employee>0? r.employee : r2(r.salary*ndshRate(r.type)/100),
+        ndshCo: r.employer>0? r.employer : 0  // ажил олгогчийн бодит НДШ
       };
+      e.credit=autoCredit(e);               // хөнгөлөлт — ОЗЦ-ийн шатлалаар автомат
+      return e;
     });
     if(meta.year && meta.month) document.getElementById('nMonth').value=meta.year+'-'+String(meta.month).padStart(2,'0');
     document.getElementById('impRowCount').value=IMP.mapped.length;
@@ -1633,14 +1638,62 @@ function impToStage3(){
   impRenderRows();
   impGoStage(3);
 }
+/* ── ХХОАТ, НДШ тооцоолол — НДШ/ХХОАТ хөрвүүлэгчтэй ЯГ ИЖИЛ логик ── */
+// Даатгуулагчийн төрлийн кодоор НДШ-ийн хувь (хөрвүүлэгчээс хуулсан):
+// ердийн 11.5%, тэтгэврийн шимтгэл төлөхгүй 0.8%, тэтгэвэр тогтоолгосон ч төлдөг 9.3%
+const NDSH_RATE_BY_CODE={
+  "22011":0.8, "22031":0.8, "25022":0.8, "34011":0.8, "39012":0.8, "70011":0.8,
+  "22001":9.3, "22021":9.3, "25012":9.3, "34001":9.3, "38002":9.3, "39002":9.3, "70001":9.3
+};
+function ndshRate(code){
+  const r=NDSH_RATE_BY_CODE[String(code||'').trim()];
+  return (r===undefined)? (DB.settings.ndshEmpPct||11.5) : r;
+}
+// Сарын хөнгөлөлтийн шатлал — ОЗЦ (цалин − НДШ)-аар (хөрвүүлэгчтэй ижил)
+function monthlyCreditTier(ozc){
+  if(ozc<=500000)  return 20000;
+  if(ozc<=1000000) return 18000;
+  if(ozc<=1500000) return 16000;
+  if(ozc<=2000000) return 14000;
+  if(ozc<=2500000) return 12000;
+  if(ozc<=3000000) return 10000;
+  return 0;
+}
+// Шатлалт татвар (хуулийн 21.1) — хөрвүүлэгчтэй ижил
+function tierTaxJ(taxable){
+  if(taxable<=0) return 0;
+  if(taxable<=120000000) return taxable*0.10;
+  if(taxable<=180000000) return 12000000+(taxable-120000000)*0.15;
+  return 21000000+(taxable-180000000)*0.20;
+}
+// Ажилтны мөрийн автомат хөнгөлөлт (70 код — татвараас чөлөөлөгдсөн,
+// 40 код — давхар ажлын 7.1.6 орлого тул сарын хөнгөлөлтгүй)
+function autoCredit(e){
+  const code=String(e.type||'').trim();
+  if(code.startsWith('70')||code.startsWith('40')) return 0;
+  const ozc=r2(Math.max(0,(e.gross||0)-(e.ndshE||0)));
+  return monthlyCreditTier(ozc);
+}
 function calcEmp(e){
   const gross=r2(e.gross), ndshE=r2(e.ndshE), credit=r2(e.credit);
-  const taxable=r2(Math.max(0, gross-ndshE));  // ХХОАТ ногдох орлого = цалин − НДШ
-  const raw=r2(taxable*0.10);                   // ХХОАТ 10%
-  const usedCredit=r2(Math.min(raw, credit));   // ашигласан хөнгөлөлт
-  const hhoat=r2(Math.max(0, raw-credit));      // суутгах ХХОАТ
-  const net=r2(gross-ndshE-hhoat);              // гарт олгох
-  return {taxable, raw, usedCredit, hhoat, net};
+  const code=String(e.type||'').trim();
+  const exempt=code.startsWith('70');   // ХХОАТ 22.1.2 — чөлөөлнө
+  const noCredit=code.startsWith('40'); // 23.1 хөнгөлөлт эдлэхгүй
+  const taxable=r2(Math.max(0, gross-ndshE));       // ОЗЦ = цалин − НДШ (бодит шимтгэлээр)
+  const raw=exempt?0:r2(tierTaxJ(taxable));          // ногдуулсан татвар — шатлалаар
+  const eff=(exempt||noCredit)?0:credit;             // үйлчлэх хөнгөлөлт
+  const usedCredit=r2(eff);
+  const hhoat=r2(raw-eff);                           // хөнгөлөлтийн дараах татвар (хөрвүүлэгчтэй ижил — clamp хийхгүй)
+  const net=r2(gross-ndshE-hhoat);                   // гарт олгох
+  return {taxable, raw, usedCredit, hhoat, net, exempt, noCredit};
+}
+// Ажил олгогчийн НДШ — тайлангаас уншсан БОДИТ дүнг ашиглана, байхгүй үед л хувиар
+function coOf(e, coPct){ return r2(e.ndshCo>0? e.ndshCo : (e.gross||0)*coPct/100); }
+// Хуучин хадгалагдсан мөрөнд овог/нэр тусдаа байхгүй бол name-ээс салгана
+function empNames(e){
+  if(e.lastName!=null||e.firstName!=null) return {ln:e.lastName||'', fn:e.firstName||''};
+  const parts=String(e.name||'').trim().split(/\s+/);
+  return parts.length>1? {ln:parts[0], fn:parts.slice(1).join(' ')} : {ln:'', fn:parts[0]||''};
 }
 function impToStage3Ndsh(){
   if(!IMP.mapped.length){ toast('Эхлээд НДШ-ийн тайлангийн PDF файлаа оруулна уу', true); return; }
@@ -1649,22 +1702,38 @@ function impToStage3Ndsh(){
 function impSetNdsh(i, field, val){
   const e=IMP.mapped[i];
   if(field==='include') e.include=val;
-  else if(field==='name'||field==='reg') e[field]=String(val).trim();
-  else e[field]=r2(val);
+  else if(field==='lastName'||field==='firstName'||field==='reg'){
+    e[field]=String(val).trim();
+    e.name=((e.lastName||'')+' '+(e.firstName||'')).replace(/\s+/g,' ').trim();
+  }
+  else{
+    e[field]=r2(val);
+    if(field==='credit') e.creditTouched=true;                 // гараар зассан — автоматаар дарж бичихгүй
+    if((field==='gross'||field==='ndshE') && !e.creditTouched) e.credit=autoCredit(e);
+  }
   impRenderRows();
+}
+function typeBadge(code){
+  const c=String(code||'').trim();
+  if(c.startsWith('70')) return ' <span class="badge warn" title="ХЧА тэтгэвэртэй — ХХОАТ-аас чөлөөлөгдөнө (22.1.2)">70</span>';
+  if(c.startsWith('40')) return ' <span class="badge warn" title="Давхар ажил (7.1.6) — сарын хөнгөлөлт эдлэхгүй (23.1)">40</span>';
+  return '';
 }
 function impRenderRowsNdsh(){
   const s=DB.settings;
-  let html='<thead><tr><th></th><th>№</th><th>Овог нэр</th><th>РД</th><th class="num">Цалин</th><th class="num">НДШ ('+s.ndshEmpPct+'%)</th><th class="num">Ногдох орлого</th><th class="num">ХХОАТ 10%</th><th class="num">Хөнгөлөлт</th><th class="num">Суутгах ХХОАТ</th><th class="num">Гарт олгох</th></tr></thead><tbody>';
-  let n=0, tG=0,tN=0,tH=0,tNet=0;
+  let html='<thead><tr><th></th><th>№</th><th>Овог</th><th>Нэр</th><th>РД</th><th title="Даатгуулагчийн төрлийн код — НДШ хувь, 70/40 кодын тооцоог тодорхойлно">Код</th><th class="num">Цалин</th><th class="num" title="Тайлангийн бодит шимтгэл; байхгүй үед кодын хувиар">НДШ</th><th class="num">Ногдох орлого</th><th class="num" title="Шатлалт татвар — 120 сая хүртэл 10%">ХХОАТ</th><th class="num" title="ОЗЦ-ийн шатлалаар автомат (гараар засаж болно)">Хөнгөлөлт</th><th class="num">Суутгах ХХОАТ</th><th class="num">Гарт олгох</th></tr></thead><tbody>';
+  let n=0, tG=0,tN=0,tH=0,tNet=0,tCo=0;
   IMP.mapped.forEach((e,i)=>{
-    const c=calcEmp(e, s);
-    if(e.include){ n++; tG=r2(tG+e.gross); tN=r2(tN+e.ndshE); tH=r2(tH+c.hhoat); tNet=r2(tNet+c.net); }
+    const c=calcEmp(e);
+    if(e.include){ n++; tG=r2(tG+e.gross); tN=r2(tN+e.ndshE); tH=r2(tH+c.hhoat); tNet=r2(tNet+c.net); tCo=r2(tCo+coOf(e,s.ndshCoPct)); }
+    const nm=empNames(e);
     html+=`<tr>
       <td><input type="checkbox" ${e.include?'checked':''} onchange="impSetNdsh(${i},'include',this.checked)"></td>
       <td>${i+1}</td>
-      <td><input class="pill-input" style="min-width:140px;" value="${esc(e.name)}" onchange="impSetNdsh(${i},'name',this.value)"></td>
+      <td><input class="pill-input" style="min-width:110px;" value="${esc(nm.ln)}" onchange="impSetNdsh(${i},'lastName',this.value)"></td>
+      <td><input class="pill-input" style="min-width:110px;" value="${esc(nm.fn)}" onchange="impSetNdsh(${i},'firstName',this.value)"></td>
       <td><input class="pill-input" style="width:100px;" value="${esc(e.reg)}" onchange="impSetNdsh(${i},'reg',this.value)"></td>
+      <td class="mono" style="white-space:nowrap;">${esc(e.type||'')}${typeBadge(e.type)}</td>
       <td class="num"><input class="pill-input num mono" style="width:100px;text-align:right;" type="number" step="0.01" value="${e.gross}" onchange="impSetNdsh(${i},'gross',this.value)"></td>
       <td class="num"><input class="pill-input num mono" style="width:90px;text-align:right;" type="number" step="0.01" value="${e.ndshE}" onchange="impSetNdsh(${i},'ndshE',this.value)"></td>
       <td class="num mono">${fmtZ(c.taxable)}</td>
@@ -1674,9 +1743,9 @@ function impRenderRowsNdsh(){
       <td class="num mono">${fmtZ(c.net)}</td>
     </tr>`;
   });
-  html+=`<tr class="total"><td colspan="5">НИЙТ — ${n} ажилтан</td><td class="num">${fmtZ(tG)}</td><td class="num">${fmtZ(tN)}</td><td colspan="3"></td><td class="num">${fmtZ(tH)}</td><td class="num">${fmtZ(tNet)}</td></tr></tbody>`;
+  html+=`<tr class="total"><td colspan="6">НИЙТ — ${n} ажилтан</td><td class="num">${fmtZ(tG)}</td><td class="num">${fmtZ(tN)}</td><td colspan="3"></td><td class="num">${fmtZ(tH)}</td><td class="num">${fmtZ(tNet)}</td></tr></tbody>`;
   document.getElementById('impRowsTable').innerHTML=html;
-  document.getElementById('impMappedInfo').textContent='АО НДШ '+s.ndshCoPct+'% = '+fmtZ(r2(tG*s.ndshCoPct/100));
+  document.getElementById('impMappedInfo').textContent='АО НДШ (тайлангийн бодит дүнгээр) = '+fmtZ(tCo);
 }
 function impToStage4Ndsh(){
   const inc=IMP.mapped.filter(e=>e.include);
@@ -1695,22 +1764,20 @@ function impToStage4Ndsh(){
   document.getElementById('impChecks').innerHTML=checks.map(c=>
     `<li><span class="ck-ico ${c.state}">${c.state==='ok'?'✓':c.state==='warn'?'!':'✕'}</span><span>${c.text}</span></li>`).join('');
   document.getElementById('impPostBtn').disabled=checks.some(c=>c.state==='err');
-  let tG=0,tN=0,tH=0;
-  inc.forEach(e=>{ const c=calcEmp(e,s); tG=r2(tG+e.gross); tN=r2(tN+e.ndshE); tH=r2(tH+c.hhoat); });
-  const co=r2(tG*s.ndshCoPct/100);
+  let tG=0,tN=0,tH=0,co=0;
+  inc.forEach(e=>{ const c=calcEmp(e); tG=r2(tG+e.gross); tN=r2(tN+e.ndshE); tH=r2(tH+c.hhoat); co=r2(co+coOf(e,s.ndshCoPct)); });
   document.getElementById('impSummary').innerHTML=
     `<div class="stat-row"><div class="stat"><div class="lbl">Нийт цалин</div><div class="val">${fmtZ(tG)}</div></div>
     <div class="stat"><div class="lbl">Ажилтны НДШ</div><div class="val">${fmtZ(tN)}</div></div>
     <div class="stat"><div class="lbl">Суутгах ХХОАТ</div><div class="val">${fmtZ(tH)}</div></div>
-    <div class="stat"><div class="lbl">АО НДШ (${s.ndshCoPct}%)</div><div class="val">${fmtZ(co)}</div></div></div>`;
+    <div class="stat"><div class="lbl">АО НДШ</div><div class="val">${fmtZ(co)}</div></div></div>`;
   impGoStage(4);
 }
 function monthEnd(month){ const [y,m]=month.split('-').map(Number); return new Date(Date.UTC(y, m, 0)).toISOString().slice(0,10); }
 function postPayrollJournal(p){
   const s=DB.settings;
-  let tG=0,tN=0,tH=0;
-  p.rows.forEach(e=>{ const c=calcEmp(e,s); tG=r2(tG+e.gross); tN=r2(tN+e.ndshE); tH=r2(tH+c.hhoat); });
-  const co=r2(tG*p.coPct/100);
+  let tG=0,tN=0,tH=0,co=0;
+  p.rows.forEach(e=>{ const c=calcEmp(e); tG=r2(tG+e.gross); tN=r2(tN+e.ndshE); tH=r2(tH+c.hhoat); co=r2(co+coOf(e,p.coPct)); });
   const date=monthEnd(p.month);
   const doc='ЦАЛИН-'+p.month;
   const base={doc, date, partner:'Ажилчид', source:'salary', batch:p.batch};
@@ -1727,7 +1794,9 @@ function impPostNdsh(){
     const old=DB.payroll.find(p=>p.month===month);
     if(old){ DB.journal=DB.journal.filter(j=>j.batch!==old.batch); DB.payroll=DB.payroll.filter(p=>p.month!==month); }
     const p={month, coPct:s.ndshCoPct, batch:nextBatch(),
-      rows:inc.map(e=>({name:e.name, reg:e.reg, tin:e.tin||((DB.employees[e.reg]||{}).tin||''), gross:e.gross, ndshE:e.ndshE, credit:e.credit}))};
+      rows:inc.map(e=>({name:e.name, lastName:e.lastName||'', firstName:e.firstName||'', reg:e.reg, type:e.type||'',
+        tin:e.tin||((DB.employees[e.reg]||{}).tin||''), gross:e.gross, ndshE:e.ndshE, ndshCo:e.ndshCo||0,
+        credit:e.credit, ...(e.creditTouched?{creditTouched:true}:{})}))};
     // Ажилтны толь баяжина: шинэ ажилтан бүртгэгдэж, мэдэгдэж буй ТТД хадгалагдана
     inc.filter(e=>e.reg).forEach(e=>{
       const known=DB.employees[e.reg]||{};
@@ -2508,15 +2577,18 @@ function renderSalary(){
     : '<span class="badge err">Журналд бичигдээгүй</span>';
   const noTin=p.rows.filter(e=>!e.tin).length;
   if(noTin) state.innerHTML+=' <span class="badge warn" title="ТТ-11 импортод ажилтан бүрийн ТТД шаардлагатай">'+noTin+' ажилтан ТТД-гүй</span>';
-  let html='<thead><tr><th>№</th><th>Овог нэр</th><th>РД</th><th title="Татвар төлөгчийн дугаар — нэг удаа оруулахад толинд хадгалагдаж дараагийн саруудад автоматаар бөглөгдөнө">ТТД</th><th class="num">Цалин</th><th class="num">Ажилтны НДШ</th><th class="num">Ногдох орлого</th><th class="num">ХХОАТ 10%</th><th class="num">Хөнгөлөлт</th><th class="num">Суутгах ХХОАТ</th><th class="num">Гарт олгох</th><th></th></tr></thead><tbody>';
-  let tG=0,tN=0,tR=0,tH=0,tNet=0;
+  let html='<thead><tr><th>№</th><th>Овог</th><th>Нэр</th><th>РД</th><th title="Даатгуулагчийн төрлийн код — НДШ хувь, 70/40 кодын тооцоог тодорхойлно">Код</th><th title="Татвар төлөгчийн дугаар — нэг удаа оруулахад толинд хадгалагдаж дараагийн саруудад автоматаар бөглөгдөнө">ТТД</th><th class="num">Цалин</th><th class="num" title="Тайлангийн бодит шимтгэл; байхгүй үед кодын хувиар">Ажилтны НДШ</th><th class="num">Ногдох орлого</th><th class="num" title="Шатлалт татвар — 120 сая хүртэл 10%">ХХОАТ</th><th class="num" title="ОЗЦ-ийн шатлалаар автомат (гараар засаж болно)">Хөнгөлөлт</th><th class="num">Суутгах ХХОАТ</th><th class="num">Гарт олгох</th><th></th></tr></thead><tbody>';
+  let tG=0,tN=0,tR=0,tH=0,tNet=0,co=0;
   p.rows.forEach((e,i)=>{
     const c=calcEmp(e);
-    tG=r2(tG+e.gross); tN=r2(tN+e.ndshE); tR=r2(tR+c.raw); tH=r2(tH+c.hhoat); tNet=r2(tNet+c.net);
+    tG=r2(tG+e.gross); tN=r2(tN+e.ndshE); tR=r2(tR+c.raw); tH=r2(tH+c.hhoat); tNet=r2(tNet+c.net); co=r2(co+coOf(e,p.coPct));
+    const nm=empNames(e);
     html+=`<tr>
       <td>${i+1}</td>
-      <td><input class="pill-input" style="min-width:140px;" value="${esc(e.name)}" onchange="updSalRow(${i},'name',this.value)"></td>
+      <td><input class="pill-input" style="min-width:110px;" value="${esc(nm.ln)}" onchange="updSalRow(${i},'lastName',this.value)"></td>
+      <td><input class="pill-input" style="min-width:110px;" value="${esc(nm.fn)}" onchange="updSalRow(${i},'firstName',this.value)"></td>
       <td><input class="pill-input" style="width:100px;" value="${esc(e.reg||'')}" onchange="updSalRow(${i},'reg',this.value)"></td>
+      <td class="mono" style="white-space:nowrap;">${esc(e.type||'')}${typeBadge(e.type)}</td>
       <td><input class="pill-input mono" style="width:96px;${e.tin?'':'border-color:var(--red);background:#FEF2F2;'}" value="${esc(e.tin||'')}" placeholder="ТТД" onchange="updSalRow(${i},'tin',this.value)"></td>
       <td class="num"><input class="pill-input mono" style="width:104px;text-align:right;" type="number" step="0.01" value="${e.gross}" onchange="updSalRow(${i},'gross',this.value)"></td>
       <td class="num"><input class="pill-input mono" style="width:92px;text-align:right;" type="number" step="0.01" value="${e.ndshE}" onchange="updSalRow(${i},'ndshE',this.value)"></td>
@@ -2528,9 +2600,8 @@ function renderSalary(){
       <td><span class="link" style="color:var(--txt-danger);" onclick="delSalRow(${i})">устгах</span></td>
     </tr>`;
   });
-  const co=r2(tG*p.coPct/100);
-  html+=`<tr class="total"><td colspan="3">НИЙТ — ${p.rows.length} ажилтан</td><td class="num">${fmtZ(tG)}</td><td class="num">${fmtZ(tN)}</td><td></td><td class="num">${fmtZ(tR)}</td><td></td><td class="num">${fmtZ(tH)}</td><td class="num">${fmtZ(tNet)}</td><td></td></tr>`;
-  html+=`<tr><td colspan="11" style="color:var(--txt-muted);">Ажил олгогчийн НДШ (${p.coPct}%): <b class="mono">${fmtZ(co)}</b> · НДШ-ийн нийт өглөг: <b class="mono">${fmtZ(r2(co+tN))}</b> · ХХОАТ-ын өглөг: <b class="mono">${fmtZ(tH)}</b></td></tr></tbody>`;
+  html+=`<tr class="total"><td colspan="6">НИЙТ — ${p.rows.length} ажилтан</td><td class="num">${fmtZ(tG)}</td><td class="num">${fmtZ(tN)}</td><td></td><td class="num">${fmtZ(tR)}</td><td></td><td class="num">${fmtZ(tH)}</td><td class="num">${fmtZ(tNet)}</td><td></td></tr>`;
+  html+=`<tr><td colspan="14" style="color:var(--txt-muted);">Ажил олгогчийн НДШ (тайлангийн бодит дүнгээр): <b class="mono">${fmtZ(co)}</b> · НДШ-ийн нийт өглөг: <b class="mono">${fmtZ(r2(co+tN))}</b> · ХХОАТ-ын өглөг: <b class="mono">${fmtZ(tH)}</b></td></tr></tbody>`;
   tbl.innerHTML=html;
 }
 function updSalRow(i, field, val){
@@ -2541,11 +2612,17 @@ function updSalRow(i, field, val){
     if(e.reg) DB.employees[e.reg]={name:e.name, tin:e.tin};   // толинд нэг удаа — үүрд
     save(); renderSalary(); return;                            // tin журналын дүнд нөлөөгүй
   }
-  if(field==='name'||field==='reg'){
+  if(field==='lastName'||field==='firstName'||field==='reg'){
+    if(field!=='reg'){ const nm=empNames(e); e.lastName=nm.ln; e.firstName=nm.fn; } // хуучин мөрийг салгаж хадгална
     e[field]=String(val).trim();
+    e.name=((e.lastName||'')+' '+(e.firstName||'')).replace(/\s+/g,' ').trim()||e.name;
     if(field==='reg' && !e.tin && DB.employees[e.reg]) e.tin=DB.employees[e.reg].tin||'';
   }
-  else e[field]=r2(val);
+  else{
+    e[field]=r2(val);
+    if(field==='credit') e.creditTouched=true;
+    if((field==='gross'||field==='ndshE') && !e.creditTouched) e.credit=autoCredit(e);
+  }
   p.dirty=true;
   save(); renderSalary();
 }
@@ -2576,15 +2653,16 @@ function exportTT11(){
     ['ТТ-11 хураангуй — Цалин, хөдөлмөрийн хөлс, шагнал урамшуулал болон тэдгээртэй адилтгах орлогоос суутгасан албан татварын тооцоолол'],
     [(DB.settings.company||'')+' — '+p.month],
     [],
-    ['№','Татвар төлөгчийн дугаар (ТТД)','Регистрийн дугаар','Овог нэр','Цалин орлого (7.1.1)','Нийт орлого','НДШ','Татвар ногдох орлого','ХХОАТ 10%','Хөнгөлөлт','Суутгасан татвар','Гарт олгох'],
+    ['№','Татвар төлөгчийн дугаар (ТТД)','Регистрийн дугаар','Овог','Нэр','Цалин орлого (7.1.1)','Нийт орлого','НДШ','Татвар ногдох орлого','Ногдуулсан ХХОАТ','Хөнгөлөлт','Суутгасан татвар','Гарт олгох'],
   ];
   let tG=0,tN=0,tT=0,tR=0,tC=0,tH=0,tNet=0;
   p.rows.forEach((e,i)=>{
     const c=calcEmp(e);
+    const nm=empNames(e);
     tG=r2(tG+e.gross); tN=r2(tN+e.ndshE); tT=r2(tT+c.taxable); tR=r2(tR+c.raw); tC=r2(tC+c.usedCredit); tH=r2(tH+c.hhoat); tNet=r2(tNet+c.net);
-    rows.push([i+1, e.tin||'', e.reg||'', e.name, e.gross, e.gross, e.ndshE, c.taxable, c.raw, c.usedCredit, c.hhoat, c.net]);
+    rows.push([i+1, e.tin||'', e.reg||'', nm.ln, nm.fn, e.gross, e.gross, e.ndshE, c.taxable, c.raw, c.usedCredit, c.hhoat, c.net]);
   });
-  rows.push(['','','','НИЙТ', tG, tG, tN, tT, tR, tC, tH, tNet]);
+  rows.push(['','','','','НИЙТ', tG, tG, tN, tT, tR, tC, tH, tNet]);
   const noTin=p.rows.filter(e=>!e.tin);
   if(noTin.length) toast(noTin.length+' ажилтны ТТД хоосон байна ('+noTin.map(e=>e.name).slice(0,3).join(', ')+(noTin.length>3?'…':'')+') — eTax импортын өмнө бөглөнө үү', true);
   xlsxSave(rows,'ТТ-11','ТТ-11_'+p.month+'.xlsx');
