@@ -303,7 +303,7 @@
         <button class="ttd-btn" id="ttdImportBtn">📥 Файлаас ТТД унших</button>
         <button class="ttd-btn" id="ttdEditBtn">✏ ТТД шалгах, гараар оруулах</button>
       </div>
-      <p class="hint">Өмнөх улирлын ХХОАТ маягт (Excel/CSV) эсвэл etax-ийн ажилтны жагсаалтыг оруулбал регистр + ТТД хосыг автоматаар танина. Оруулсан ТТД энэ хөтөчид хадгалагдаж, дараагийн улирал/жилд автоматаар бөглөгдөнө — зөвхөн шинэ ажилтных л дутна.</p>
+      <p class="hint">Өмнө нь etax-д явуулсан ХХОАТ маягтаа (энэ хэрэгслээс гарсан Excel) оруулбал <b>овог нэрээр</b> тулгаж ТТД-г автоматаар авна. Регистр + ТТД хамт байгаа файл (толийн CSV г.м.) регистрээр тулгагдана. Оруулсан ТТД энэ хөтөчид хадгалагдаж, дараагийн улирал/жилд автоматаар бөглөгдөнө — зөвхөн шинэ ажилтных л дутна.</p>
     </div>
 
     <div class="panel" id="dlPanel">
@@ -1440,8 +1440,16 @@ function refreshTTD(){
   }
 }
 
-// ---- Файлаас ТТД унших: өмнөх ХХОАТ маягт / etax ажилтны жагсаалт / өөрийн CSV ----
-// Аль ч мөрөнд регистр (2 кирилл + 8 орон) ба 12 оронт тоо ХАМТ байвал хос гэж танина.
+// ---- Файлаас ТТД унших ----
+// Хоёр аргаар танина (мөр бүрд):
+//  1) РЕГИСТРЭЭР: мөрөнд регистр (2 кирилл + 8 орон) ба 12 оронт ТТД ХАМТ
+//     байвал шууд хос гэж авна (толийн CSV, etax ажилтны жагсаалт г.м.).
+//  2) ОВОГ НЭРЭЭР: өмнө нь etax-д явуулсан ХХОАТ маягт — энэ хэрэгслийн
+//     гаралттай ЯГ ижил формат (A=ТТД, B=Овог, C=Нэр, регистргүй).
+//     ТТД-ийн дараах 2 нүдийг Овог, Нэр гэж үзээд одоо оруулсан НДШ
+//     тайлангийн ажилтнуудтай овог нэрээр тулгана. Ижил овог нэртэй
+//     хүн олдвол (маш ховор) алгасаж, гараар оруулахыг сануулна.
+const nameKey=(ln,fn)=>String(ln||'').replace(/[\s\-]/g,'').toUpperCase()+'|'+String(fn||'').replace(/[\s\-]/g,'').toUpperCase();
 $('ttdImportBtn').onclick=()=>$('ttdFileInput').click();
 $('ttdFileInput').onchange=async e=>{
   const f=e.target.files[0]; e.target.value='';
@@ -1449,24 +1457,64 @@ $('ttdFileInput').onchange=async e=>{
   try{
     const buf=await f.arrayBuffer();
     const wb=XLSX.read(buf,{type:'array'});
-    let pairs=0, changed=0;
+
+    // Одоогийн ажилтнуудын овог нэр → регистр индекс (нэрээр тулгахад)
+    const empList=aggregateByRegister().list;
+    const byName={};
+    empList.forEach(r=>{
+      const k=nameKey(r.lastName,r.firstName);
+      if(k==='|') return;
+      (byName[k]=byName[k]||[]).push(normRegKey(r.reg));
+    });
+
+    let regPairs=0, nameHits=0, changed=0, dupNames=0, unmatched=0;
     wb.SheetNames.forEach(sn=>{
       const rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,raw:true,defval:''});
       rows.forEach(row=>{
-        let reg='', ttd='';
-        row.forEach(cell=>{
+        let reg='', ttd='', ttdIdx=-1;
+        row.forEach((cell,ci)=>{
           const s=String(cell).trim();
           if(!reg){ const k=normRegKey(s); if(REG_FULL_RE.test(k)) reg=k; }
-          if(!ttd){ const d=s.replace(/[\s\-]/g,''); if(TTD_FULL_RE.test(d)) ttd=d; }
+          if(!ttd){ const d=s.replace(/[\s\-]/g,''); if(TTD_FULL_RE.test(d)){ ttd=d; ttdIdx=ci; } }
         });
-        if(reg&&ttd){ pairs++; if(TTD_DB[reg]!==ttd){ TTD_DB[reg]=ttd; changed++; } }
+        if(!ttd) return;
+        // 1) Регистр мөрөнд байвал — хамгийн найдвартай
+        if(reg){
+          regPairs++;
+          if(TTD_DB[reg]!==ttd){ TTD_DB[reg]=ttd; changed++; }
+          return;
+        }
+        // 2) Регистргүй — манай маягтын формат: ТТД-ийн дараах 2 нүд = Овог, Нэр
+        const k=nameKey(row[ttdIdx+1], row[ttdIdx+2]);
+        if(k==='|'){ unmatched++; return; }
+        const regs=byName[k];
+        if(!regs || !regs.length){ unmatched++; return; }
+        if(regs.length>1){ dupNames++; return; } // ижил овог нэр — гараар шийднэ
+        nameHits++;
+        if(TTD_DB[regs[0]]!==ttd){ TTD_DB[regs[0]]=ttd; changed++; }
       });
     });
-    if(pairs===0){
-      toast('Регистр + 12 оронт ТТД хос олдсонгүй. Нэг мөрөнд хоёулаа байх файл оруулна уу.');
+
+    const found=regPairs+nameHits;
+    if(found===0){
+      if((unmatched>0||dupNames>0) && !empList.length){
+        toast('ТТД олдсон ч тулгах ажилтан алга — эхлээд Алхам 1-д сарын НДШ тайлангаа оруулна уу.');
+      }else if(dupNames>0){
+        toast(`Ижил овог нэртэй ${dupNames} мөрийг алгаслаа — гараар оруулна уу.`+(unmatched?` ${unmatched} мөр тулгагдсангүй.`:''));
+      }else if(unmatched>0){
+        toast(`${unmatched} ТТД-ийн овог нэр одоогийн ажилтнуудтай таарсангүй. Гараар оруулна уу.`);
+      }else{
+        toast('ТТД олдсонгүй. Өмнө явуулсан ХХОАТ маягт эсвэл регистр+ТТД-тэй файл оруулна уу.');
+      }
     }else{
       saveTTD();
-      toast(`${pairs} хос танигдаж, ${changed} ТТД шинээр хадгалагдлаа ✓`);
+      const parts=[];
+      if(regPairs) parts.push(`${regPairs} регистрээр`);
+      if(nameHits) parts.push(`${nameHits} овог нэрээр`);
+      let msg=`${found} ТТД танигдлаа (${parts.join(', ')}) — ${changed} шинээр хадгалагдлаа ✓`;
+      if(dupNames) msg+=` Ижил овог нэртэй ${dupNames} мөрийг алгаслаа — гараар оруулна уу.`;
+      if(unmatched) msg+=` ${unmatched} мөр тулгагдсангүй.`;
+      toast(msg);
     }
   }catch(err){
     toast('Файл уншигдсангүй: '+(err.message||'алдаа'));
@@ -1529,7 +1577,10 @@ $('ttdExportBtn').onclick=()=>{
 };
 
 // ---- Excel export (4-sheet structure) ----
-$('dlBtn').onclick = BBIGate.protect(() => buildExcel(), {
+// gate.js ачаалагдаагүй үед (файлыг дангаар нь нээх г.м.) товч ажиллахгүй
+// болохоос сэргийлж хамгаалалттай fallback ашиглана.
+const gateProtect=(fn,meta)=>(window.BBIGate&&BBIGate.protect)?BBIGate.protect(fn,meta):fn;
+$('dlBtn').onclick = gateProtect(() => buildExcel(), {
   tool: 'НДШ/ХХОАТ хөрвүүлэгч',
   action: 'download'
 });
