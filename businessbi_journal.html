@@ -356,14 +356,14 @@ tr.set-detail>td{background:var(--bg-row)!important;padding:8px 10px 12px 34px;}
       <div class="note">НӨАТ-тэй гүйлгээ импортлоход цэвэр дүн = нийт ÷ (1 + НӨАТ%). ААНОАТ нь хаалтын бичилтэд ашигтай үед автоматаар тооцогдоно.</div>
       <h3 style="margin-top:14px;">Хаалтын дансууд</h3>
       <div class="grid2">
-        <div class="field"><label>Орлого зардлын нэгдсэн данс</label><input id="stAccSummary"></div>
-        <div class="field"><label>Орлогын татварын зардал</label><input id="stAccTaxExp"></div>
-        <div class="field"><label>ААНОАТ-ын өглөг</label><input id="stAccTaxPay"></div>
-        <div class="field"><label>Тайлант үеийн ашиг</label><input id="stAccProfit"></div>
-        <div class="field"><label>Хуримтлагдсан ашиг</label><input id="stAccRetained"></div>
-        <div class="field"><label>Дансны өглөг (аккруэл)</label><input id="stAccPayable"></div>
-        <div class="field"><label>Дансны авлага (аккруэл)</label><input id="stAccReceivable"></div>
-        <div class="field"><label>НӨАТ-ын авлага / өглөг</label><div style="display:flex;gap:6px;"><input id="stAccVatIn" style="flex:1;" class="pill-input"><input id="stAccVatOut" style="flex:1;" class="pill-input"></div></div>
+        <div class="field"><label>Орлого зардлын нэгдсэн данс</label><input id="stAccSummary" list="accList"></div>
+        <div class="field"><label>Орлогын татварын зардал</label><input id="stAccTaxExp" list="accList"></div>
+        <div class="field"><label>ААНОАТ-ын өглөг</label><input id="stAccTaxPay" list="accList"></div>
+        <div class="field"><label>Тайлант үеийн ашиг</label><input id="stAccProfit" list="accList"></div>
+        <div class="field"><label>Хуримтлагдсан ашиг</label><input id="stAccRetained" list="accList"></div>
+        <div class="field"><label>Дансны өглөг (аккруэл)</label><input id="stAccPayable" list="accList"></div>
+        <div class="field"><label>Дансны авлага (аккруэл)</label><input id="stAccReceivable" list="accList"></div>
+        <div class="field"><label>НӨАТ-ын авлага / өглөг</label><div style="display:flex;gap:6px;"><input id="stAccVatIn" list="accList" style="flex:1;" class="pill-input"><input id="stAccVatOut" list="accList" style="flex:1;" class="pill-input"></div></div>
       </div>
     </div>
   </div>
@@ -1007,6 +1007,10 @@ document.getElementById('tabstrip').addEventListener('click', e=>{
   const t=e.target.closest('.rtab'); if(t) nav(t.dataset.default);
 });
 function refreshDots(){
+  // Данс, харилцагчийн datalist-ийг ямар ч хуудаснаас үл хамааран байнга шинэ байлгана
+  // (өмнө нь зөвхөн Данс/Харилцагч хуудас нээгдэхэд бөглөгддөг байсан тул
+  //  Гар бичилт зэрэг цонхнуудад жагсаалт хоосон гарч байсан)
+  fillAccDatalist(); fillPartnerDatalist();
   const set=(id,state)=>{ const el=document.getElementById(id); if(el){ el.className='sb-dot'+(state?' '+state:''); } };
   const s=DB.settings;
   set('dot-settings', s.company? 'ok':'warn');
@@ -2359,6 +2363,7 @@ function deleteDoc(doc){
 }
 function editDoc(doc){
   const es=guardMutable(doc); if(!es) return;
+  fillAccDatalist(); fillPartnerDatalist();
   document.getElementById('jeTitle').textContent='Баримт засах — №'+doc;
   document.getElementById('jeEditDoc').value=doc;
   document.getElementById('jeVatNote').style.display=(es[0].source==='vatbuy'||es[0].source==='vatsale')?'':'none';
@@ -2392,6 +2397,7 @@ function stornoDoc(doc){
 function openJEntry(){
   if(!DB.accounts.length){ toast('Эхлээд дансны төлөвлөгөө үүсгэнэ үү', true); nav('accounts'); return; }
   if(periodClosed()){ toast('Тайлант үе хаагдсан — шинэ бичилт нэмэхийн өмнө хаалтыг буцаана уу', true); return; }
+  fillAccDatalist(); fillPartnerDatalist();
   document.getElementById('jeTitle').textContent='Гар бичилт';
   document.getElementById('jeEditDoc').value='';
   document.getElementById('jeVatNote').style.display='none';
