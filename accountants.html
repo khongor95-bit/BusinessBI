@@ -49,6 +49,7 @@ header{background:#fff;padding:20px 0;border-bottom:1px solid #e5e5e5;position:s
 .acc-card:hover{transform:translateY(-6px);box-shadow:0 18px 40px -22px rgba(0,0,0,.4)}
 .acc-top{padding:24px 24px 0;display:flex;gap:16px;align-items:center}
 .acc-photo{width:64px;height:64px;border-radius:16px;object-fit:cover;flex-shrink:0;background:#eee}
+.acc-initials{width:64px;height:64px;border-radius:16px;flex-shrink:0;background:#f3ecd9;color:#7a6534;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800}
 .acc-name-wrap{flex:1;min-width:0}
 .acc-name{font-size:19px;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:6px}
 .verified{width:16px;height:16px;flex-shrink:0}
@@ -78,7 +79,7 @@ header{background:#fff;padding:20px 0;border-bottom:1px solid #e5e5e5;position:s
 .modal-close{position:absolute;top:18px;right:18px;width:38px;height:38px;border-radius:50%;background:#f0f0f0;border:none;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2}
 .modal-close:hover{background:#e5e5e5}
 .modal-hero{padding:36px 36px 0;display:flex;gap:20px;align-items:center}
-.modal-hero img{width:88px;height:88px;border-radius:20px;object-fit:cover;background:#eee}
+.modal-hero img,.modal-hero .acc-initials{width:88px;height:88px;border-radius:20px;object-fit:cover;background:#eee;font-size:32px}
 .modal-hero h2{font-size:26px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
 .modal-hero .ml{font-size:15px;color:#888;margin-top:4px}
 .modal-hero .mr{font-size:15px;font-weight:600;margin-top:8px}
@@ -98,6 +99,29 @@ header{background:#fff;padding:20px 0;border-bottom:1px solid #e5e5e5;position:s
 .b-msg{background:#0084ff;color:#fff}
 .b-mail{background:#f3ecd9;color:#7a6534}
 
+/* LEAD & REVIEW FORMS */
+.lead-form{background:#f8f8f8;border-radius:16px;padding:20px}
+.lead-form input,.lead-form select,.lead-form textarea{width:100%;padding:12px 14px;border:1px solid #e5e5e5;border-radius:12px;font-size:15px;font-family:inherit;background:#fff;color:#111;margin-bottom:10px}
+.lead-form textarea{resize:vertical;min-height:70px}
+.lead-form input:focus,.lead-form select:focus,.lead-form textarea:focus{outline:2px solid #b79a63;outline-offset:1px;border-color:transparent}
+.lead-form .row2{display:flex;gap:10px}
+.lead-form .row2 input{flex:1}
+.btn-gold{width:100%;background:#b79a63;color:#fff;border:none;padding:15px;border-radius:14px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;transition:.15s}
+.btn-gold:hover{background:#a68952;transform:translateY(-1px)}
+.btn-gold:disabled{opacity:.6;cursor:default;transform:none}
+.form-ok{background:#e8f5e9;color:#1b5e20;border-radius:12px;padding:14px;font-size:14px;font-weight:600;text-align:center}
+.form-err{background:#fdecea;color:#b71c1c;border-radius:12px;padding:12px;font-size:14px;margin-bottom:10px}
+.review-item{border-top:1px solid #f0f0f0;padding:12px 0}
+.review-item:first-child{border-top:none;padding-top:0}
+.review-head{display:flex;justify-content:space-between;font-size:14px;font-weight:600}
+.review-head .stars{color:#f0a500}
+.review-item p{font-size:14px;color:#555;margin-top:4px}
+.review-toggle{background:none;border:none;color:#b79a63;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;padding:0;margin-top:10px}
+.star-pick{display:flex;gap:6px;margin-bottom:10px;font-size:26px;cursor:pointer;user-select:none}
+.star-pick span{color:#ddd;transition:color .1s}
+.star-pick span.on{color:#f0a500}
+.notice{background:#fff8e6;border:1px solid #f0e2bb;color:#7a6534;border-radius:14px;padding:14px 18px;font-size:14px;margin-bottom:24px;display:none}
+
 /* FOOTER */
 footer{background:#111;color:#fff;padding:50px 0 36px}
 .foot-inner{display:flex;justify-content:space-between;flex-wrap:wrap;gap:24px;align-items:center}
@@ -109,6 +133,7 @@ footer{background:#111;color:#fff;padding:50px 0 36px}
 .foot-links a:hover{color:#b79a63}
 
 .empty{grid-column:1/-1;text-align:center;padding:60px;color:#888;font-size:16px}
+.skeleton{grid-column:1/-1;text-align:center;padding:60px;color:#aaa;font-size:15px}
 
 @media(max-width:1100px){.grid{grid-template-columns:repeat(2,1fr)}.page-head h1{font-size:42px}}
 @media(max-width:768px){
@@ -122,6 +147,7 @@ footer{background:#111;color:#fff;padding:50px 0 36px}
   .band{padding:40px 28px}.band h2{font-size:28px}
   .modal-hero{flex-direction:column;text-align:center;padding:36px 24px 0}
   .modal-body{padding:24px}
+  .lead-form .row2{flex-direction:column;gap:0}
 }
 *:focus-visible{outline:2px solid #b79a63;outline-offset:3px}
 </style>
@@ -147,6 +173,8 @@ footer{background:#111;color:#fff;padding:50px 0 36px}
     <h1>Итгэмжтэй <em>нягтлантай</em> холбоно</h1>
     <p>Тайлан хийлгэх хүн хайж зовох хэрэггүй. Манай баталгаажсан, үнэлгээтэй нягтлангуудаас сонгоод шууд холбогд. Бид зуучлагч биш — итгэл, баталгаа өгч холбоно.</p>
   </section>
+
+  <div class="notice" id="notice">Одоогоор жишээ мэдээлэл харагдаж байна — жинхэнэ нягтлангууд удахгүй нэмэгдэнэ.</div>
 
   <div class="filters">
     <input type="text" id="search" placeholder="🔍 Нэр, чиглэлээр хайх...">
@@ -174,14 +202,14 @@ footer{background:#111;color:#fff;padding:50px 0 36px}
     <span class="count" id="count"></span>
   </div>
 
-  <div class="grid" id="grid"></div>
+  <div class="grid" id="grid"><div class="skeleton">Ачааллаж байна…</div></div>
 
   <div class="band">
     <div>
       <h2>Нягтлан бол элсэх үү?</h2>
       <p>Хэрэглэгч хайхаа болиод, тогтмол захиалга авмаар байна уу? Эхний баталгаажсан агентуудын нэг бол.</p>
     </div>
-    <a href="index.html#contact">Нягтлан болж бүртгүүлэх</a>
+    <a href="accountant_signup.html">Нягтлан болж бүртгүүлэх</a>
   </div>
 </div>
 
@@ -194,6 +222,7 @@ footer{background:#111;color:#fff;padding:50px 0 36px}
     <div class="foot-links">
       <a href="index.html#tools">Хэрэгслүүд</a>
       <a href="accountants.html">Тайлан гаргах үйлчилгээ</a>
+      <a href="accountant_signup.html">Нягтлан болж элсэх</a>
       <a href="index.html#contact">Холбоо барих</a>
     </div>
   </div>
@@ -204,44 +233,53 @@ footer{background:#111;color:#fff;padding:50px 0 36px}
   <div class="modal" id="modal"></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-/* ===== ЖИШЭЭ ДАТА — дараа нь Firebase-ээр солино ===== */
-const ACCOUNTANTS = [
-  {id:1, name:"Б. Оюунчимэг", photo:"https://i.pravatar.cc/160?img=47", verified:true,
+/* ===== SUPABASE ===== */
+const SB_URL = 'https://mpfjceziasadnswwnkpc.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wZmpjZXppYXNhZG5zd3dua3BjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDY3MDMsImV4cCI6MjA5ODI4MjcwM30.LJ1Fh2TGjyPDv6EeTDzlhcR0S3WkUHhy2yRxnop940A';
+const sb = window.supabase.createClient(SB_URL, SB_KEY);
+
+/* ===== FALLBACK ЖИШЭЭ ДАТА (DB хоосон/алдаатай үед л харагдана) ===== */
+const SAMPLE = [
+  {id:'s1', name:"Б. Оюунчимэг", photo_url:"https://i.pravatar.cc/160?img=47", verified:true,
    location:"Улаанбаатар", specialties:["Татварын тайлан","НӨАТ","Жижиг бизнес"],
    bio:"15 жилийн туршлагатай ТМЗ. Жижиг, дунд бизнесийн татвар, санхүүгийн тайланг хариуцлагатай хийнэ.",
-   experience:15, priceFrom:150000, rating:4.9, reviews:38,
-   phone:"99112233", messenger:"businessbi", mail:"oyunchimeg@example.mn"},
-  {id:2, name:"Г. Батбаяр", photo:"https://i.pravatar.cc/160?img=12", verified:true,
+   experience:15, price_from:150000, rating:4.9, review_count:38,
+   phone:"99112233", messenger:"businessbi", email:"oyunchimeg@example.mn", sample:true},
+  {id:'s2', name:"Г. Батбаяр", photo_url:"https://i.pravatar.cc/160?img=12", verified:true,
    location:"Улаанбаатар", specialties:["Санхүүгийн тайлан","Аудит"],
    bio:"Аудитор, CPA. Компанийн санхүүгийн тайлан, дотоод хяналт, аудитад мэргэшсэн.",
-   experience:12, priceFrom:300000, rating:4.8, reviews:24,
-   phone:"99223344", messenger:"businessbi", mail:"batbayar@example.mn"},
-  {id:3, name:"С. Энхтуяа", photo:"https://i.pravatar.cc/160?img=32", verified:true,
+   experience:12, price_from:300000, rating:4.8, review_count:24,
+   phone:"99223344", messenger:"businessbi", email:"batbayar@example.mn", sample:true},
+  {id:'s3', name:"С. Энхтуяа", photo_url:"https://i.pravatar.cc/160?img=32", verified:true,
    location:"Дархан", specialties:["Цалин, НДШ","Жижиг бизнес"],
    bio:"Цалин бодолт, НДШ, ХХОАТ суутгал, ажилтны бүртгэлийг бүрэн хариуцна. Хурдан, найдвартай.",
-   experience:8, priceFrom:120000, rating:4.7, reviews:19,
-   phone:"99334455", messenger:"businessbi", mail:"enkhtuya@example.mn"},
-  {id:4, name:"Д. Мөнхзул", photo:"https://i.pravatar.cc/160?img=45", verified:false,
+   experience:8, price_from:120000, rating:4.7, review_count:19,
+   phone:"99334455", messenger:"businessbi", email:"enkhtuya@example.mn", sample:true},
+  {id:'s4', name:"Д. Мөнхзул", photo_url:"https://i.pravatar.cc/160?img=45", verified:false,
    location:"Улаанбаатар", specialties:["Татварын тайлан","Цалин, НДШ"],
    bio:"Жижиг бизнес эрхлэгчдэд зориулсан сар бүрийн татвар, цалингийн тайлан. Боломжийн үнэ.",
-   experience:5, priceFrom:90000, rating:4.6, reviews:11,
-   phone:"99445566", messenger:"businessbi", mail:"munkhzul@example.mn"},
-  {id:5, name:"Т. Ганболд", photo:"https://i.pravatar.cc/160?img=15", verified:true,
+   experience:5, price_from:90000, rating:4.6, review_count:11,
+   phone:"99445566", messenger:"businessbi", email:"munkhzul@example.mn", sample:true},
+  {id:'s5', name:"Т. Ганболд", photo_url:"https://i.pravatar.cc/160?img=15", verified:true,
    location:"Эрдэнэт", specialties:["Санхүүгийн тайлан","НӨАТ","Татварын тайлан"],
    bio:"Уул уурхай, үйлдвэрлэлийн салбарын санхүү, татварын тайланд туршлагатай нягтлан.",
-   experience:18, priceFrom:250000, rating:5.0, reviews:42,
-   phone:"99556677", messenger:"businessbi", mail:"ganbold@example.mn"},
-  {id:6, name:"Н. Сарантуяа", photo:"https://i.pravatar.cc/160?img=20", verified:true,
+   experience:18, price_from:250000, rating:5.0, review_count:42,
+   phone:"99556677", messenger:"businessbi", email:"ganbold@example.mn", sample:true},
+  {id:'s6', name:"Н. Сарантуяа", photo_url:"https://i.pravatar.cc/160?img=20", verified:true,
    location:"Улаанбаатар", specialties:["Жижиг бизнес","НӨАТ","Цалин, НДШ"],
    bio:"Старт-ап болон жижиг бизнест ээлтэй. Эрхэт, e-Tax системээр хурдан, цэгцтэй ажиллана.",
-   experience:7, priceFrom:110000, rating:4.8, reviews:27,
-   phone:"99667788", messenger:"businessbi", mail:"sarantuya@example.mn"},
+   experience:7, price_from:110000, rating:4.8, review_count:27,
+   phone:"99667788", messenger:"businessbi", email:"sarantuya@example.mn", sample:true},
 ];
+
+let ACCOUNTANTS = [];
 
 const VERIFIED_ICON = `<svg class="verified" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 1.8 3-.3 1 2.8 2.6 1.5-.8 2.9.8 2.9-2.6 1.5-1 2.8-3-.3L12 22l-2.4-1.8-3 .3-1-2.8L3 16.5l.8-2.9L3 10.7l2.6-1.5 1-2.8 3 .3L12 2z" fill="#b79a63"/><path d="M8.5 12l2.3 2.3 4.7-4.7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
-const fmt = n => n.toLocaleString('en-US').replace(/,/g,'\u2019');
+const fmt = n => Number(n).toLocaleString('en-US').replace(/,/g,'\u2019');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const grid = document.getElementById('grid');
 const search = document.getElementById('search');
 const fLoc = document.getElementById('fLoc');
@@ -249,21 +287,54 @@ const fSpec = document.getElementById('fSpec');
 const fSort = document.getElementById('fSort');
 const count = document.getElementById('count');
 
+function initials(name){
+  const parts = String(name).replace(/\./g,' ').trim().split(/\s+/);
+  return (parts[0]?.[0]||'') + (parts[1]?.[0]||'');
+}
+function photoHTML(a, cls){
+  return a.photo_url
+    ? `<img class="${cls}" src="${esc(a.photo_url)}" alt="${esc(a.name)}" onerror="this.outerHTML='<div class=&quot;acc-initials&quot;>${esc(initials(a.name))}</div>'">`
+    : `<div class="acc-initials">${esc(initials(a.name))}</div>`;
+}
+
+async function loadAccountants(){
+  try{
+    const { data, error } = await sb
+      .from('mp_accountants')
+      .select('*')
+      .eq('status','approved')
+      .order('verified',{ascending:false})
+      .order('rating',{ascending:false});
+    if(error) throw error;
+    if(data && data.length){
+      ACCOUNTANTS = data;
+    } else {
+      ACCOUNTANTS = SAMPLE;
+      document.getElementById('notice').style.display='block';
+    }
+  }catch(e){
+    console.error('mp load:', e);
+    ACCOUNTANTS = SAMPLE;
+    document.getElementById('notice').style.display='block';
+  }
+  render();
+}
+
 function cardHTML(a){
   return `<article class="acc-card" data-id="${a.id}">
     <div class="acc-top">
-      <img class="acc-photo" src="${a.photo}" alt="${a.name}">
+      ${photoHTML(a,'acc-photo')}
       <div class="acc-name-wrap">
-        <div class="acc-name">${a.name}${a.verified?VERIFIED_ICON:''}</div>
-        <div class="acc-loc">${a.location} · ${a.experience} жил туршлага</div>
+        <div class="acc-name">${esc(a.name)}${a.verified?VERIFIED_ICON:''}</div>
+        <div class="acc-loc">${esc(a.location)} · ${a.experience} жил туршлага</div>
       </div>
     </div>
     <div class="acc-body">
-      <p class="acc-bio">${a.bio}</p>
-      <div class="tags">${a.specialties.slice(0,3).map(s=>`<span class="tag-pill">${s}</span>`).join('')}</div>
+      <p class="acc-bio">${esc(a.bio)}</p>
+      <div class="tags">${(a.specialties||[]).slice(0,3).map(s=>`<span class="tag-pill">${esc(s)}</span>`).join('')}</div>
       <div class="acc-foot">
-        <span class="rating"><span class="star">★</span> ${a.rating.toFixed(1)} <span style="color:#aaa;font-weight:400">(${a.reviews})</span></span>
-        <span class="price-from">эхлэх <b>₮${fmt(a.priceFrom)}</b></span>
+        <span class="rating"><span class="star">★</span> ${Number(a.rating||0).toFixed(1)} <span style="color:#aaa;font-weight:400">(${a.review_count||0})</span></span>
+        <span class="price-from">эхлэх <b>₮${fmt(a.price_from)}</b></span>
       </div>
     </div>
   </article>`;
@@ -272,56 +343,194 @@ function cardHTML(a){
 function render(){
   let list = ACCOUNTANTS.filter(a=>{
     const q = search.value.trim().toLowerCase();
-    const matchQ = !q || a.name.toLowerCase().includes(q) || a.specialties.some(s=>s.toLowerCase().includes(q)) || a.bio.toLowerCase().includes(q);
+    const matchQ = !q || a.name.toLowerCase().includes(q) || (a.specialties||[]).some(s=>s.toLowerCase().includes(q)) || (a.bio||'').toLowerCase().includes(q);
     const matchLoc = !fLoc.value || a.location===fLoc.value;
-    const matchSpec = !fSpec.value || a.specialties.includes(fSpec.value);
+    const matchSpec = !fSpec.value || (a.specialties||[]).includes(fSpec.value);
     return matchQ && matchLoc && matchSpec;
   });
   const s = fSort.value;
-  list.sort((x,y)=> s==='priceLow' ? x.priceFrom-y.priceFrom : s==='exp' ? y.experience-x.experience : y.rating-x.rating);
+  list.sort((x,y)=> s==='priceLow' ? x.price_from-y.price_from : s==='exp' ? y.experience-x.experience : y.rating-x.rating);
   grid.innerHTML = list.length ? list.map(cardHTML).join('') : `<div class="empty">Тохирох нягтлан олдсонгүй. Шүүлтүүрээ өөрчилж үзээрэй.</div>`;
   count.textContent = `${list.length} нягтлан`;
 }
+
+/* ===== MODAL ===== */
+const SERVICES = ["Татварын тайлан","Цалин, НДШ","Санхүүгийн тайлан","НӨАТ","Аудит","Бусад"];
 
 function openModal(a){
   const modal = document.getElementById('modal');
   modal.innerHTML = `
     <button class="modal-close" id="mClose" aria-label="Хаах">×</button>
     <div class="modal-hero">
-      <img src="${a.photo}" alt="${a.name}">
+      ${photoHTML(a,'')}
       <div>
-        <h2>${a.name}${a.verified?VERIFIED_ICON:''}</h2>
-        <div class="ml">${a.location}</div>
-        <div class="mr"><span class="star">★</span> ${a.rating.toFixed(1)} · ${a.reviews} үнэлгээ</div>
+        <h2>${esc(a.name)}${a.verified?VERIFIED_ICON:''}</h2>
+        <div class="ml">${esc(a.location)}</div>
+        <div class="mr"><span class="star">★</span> ${Number(a.rating||0).toFixed(1)} · ${a.review_count||0} үнэлгээ</div>
       </div>
     </div>
     <div class="modal-body">
       <div class="modal-stats">
         <div class="mstat"><b>${a.experience}</b><span>жил туршлага</span></div>
-        <div class="mstat"><b>₮${fmt(a.priceFrom)}</b><span>эхлэх үнэ</span></div>
-        <div class="mstat"><b>${a.reviews}</b><span>захиалга</span></div>
+        <div class="mstat"><b>₮${fmt(a.price_from)}</b><span>эхлэх үнэ</span></div>
+        <div class="mstat"><b>${a.review_count||0}</b><span>үнэлгээ</span></div>
       </div>
       <div class="modal-section">
         <h4>Танилцуулга</h4>
-        <p>${a.bio}</p>
+        <p>${esc(a.bio)}</p>
       </div>
       <div class="modal-section">
         <h4>Мэргэшсэн чиглэл</h4>
-        <div class="tags">${a.specialties.map(s=>`<span class="tag-pill">${s}</span>`).join('')}</div>
+        <div class="tags">${(a.specialties||[]).map(s=>`<span class="tag-pill">${esc(s)}</span>`).join('')}</div>
       </div>
       <div class="modal-section">
-        <h4>Холбогдох</h4>
+        <h4>Хүсэлт илгээх</h4>
+        <div class="lead-form" id="leadForm">
+          <div id="leadErr"></div>
+          <div class="row2">
+            <input type="text" id="lName" placeholder="Таны нэр *">
+            <input type="tel" id="lPhone" placeholder="Утас *">
+          </div>
+          <input type="text" id="lCompany" placeholder="Компани / бизнесийн нэр">
+          <select id="lService">
+            <option value="">Ямар үйлчилгээ хэрэгтэй вэ?</option>
+            ${SERVICES.map(s=>`<option>${s}</option>`).join('')}
+          </select>
+          <textarea id="lMsg" placeholder="Товч тайлбар (сар бүрийн тайлан уу, нэг удаагийн ажил уу...)"></textarea>
+          <button class="btn-gold" id="lSend">Хүсэлт илгээх</button>
+        </div>
+      </div>
+      <div class="modal-section">
+        <h4>Шууд холбогдох</h4>
         <div class="contact-btns">
-          <a class="b-call" href="tel:+976${a.phone}">📞 ${a.phone}</a>
-          <a class="b-msg" href="https://m.me/${a.messenger}" target="_blank" rel="noopener">💬 Messenger</a>
-          <a class="b-mail" href="mailto:${a.mail}">✉️ Имэйл</a>
+          <a class="b-call" href="tel:+976${esc(a.phone)}">📞 ${esc(a.phone)}</a>
+          ${a.messenger?`<a class="b-msg" href="https://m.me/${esc(a.messenger)}" target="_blank" rel="noopener">💬 Messenger</a>`:''}
+          ${a.email?`<a class="b-mail" href="mailto:${esc(a.email)}">✉️ Имэйл</a>`:''}
+        </div>
+      </div>
+      <div class="modal-section">
+        <h4>Үнэлгээ</h4>
+        <div id="revList"><p style="color:#999;font-size:14px">Ачааллаж байна…</p></div>
+        <button class="review-toggle" id="revToggle">+ Үнэлгээ үлдээх</button>
+        <div class="lead-form" id="revForm" style="display:none;margin-top:12px">
+          <div id="revErr"></div>
+          <div class="star-pick" id="starPick">${[1,2,3,4,5].map(i=>`<span data-v="${i}">★</span>`).join('')}</div>
+          <input type="text" id="rName" placeholder="Таны нэр *">
+          <textarea id="rComment" placeholder="Сэтгэгдэл (заавал биш)"></textarea>
+          <button class="btn-gold" id="rSend">Илгээх</button>
         </div>
       </div>
     </div>`;
   document.getElementById('modalBg').classList.add('open');
   document.body.style.overflow='hidden';
   document.getElementById('mClose').onclick = closeModal;
+
+  loadReviews(a);
+  bindLeadForm(a);
+  bindReviewForm(a);
 }
+
+async function loadReviews(a){
+  const box = document.getElementById('revList');
+  if(a.sample){ box.innerHTML = `<p style="color:#999;font-size:14px">Үнэлгээ одоогоор алга.</p>`; return; }
+  try{
+    const { data, error } = await sb
+      .from('mp_reviews')
+      .select('reviewer_name,rating,comment,created_at')
+      .eq('accountant_id', a.id)
+      .eq('approved', true)
+      .order('created_at',{ascending:false})
+      .limit(10);
+    if(error) throw error;
+    if(!data || !data.length){
+      box.innerHTML = `<p style="color:#999;font-size:14px">Үнэлгээ одоогоор алга. Та эхнийх нь болоорой.</p>`;
+      return;
+    }
+    box.innerHTML = data.map(r=>`
+      <div class="review-item">
+        <div class="review-head">
+          <span>${esc(r.reviewer_name)}</span>
+          <span class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+        </div>
+        ${r.comment?`<p>${esc(r.comment)}</p>`:''}
+      </div>`).join('');
+  }catch(e){
+    box.innerHTML = `<p style="color:#999;font-size:14px">Үнэлгээ ачаалж чадсангүй.</p>`;
+  }
+}
+
+function bindLeadForm(a){
+  document.getElementById('lSend').onclick = async ()=>{
+    const name = document.getElementById('lName').value.trim();
+    const phone = document.getElementById('lPhone').value.trim();
+    const err = document.getElementById('leadErr');
+    err.innerHTML = '';
+    if(!name || !phone){
+      err.innerHTML = `<div class="form-err">Нэр, утасны дугаараа оруулна уу.</div>`;
+      return;
+    }
+    const btn = document.getElementById('lSend');
+    btn.disabled = true; btn.textContent = 'Илгээж байна…';
+    try{
+      const { error } = await sb.from('mp_leads').insert({
+        accountant_id: a.sample ? null : a.id,
+        client_name: name,
+        client_phone: phone,
+        company: document.getElementById('lCompany').value.trim() || null,
+        service: document.getElementById('lService').value || null,
+        message: (a.sample ? `[Жишээ профайл: ${a.name}] ` : '') + (document.getElementById('lMsg').value.trim() || '')
+      });
+      if(error) throw error;
+      if(window.BBIGate?.isLoggedIn?.()) BBIGate.logActivity('lead_sent', { toolName:'Нягтлан холбох', accountant:a.name });
+      document.getElementById('leadForm').innerHTML =
+        `<div class="form-ok">✓ Хүсэлт илгээгдлээ! ${esc(a.name)} тантай удахгүй холбогдоно.</div>`;
+    }catch(e){
+      console.error('lead:', e);
+      btn.disabled = false; btn.textContent = 'Хүсэлт илгээх';
+      err.innerHTML = `<div class="form-err">Алдаа гарлаа. Дахин оролдоно уу, эсвэл доорх утсаар шууд холбогдоорой.</div>`;
+    }
+  };
+}
+
+function bindReviewForm(a){
+  let picked = 0;
+  const pick = document.getElementById('starPick');
+  pick.onclick = e=>{
+    const v = e.target.dataset.v;
+    if(!v) return;
+    picked = +v;
+    [...pick.children].forEach((s,i)=>s.classList.toggle('on', i < picked));
+  };
+  document.getElementById('revToggle').onclick = ()=>{
+    const f = document.getElementById('revForm');
+    f.style.display = f.style.display==='none' ? 'block' : 'none';
+  };
+  document.getElementById('rSend').onclick = async ()=>{
+    const name = document.getElementById('rName').value.trim();
+    const err = document.getElementById('revErr');
+    err.innerHTML = '';
+    if(a.sample){ err.innerHTML = `<div class="form-err">Жишээ профайлд үнэлгээ өгөх боломжгүй.</div>`; return; }
+    if(!name || !picked){ err.innerHTML = `<div class="form-err">Нэр болон одоо сонгоно уу.</div>`; return; }
+    const btn = document.getElementById('rSend');
+    btn.disabled = true; btn.textContent = 'Илгээж байна…';
+    try{
+      const { error } = await sb.from('mp_reviews').insert({
+        accountant_id: a.id,
+        reviewer_name: name,
+        rating: picked,
+        comment: document.getElementById('rComment').value.trim() || null
+      });
+      if(error) throw error;
+      document.getElementById('revForm').innerHTML =
+        `<div class="form-ok">✓ Баярлалаа! Үнэлгээ тань шалгагдсаны дараа нийтлэгдэнэ.</div>`;
+    }catch(e){
+      console.error('review:', e);
+      btn.disabled = false; btn.textContent = 'Илгээх';
+      err.innerHTML = `<div class="form-err">Алдаа гарлаа. Дахин оролдоно уу.</div>`;
+    }
+  };
+}
+
 function closeModal(){
   document.getElementById('modalBg').classList.remove('open');
   document.body.style.overflow='';
@@ -330,15 +539,18 @@ function closeModal(){
 grid.addEventListener('click', e=>{
   const card = e.target.closest('.acc-card');
   if(card){
-    const a = ACCOUNTANTS.find(x=>x.id==card.dataset.id);
-    // Нягтлангийн холбоо барих мэдээлэл харахын тулд нэвтрэлт шаардана
-    if(BBIGate.isLoggedIn()){
+    const a = ACCOUNTANTS.find(x=>String(x.id)===String(card.dataset.id));
+    if(!a) return;
+    // Нягтлангийн дэлгэрэнгүй харахын тулд нэвтрэлт шаардана
+    if(window.BBIGate?.isLoggedIn?.()){
       BBIGate.logActivity('tool_open', { toolName:'Нягтлан холбох', accountant:a.name });
       openModal(a);
-    } else {
+    } else if(window.BBIGate){
       window.__bbiPendingAcc = a;
       BBIGate.openLogin();
       const iv = setInterval(()=>{ if(BBIGate.isLoggedIn()){ clearInterval(iv); const acc=window.__bbiPendingAcc; window.__bbiPendingAcc=null; if(acc){ BBIGate.logActivity('tool_open',{toolName:'Нягтлан холбох',accountant:acc.name}); openModal(acc); } } }, 400);
+    } else {
+      openModal(a);
     }
   }
 });
@@ -350,7 +562,7 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
 const burger=document.getElementById('burger'), menu=document.getElementById('menu');
 burger.addEventListener('click',()=>{burger.classList.toggle('open');menu.classList.toggle('open');});
 
-render();
+loadAccountants();
 </script>
 </body>
 </html>

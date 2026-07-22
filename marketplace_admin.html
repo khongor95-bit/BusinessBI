@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketplace админ — BusinessBI.mn</title>
+<meta name="robots" content="noindex,nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+body{background:#f8f8f8;color:#111}
+.container{width:94%;max-width:1100px;margin:auto;padding:30px 0 80px}
+h1{font-size:26px;font-weight:800;letter-spacing:-.02em}
+h1 span{color:#b79a63}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;flex-wrap:wrap;gap:12px}
+.topbar .who{font-size:14px;color:#888}
+.btn{border:none;border-radius:12px;padding:10px 18px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;transition:.15s}
+.btn:hover{transform:translateY(-1px)}
+.btn-dark{background:#111;color:#fff}
+.btn-gold{background:#b79a63;color:#fff}
+.btn-green{background:#2e7d32;color:#fff}
+.btn-red{background:#c62828;color:#fff}
+.btn-gray{background:#eee;color:#444}
+.btn-sm{padding:7px 13px;font-size:13px;border-radius:10px}
+
+.login-box{max-width:420px;margin:100px auto;background:#fff;border-radius:24px;padding:44px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.login-box p{color:#777;font-size:15px;margin:12px 0 24px;line-height:1.6}
+
+.tabs{display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap}
+.tab{background:#fff;border:1.5px solid #e5e5e5;border-radius:20px;padding:10px 20px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;color:#555}
+.tab.on{background:#111;border-color:#111;color:#fff}
+.tab .badge{background:#b79a63;color:#fff;border-radius:10px;padding:1px 8px;font-size:12px;margin-left:6px}
+
+.card{background:#fff;border-radius:18px;padding:22px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card .head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.card .title{font-size:17px;font-weight:700}
+.card .sub{font-size:14px;color:#888;margin-top:3px}
+.card .meta{font-size:14px;color:#555;line-height:1.7;margin-top:10px}
+.card .meta b{color:#111}
+.pill{display:inline-block;font-size:12px;font-weight:700;border-radius:20px;padding:4px 12px}
+.p-pending{background:#fff3e0;color:#e65100}
+.p-approved{background:#e8f5e9;color:#1b5e20}
+.p-rejected{background:#fdecea;color:#b71c1c}
+.p-new{background:#e3f2fd;color:#0d47a1}
+.p-contacted{background:#fff3e0;color:#e65100}
+.p-closed{background:#eee;color:#555}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.empty{text-align:center;color:#999;padding:60px 0;font-size:15px}
+.msg{background:#fdecea;color:#b71c1c;border-radius:12px;padding:14px;margin-bottom:16px;font-size:14px;display:none}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="login-box" id="loginBox" style="display:none">
+    <h1>BBI <span>Admin</span></h1>
+    <p>Marketplace удирдлагад нэвтрэхийн тулд админ эрхтэй Google хаягаар нэвтэрнэ үү.</p>
+    <button class="btn btn-dark" id="btnLogin">Google-ээр нэвтрэх</button>
+  </div>
+
+  <div id="panel" style="display:none">
+    <div class="topbar">
+      <h1>Marketplace <span>админ</span></h1>
+      <div style="display:flex;gap:12px;align-items:center">
+        <span class="who" id="who"></span>
+        <button class="btn btn-gray btn-sm" id="btnLogout">Гарах</button>
+      </div>
+    </div>
+    <div class="msg" id="msg"></div>
+    <div class="tabs">
+      <button class="tab on" data-tab="acc">Нягтлан <span class="badge" id="bAcc">0</span></button>
+      <button class="tab" data-tab="leads">Хүсэлт <span class="badge" id="bLeads">0</span></button>
+      <button class="tab" data-tab="revs">Үнэлгээ <span class="badge" id="bRevs">0</span></button>
+    </div>
+    <div id="content"><div class="empty">Ачааллаж байна…</div></div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const SB_URL = 'https://mpfjceziasadnswwnkpc.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wZmpjZXppYXNhZG5zd3dua3BjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDY3MDMsImV4cCI6MjA5ODI4MjcwM30.LJ1Fh2TGjyPDv6EeTDzlhcR0S3WkUHhy2yRxnop940A';
+const sb = window.supabase.createClient(SB_URL, SB_KEY);
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const dt = s => new Date(s).toLocaleString('mn-MN',{dateStyle:'short',timeStyle:'short'});
+let TAB = 'acc';
+let DATA = { acc:[], leads:[], revs:[] };
+
+function showMsg(t){ const m=document.getElementById('msg'); m.textContent=t; m.style.display='block'; setTimeout(()=>m.style.display='none', 6000); }
+
+/* ===== AUTH ===== */
+async function init(){
+  const { data:{ session } } = await sb.auth.getSession();
+  if(session){ enter(session); } else { document.getElementById('loginBox').style.display='block'; }
+  sb.auth.onAuthStateChange((_e, s)=>{ if(s && document.getElementById('panel').style.display==='none') enter(s); });
+}
+async function enter(session){
+  document.getElementById('loginBox').style.display='none';
+  document.getElementById('panel').style.display='block';
+  document.getElementById('who').textContent = session.user.email;
+  await loadAll();
+}
+document.getElementById('btnLogin').onclick = ()=>
+  sb.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: location.href.split('#')[0] } });
+document.getElementById('btnLogout').onclick = async ()=>{ await sb.auth.signOut(); location.reload(); };
+
+/* ===== LOAD ===== */
+async function loadAll(){
+  const [a, l, r] = await Promise.all([
+    sb.from('mp_accountants').select('*').order('created_at',{ascending:false}),
+    sb.from('mp_leads').select('*, mp_accountants(name)').order('created_at',{ascending:false}),
+    sb.from('mp_reviews').select('*, mp_accountants(name)').order('created_at',{ascending:false}),
+  ]);
+  if(a.error || l.error || r.error){
+    // RLS-ээр хаагдсан = админ биш хаяг
+    if((l.error||a.error||r.error)) {
+      showMsg('Дата уншиж чадсангүй. Энэ имэйл mp_admins хүснэгтэд байгаа эсэхийг шалгаарай.');
+    }
+  }
+  DATA.acc = a.data || [];
+  DATA.leads = l.data || [];
+  DATA.revs = r.data || [];
+  document.getElementById('bAcc').textContent = DATA.acc.filter(x=>x.status==='pending').length;
+  document.getElementById('bLeads').textContent = DATA.leads.filter(x=>x.status==='new').length;
+  document.getElementById('bRevs').textContent = DATA.revs.filter(x=>!x.approved).length;
+  render();
+}
+
+/* ===== RENDER ===== */
+function render(){
+  const c = document.getElementById('content');
+  if(TAB==='acc'){
+    const list = [...DATA.acc].sort((x,y)=> (x.status==='pending'?-1:1) - (y.status==='pending'?-1:1));
+    c.innerHTML = list.length ? list.map(a=>`
+      <div class="card">
+        <div class="head">
+          <div>
+            <div class="title">${esc(a.name)} ${a.verified?'✓':''}</div>
+            <div class="sub">${esc(a.location)} · ${a.experience} жил · ₮${Number(a.price_from).toLocaleString()} · ${dt(a.created_at)}</div>
+          </div>
+          <span class="pill p-${a.status}">${{pending:'Хүлээгдэж буй',approved:'Батлагдсан',rejected:'Татгалзсан'}[a.status]}</span>
+        </div>
+        <div class="meta">
+          <b>Утас:</b> ${esc(a.phone)} ${a.email?` · <b>Имэйл:</b> ${esc(a.email)}`:''} ${a.messenger?` · <b>Msgr:</b> ${esc(a.messenger)}`:''}<br>
+          <b>Чиглэл:</b> ${(a.specialties||[]).join(', ')}<br>
+          ${esc(a.bio)}
+        </div>
+        <div class="actions">
+          ${a.status!=='approved'?`<button class="btn btn-green btn-sm" onclick="setAcc('${a.id}',{status:'approved'})">Батлах</button>`:''}
+          ${a.status!=='rejected'?`<button class="btn btn-red btn-sm" onclick="setAcc('${a.id}',{status:'rejected'})">Татгалзах</button>`:''}
+          <button class="btn btn-gold btn-sm" onclick="setAcc('${a.id}',{verified:${!a.verified}})">${a.verified?'Verified авах':'Verified болгох'}</button>
+        </div>
+      </div>`).join('') : `<div class="empty">Бүртгэл алга.</div>`;
+  }
+  if(TAB==='leads'){
+    c.innerHTML = DATA.leads.length ? DATA.leads.map(l=>`
+      <div class="card">
+        <div class="head">
+          <div>
+            <div class="title">${esc(l.client_name)} — ${esc(l.client_phone)}</div>
+            <div class="sub">→ ${esc(l.mp_accountants?.name || 'Тодорхойгүй нягтлан')} · ${dt(l.created_at)}</div>
+          </div>
+          <span class="pill p-${l.status}">${{new:'Шинэ',contacted:'Холбогдсон',closed:'Хаагдсан'}[l.status]}</span>
+        </div>
+        <div class="meta">
+          ${l.company?`<b>Компани:</b> ${esc(l.company)}<br>`:''}
+          ${l.service?`<b>Үйлчилгээ:</b> ${esc(l.service)}<br>`:''}
+          ${l.message?esc(l.message):''}
+        </div>
+        <div class="actions">
+          ${l.status!=='contacted'?`<button class="btn btn-gold btn-sm" onclick="setLead('${l.id}','contacted')">Холбогдсон</button>`:''}
+          ${l.status!=='closed'?`<button class="btn btn-gray btn-sm" onclick="setLead('${l.id}','closed')">Хаах</button>`:''}
+        </div>
+      </div>`).join('') : `<div class="empty">Хүсэлт алга.</div>`;
+  }
+  if(TAB==='revs'){
+    const list = [...DATA.revs].sort((x,y)=> (x.approved?1:-1) - (y.approved?1:-1));
+    c.innerHTML = list.length ? list.map(r=>`
+      <div class="card">
+        <div class="head">
+          <div>
+            <div class="title">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)} — ${esc(r.reviewer_name)}</div>
+            <div class="sub">→ ${esc(r.mp_accountants?.name || '?')} · ${dt(r.created_at)}</div>
+          </div>
+          <span class="pill ${r.approved?'p-approved':'p-pending'}">${r.approved?'Нийтлэгдсэн':'Хүлээгдэж буй'}</span>
+        </div>
+        ${r.comment?`<div class="meta">${esc(r.comment)}</div>`:''}
+        <div class="actions">
+          ${!r.approved?`<button class="btn btn-green btn-sm" onclick="setRev('${r.id}',true)">Нийтлэх</button>`:
+                        `<button class="btn btn-gray btn-sm" onclick="setRev('${r.id}',false)">Нуух</button>`}
+          <button class="btn btn-red btn-sm" onclick="delRev('${r.id}')">Устгах</button>
+        </div>
+      </div>`).join('') : `<div class="empty">Үнэлгээ алга.</div>`;
+  }
+}
+
+/* ===== ACTIONS ===== */
+async function setAcc(id, patch){
+  const { error } = await sb.from('mp_accountants').update(patch).eq('id', id);
+  if(error){ showMsg('Хадгалж чадсангүй: '+error.message); return; }
+  await loadAll();
+}
+async function setLead(id, status){
+  const { error } = await sb.from('mp_leads').update({status}).eq('id', id);
+  if(error){ showMsg('Хадгалж чадсангүй: '+error.message); return; }
+  await loadAll();
+}
+async function setRev(id, approved){
+  const { error } = await sb.from('mp_reviews').update({approved}).eq('id', id);
+  if(error){ showMsg('Хадгалж чадсангүй: '+error.message); return; }
+  await loadAll();
+}
+async function delRev(id){
+  if(!confirm('Энэ үнэлгээг бүрмөсөн устгах уу?')) return;
+  const { error } = await sb.from('mp_reviews').delete().eq('id', id);
+  if(error){ showMsg('Устгаж чадсангүй: '+error.message); return; }
+  await loadAll();
+}
+
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  t.classList.add('on');
+  TAB = t.dataset.tab;
+  render();
+});
+
+init();
+</script>
+</body>
+</html>

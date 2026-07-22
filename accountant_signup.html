@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Нягтлан болж бүртгүүлэх — BusinessBI.mn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+body{background:#f8f8f8;color:#111}
+.container{width:90%;max-width:1400px;margin:auto}
+
+header{background:#fff;padding:20px 0;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100}
+.navbar{display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:26px;font-weight:800;color:#b79a63;text-decoration:none;letter-spacing:-.02em}
+.logo span{color:#111}
+.menu{display:flex;gap:38px;align-items:center}
+.menu a{text-decoration:none;color:#111;font-weight:500;font-size:15px;transition:color .2s}
+.menu a:hover,.menu a.active{color:#b79a63}
+.menu .cta{background:#111;color:#fff;padding:11px 22px;border-radius:50px;font-size:14px}
+.menu .cta:hover{color:#fff;background:#333}
+.burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:6px}
+.burger span{display:block;width:24px;height:2px;background:#111;transition:.3s}
+.burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.burger.open span:nth-child(2){opacity:0}
+.burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+.wrap{max-width:720px;margin:0 auto;padding:60px 0 80px}
+.page-head .tag{font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#b79a63;margin-bottom:14px}
+.page-head h1{font-size:44px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin-bottom:14px}
+.page-head h1 em{font-style:normal;color:#b79a63}
+.page-head p{font-size:17px;color:#555;line-height:1.7;margin-bottom:36px}
+
+.benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:36px}
+.benefit{background:#fff;border-radius:16px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.benefit b{display:block;font-size:15px;margin-bottom:4px}
+.benefit span{font-size:13px;color:#777;line-height:1.5}
+
+.form-card{background:#fff;border-radius:24px;padding:36px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.form-card h3{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:#999;margin:26px 0 12px}
+.form-card h3:first-child{margin-top:0}
+label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
+label small{font-weight:400;color:#999}
+input,select,textarea{width:100%;padding:13px 15px;border:1px solid #e5e5e5;border-radius:12px;font-size:15px;font-family:inherit;background:#f8f8f8;color:#111;margin-bottom:16px}
+textarea{resize:vertical;min-height:100px}
+input:focus,select:focus,textarea:focus{outline:2px solid #b79a63;outline-offset:1px;border-color:transparent}
+.row2{display:flex;gap:14px}
+.row2>div{flex:1}
+.specs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.spec-chip{border:1.5px solid #e5e5e5;background:#f8f8f8;border-radius:20px;padding:9px 16px;font-size:14px;font-weight:600;cursor:pointer;user-select:none;transition:.15s;color:#555}
+.spec-chip.on{background:#f3ecd9;border-color:#b79a63;color:#7a6534}
+.btn-gold{width:100%;background:#b79a63;color:#fff;border:none;padding:17px;border-radius:14px;font-weight:700;font-size:16px;cursor:pointer;font-family:inherit;transition:.15s;margin-top:8px}
+.btn-gold:hover{background:#a68952;transform:translateY(-1px)}
+.btn-gold:disabled{opacity:.6;cursor:default;transform:none}
+.form-ok{background:#e8f5e9;color:#1b5e20;border-radius:16px;padding:28px;font-size:16px;font-weight:600;text-align:center;line-height:1.6}
+.form-err{background:#fdecea;color:#b71c1c;border-radius:12px;padding:12px 16px;font-size:14px;margin-bottom:16px}
+.note{font-size:13px;color:#999;margin-top:14px;line-height:1.6;text-align:center}
+
+footer{background:#111;color:#fff;padding:50px 0 36px;margin-top:40px}
+.foot-inner{display:flex;justify-content:space-between;flex-wrap:wrap;gap:24px;align-items:center}
+.foot-inner .logo{color:#b79a63}
+.foot-inner .logo span{color:#fff}
+.foot-inner p{font-size:14px;color:#888}
+.foot-links{display:flex;gap:22px;flex-wrap:wrap}
+.foot-links a{color:#ddd;text-decoration:none;font-size:14px}
+.foot-links a:hover{color:#b79a63}
+
+@media(max-width:768px){
+  .menu{position:fixed;top:69px;left:0;right:0;background:#fff;flex-direction:column;gap:0;padding:10px 0;transform:translateY(-130%);transition:transform .3s;border-bottom:1px solid #e5e5e5;box-shadow:0 12px 30px -18px rgba(0,0,0,.3)}
+  .menu.open{transform:translateY(0)}
+  .menu a{padding:14px 5%;width:100%}.menu .cta{margin:8px 5%;text-align:center}
+  .burger{display:flex}
+  .page-head h1{font-size:32px}
+  .benefits{grid-template-columns:1fr}
+  .row2{flex-direction:column;gap:0}
+  .form-card{padding:24px}
+}
+*:focus-visible{outline:2px solid #b79a63;outline-offset:3px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container navbar">
+    <a href="index.html" class="logo">Business<span>BI</span></a>
+    <nav class="menu" id="menu">
+      <a href="index.html#tools">Хэрэгслүүд</a>
+      <a href="businessbi_journal.html">Санхүүгийн програм</a>
+      <a href="accountants.html">Тайлан гаргах үйлчилгээ</a>
+      <a href="index.html#contact" class="cta">Холбогдох</a>
+    </nav>
+    <button class="burger" id="burger" aria-label="Цэс"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="wrap">
+    <section class="page-head">
+      <div class="tag">Нягтлангуудад зориулав</div>
+      <h1>Захиалга <em>танд ирдэг</em> болно</h1>
+      <p>BusinessBI-ийн нягтлан холбох үйлчилгээнд профайлаа нэмээд, тайлан хийлгэх гэж буй бизнесүүдээс шууд хүсэлт хүлээж аваарай. Бүртгэл үнэгүй.</p>
+    </section>
+
+    <div class="benefits">
+      <div class="benefit"><b>Тогтмол захиалга</b><span>Хэрэглэгч хайх биш — хэрэглэгч таныг олно</span></div>
+      <div class="benefit"><b>Баталгаажсан тэмдэг</b><span>Итгэл нэмдэг verified badge-тэй профайл</span></div>
+      <div class="benefit"><b>Үнэлгээний систем</b><span>Сайн ажил тань дараагийн захиалгыг авчирна</span></div>
+    </div>
+
+    <div class="form-card" id="formCard">
+      <div id="errBox"></div>
+
+      <h3>Хувийн мэдээлэл</h3>
+      <div class="row2">
+        <div>
+          <label>Нэр *</label>
+          <input type="text" id="fName" placeholder="Овгийн эхний үсэг. Нэр (ж: Б. Оюунчимэг)">
+        </div>
+        <div>
+          <label>Байршил *</label>
+          <select id="fLocation">
+            <option value="">Сонгох…</option>
+            <option>Улаанбаатар</option>
+            <option>Дархан</option>
+            <option>Эрдэнэт</option>
+            <option>Орон нутаг</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div>
+          <label>Утас *</label>
+          <input type="tel" id="fPhone" placeholder="99112233">
+        </div>
+        <div>
+          <label>Имэйл</label>
+          <input type="email" id="fEmail" placeholder="name@example.mn">
+        </div>
+      </div>
+      <label>Messenger хэрэглэгчийн нэр <small>(m.me/… хэсэг)</small></label>
+      <input type="text" id="fMessenger" placeholder="ж: oyunchimeg.acc">
+      <label>Профайл зургийн холбоос <small>(заавал биш — байхгүй бол нэрийн үсгээр харагдана)</small></label>
+      <input type="url" id="fPhoto" placeholder="https://…">
+
+      <h3>Мэргэжлийн мэдээлэл</h3>
+      <label>Мэргэшсэн чиглэл * <small>(хэдийг ч сонгож болно)</small></label>
+      <div class="specs" id="specs">
+        <span class="spec-chip">Татварын тайлан</span>
+        <span class="spec-chip">Цалин, НДШ</span>
+        <span class="spec-chip">Санхүүгийн тайлан</span>
+        <span class="spec-chip">НӨАТ</span>
+        <span class="spec-chip">Аудит</span>
+        <span class="spec-chip">Жижиг бизнес</span>
+      </div>
+      <div class="row2">
+        <div>
+          <label>Ажилласан жил *</label>
+          <input type="number" id="fExp" min="0" max="60" placeholder="ж: 8">
+        </div>
+        <div>
+          <label>Эхлэх үнэ (₮/сар) *</label>
+          <input type="number" id="fPrice" min="0" step="10000" placeholder="ж: 150000">
+        </div>
+      </div>
+      <label>Танилцуулга * <small>(2-3 өгүүлбэр — юунд мэргэшсэн, яаж ажилладаг вэ)</small></label>
+      <textarea id="fBio" placeholder="ж: 15 жилийн туршлагатай ТМЗ. Жижиг, дунд бизнесийн татвар, санхүүгийн тайланг хариуцлагатай хийнэ."></textarea>
+
+      <button class="btn-gold" id="fSend">Бүртгүүлэх</button>
+      <p class="note">Илгээсний дараа бид мэдээллийг тань шалгаж, 1-2 хоногт баталгаажуулна. Батлагдмагц профайл тань нийтэд харагдана.</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container foot-inner">
+    <div>
+      <a href="index.html" class="logo" style="display:block;margin-bottom:8px">Business<span>BI</span></a>
+      <p>Тоо баримтыг шийдвэр болгоно. © 2026</p>
+    </div>
+    <div class="foot-links">
+      <a href="index.html#tools">Хэрэгслүүд</a>
+      <a href="accountants.html">Тайлан гаргах үйлчилгээ</a>
+      <a href="index.html#contact">Холбоо барих</a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const SB_URL = 'https://mpfjceziasadnswwnkpc.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wZmpjZXppYXNhZG5zd3dua3BjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDY3MDMsImV4cCI6MjA5ODI4MjcwM30.LJ1Fh2TGjyPDv6EeTDzlhcR0S3WkUHhy2yRxnop940A';
+const sb = window.supabase.createClient(SB_URL, SB_KEY);
+
+// Чиглэл сонгох chip-үүд
+document.getElementById('specs').addEventListener('click', e=>{
+  if(e.target.classList.contains('spec-chip')) e.target.classList.toggle('on');
+});
+
+document.getElementById('fSend').addEventListener('click', async ()=>{
+  const err = document.getElementById('errBox');
+  err.innerHTML = '';
+  const val = id => document.getElementById(id).value.trim();
+  const specialties = [...document.querySelectorAll('.spec-chip.on')].map(c=>c.textContent);
+
+  const name = val('fName'), location = val('fLocation'), phone = val('fPhone'),
+        bio = val('fBio'), exp = val('fExp'), price = val('fPrice');
+
+  const missing = [];
+  if(!name) missing.push('нэр');
+  if(!location) missing.push('байршил');
+  if(!phone) missing.push('утас');
+  if(!specialties.length) missing.push('мэргэшсэн чиглэл');
+  if(!exp) missing.push('ажилласан жил');
+  if(!price) missing.push('эхлэх үнэ');
+  if(!bio) missing.push('танилцуулга');
+  if(missing.length){
+    err.innerHTML = `<div class="form-err">Дутуу талбар: ${missing.join(', ')}.</div>`;
+    err.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+  if(!/^\d{8}$/.test(phone.replace(/\s/g,''))){
+    err.innerHTML = `<div class="form-err">Утасны дугаар 8 оронтой тоо байх ёстой.</div>`;
+    err.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+
+  const btn = document.getElementById('fSend');
+  btn.disabled = true; btn.textContent = 'Илгээж байна…';
+  try{
+    const { error } = await sb.from('mp_accountants').insert({
+      name, location, phone: phone.replace(/\s/g,''),
+      email: val('fEmail') || null,
+      messenger: val('fMessenger') || null,
+      photo_url: val('fPhoto') || null,
+      specialties,
+      experience: parseInt(exp,10) || 0,
+      price_from: parseInt(price,10) || 0,
+      bio,
+      status: 'pending',
+      verified: false
+    });
+    if(error) throw error;
+    document.getElementById('formCard').innerHTML =
+      `<div class="form-ok">✓ Бүртгэл амжилттай илгээгдлээ!<br><br>
+       Бид мэдээллийг тань шалгаад ${phone} дугаараар холбогдож баталгаажуулна.
+       Батлагдсаны дараа профайл тань <a href="accountants.html" style="color:#1b5e20">нягтлангуудын жагсаалтад</a> нийтлэгдэнэ.</div>`;
+    window.scrollTo({top:0, behavior:'smooth'});
+  }catch(e){
+    console.error('signup:', e);
+    btn.disabled = false; btn.textContent = 'Бүртгүүлэх';
+    err.innerHTML = `<div class="form-err">Алдаа гарлаа. Дахин оролдоно уу. Асуудал давтагдвал hello@businessbi.mn руу бичээрэй.</div>`;
+    err.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+});
+
+// burger
+const burger=document.getElementById('burger'), menu=document.getElementById('menu');
+burger.addEventListener('click',()=>{burger.classList.toggle('open');menu.classList.toggle('open');});
+</script>
+</body>
+</html>
