@@ -475,11 +475,14 @@ tr.set-detail>td{background:var(--bg-row)!important;padding:8px 10px 12px 34px;}
       <div class="field"><label>Огнооны формат</label><select id="impDateFmt"><option value="auto">Автомат</option><option value="ymd">ОН-САР-ӨДӨР</option><option value="dmy">ӨДӨР-САР-ОН</option><option value="mdy">САР-ӨДӨР-ОН</option></select></div>
       <div class="field"><label>Мөрийн тоо</label><input id="impRowCount" readonly></div>
     </div>
-    <div class="note">Мөр бүрд <b>харьцсан данс</b> болон <b>гүйлгээний төрөл</b> сонгоно. НӨАТ-тэй төрөл сонговол журналд нийт дүн, цэвэр дүн, НӨАТ гэсэн 3 мөр бичилт автоматаар үүснэ. Хадгалсан дүрэм таарвал данс автоматаар бөглөгдөнө.</div>
+    <div class="note">Данс аль болох <b>автоматаар</b> бөглөгдөнө: дүрэм → нээлттэй падаантай тулгалт → <b>харилцагчийн санах ой</b> (энэ нийлүүлэгчийг өмнө аль данс руу бичиж байсан) → журналын түүх → түлхүүр үгийн каталог. Үлдсэн мөрөнд <b>нэг удаа</b> данс сонгоход ижил утгатай/ижил харилцагчтай бүх мөр давхар бөглөгдөнө. <span class="badge warn">таамаг</span> тэмдэгтэй мөрийг шалгаж баталгаажуулна уу. Өглөг/авлагын төлбөр нь тухайн харилцагчийн <b>падаантай автоматаар холбогдоно</b> (яг таарах падаан → яг таарах хослол → хамгийн хуучнаас FIFO) — 🔗 тэмдэг дээр дарж өөрчилж болно.</div>
     <div id="impSkipWarn" style="display:none;"></div>
     <div class="toolbar">
-      <button class="btn sm" onclick="impApplyRules()">Дүрэм дахин хэрэглэх</button>
-      <button class="btn sm" onclick="impBulkAcc()">Сонгоогүй бүгдэд данс олгох</button>
+      <span id="impAssignTools" style="display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <button class="btn sm" onclick="impApplyRules()" title="Дүрэм, тулгалт, харилцагчийн санах ой, түүх, түлхүүр үгээр автоматаар бөглөнө">⚡ Автоматаар бөглөх</button>
+        <select class="pill-input" id="impBulkSel" style="width:auto;min-width:210px;max-width:280px;" onchange="impBulkAcc(this.value); this.value='';"><option value="">Дансгүй бүх мөрөнд олгох…</option></select>
+        <label style="font-size:12px;display:inline-flex;align-items:center;gap:5px;cursor:pointer;"><input type="checkbox" id="impOnlyEmpty" onchange="impToggleOnlyEmpty()"> Зөвхөн дансгүй мөр</label>
+      </span>
       <span style="font-size:12px;color:var(--muted);" id="impMappedInfo"></span>
     </div>
     <div class="tbl-wrap" style="max-height:480px;overflow-y:auto;"><table class="tbl" id="impRowsTable"></table></div>
@@ -848,6 +851,18 @@ tr.set-detail>td{background:var(--bg-row)!important;padding:8px 10px 12px 34px;}
   </div>
 </div></div>
 
+<div class="modal-bg" id="impLinkModal"><div class="modal" style="max-width:640px;">
+  <h3 id="ilTitle">Төлбөрийг падаантай холбох</h3>
+  <div class="note" id="ilInfo"></div>
+  <div class="tbl-wrap" style="max-height:300px;overflow-y:auto;"><table class="tbl" id="ilTable"></table></div>
+  <div style="margin-top:10px;font-size:12.5px;" id="ilSum"></div>
+  <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+    <button class="btn primary" onclick="impLinkSave()">Хадгалах</button>
+    <button class="btn sm" onclick="impLinkAuto()">Автомат сонголт</button>
+    <button class="btn sm" onclick="impLinkNone()">Холбоосгүй (урьдчилгаа)</button>
+    <button class="btn sm" onclick="closeModal('impLinkModal')">Болих</button>
+  </div>
+</div></div>
 <datalist id="partnerList"></datalist>
 <datalist id="accList"></datalist>
 <div class="toast-wrap" id="toastWrap"></div>
@@ -2042,6 +2057,104 @@ function suggestFromHistory(idx, desc){
   }
   return bestAcc;
 }
+/* ───────── Харилцагчийн санах ой ─────────
+   Өмнөх падаанууд аль данс руу бичигдэж байсныг харилцагчийн нэр, ТТД-аар нь
+   тогтоож, дараагийн импортод автоматаар санал болгоно. Дүрэм үүсгэх шаардлагагүй —
+   нэг удаа зөв бичсэн бол дараа нь өөрөө санана. */
+function buildPartnerIndex(){
+  const s=DB.settings;
+  const idx={buy:{}, sale:{}};
+  const bump=(bucket,key,acc)=>{ if(!key||!acc) return; (bucket[key]=bucket[key]||{}); bucket[key][acc]=(bucket[key][acc]||0)+1; };
+  // Журналд ТТД хадгалагддаггүй тул харилцагчийн сангаас нэр→ТТД холбоос авна
+  const tinByName={};
+  for(const p of (DB.partners||[])){
+    const n=String(p.name||'').trim().toLowerCase();
+    if(n && p.tin) tinByName[n]=String(p.tin).trim();
+  }
+  const vatAccs=new Set([s.accVatIn, s.accVatOut].filter(Boolean));
+  for(const j of DB.journal){
+    const partner=String(j.partner||'').trim().toLowerCase();
+    if(!partner) continue;
+    if(vatAccs.has(j.dt)||vatAccs.has(j.kt)) continue;   // НӨАТ-ын мөр өөрөө дохио биш
+    let kind=null, acc=null;
+    if(j.kt===s.accPayable && j.dt!==s.accPayable){ kind='buy'; acc=j.dt; }
+    else if(j.dt===s.accReceivable && j.kt!==s.accReceivable){ kind='sale'; acc=j.kt; }
+    if(!kind) continue;
+    const a=accByCode(acc);
+    if(!a||['11','12','31'].includes(a.cat)) continue;
+    bump(idx[kind], 'n:'+partner, acc);
+    const tin=tinByName[partner];
+    if(tin) bump(idx[kind], 't:'+tin, acc);
+  }
+  return idx;
+}
+function partnerKeyClean(x){
+  return String(x||'').toLowerCase()
+    .replace(/[^a-zа-яөүё0-9]+/gi,' ')
+    .replace(/\b(ххк|ххн|ххкомпани|llc|co|ltd|inc|group|групп)\b/g,' ')
+    .replace(/\s+/g,' ').trim();
+}
+function suggestFromPartner(pidx, kind, partner, tin){
+  const bucket=(pidx&&pidx[kind])||{};
+  const top=h=>{ const b=h&&Object.entries(h).sort((x,y)=>y[1]-x[1])[0]; return b? b[0] : null; };
+  const t=String(tin||'').trim();
+  if(t){ const r=top(bucket['t:'+t]); if(r) return r; }
+  const n=String(partner||'').trim().toLowerCase();
+  if(!n) return null;
+  const exact=top(bucket['n:'+n]); if(exact) return exact;
+  // Сул тохирол: "ХХК", цэг таслал зэргээр зөрсөн бичилтийг барина
+  const nc=partnerKeyClean(n);
+  if(nc.length<4) return null;
+  for(const k of Object.keys(bucket)){
+    if(k[0]!=='n') continue;
+    const kc=partnerKeyClean(k.slice(2));
+    if(kc.length>=4 && (kc===nc||kc.includes(nc)||nc.includes(kc))){ const r=top(bucket[k]); if(r) return r; }
+  }
+  return null;
+}
+/* ───────── Суурь түлхүүр үгийн каталог ─────────
+   Түүх огт байхгүй шинэ хэрэглэгч ч хамгийн түгээмэл гүйлгээнүүддээ данс автоматаар
+   олж авна. Хамгийн сүүлд ажиллана — дүрэм, тулгалт, санах ой, түүх бүгд илүү хүчтэй. */
+const ACC_KEYWORDS=[
+  {acc:'750101', dir:'out', re:/шимтгэл|хураамж|комисс|зээлийн хүү|хүүгийн зардал|service charge|commission|карт хураамж/i},
+  {acc:'520101', dir:'in',  re:/хадгаламжийн хүү|хүү бодов|хүүгийн орлого|interest/i},
+  {acc:'700105', dir:'out', re:/түрээс|rent|байрны төлбөр|оффисын төлбөр/i},
+  {acc:'700110', dir:'out', re:/шатахуун|бензин|дизель|petrol|тээвэр|карго|такси|автомашины засвар/i},
+  {acc:'700115', dir:'out', re:/бичиг хэрэг|канц|хэвлэх|принтер|цаас|бичгийн хэрэгсэл|хангамжийн бараа/i},
+  {acc:'700120', dir:'out', re:/интернэт|интернет|юнител|скайтел|мобиком|g[- ]?mobile|жи[- ]?мобайл|дата төлбөр|утасны төлбөр|холбооны төлбөр/i},
+  {acc:'700125', dir:'out', re:/цахилгаан|дулаан|усны төлбөр|ундны ус|ус суваг|дулааны төлбөр|цэвэр бохир/i},
+  {acc:'313001', dir:'out', re:/цалин|salary|урамшуулал|тэтгэмж|унааны мөнгө/i},
+  {acc:'311001', dir:'out', re:/ндш|нийгмийн даатгал|эрүүл мэндийн даатгал/i},
+  {acc:'311004', dir:'out', re:/ххоат|хувь хүний орлогын албан татвар/i},
+  {acc:'311002', dir:'out', re:/нөат төл|ноат төл|нэмэгдсэн өртгийн албан татвар/i},
+  {acc:'311003', dir:'out', re:/ааноат|аж ахуйн нэгжийн орлогын албан татвар/i},
+  {acc:'340101', dir:'in',  re:/зээл олгов|зээл авав|зээлийн шилжүүлэг|лизинг/i},
+  {acc:'340101', dir:'out', re:/зээл төлөв|зээлийн эргэн төлөлт|үндсэн зээл/i},
+  {acc:'130101', dir:'out', re:/бараа авав|түүхий эд|материал худалдан|бэлэн бүтээгдэхүүн/i},
+  {acc:'510101', dir:'in',  re:/борлуулалт|худалдааны орлого|үйлчилгээний орлого/i},
+];
+function suggestFromKeywords(text, dir){
+  const t=String(text||'');
+  if(t.trim().length<3) return null;
+  for(const k of ACC_KEYWORDS){
+    if(k.dir && dir && k.dir!==dir) continue;
+    if(!k.re.test(t)) continue;
+    if(!accByCode(k.acc)) continue;
+    return k.acc;
+  }
+  return null;
+}
+/* Санал болгосон данс тухайн импортын төрөл, чиглэлд утга төгөлдөр эсэх */
+function impAccFits(code, row){
+  const a=accByCode(code);
+  if(!a) return false;
+  if(IMP.type==='vatsale') return ['51','52'].includes(a.cat);
+  if(IMP.type==='vatbuy')  return !['51','52','92'].includes(a.cat);
+  if(a.cat==='92') return false;
+  if(row && row.dir==='in'  && ['61','70','75','91'].includes(a.cat)) return false;
+  if(row && row.dir==='out' && ['51','52'].includes(a.cat)) return false;
+  return true;
+}
 function impSuggestMatches(){
   if(IMP.type!=='bank') return 0;
   let hit=0;
@@ -2051,7 +2164,75 @@ function impSuggestMatches(){
     const p=suggestMatch(row, kind);
     if(p){ row.vat=kind; row.partner=row.partner||p; row.matched=p; row.acc= kind==='payable'? DB.settings.accPayable : DB.settings.accReceivable; hit++; }
   }
+  impRelinkAll();
   return hit;
+}
+/* ═══ Төлбөр ↔ падаан холбох хөдөлгүүр ═══
+   Төлбөрийг тодорхой падаанд хуваарилна:
+   1) яг таарах ганц падаан  2) яг таарах хослол (нийлбэр = төлбөр)
+   3) FIFO — хамгийн хуучин падаанаас эхэлж хааж, үлдэгдэл нь урьдчилгаа болно.
+   Хуваарилалт бүр журналд ref-тэй тусдаа мөр болж бичигдэх тул тооцооны
+   задаргаа падаан бүрээр ЯГ таарна — гараар тулгах шаардлагагүй. */
+function allocPayment(docs, amount){
+  // docs: [{doc,date,desc,rem}] огноогоор эрэмбэлэгдсэн, rem>0
+  const A=r2(amount);
+  if(A<=0.004||!docs.length) return {allocs:[], leftover:A};
+  // 1) Яг таарах ганц падаан (хамгийн хуучин нь)
+  const single=docs.find(d=>Math.abs(d.rem-A)<0.01);
+  if(single) return {allocs:[{doc:single.doc, amt:A}], leftover:0};
+  // 2) Яг таарах хослол — хуучин падааныг түрүүлж оруулсан DFS (n≤14 үед)
+  if(docs.length<=14){
+    const found=(function dfs(i, rest, picked){
+      if(rest<0.01&&rest>-0.01) return picked;
+      if(i>=docs.length||rest<0) return null;
+      const withIt=dfs(i+1, r2(rest-docs[i].rem), [...picked, i]);
+      if(withIt) return withIt;
+      return dfs(i+1, rest, picked);
+    })(0, A, []);
+    if(found&&found.length) return {allocs:found.map(i=>({doc:docs[i].doc, amt:docs[i].rem})), leftover:0};
+  }
+  // 3) FIFO хэсэгчилсэн хуваарилалт
+  const allocs=[]; let rest=A;
+  for(const d of docs){
+    if(rest<=0.004) break;
+    const take=Math.min(d.rem, rest);
+    if(take>0.004){ allocs.push({doc:d.doc, amt:r2(take)}); rest=r2(rest-take); }
+  }
+  return {allocs, leftover:r2(rest)};
+}
+/* Мөрийн харилцагчийн нээлттэй падаанууд — багц доторх бусад мөрийн
+   хуваарилалтыг (shadow) хассан бодит үлдэгдэлтэйгээр */
+function impOpenDocsFor(row, shadow){
+  const kind=row.vat;
+  if(kind!=='payable'&&kind!=='receivable') return [];
+  const partner=(row.partner||'').trim();
+  if(!partner) return [];
+  return partnerDocs(kind, partner).list
+    .map(d=>({doc:d.doc, date:d.date, desc:d.desc, rem:r2(d.rem-((shadow&&shadow[d.doc])||0))}))
+    .filter(d=>d.rem>0.004);
+}
+/* Бүх төлбөрийн мөрийг огнооны дарааллаар падаанд дахин хуваарилна.
+   Гараар холбосон мөр (refsManual) хөдлөхгүй — эхэлж эзэмшинэ. */
+function impRelinkAll(){
+  if(IMP.type!=='bank') return;
+  const shadow={};
+  const rows=IMP.mapped.map((r,i)=>({r,i}))
+    .filter(x=>x.r.include && (x.r.vat==='payable'||x.r.vat==='receivable') && (x.r.partner||'').trim());
+  rows.sort((a,b)=> String(a.r.date||'').localeCompare(String(b.r.date||'')) || a.i-b.i);
+  for(const x of rows){
+    if(x.r.refsManual&&Array.isArray(x.r.refs))
+      for(const a of x.r.refs) shadow[a.doc]=r2((shadow[a.doc]||0)+a.amt);
+  }
+  for(const x of rows){
+    const r=x.r;
+    if(r.refsManual) continue;
+    const {allocs}=allocPayment(impOpenDocsFor(r, shadow), r.amount);
+    r.refs=allocs;
+    for(const a of allocs) shadow[a.doc]=r2((shadow[a.doc]||0)+a.amt);
+  }
+  // Тооцооны төрөлгүй болсон мөрийн холбоосыг цэвэрлэнэ
+  for(const r of IMP.mapped)
+    if(r.vat!=='payable'&&r.vat!=='receivable'){ r.refs=null; r.refsManual=false; }
 }
 function impApplyRules(silent){
   // Тулгалт эхэлж ажиллана — нээлттэй падаантай таарах нь дүрмээс илүү тодорхой дохио
@@ -2070,8 +2251,8 @@ function impApplyRules(silent){
     });
     if(rule){ row.acc=rule.acc; if(IMP.type==='bank') row.vat=rule.vat||'plain'; hit++; }
   }
-  // Түүхээс санал: дүрэм, тулгалтад өртөөгүй банкны мөрүүдэд
-  let hist=0;
+  // ── Санах ой: дүрэм, тулгалтад өртөөгүй мөрүүдэд ──
+  let hist=0, pmem=0, kw=0;
   if(IMP.type==='bank'){
     const idx=buildHistoryIndex();
     for(const row of IMP.mapped){
@@ -2079,8 +2260,43 @@ function impApplyRules(silent){
       const sug=suggestFromHistory(idx, row.desc);
       if(sug){ row.acc=sug; row.fromHistory=true; hist++; }
     }
+  } else if(IMP.type==='vatbuy'||IMP.type==='vatsale'){
+    // 1) Харилцагчийн санах ой — падаанд хамгийн хүчтэй дохио
+    const pidx=buildPartnerIndex();
+    const kind=IMP.type==='vatbuy'?'buy':'sale';
+    for(const row of IMP.mapped){
+      if(row.acc) continue;
+      const sug=suggestFromPartner(pidx, kind, row.partner, row.tin);
+      if(sug && impAccFits(sug, row)){ row.acc=sug; row.fromPartner=true; pmem++; }
+    }
+    // 2) Падааны утгаас түүх хайх (ижил төрлийн зардал өөр харилцагчаас ирсэн тохиолдол)
+    const hidx=buildHistoryIndex();
+    for(const row of IMP.mapped){
+      if(row.acc) continue;
+      const sug=suggestFromHistory(hidx, row.desc);
+      if(sug && impAccFits(sug, row)){ row.acc=sug; row.fromHistory=true; hist++; }
+    }
   }
-  if(!silent){ impRenderRows(); toast(hit+' мөрөнд дүрэм, '+matched+' мөрөнд тулгалт, '+hist+' мөрөнд түүхээс санал тохирлоо'); }
+  // ── Суурь түлхүүр үгийн каталог: хамгийн сүүлд, зөвхөн үлдсэн хоосон мөрөнд ──
+  for(const row of IMP.mapped){
+    if(row.acc) continue;
+    const text=(IMP.type==='bank'? row.desc : (row.partner+' '+row.desc));
+    const sug=suggestFromKeywords(text, row.dir);
+    if(sug && impAccFits(sug, row)){ row.acc=sug; row.fromKeyword=true; kw++; }
+  }
+  if(!silent){
+    impRenderRows();
+    const parts=[];
+    if(hit) parts.push(hit+' дүрэм');
+    if(matched) parts.push(matched+' тулгалт');
+    if(pmem) parts.push(pmem+' харилцагчийн санах ой');
+    if(hist) parts.push(hist+' түүх');
+    if(kw) parts.push(kw+' түлхүүр үг');
+    const left=IMP.mapped.filter(r=>r.include&&!r.acc).length;
+    toast(parts.length
+      ? ('Автоматаар бөглөв — '+parts.join(', ')+(left? ('. Үлдсэн '+left+' мөрийг гараар сонгоно уу') : '. Бүх мөр данстай ✓'))
+      : 'Автоматаар тохирох данс олдсонгүй');
+  }
 }
 function impToggleGroup(gi){
   const head=document.getElementById('grpHead'+gi);
@@ -2090,16 +2306,45 @@ function impToggleGroup(gi){
   document.querySelectorAll('.grp-c'+gi).forEach(tr=>tr.style.display=open?'none':'table-row');
 }
 function impSetGroupAcc(indices, code){
-  indices.forEach(i=>{ if(IMP.mapped[i]) IMP.mapped[i].acc=code; });
+  indices.forEach(i=>{ const r=IMP.mapped[i]; if(!r) return;
+    r.acc=code; r.fromHistory=false; r.fromPartner=false; r.fromKeyword=false; r.autoFilled=false; });
   impRenderRows();
   toast(indices.length+' мөрөнд '+accLabel(code)+' оноогдлоо');
 }
-function impBulkAcc(){
-  const code=prompt('Данс сонгоогүй бүх мөрөнд олгох дансны код:');
+function impBulkAcc(code){
+  code=String(code||'').trim();
   if(!code) return;
-  if(!accByCode(code.trim())){ toast('Ийм код бүхий данс алга', true); return; }
-  IMP.mapped.forEach(r=>{ if(!r.acc) r.acc=code.trim(); });
+  if(!accByCode(code)){ toast('Ийм код бүхий данс алга', true); return; }
+  let n=0;
+  IMP.mapped.forEach(r=>{ if(!r.acc && r.include && r.vat!=='payable' && r.vat!=='receivable'){ r.acc=code; r.autoFilled=true; n++; } });
   impRenderRows();
+  toast(n? (n+' мөрөнд '+accLabel(code)+' оноогдлоо') : 'Дансгүй мөр үлдээгүй байна');
+}
+/* Нэг мөрөнд данс сонгоход тухайн багц доторх ижил төрлийн бусад ХООСОН мөрийг
+   мөн бөглөнө — 12 падаан → 1 сонголт болж гар ажиллагаа эрс багасна */
+function impStickyAcc(i, code){
+  const src=IMP.mapped[i];
+  if(!src||!code) return 0;
+  const isBank=IMP.type==='bank';
+  const keyOf=r=> isBank
+    ? (normDesc(r.desc)+'␟'+r.dir)
+    : (String(r.partner||'').trim().toLowerCase()+'␟'+String(r.tin||'').trim());
+  const key=keyOf(src);
+  if(!key.replace(/␟/g,'').trim()) return 0;   // хоосон түлхүүрээр тархаахгүй
+  let n=0;
+  IMP.mapped.forEach((r,j)=>{
+    if(j===i||r.acc||!r.include) return;
+    if(r.vat==='payable'||r.vat==='receivable') return;
+    if(keyOf(r)!==key) return;
+    r.acc=code; r.autoFilled=true; n++;
+  });
+  if(n){ impRenderRows(); toast('Ижил '+(isBank?'утгатай':'харилцагчтай')+' '+n+' мөрөнд мөн '+accLabel(code)+' оноогдлоо'); }
+  return n;
+}
+function impToggleOnlyEmpty(){ impRenderRows(); }
+function impOnlyEmptyOn(){
+  const el=document.getElementById('impOnlyEmpty');
+  return !!(el&&el.checked);
 }
 function impSetRow(i, field, val){
   const r=IMP.mapped[i];
@@ -2108,27 +2353,162 @@ function impSetRow(i, field, val){
     if(val==='payable'){ r.acc=DB.settings.accPayable; }
     else if(val==='receivable'){ r.acc=DB.settings.accReceivable; }
     else if(r.matched){ r.matched=null; r.acc=''; }
+    r.refsManual=false;
+    impRelinkAll();
     impRenderRows();
   }
   if(field==='dir'){
     // Чиглэл өөрчлөгдвөл зөвхөн тухайн чиглэлд тохирох тооцооны төрөл үлдэнэ
     if((r.vat==='payable'&&r.dir!=='out')||(r.vat==='receivable'&&r.dir!=='in')){ r.vat='plain'; r.matched=null; r.acc=''; }
+    impRelinkAll();
     impRenderRows();
+  }
+  if(field==='include' && IMP.type==='bank' && (r.vat==='payable'||r.vat==='receivable')){
+    impRelinkAll(); impRenderRows();
+  }
+  if(field==='partner' && IMP.type==='bank' && (r.vat==='payable'||r.vat==='receivable')){
+    r.refsManual=false;
+    impRelinkAll(); impRenderRows();
+  }
+  // Харилцагч/ТТД-г гараар засмагц санах ойгоос дахин санал болгоно
+  if((field==='partner'||field==='tin') && (IMP.type==='vatbuy'||IMP.type==='vatsale')){
+    if(!r.acc){
+      const sug=suggestFromPartner(buildPartnerIndex(), IMP.type==='vatbuy'?'buy':'sale', r.partner, r.tin);
+      if(sug && impAccFits(sug, r)){ r.acc=sug; r.fromPartner=true; toast(accLabel(sug)+' — энэ харилцагчийн өмнөх бичилтээс санал болгов'); }
+    }
+    impRenderRows();
+  }
+  if(field==='acc'){
+    r.fromHistory=false; r.fromPartner=false; r.fromKeyword=false; r.autoFilled=false;
+    if(r.acc) impStickyAcc(i, r.acc);
   }
   if(field==='acc'||field==='vat') impMappedInfo();
 }
 function impMappedInfo(){
   const inc=IMP.mapped.filter(r=>r.include);
   const done=inc.filter(r=>r.acc&&accByCode(r.acc)).length;
-  document.getElementById('impMappedInfo').textContent=done+' / '+inc.length+' мөр данстай';
+  const left=inc.length-done;
+  const el=document.getElementById('impMappedInfo');
+  if(el) el.innerHTML= left
+    ? (done+' / '+inc.length+' мөр данстай · <b style="color:var(--red);">'+left+' мөр үлдсэн</b>')
+    : ('<b style="color:var(--green);">Бүх '+inc.length+' мөр данстай ✓</b>');
+}
+/* Bulk сонголтын жагсаалтыг тухайн импортын төрөлд тохируулж дүүргэнэ */
+function impFillBulkSel(opts){
+  const bs=document.getElementById('impBulkSel');
+  if(bs) bs.innerHTML='<option value="">Дансгүй бүх мөрөнд олгох…</option>'+opts;
+}
+/* ═══ Холболтын modal ═══ */
+const ILINK={i:-1, docs:[]};
+function impLinkBadge(r, i){
+  if(r.vat!=='payable'&&r.vat!=='receivable') return '';
+  const n=(r.refs||[]).length;
+  if(n){
+    const tip=r.refs.map(a=>'№'+a.doc+': '+fmtZ(a.amt)).join('  ·  ');
+    return ` <span class="badge ok" style="cursor:pointer;" onclick="impOpenLink(${i})" title="${esc(tip)} — дарж өөрчилнө">🔗 падаан ${n>1? n+'ш' : '№'+esc(String(r.refs[0].doc))}</span>`;
+  }
+  return ` <span class="badge warn" style="cursor:pointer;" onclick="impOpenLink(${i})" title="Аль падааны төлбөр болохыг сонгоно — сонгохгүй бол урьдчилгаа/нээлттэй үлдэгдэл болно">падаан холбоогүй</span>`;
+}
+function impOpenLink(i){
+  const r=IMP.mapped[i];
+  if(!r) return;
+  if(!(r.partner||'').trim()){ toast('Эхлээд мөрийн харилцагчийг бөглөнө үү', true); return; }
+  // Бусад мөрийн эзэмшлийг shadow-д тооцно (энэ мөрийнхөөс бусад)
+  const shadow={};
+  IMP.mapped.forEach((x,j)=>{
+    if(j===i||!x.include||!Array.isArray(x.refs)) return;
+    if(x.vat!=='payable'&&x.vat!=='receivable') return;
+    for(const a of x.refs) shadow[a.doc]=r2((shadow[a.doc]||0)+a.amt);
+  });
+  const docs=impOpenDocsFor(r, shadow);
+  if(!docs.length){ toast((r.partner||'')+' — нээлттэй падаан алга. Төлбөр урьдчилгаа/нээлттэй үлдэгдэл болно'); return; }
+  ILINK.i=i;
+  const chosen=new Set((r.refs||[]).map(a=>String(a.doc)));
+  ILINK.docs=docs.map(d=>({...d, checked: chosen.size? chosen.has(String(d.doc)) : false}));
+  if(!chosen.size){ const {allocs}=allocPayment(docs, r.amount); const auto=new Set(allocs.map(a=>String(a.doc))); ILINK.docs.forEach(d=>d.checked=auto.has(String(d.doc))); }
+  document.getElementById('ilTitle').textContent=(r.vat==='payable'?'Өглөгийн төлөлт':'Авлагын орлого')+' — падаантай холбох';
+  document.getElementById('ilInfo').innerHTML='<b>'+esc(r.partner)+'</b> · '+esc(r.date)+' · төлбөр <b>'+fmtZ(r.amount)+'</b>. Сонгосон падаанууд огнооны дарааллаар хаагдана; дүн хүрэлцэхгүй бол сүүлийнх нь хэсэгчлэн хаагдана.';
+  impLinkRender();
+  openModal('impLinkModal');
+}
+function impLinkAllocs(){
+  const r=IMP.mapped[ILINK.i];
+  const sel=ILINK.docs.filter(d=>d.checked);
+  const allocs=[]; let rest=r2(r.amount);
+  for(const d of sel){
+    if(rest<=0.004) break;
+    const take=Math.min(d.rem, rest);
+    if(take>0.004){ allocs.push({doc:d.doc, amt:r2(take)}); rest=r2(rest-take); }
+  }
+  return {allocs, leftover:r2(rest)};
+}
+function impLinkRender(){
+  const r=IMP.mapped[ILINK.i];
+  if(!r) return;
+  const {allocs, leftover}=impLinkAllocs();
+  const byDoc={}; allocs.forEach(a=>byDoc[String(a.doc)]=a.amt);
+  let html='<thead><tr><th></th><th>Падаан №</th><th>Огноо</th><th>Утга</th><th class="num">Үлдэгдэл</th><th class="num">Хаагдах дүн</th></tr></thead><tbody>';
+  ILINK.docs.forEach((d,k)=>{
+    const got=byDoc[String(d.doc)]||0;
+    html+=`<tr>
+      <td><input type="checkbox" ${d.checked?'checked':''} onchange="ILINK.docs[${k}].checked=this.checked; impLinkRender();"></td>
+      <td class="mono">${esc(String(d.doc))}</td>
+      <td class="mono">${esc(d.date)}</td>
+      <td style="max-width:200px;">${esc(d.desc)}</td>
+      <td class="num mono">${fmtZ(d.rem)}</td>
+      <td class="num mono">${got? '<b>'+fmtZ(got)+'</b>'+(got<d.rem-0.004?' <span class="badge warn">хэсэгчлэн</span>':'') : ''}</td>
+    </tr>`;
+  });
+  html+='</tbody>';
+  document.getElementById('ilTable').innerHTML=html;
+  const tot=r2(allocs.reduce((s,a)=>s+a.amt,0));
+  document.getElementById('ilSum').innerHTML=
+    'Холбогдох: <b>'+fmtZ(tot)+'</b> / '+fmtZ(r.amount)+
+    (leftover>0.004? ' · <b style="color:var(--red);">'+fmtZ(leftover)+' үлдэнэ</b> — урьдчилгаа/нээлттэй үлдэгдэл болно' : ' · <b style="color:var(--green);">бүрэн холбогдоно ✓</b>');
+}
+function impLinkAuto(){
+  const r=IMP.mapped[ILINK.i];
+  const {allocs}=allocPayment(ILINK.docs.map(d=>({doc:d.doc,date:d.date,desc:d.desc,rem:d.rem})), r.amount);
+  const auto=new Set(allocs.map(a=>String(a.doc)));
+  ILINK.docs.forEach(d=>d.checked=auto.has(String(d.doc)));
+  impLinkRender();
+}
+function impLinkNone(){
+  const r=IMP.mapped[ILINK.i];
+  if(r){ r.refs=[]; r.refsManual=true; }
+  closeModal('impLinkModal');
+  impRelinkAll(); impRenderRows();
+}
+function impLinkSave(){
+  const r=IMP.mapped[ILINK.i];
+  if(!r) return;
+  const {allocs}=impLinkAllocs();
+  r.refs=allocs; r.refsManual=true;
+  closeModal('impLinkModal');
+  impRelinkAll(); impRenderRows();
+  toast(allocs.length? (allocs.length+' падаантай холбогдлоо') : 'Холбоосгүй — урьдчилгаа болно');
+}
+/* Данс хаанаас санал болгогдсоныг мөрөнд тэмдэглэнэ — хэрэглэгч итгэх эсэхээ шийднэ */
+function impSrcBadge(r){
+  if(r.fromPartner) return ' <span class="badge hist" title="Энэ харилцагчийн өмнөх падаанаас санал болгов">харилцагчаас</span>';
+  if(r.fromHistory) return ' <span class="badge hist" title="Өмнөх журналын ижил утгатай бичилтээс санал болгов">түүхээс</span>';
+  if(r.fromKeyword) return ' <span class="badge warn" title="Түлхүүр үгээр таамаглав — шалгаж баталгаажуулна уу">таамаг</span>';
+  if(r.autoFilled)  return ' <span class="badge info" title="Ижил мөрөөс автоматаар бөглөв">авто</span>';
+  return '';
 }
 function impRenderRows(){
+  const tools=document.getElementById('impAssignTools');
+  if(tools) tools.style.display= IMP.type==='ndsh'? 'none' : 'inline-flex';
   if(IMP.type==='ndsh'){ impRenderRowsNdsh(); return; }
   if(IMP.type!=='bank'){ impRenderRowsVat(); return; }
-  const accOpts='<option value="">— данс —</option>'+DB.accounts.filter(a=>a.cat!=='92').map(a=>`<option value="${esc(a.code)}">${esc(a.code)} ${esc(a.name)}</option>`).join('');
+  const accOptsRaw=DB.accounts.filter(a=>a.cat!=='92').map(a=>`<option value="${esc(a.code)}">${esc(a.code)} ${esc(a.name)}</option>`).join('');
+  const accOpts='<option value="">— данс —</option>'+accOptsRaw;
+  impFillBulkSel(accOptsRaw);
+  const onlyEmpty=impOnlyEmptyOn();
   // ── Бүлэглэлт: тулгагдаагүй мөрүүдийг цэвэрлэсэн утгаар нь бүлэглэнэ ──
   const groups={}; const singles=[];
   IMP.mapped.forEach((r,i)=>{
+    if(onlyEmpty && r.acc) return;
     if(r.vat==='payable'||r.vat==='receivable'){ singles.push(i); return; }
     const key=(normDesc(r.desc)||'бусад')+'␟'+r.dir;
     (groups[key]=groups[key]||[]).push(i);
@@ -2148,7 +2528,7 @@ function impRenderRows(){
     return `<tr class="${child!==null&&child!==undefined&&child!==''? 'grp-child grp-c'+child : ''}">
       <td><input type="checkbox" ${r.include?'checked':''} onchange="impSetRow(${i},'include',this.checked)"></td>
       <td class="mono">${esc(r.date)}</td>
-      <td style="max-width:240px;">${esc(r.desc)}${r.matched?' <span class="badge ok">тулгалт: '+esc(r.matched)+'</span>':''}${r.fromHistory?' <span class="badge hist" title="Өмнөх журналын ижил утгатай бичилтээс санал болгов">түүхээс</span>':''}</td>
+      <td style="max-width:240px;">${esc(r.desc)}${r.matched?' <span class="badge ok">тулгалт: '+esc(r.matched)+'</span>':''}${impSrcBadge(r)}${impLinkBadge(r,i)}</td>
       <td><input class="pill-input" style="min-width:110px;" list="partnerList" value="${esc(r.partner)}" onchange="impSetRow(${i},'partner',this.value)"></td>
       <td class="num mono">${fmtZ(r.amount)}</td>
       <td><select class="pill-input" style="min-width:92px;" onchange="impSetRow(${i},'dir',this.value)">
@@ -2180,6 +2560,7 @@ function impRenderRows(){
     ix.forEach(i2=>{ html+=rowHtml(IMP.mapped[i2], i2, gi); });
   });
   plainRows.forEach(i2=>{ html+=rowHtml(IMP.mapped[i2], i2, null); });
+  if(!multi.length && !plainRows.length) html+='<tr><td colspan="9"><div class="empty"><b>Харагдах мөр алга</b>'+(onlyEmpty?'Бүх мөр данстай болсон байна — шүүлтүүрийг арилгана уу':'Мөр уншигдаагүй байна')+'</div></td></tr>';
   html+='</tbody>';
   document.getElementById('impRowsTable').innerHTML=html;
   impMappedInfo();
@@ -2187,22 +2568,57 @@ function impRenderRows(){
 }
 function impRenderRowsVat(){
   const isBuy=IMP.type==='vatbuy';
-  const accOpts='<option value="">— данс —</option>'+DB.accounts.filter(a=> isBuy? !['51','52','92'].includes(a.cat) : ['51','52'].includes(a.cat)).map(a=>`<option value="${esc(a.code)}">${esc(a.code)} ${esc(a.name)}</option>`).join('');
-  let html='<thead><tr><th></th><th>Огноо</th><th>'+(isBuy?'Нийлүүлэгч':'Худалдан авагч')+'</th><th>ТТД</th><th>Утга</th><th class="num">Цэвэр дүн</th><th class="num">НӨАТ</th><th class="num">Нийт дүн</th><th style="min-width:200px;">'+(isBuy?'Зардал / хөрөнгийн данс':'Орлогын данс')+'</th><th>Дүрэм</th></tr></thead><tbody>';
+  const accOptsRaw=DB.accounts.filter(a=> isBuy? !['51','52','92'].includes(a.cat) : ['51','52'].includes(a.cat)).map(a=>`<option value="${esc(a.code)}">${esc(a.code)} ${esc(a.name)}</option>`).join('');
+  const accOpts='<option value="">— данс —</option>'+accOptsRaw;
+  impFillBulkSel(accOptsRaw);
+  const onlyEmpty=impOnlyEmptyOn();
+  // ── Бүлэглэлт: нэг харилцагчийн бүх падааныг нэг бүлэг болгоно.
+  //    12 падаантай нийлүүлэгч → 12 биш, 1 сонголтоор данстай болно ──
+  const groups={};
   IMP.mapped.forEach((r,i)=>{
-    html+=`<tr>
+    if(onlyEmpty && r.acc) return;
+    const key=(String(r.partner||'').trim().toLowerCase()||'бусад')+'␟'+String(r.tin||'').trim();
+    (groups[key]=groups[key]||[]).push(i);
+  });
+  const multi=Object.entries(groups).filter(([k,ix])=>ix.length>1);
+  const plainRows=Object.values(groups).filter(ix=>ix.length===1).map(ix=>ix[0]).sort((a,b)=>a-b);
+  let html='<thead><tr><th></th><th>Огноо</th><th>'+(isBuy?'Нийлүүлэгч':'Худалдан авагч')+'</th><th>ТТД</th><th>Утга</th><th class="num">Цэвэр дүн</th><th class="num">НӨАТ</th><th class="num">Нийт дүн</th><th style="min-width:200px;">'+(isBuy?'Зардал / хөрөнгийн данс':'Орлогын данс')+'</th><th>Дүрэм</th></tr></thead><tbody>';
+  const rowHtml=(r,i,child)=>`<tr class="${child!==null&&child!==undefined&&child!==''? 'grp-child grp-c'+child : ''}">
       <td><input type="checkbox" ${r.include?'checked':''} onchange="impSetRow(${i},'include',this.checked)"></td>
       <td class="mono">${esc(r.date)}</td>
       <td><input class="pill-input" style="min-width:120px;" list="partnerList" value="${esc(r.partner)}" onchange="impSetRow(${i},'partner',this.value)"></td>
       <td><input class="pill-input" style="width:92px;" value="${esc(r.tin||'')}" onchange="impSetRow(${i},'tin',this.value)"></td>
-      <td style="max-width:160px;">${esc(r.desc)}</td>
+      <td style="max-width:160px;">${esc(r.desc)}${impSrcBadge(r)}</td>
       <td class="num mono">${fmtZ(r.net)}</td>
       <td class="num mono">${fmtZ(r.vat)}</td>
       <td class="num mono">${fmtZ(r.total)}</td>
       <td><select class="pill-input" onchange="impSetRow(${i},'acc',this.value)">${accOpts.replace(`value="${esc(r.acc)}"`,`value="${esc(r.acc)}" selected`)}</select></td>
       <td style="text-align:center;"><input type="checkbox" ${r.makeRule?'checked':''} onchange="impSetRow(${i},'makeRule',this.checked)" title="Энэ харилцагч + дансыг дүрэм болгож хадгалах"></td>
     </tr>`;
+  multi.sort((a,b)=>b[1].length-a[1].length);
+  multi.forEach(([key, ix], gi)=>{
+    const first=IMP.mapped[ix[0]];
+    const tNet=r2(ix.reduce((s,i2)=>s+IMP.mapped[i2].net,0));
+    const tVat=r2(ix.reduce((s,i2)=>s+IMP.mapped[i2].vat,0));
+    const tTot=r2(ix.reduce((s,i2)=>s+IMP.mapped[i2].total,0));
+    const accSet=new Set(ix.map(i2=>IMP.mapped[i2].acc||''));
+    const groupAcc=accSet.size===1? [...accSet][0] : '';
+    html+=`<tr class="grp-head" id="grpHead${gi}" onclick="if(event.target.tagName!=='SELECT'&&event.target.tagName!=='OPTION')impToggleGroup(${gi})">
+      <td>▸</td>
+      <td class="mono">${ix.length} падаан</td>
+      <td style="max-width:200px;"><b>${esc(first.partner||'(харилцагчгүй)')}</b><span class="grp-count">×${ix.length}</span></td>
+      <td class="mono">${esc(first.tin||'')}</td>
+      <td style="font-size:10.5px;color:var(--txt-muted);">бүлгээр оноох</td>
+      <td class="num mono"><b>${fmtZ(tNet)}</b></td>
+      <td class="num mono"><b>${fmtZ(tVat)}</b></td>
+      <td class="num mono"><b>${fmtZ(tTot)}</b></td>
+      <td><select class="pill-input" onchange="impSetGroupAcc([${ix.join(',')}],this.value)" onclick="event.stopPropagation()">${accOpts.replace(`value="${esc(groupAcc)}"`,`value="${esc(groupAcc)}" selected`)}</select></td>
+      <td></td>
+    </tr>`;
+    ix.forEach(i2=>{ html+=rowHtml(IMP.mapped[i2], i2, gi); });
   });
+  plainRows.forEach(i2=>{ html+=rowHtml(IMP.mapped[i2], i2, null); });
+  if(!multi.length && !plainRows.length) html+='<tr><td colspan="10"><div class="empty"><b>Харагдах мөр алга</b>'+(onlyEmpty?'Бүх падаан данстай болсон байна — шүүлтүүрийг арилгана уу':'Мөр уншигдаагүй байна')+'</div></td></tr>';
   html+='</tbody>';
   document.getElementById('impRowsTable').innerHTML=html;
   impMappedInfo();
@@ -2222,6 +2638,21 @@ function impToStage4(){
   checks.push({state:noAcc?'err':'ok', text:noAcc?(noAcc+' мөрөнд харьцсан данс сонгоогүй'):'Бүх мөр харьцсан данстай'});
   if(badAcc) checks.push({state:'err', text:badAcc+' мөрөнд бүртгэлгүй дансны код байна'});
   checks.push({state:outPeriod?'warn':'ok', text:outPeriod?(outPeriod+' мөрийн огноо тайлант үеэс гадуур ('+DB.settings.from+' — '+DB.settings.to+') — үеийн өмнөх нь эхний үлдэгдэлд шингэж, дараах нь тайланд орохгүй'):'Бүх огноо тайлант үе дотор'});
+  // Падаантай холболтын байдал
+  const setRows=inc.filter(r=>r.vat==='payable'||r.vat==='receivable');
+  if(setRows.length){
+    const linked=setRows.filter(r=>Array.isArray(r.refs)&&r.refs.length);
+    const nDocs=new Set(linked.flatMap(r=>r.refs.map(a=>String(a.doc)))).size;
+    const partial=setRows.reduce((s,r)=>{
+      const t=(r.refs||[]).reduce((x,a)=>x+a.amt,0);
+      return s + (t<r.amount-0.004? r2(r.amount-t):0);
+    },0);
+    const un=setRows.length-linked.length;
+    checks.push({state:(un||partial>0.004)?'warn':'ok',
+      text: linked.length+' төлбөр '+nDocs+' падаантай шууд холбогдож тооцоо автоматаар хаагдана'
+        +(un? ' — '+un+' төлбөр падаан холбоогүй':'')
+        +(partial>0.004? ' — '+fmtZ(partial)+' нь урьдчилгаа/нээлттэй үлдэгдэл болно':'')});
+  }
   // Давхардлын анхааруулга: НӨАТ-тэй/энгийн зарлага нь нээлттэй өглөгтэй таарч байвал
   const dup=inc.filter(r=> r.dir==='out' && (r.vat==='buy'||r.vat==='plain') && suggestMatch(r,'payable')).length;
   if(dup) checks.push({state:'warn', text:dup+' зарлагын мөр нээлттэй өглөгтэй дүнгээрээ таарч байна — падаанаар аль хэдийн бүртгэсэн бол «Өглөгийн төлөлт» төрлийг сонгоогүй тохиолдолд зардал ДАВХАРДАНА'});
@@ -2284,12 +2715,21 @@ function impPost(){
       const doc=nextDocNo();
       ensurePartner(r.partner);
       const base={doc, date:r.date, desc:r.desc, partner:r.partner, source:'import', batch};
-      if(r.vat==='payable'){
-        DB.journal.push({...base, dt:s.accPayable, kt:mainAcc, amt:r.amount, desc:r.desc+' — өглөгийн төлөлт'});
-        lines+=1;
-      } else if(r.vat==='receivable'){
-        DB.journal.push({...base, dt:mainAcc, kt:s.accReceivable, amt:r.amount, desc:r.desc+' — авлагын орлого'});
-        lines+=1;
+      if(r.vat==='payable'||r.vat==='receivable'){
+        const pay=r.vat==='payable';
+        const lbl=pay?'өглөгийн төлөлт':'авлагын орлого';
+        const push=(amt,ref)=>{ DB.journal.push({...base,
+          dt: pay? s.accPayable : mainAcc,
+          kt: pay? mainAcc : s.accReceivable,
+          amt, ...(ref?{ref:String(ref)}:{}),
+          desc:r.desc+' — '+lbl+(ref?' (падаан №'+ref+')':'')}); lines+=1; };
+        const allocs=Array.isArray(r.refs)? r.refs : [];
+        let rest=r2(r.amount);
+        for(const a of allocs){
+          const take=Math.min(r2(a.amt), rest);
+          if(take>0.004){ push(take, a.doc); rest=r2(rest-take); }
+        }
+        if(rest>0.004) push(rest, null);   // холбоогүй үлдэгдэл — урьдчилгаа, FIFO-гоор хаагдана
       } else if(r.vat==='plain'){
         if(r.dir==='in') DB.journal.push({...base, dt:mainAcc, kt:r.acc, amt:r.amount});
         else             DB.journal.push({...base, dt:r.acc, kt:mainAcc, amt:r.amount});
