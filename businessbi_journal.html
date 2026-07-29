@@ -231,6 +231,10 @@ tr.set-detail>td{background:var(--bg-row)!important;padding:8px 10px 12px 34px;}
 .grp-child{display:none;}
 .grp-open .grp-child{display:table-row;}
 .grp-count{display:inline-block;background:var(--c-accent);color:#fff;border-radius:9px;padding:0 7px;font-size:10px;margin-left:6px;}
+.flt-in{display:block;margin-top:4px;width:100%;min-width:58px;box-sizing:border-box;font-weight:400;padding:2px 6px;border:none;border-radius:4px;font-size:11px;color:#1e293b;background:#fff;}
+.flt-in:focus{outline:2px solid var(--acc-mid);}
+.flt-clear{display:block;margin-top:4px;background:rgba(255,255,255,.18);color:#fff;border:none;border-radius:4px;font-size:11px;cursor:pointer;padding:2px 5px;width:100%;}
+.flt-clear:hover{background:rgba(255,255,255,.35);}
 .badge.hist{background:#EEF2FF;color:#4338CA;}
 .imp-type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;}
 .imp-type-card{border:1px solid var(--bdr-strong);border-radius:var(--r-lg);padding:12px 13px;cursor:pointer;background:var(--bg-surface);display:flex;flex-direction:column;gap:5px;transition:border-color .12s, background .12s, box-shadow .12s;user-select:none;}
@@ -1750,6 +1754,7 @@ function impToStage3(){
   IMP.skip=skip;
   if(!IMP.mapped.length){ toast('Уншиж чадсан мөр олдсонгүй — огнооны формат, дүнгийн баганаа шалгана уу', true); return; }
   document.getElementById('impRowCount').value=IMP.mapped.length;
+  IMP.flt={};
   impApplyRules(true);
   impRenderRows();
   impGoStage(3);
@@ -1969,6 +1974,7 @@ function impToStage3Vat(){
   if(!IMP.mapped.length){ toast('Уншиж чадсан мөр олдсонгүй — багана, огнооны форматаа шалгана уу', true); return; }
   if(netMismatch) toast(netMismatch+' мөрөнд цэвэр дүн ≠ нийт − НӨАТ (НХАТ байж магадгүй) — зөрүү нь зардалд шингэнэ');
   document.getElementById('impRowCount').value=IMP.mapped.length;
+  IMP.flt={};
   impApplyRules(true);
   impRenderRows();
   impGoStage(3);
@@ -2316,9 +2322,11 @@ function impBulkAcc(code){
   if(!code) return;
   if(!accByCode(code)){ toast('Ийм код бүхий данс алга', true); return; }
   let n=0;
-  IMP.mapped.forEach(r=>{ if(!r.acc && r.include && r.vat!=='payable' && r.vat!=='receivable'){ r.acc=code; r.autoFilled=true; n++; } });
+  IMP.mapped.forEach(r=>{
+    if(!r.acc && r.include && r.vat!=='payable' && r.vat!=='receivable' && impRowVisible(r)){ r.acc=code; r.autoFilled=true; n++; }
+  });
   impRenderRows();
-  toast(n? (n+' мөрөнд '+accLabel(code)+' оноогдлоо') : 'Дансгүй мөр үлдээгүй байна');
+  toast(n? (n+' мөрөнд '+accLabel(code)+' оноогдлоо'+(impFltActive()?' (зөвхөн шүүлтүүрт харагдаж буй мөрөнд)':'')) : 'Дансгүй мөр үлдээгүй байна');
 }
 /* Нэг мөрөнд данс сонгоход тухайн багц доторх ижил төрлийн бусад ХООСОН мөрийг
    мөн бөглөнө — 12 падаан → 1 сонголт болж гар ажиллагаа эрс багасна */
@@ -2345,6 +2353,57 @@ function impToggleOnlyEmpty(){ impRenderRows(); }
 function impOnlyEmptyOn(){
   const el=document.getElementById('impOnlyEmpty');
   return !!(el&&el.checked);
+}
+/* ═══ Баганы шүүлтүүр (импортын хүснэгтийн толгойд) ═══ */
+function impFltGet(){ IMP.flt=IMP.flt||{}; return IMP.flt; }
+function impFltActive(){ return Object.values(impFltGet()).some(v=>v&&String(v).trim()); }
+function impFltClear(){ IMP.flt={}; impRenderRows(); }
+let IMPFLT_T=null;
+function impFltSet(k, v, immediate){
+  impFltGet()[k]=v;
+  clearTimeout(IMPFLT_T);
+  const go=()=>{
+    const act=document.activeElement;
+    const id=act&&act.id, pos=(act&&act.selectionStart!=null)? act.selectionStart : null;
+    impRenderRows();
+    if(id){ const el=document.getElementById(id);
+      if(el){ el.focus(); if(pos!=null){ try{ el.setSelectionRange(pos,pos); }catch(e){} } } }
+  };
+  if(immediate) go(); else IMPFLT_T=setTimeout(go, 180);
+}
+/* Дүнгийн шүүлтүүр: >1000000, <5000, =545380 эсвэл тоон хэсгээр хайх */
+function impAmtMatch(amount, q){
+  q=String(q||'').replace(/[,\s']/g,'');
+  if(!q) return true;
+  const op=q[0], num=parseFloat(q.replace(/^[<>=]+/,''));
+  if(op==='>') return isNaN(num)? true : amount>num;
+  if(op==='<') return isNaN(num)? true : amount<num;
+  if(op==='=') return isNaN(num)? true : Math.abs(amount-num)<0.01;
+  return String(Math.round(amount*100)/100).includes(q);
+}
+function impRowVisible(r){
+  const f=impFltGet();
+  const has=v=>v&&String(v).trim()!=='';
+  const inc=(a,b)=>String(a||'').toLowerCase().includes(String(b).trim().toLowerCase());
+  if(has(f.date) && !inc(r.date, f.date)) return false;
+  if(has(f.desc) && !inc(r.desc, f.desc)) return false;
+  if(has(f.partner) && !inc(r.partner, f.partner)) return false;
+  if(has(f.tin) && !inc(r.tin, f.tin)) return false;
+  if(has(f.amt) && !impAmtMatch(IMP.type==='bank'? r.amount : r.total, f.amt)) return false;
+  if(has(f.dir) && r.dir!==f.dir) return false;
+  if(has(f.vat) && r.vat!==f.vat) return false;
+  if(has(f.acc)){ if(f.acc==='__empty'){ if(r.acc) return false; } else if(r.acc!==f.acc) return false; }
+  return true;
+}
+function impFltAccOpts(){
+  const f=impFltGet();
+  const used=[...new Set(IMP.mapped.map(r=>r.acc).filter(Boolean))].sort();
+  return '<option value="">Бүгд</option><option value="__empty" '+(f.acc==='__empty'?'selected':'')+'>— хоосон —</option>'+
+    used.map(c=>`<option value="${esc(c)}" ${f.acc===c?'selected':''}>${esc(accLabel(c))}</option>`).join('');
+}
+function impFltIn(key, ph, style){
+  const f=impFltGet();
+  return `<input class="flt-in" id="impF_${key}" style="${style||''}" placeholder="${ph||'шүүх…'}" value="${esc(f[key]||'')}" oninput="impFltSet('${key}',this.value)">`;
 }
 function impSetRow(i, field, val){
   const r=IMP.mapped[i];
@@ -2389,9 +2448,11 @@ function impMappedInfo(){
   const done=inc.filter(r=>r.acc&&accByCode(r.acc)).length;
   const left=inc.length-done;
   const el=document.getElementById('impMappedInfo');
-  if(el) el.innerHTML= left
+  if(!el) return;
+  const flt=impFltActive()? ' · <span style="color:var(--acc-mid);">шүүлтүүр: '+(IMP.fltShown||0)+' / '+IMP.mapped.length+' мөр харагдана</span>' : '';
+  el.innerHTML=( left
     ? (done+' / '+inc.length+' мөр данстай · <b style="color:var(--red);">'+left+' мөр үлдсэн</b>')
-    : ('<b style="color:var(--green);">Бүх '+inc.length+' мөр данстай ✓</b>');
+    : ('<b style="color:var(--green);">Бүх '+inc.length+' мөр данстай ✓</b>') ) + flt;
 }
 /* Bulk сонголтын жагсаалтыг тухайн импортын төрөлд тохируулж дүүргэнэ */
 function impFillBulkSel(opts){
@@ -2505,18 +2566,39 @@ function impRenderRows(){
   const accOpts='<option value="">— данс —</option>'+accOptsRaw;
   impFillBulkSel(accOptsRaw);
   const onlyEmpty=impOnlyEmptyOn();
+  const f=impFltGet();
   // ── Бүлэглэлт: тулгагдаагүй мөрүүдийг цэвэрлэсэн утгаар нь бүлэглэнэ ──
   const groups={}; const singles=[];
+  let shown=0;
   IMP.mapped.forEach((r,i)=>{
     if(onlyEmpty && r.acc) return;
+    if(!impRowVisible(r)) return;
+    shown++;
     if(r.vat==='payable'||r.vat==='receivable'){ singles.push(i); return; }
     const key=(normDesc(r.desc)||'бусад')+'␟'+r.dir;
     (groups[key]=groups[key]||[]).push(i);
   });
+  IMP.fltShown=shown;
   const multi=Object.entries(groups).filter(([k,ix])=>ix.length>1);
   const singleFromGroups=Object.values(groups).filter(ix=>ix.length===1).map(ix=>ix[0]);
   const plainRows=[...singles, ...singleFromGroups].sort((a,b)=>a-b);
-  let html='<thead><tr><th></th><th>Огноо</th><th>Гүйлгээний утга</th><th>Харилцагч</th><th class="num">Дүн</th><th>Чиглэл</th><th style="min-width:200px;">Харьцсан данс</th><th>Төрөл</th><th>Дүрэм</th></tr></thead><tbody>';
+  let html=`<thead><tr>
+    <th class="chk">${impFltActive()? '<button class="flt-clear" onclick="impFltClear()" title="Бүх шүүлтүүрийг цэвэрлэх">✕</button>':''}</th>
+    <th>Огноо${impFltIn('date','2026-01')}</th>
+    <th>Гүйлгээний утга${impFltIn('desc','шүүх…','min-width:110px;')}</th>
+    <th>Харилцагч${impFltIn('partner')}</th>
+    <th class="num">Дүн${impFltIn('amt','>1000000')}</th>
+    <th>Чиглэл<select class="flt-in" id="impF_dir" onchange="impFltSet('dir',this.value,true)">
+      <option value="">Бүгд</option><option value="in" ${f.dir==='in'?'selected':''}>Орлого</option><option value="out" ${f.dir==='out'?'selected':''}>Зарлага</option></select></th>
+    <th style="min-width:200px;">Харьцсан данс<select class="flt-in" id="impF_acc" onchange="impFltSet('acc',this.value,true)">${impFltAccOpts()}</select></th>
+    <th>Төрөл<select class="flt-in" id="impF_vat" onchange="impFltSet('vat',this.value,true)">
+      <option value="">Бүгд</option>
+      <option value="plain" ${f.vat==='plain'?'selected':''}>Энгийн</option>
+      <option value="sale" ${f.vat==='sale'?'selected':''}>НӨАТ борл</option>
+      <option value="buy" ${f.vat==='buy'?'selected':''}>НӨАТ ХА</option>
+      <option value="payable" ${f.vat==='payable'?'selected':''}>Өглөгийн төлөлт</option>
+      <option value="receivable" ${f.vat==='receivable'?'selected':''}>Авлагын орлого</option></select></th>
+    <th>Дүрэм</th></tr></thead><tbody>`;
   const rowHtml=(r,i,child)=>{
     const isSettle=r.vat==='payable'||r.vat==='receivable';
     const typeOpts=`
@@ -2560,7 +2642,7 @@ function impRenderRows(){
     ix.forEach(i2=>{ html+=rowHtml(IMP.mapped[i2], i2, gi); });
   });
   plainRows.forEach(i2=>{ html+=rowHtml(IMP.mapped[i2], i2, null); });
-  if(!multi.length && !plainRows.length) html+='<tr><td colspan="9"><div class="empty"><b>Харагдах мөр алга</b>'+(onlyEmpty?'Бүх мөр данстай болсон байна — шүүлтүүрийг арилгана уу':'Мөр уншигдаагүй байна')+'</div></td></tr>';
+  if(!multi.length && !plainRows.length) html+='<tr><td colspan="9"><div class="empty"><b>Харагдах мөр алга</b>'+(impFltActive()?'Шүүлтүүрт таарах мөр алга — толгойн ✕ товчоор цэвэрлэнэ үү':onlyEmpty?'Бүх мөр данстай болсон байна — шүүлтүүрийг арилгана уу':'Мөр уншигдаагүй байна')+'</div></td></tr>';
   html+='</tbody>';
   document.getElementById('impRowsTable').innerHTML=html;
   impMappedInfo();
@@ -2575,14 +2657,27 @@ function impRenderRowsVat(){
   // ── Бүлэглэлт: нэг харилцагчийн бүх падааныг нэг бүлэг болгоно.
   //    12 падаантай нийлүүлэгч → 12 биш, 1 сонголтоор данстай болно ──
   const groups={};
+  let shown=0;
   IMP.mapped.forEach((r,i)=>{
     if(onlyEmpty && r.acc) return;
+    if(!impRowVisible(r)) return;
+    shown++;
     const key=(String(r.partner||'').trim().toLowerCase()||'бусад')+'␟'+String(r.tin||'').trim();
     (groups[key]=groups[key]||[]).push(i);
   });
+  IMP.fltShown=shown;
   const multi=Object.entries(groups).filter(([k,ix])=>ix.length>1);
   const plainRows=Object.values(groups).filter(ix=>ix.length===1).map(ix=>ix[0]).sort((a,b)=>a-b);
-  let html='<thead><tr><th></th><th>Огноо</th><th>'+(isBuy?'Нийлүүлэгч':'Худалдан авагч')+'</th><th>ТТД</th><th>Утга</th><th class="num">Цэвэр дүн</th><th class="num">НӨАТ</th><th class="num">Нийт дүн</th><th style="min-width:200px;">'+(isBuy?'Зардал / хөрөнгийн данс':'Орлогын данс')+'</th><th>Дүрэм</th></tr></thead><tbody>';
+  let html=`<thead><tr>
+    <th class="chk">${impFltActive()? '<button class="flt-clear" onclick="impFltClear()" title="Бүх шүүлтүүрийг цэвэрлэх">✕</button>':''}</th>
+    <th>Огноо${impFltIn('date','2026-01')}</th>
+    <th>${isBuy?'Нийлүүлэгч':'Худалдан авагч'}${impFltIn('partner')}</th>
+    <th>ТТД${impFltIn('tin')}</th>
+    <th>Утга${impFltIn('desc')}</th>
+    <th class="num">Цэвэр дүн</th><th class="num">НӨАТ</th>
+    <th class="num">Нийт дүн${impFltIn('amt','>1000000')}</th>
+    <th style="min-width:200px;">${isBuy?'Зардал / хөрөнгийн данс':'Орлогын данс'}<select class="flt-in" id="impF_acc" onchange="impFltSet('acc',this.value,true)">${impFltAccOpts()}</select></th>
+    <th>Дүрэм</th></tr></thead><tbody>`;
   const rowHtml=(r,i,child)=>`<tr class="${child!==null&&child!==undefined&&child!==''? 'grp-child grp-c'+child : ''}">
       <td><input type="checkbox" ${r.include?'checked':''} onchange="impSetRow(${i},'include',this.checked)"></td>
       <td class="mono">${esc(r.date)}</td>
@@ -2618,7 +2713,7 @@ function impRenderRowsVat(){
     ix.forEach(i2=>{ html+=rowHtml(IMP.mapped[i2], i2, gi); });
   });
   plainRows.forEach(i2=>{ html+=rowHtml(IMP.mapped[i2], i2, null); });
-  if(!multi.length && !plainRows.length) html+='<tr><td colspan="10"><div class="empty"><b>Харагдах мөр алга</b>'+(onlyEmpty?'Бүх падаан данстай болсон байна — шүүлтүүрийг арилгана уу':'Мөр уншигдаагүй байна')+'</div></td></tr>';
+  if(!multi.length && !plainRows.length) html+='<tr><td colspan="10"><div class="empty"><b>Харагдах мөр алга</b>'+(impFltActive()?'Шүүлтүүрт таарах падаан алга — толгойн ✕ товчоор цэвэрлэнэ үү':onlyEmpty?'Бүх падаан данстай болсон байна — шүүлтүүрийг арилгана уу':'Мөр уншигдаагүй байна')+'</div></td></tr>';
   html+='</tbody>';
   document.getElementById('impRowsTable').innerHTML=html;
   impMappedInfo();
