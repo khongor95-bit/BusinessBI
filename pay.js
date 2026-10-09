@@ -167,7 +167,12 @@
       if (win && !win.closed) { try { win.close(); } catch (_) {} }
       console.error(e);
       const msg = (e && e.message) || "алдаа";
-      setStatus(/unauthenticated|нэвтэрнэ/i.test(msg) ? "Эхлээд нэвтэрнэ үү." : "Төлбөр эхлүүлж чадсангүй: " + msg, "err");
+      const code = (e && e.code) || "";
+      let text;
+      if (/unauthenticated|нэвтэрнэ/i.test(msg + code)) text = "Эхлээд нэвтэрнэ үү.";
+      else if (/not-found|functions\/not-found|SDK ачаалагдсангүй|Failed to fetch|NetworkError/i.test(msg + code)) text = "Төлбөрийн систем одоогоор тохируулагдаж байна — түр хүлээгээд дахин оролдоно уу. (Серверийн функц хараахан deploy хийгдээгүй.)";
+      else text = "Төлбөр эхлүүлж чадсангүй: " + msg;
+      setStatus(text, "err");
       btn.disabled = false;
     }
   }
