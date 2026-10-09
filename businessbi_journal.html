@@ -4,6 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BusinessBI — Ерөнхий журнал ба автомат тайлан</title>
+<meta name="description" content="Ерөнхий журнал бичихэд СТ-1–СТ-4 санхүүгийн тайлан, ТТ-02 татварын тайлан, тодруулга автоматаар — Сангийн сайдын 361-р тушаалын дагуу. 14 хоног үнэгүй.">
+<link rel="canonical" href="https://businessbi.mn/businessbi_journal.html">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#216a4c">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BusinessBI.mn">
+<meta property="og:title" content="BusinessBI — Ерөнхий журнал ба автомат тайлан">
+<meta property="og:description" content="Ерөнхий журнал бичихэд СТ-1–СТ-4 санхүүгийн тайлан, ТТ-02 татварын тайлан, тодруулга автоматаар — Сангийн сайдын 361-р тушаалын дагуу. 14 хоног үнэгүй.">
+<meta property="og:url" content="https://businessbi.mn/businessbi_journal.html">
+<meta property="og:image" content="https://businessbi.mn/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="mn_MN">
+<meta name="twitter:card" content="summary_large_image">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -4955,7 +4971,9 @@ function cloudAuthClick(){
   }
 }
 function billingInfo(){
-  alert('Cloud эрх сунгах:\n\n1) Хаан банк: 5123456789 (BusinessBI)\n2) Гүйлгээний утга: НЭВТЭРСЭН ИМЭЙЛ хаягаа бичнэ\n3) Төлбөр баталгаажмагц эрх автоматаар сунгагдана.\n\nАсуулт: info@businessbi.mn');
+  // Төлбөрийн сувгийг WIRE.mn-ээр нээх хүртэл: үнийн хуудас + имэйлээр холбогдох
+  const email=(CLOUD&&CLOUD.user&&CLOUD.user.email)||'';
+  if(confirm('Cloud эрх сунгах:\n\nТуршилтын дараах сарын төлбөрийг бүртгүүлсэн хэрэглэгчдэд эхэлж зарлана. Эрхээ сунгуулах, үнийн санал авах бол hello@businessbi.mn руу нэвтэрсэн имэйлээрээ ('+email+') бичнэ үү.\n\n«OK» дарвал үнийн хуудас нээгдэнэ.')) window.open('pricing.html','_blank');
 }
 /* ── Компани удирдлага ── */
 function updateCompanyUI(){

@@ -3,7 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="site.css">
+<script src="site.js" defer></script>
+
 <title>Нягтлан болж бүртгүүлэх — BusinessBI.mn</title>
+<meta name="description" content="Нягтлан бодогч та BusinessBI-д бүртгүүлж, захиалга хүлээн авч эхлээрэй.">
+<link rel="canonical" href="https://businessbi.mn/accountant_signup.html">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#216a4c">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BusinessBI.mn">
+<meta property="og:title" content="Нягтлан болж бүртгүүлэх — BusinessBI.mn">
+<meta property="og:description" content="Нягтлан бодогч та BusinessBI-д бүртгүүлж, захиалга хүлээн авч эхлээрэй.">
+<meta property="og:url" content="https://businessbi.mn/accountant_signup.html">
+<meta property="og:image" content="https://businessbi.mn/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="mn_MN">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -82,18 +101,6 @@ footer{background:#111;color:#fff;padding:50px 0 36px;margin-top:40px}
 </head>
 <body>
 
-<header>
-  <div class="container navbar">
-    <a href="index.html" class="logo">Business<span>BI</span></a>
-    <nav class="menu" id="menu">
-      <a href="index.html#tools">Хэрэгслүүд</a>
-      <a href="businessbi_journal.html">Санхүүгийн програм</a>
-      <a href="accountants.html">Тайлан гаргах үйлчилгээ</a>
-      <a href="index.html#contact" class="cta">Холбогдох</a>
-    </nav>
-    <button class="burger" id="burger" aria-label="Цэс"><span></span><span></span><span></span></button>
-  </div>
-</header>
 
 <div class="container">
   <div class="wrap">
@@ -173,19 +180,6 @@ footer{background:#111;color:#fff;padding:50px 0 36px;margin-top:40px}
   </div>
 </div>
 
-<footer>
-  <div class="container foot-inner">
-    <div>
-      <a href="index.html" class="logo" style="display:block;margin-bottom:8px">Business<span>BI</span></a>
-      <p>Тоо баримтыг шийдвэр болгоно. © 2026</p>
-    </div>
-    <div class="foot-links">
-      <a href="index.html#tools">Хэрэгслүүд</a>
-      <a href="accountants.html">Тайлан гаргах үйлчилгээ</a>
-      <a href="index.html#contact">Холбоо барих</a>
-    </div>
-  </div>
-</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
@@ -255,9 +249,5 @@ document.getElementById('fSend').addEventListener('click', async ()=>{
   }
 });
 
-// burger
-const burger=document.getElementById('burger'), menu=document.getElementById('menu');
-burger.addEventListener('click',()=>{burger.classList.toggle('open');menu.classList.toggle('open');});
-</script>
 </body>
 </html>

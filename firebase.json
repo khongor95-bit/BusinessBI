@@ -4,10 +4,16 @@
       "source": "functions",
       "codebase": "payments",
       "runtime": "nodejs20",
-      "ignore": ["node_modules", ".git", "*.log", "test"]
+      "ignore": [
+        "node_modules",
+        ".git",
+        "*.log",
+        "test"
+      ]
     }
   ],
   "firestore": {
+    "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   }
 }

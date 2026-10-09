@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BusinessBI — Хэрэглэгчийн үйлдлийн тайлан</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <style>
   :root{
     --ink:#0d1b2a; --ink-soft:#415a77; --paper:#f5f3ee; --card:#ffffff;
@@ -147,6 +149,24 @@
     <h2>Хамгийн идэвхтэй хэрэглэгч</h2>
     <div id="topUsers"></div>
   </div>
+  <div class="panel full" id="leadsPanel">
+    <h2>Хүсэлтүүд (холбоо барих форм) <span id="leadsCount" style="font-weight:400;color:var(--ink-soft);font-size:13px"></span></h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Огноо</th><th>Нэр</th><th>Утас</th><th>И-мэйл</th><th>Сэдэв</th><th>Мессеж</th><th>Төлөв</th></tr></thead>
+        <tbody id="leadRows"><tr><td colspan="7" style="color:var(--ink-soft)">Уншиж байна…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="panel full" id="payPanel">
+    <h2>Төлбөр (WIRE.mn) <span id="payCount" style="font-weight:400;color:var(--ink-soft);font-size:13px"></span></h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Огноо</th><th>Хэрэглэгч</th><th>Хэрэгсэл</th><th>Дүн</th><th>Төлөв</th><th>Сувг</th><th>Татсан</th></tr></thead>
+        <tbody id="payRows"><tr><td colspan="7" style="color:var(--ink-soft)">Уншиж байна…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
   <div class="panel full">
     <h2>Сүүлийн үйлдлүүд</h2>
     <div style="overflow-x:auto">
@@ -252,7 +272,40 @@ function doLogout(){ if(auth) auth.signOut(); }
 /* ============================================================
    2) ДАШБОАРД: Firestore-оос уншиж, анализ хийж, зурна
    ============================================================ */
+
+/* ── Хүсэлтүүд (leads) ба төлбөрүүд (payments) ── */
+const TOPIC_MN={tools:'Хэрэгслүүд',journal:'Журнал',accountant:'Нягтлан холбуулах',become_accountant:'Нягтлан болох',training:'Сургалт',corporate:'Байгууллагын сургалт',waitlist:'Хүлээлгийн жагсаалт',custom:'Захиалгат ажил',other:'Бусад'};
+function tsStr(t){ try{ const d=t&&t.toDate?t.toDate():new Date(t); return d.toLocaleString('mn-MN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}); }catch(e){ return ''; } }
+async function loadLeads(){
+  if(!db) return;
+  const tb=document.getElementById('leadRows'); if(!tb) return;
+  try{
+    const snap=await db.collection('leads').orderBy('createdAt','desc').limit(200).get();
+    document.getElementById('leadsCount').textContent=snap.size?`(${snap.size})`:'';
+    if(snap.empty){ tb.innerHTML='<tr><td colspan="7" style="color:var(--ink-soft)">Хүсэлт ирээгүй байна.</td></tr>'; return; }
+    tb.innerHTML=snap.docs.map(d=>{const l=d.data(); const st=l.status||'new';
+      return `<tr><td>${tsStr(l.createdAt)}</td><td>${esc(l.name||'')}</td><td><a href="tel:${esc(l.phone||'')}">${esc(l.phone||'')}</a></td><td>${esc(l.email||'')}</td><td>${esc(TOPIC_MN[l.topic]||l.topicText||l.topic||'')}</td><td style="max-width:360px;white-space:pre-wrap">${esc(l.message||'')}</td>
+      <td><select data-lead="${d.id}" style="font:inherit;font-size:12px"><option value="new"${st==='new'?' selected':''}>Шинэ</option><option value="contacted"${st==='contacted'?' selected':''}>Холбогдсон</option><option value="won"${st==='won'?' selected':''}>Болсон</option><option value="lost"${st==='lost'?' selected':''}>Болоогүй</option></select></td></tr>`;}).join('');
+    tb.querySelectorAll('select[data-lead]').forEach(sel=>sel.onchange=()=>db.collection('leads').doc(sel.dataset.lead).update({status:sel.value}).catch(e=>alert('Хадгалж чадсангүй: '+e.message)));
+  }catch(e){ tb.innerHTML=`<tr><td colspan="7" style="color:var(--err)">Уншиж чадсангүй: ${esc(e.message)} (firestore.rules deploy хийсэн эсэхээ шалгана уу)</td></tr>`; }
+}
+async function loadPayments(){
+  if(!db) return;
+  const tb=document.getElementById('payRows'); if(!tb) return;
+  try{
+    const snap=await db.collection('payments').orderBy('createdAt','desc').limit(200).get();
+    const paid=snap.docs.filter(d=>d.data().status==='paid');
+    const sum=paid.reduce((a,d)=>a+(d.data().amount||0),0);
+    document.getElementById('payCount').textContent=snap.size?`(${paid.length} төлөгдсөн · ${sum.toLocaleString('en-US')}₮)`:'';
+    if(snap.empty){ tb.innerHTML='<tr><td colspan="7" style="color:var(--ink-soft)">Төлбөр байхгүй.</td></tr>'; return; }
+    const ST={paid:'<b style="color:var(--teal)">Төлсөн</b>',pending:'Хүлээгдэж буй',failed:'<span style="color:var(--err)">Амжилтгүй</span>'};
+    tb.innerHTML=snap.docs.map(d=>{const p=d.data();
+      return `<tr><td>${tsStr(p.paidAt||p.createdAt)}</td><td>${esc(p.email||p.uid||'')}</td><td>${esc(p.tool||'')} ${p.meta&&p.meta.period?'<span style="color:var(--ink-soft)">'+esc(p.meta.period)+'</span>':''}</td><td>${(p.amount||0).toLocaleString('en-US')}₮</td><td>${ST[p.status]||esc(p.status||'')}</td><td>${esc(p.provider||'')}${p.paidVia?' / '+esc(p.paidVia):''}</td><td>${p.downloads||0}</td></tr>`;}).join('');
+  }catch(e){ tb.innerHTML=`<tr><td colspan="7" style="color:var(--err)">Уншиж чадсангүй: ${esc(e.message)}</td></tr>`; }
+}
+
 async function loadData(){
+  loadLeads(); loadPayments();
   if(notConfigured){ render(filterDemo()); return; }
   const days = parseInt(document.getElementById('range').value);
   const actionF = document.getElementById('actionFilter').value;

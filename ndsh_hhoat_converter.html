@@ -5,7 +5,26 @@
 <script src="gate.js"></script>
 <script src="pay.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="site.css">
+<script src="site.js" defer></script>
+
 <title>НДШ → ХХОАТ хөрвүүлэгч</title>
+<meta name="description" content="НДШ-ийн сарын тайлангийн PDF-ийг etax-д бэлэн ХХОАТ суутгалын маягт (Excel) болгон хөрвүүлнэ. Улирал, жилийн эцсийн тайлан, хөнгөлөлт автоматаар. 5,000₮/тайлан.">
+<link rel="canonical" href="https://businessbi.mn/ndsh_hhoat_converter.html">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#216a4c">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BusinessBI.mn">
+<meta property="og:title" content="НДШ → ХХОАТ хөрвүүлэгч">
+<meta property="og:description" content="НДШ-ийн сарын тайлангийн PDF-ийг etax-д бэлэн ХХОАТ суутгалын маягт (Excel) болгон хөрвүүлнэ. Улирал, жилийн эцсийн тайлан, хөнгөлөлт автоматаар. 5,000₮/тайлан.">
+<meta property="og:url" content="https://businessbi.mn/ndsh_hhoat_converter.html">
+<meta property="og:image" content="https://businessbi.mn/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="mn_MN">
+<meta name="twitter:card" content="summary_large_image">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -147,7 +166,7 @@
     opacity:0; transition:.25s; pointer-events:none; z-index:99;
   }
   .toast.show{opacity:1; bottom:34px}
-  .foot{text-align:center; font-size:11px; color:var(--muted); margin-top:14px}
+  .foot{text-align:center; font-size:11px; color:var(--muted); margin:14px 0 36px}
 
   /* two-column layout: зүүн нарийн, баруун dashboard өргөн */
   .layout{display:grid; grid-template-columns:340px minmax(0,1fr); gap:20px; align-items:start}
@@ -241,50 +260,8 @@
 
 </style>
 
-<style id="bbi-unified-nav-css">
-.ubbi-nav{position:sticky;top:0;z-index:1000;background:#fff;border-bottom:1px solid #ececec}
-.ubbi-nav-inner{max-width:1480px;margin:0 auto;padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;gap:20px}
-.ubbi-logo{display:flex;align-items:center;gap:12px;text-decoration:none;font-size:22px;font-weight:800;letter-spacing:-.02em;color:#b79a63;white-space:nowrap}
-.ubbi-logo span{color:#111}
-.ubbi-logo-sep{width:1px;height:24px;background:#ddd}
-.ubbi-logo-title{font-size:15px;font-weight:600;color:#555;letter-spacing:0}
-.ubbi-menu{display:flex;align-items:center;gap:30px}
-.ubbi-menu a{text-decoration:none;color:#444;font-size:15px;font-weight:500;transition:color .2s;white-space:nowrap}
-.ubbi-menu a:hover{color:#b79a63}
-.ubbi-menu a.ubbi-cta{background:#111;color:#fff;padding:9px 20px;border-radius:50px;font-size:14px}
-.ubbi-menu a.ubbi-cta:hover{background:#333;color:#fff}
-.ubbi-burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:6px}
-.ubbi-burger span{display:block;width:24px;height:2px;background:#111;transition:.3s}
-.ubbi-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
-.ubbi-burger.open span:nth-child(2){opacity:0}
-.ubbi-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-@media(max-width:820px){
-  .ubbi-logo-sep,.ubbi-logo-title{display:none}
-  .ubbi-menu{position:fixed;top:64px;left:0;right:0;background:#fff;flex-direction:column;gap:0;align-items:stretch;padding:8px 0;transform:translateY(-130%);transition:transform .3s;border-bottom:1px solid #ececec;box-shadow:0 12px 30px -18px rgba(0,0,0,.3)}
-  .ubbi-menu.open{transform:translateY(0)}
-  .ubbi-menu a{padding:14px 28px}
-  .ubbi-menu a.ubbi-cta{margin:8px 28px;text-align:center;border-radius:8px}
-  .ubbi-burger{display:flex}
-}
-</style>
 </head>
-<body>
-<nav class="ubbi-nav">
-  <div class="ubbi-nav-inner">
-    <a href="index.html" class="ubbi-logo">Business<span>BI</span>
-      <div class="ubbi-logo-sep"></div>
-      <span class="ubbi-logo-title">НДШ / ХХОАТ хөрвүүлэгч</span>
-    </a>
-    <nav class="ubbi-menu" id="ubbiMenu">
-      <a href="index.html#tools">Хэрэгслүүд</a>
-      <a href="businessbi_journal.html">Санхүүгийн програм</a>
-      <a href="accountants.html">Тайлан гаргах үйлчилгээ</a>
-      <a href="index.html#contact">Холбогдох</a>
-      <a href="businessbi_journal.html" class="ubbi-cta">Программ турших</a>
-    </nav>
-    <button class="ubbi-burger" id="ubbiBurger" aria-label="Цэс"><span></span><span></span><span></span></button>
-  </div>
-</nav>
+<body data-nav-title="НДШ / ХХОАТ хөрвүүлэгч">
 <div class="wrap">
 <details class="bbi-guide" style="max-width:1100px;margin:16px auto;background:#f2f7f4;border:1px solid #d7e5dc;border-radius:10px;"><summary style="cursor:pointer;padding:13px 18px;font-weight:600;color:#0e3b2e;display:flex;align-items:center;gap:8px;">📖 Ашиглах заавар <span style="font-weight:400;font-size:13px;color:#5b7365;">— 1 минут уншаад эхлээрэй</span></summary><ol style="margin:0;padding:4px 22px 14px 40px;color:#243b30;font-size:14.5px;line-height:1.75;"><li style="margin:4px 0;">Нийгмийн даатгалын цахим системээс сарын <b>НДШ тайлангаа PDF</b> хэлбэрээр татаж авна.</li><li style="margin:4px 0;">PDF файлаа энэ хуудсанд чирж оруулах эсвэл сонгоно — тайлант сар автоматаар танигдана.</li><li style="margin:4px 0;">Хэд хэдэн сарын тайланг дараалан нэмж болно; сар бүр жагсаалтад харагдах ба × товчоор устгаж болно.</li><li style="margin:4px 0;">Алхам 2-т ажилтнуудын <b>12 оронт ТТД</b> (татвар төлөгчийн дугаар)-г тулгана — өмнөх улирлын ХХОАТ маягт эсвэл etax-ийн ажилтны жагсаалтыг оруулбал автоматаар танигдана. Нэг удаа оруулсан ТТД хөтөчид хадгалагдаж дараагийн тайланд өөрөө бөглөгдөнө.</li><li style="margin:4px 0;">Тойм самбараас Цалин / Ажилтан / НДШ үзүүлэлтүүдээ шалгана.</li><li style="margin:4px 0;"><b>«⬇ Excel файл татах»</b> товчоор ХХОАТ тайланд бэлэн хүснэгтээ авна — <b>1 тайлан 5,000₮</b>, WIRE.mn-ээр төлнө (төлснөөс хойш 24 цаг дахин татах үнэгүй).</li></ol><p style="margin:0;padding:0 22px 14px;font-size:13px;color:#5b7365;">💡 PDF тань браузер дээр уншигдана. Нэг дор олон сар оруулбал улирал, жилийн харьцуулалт автоматаар гарна.</p></details>
 
@@ -1848,10 +1825,6 @@ function buildExcel(){
 }
 </script>
 
-<script>
-(function(){var b=document.getElementById('ubbiBurger'),m=document.getElementById('ubbiMenu');
-if(b&&m)b.addEventListener('click',function(){b.classList.toggle('open');m.classList.toggle('open');});})();
-</script>
-<section style="background:#0e3b2e;color:#fff;padding:36px 20px;text-align:center;"><p style="margin:0 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;opacity:.7;">BusinessBI санхүүгийн програм</p><h2 style="margin:0 0 10px;font-size:24px;font-weight:700;">Журналаа бич. Тайлан нь бэлэн.</h2><p style="margin:0 auto 18px;max-width:560px;opacity:.85;font-size:15px;line-height:1.5;">Гүйлгээгээ бүртгэхэд СТ-1–СТ-4 санхүүгийн тайлан, татварын тайлан автоматаар — Сангийн сайдын 361-р тушаалын дагуу.</p><a href="businessbi_journal.html" style="display:inline-block;background:#fff;color:#0e3b2e;font-weight:600;padding:12px 26px;border-radius:8px;text-decoration:none;">14 хоног үнэгүй турших →</a></section>
+<section class="bbi-band"><p class="k">BusinessBI санхүүгийн програм</p><h2>Журналаа бич. Тайлан нь бэлэн.</h2><p>Гүйлгээгээ бүртгэхэд СТ-1–СТ-4 санхүүгийн тайлан, татварын тайлан автоматаар — Сангийн сайдын 361-р тушаалын дагуу.</p><a href="businessbi_journal.html">14 хоног үнэгүй турших →</a></section>
 </body>
 </html>

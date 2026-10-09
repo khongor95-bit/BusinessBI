@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /marketplace_admin.html
+Disallow: /auth.html
+Disallow: /pay_done.html
+Sitemap: https://businessbi.mn/sitemap.xml

@@ -3,7 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Үнэгүй хэрэгслүүд — BusinessBI.mn</title>
+<link rel="stylesheet" href="site.css">
+<script src="site.js" defer></script>
+
+<title>Хэрэгслүүд — BusinessBI.mn</title>
+<meta name="description" content="Нягтлан бодогчдод зориулсан онлайн хэрэгслүүд: НДШ/ХХОАТ хөрвүүлэгч, НӨАТ тулгагч, нэхэмжлэх үүсгэгч, санхүүгийн шинжилгээ. Боловсруулалт хөтөч дотор.">
+<link rel="canonical" href="https://businessbi.mn/tools.html">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#216a4c">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BusinessBI.mn">
+<meta property="og:title" content="Хэрэгслүүд — BusinessBI.mn">
+<meta property="og:description" content="Нягтлан бодогчдод зориулсан онлайн хэрэгслүүд: НДШ/ХХОАТ хөрвүүлэгч, НӨАТ тулгагч, нэхэмжлэх үүсгэгч, санхүүгийн шинжилгээ. Боловсруулалт хөтөч дотор.">
+<meta property="og:url" content="https://businessbi.mn/tools.html">
+<meta property="og:image" content="https://businessbi.mn/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="mn_MN">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -93,26 +112,13 @@ footer{background:#111;color:#fff;padding:50px 0 36px}
 </head>
 <body>
 
-<header>
-  <div class="container navbar">
-    <a href="index.html" class="logo">Business<span>BI</span></a>
-    <nav class="menu" id="menu">
-      <a href="tools.html" class="active">Хэрэгслүүд</a>
-      <a href="businessbi_journal.html">Санхүүгийн програм</a>
-      <a href="accountants.html">Тайлан гаргах үйлчилгээ</a>
-      <a href="learn.html">Сургалт</a>
-      <a href="index.html#contact" class="cta">Холбогдох</a>
-    </nav>
-    <button class="burger" id="burger" aria-label="Цэс"><span></span><span></span><span></span></button>
-  </div>
-</header>
 
 <div class="container">
   <section class="page-head">
-    <div class="tag">Үнэгүй хэрэгслүүд</div>
+    <div class="tag">Хэрэгслүүд</div>
     <h1>Цаг хэмнэх <em>онлайн хэрэгслүүд</em></h1>
     <p>Нягтлан, санхүүчдэд зориулсан автоматжуулалтын хэрэгслүүд. Өгөгдлөө оруулаад л үр дүнгээ ав — боловсруулалт хөтөч дотор чинь хийгдэнэ.</p>
-    <div class="free-note">✓ Урьдчилан харах үнэгүй · Зөвхөн үр дүн татахад бага төлбөртэй хэрэгсэл бий</div>
+    <div class="free-note">✓ 3 хэрэгсэл бүрэн үнэгүй · НДШ/ХХОАТ хөрвүүлэгч: урьдчилан харах үнэгүй, Excel татахад 5,000₮</div>
   </section>
 
   <div class="tool-grid">
@@ -124,7 +130,15 @@ footer{background:#111;color:#fff;padding:50px 0 36px}
       <span class="tool-open">Нээх →</span>
     </a>
 
-    <a class="tool-card" href="invoice_generator_12.html" target="_blank" rel="noopener">
+    <a class="tool-card" href="noat_matcher.html" target="_blank" rel="noopener">
+      <span class="tool-badge badge-free">Үнэгүй</span>
+      <div class="tool-ic">🔗</div>
+      <h3>НӨАТ тулгагч</h3>
+      <p>eBarimt-аас татсан падааныг дотоод бүртгэлтэй автоматаар тулгаж, зөрүүг шууд илрүүлнэ.</p>
+      <span class="tool-open">Нээх →</span>
+    </a>
+
+    <a class="tool-card" href="invoice_generator.html" target="_blank" rel="noopener">
       <span class="tool-badge badge-free">Үнэгүй</span>
       <div class="tool-ic">📄</div>
       <h3>Автомат нэхэмжлэх</h3>
@@ -146,30 +160,11 @@ footer{background:#111;color:#fff;padding:50px 0 36px}
       <h2>Илүү гүнзгий шийдэл хэрэгтэй юу?</h2>
       <p>Танай өгөгдөлд тааруулсан захиалгат dashboard, автоматжуулалт бүтээж өгнө.</p>
     </div>
-    <a href="index.html#contact">Холбогдох</a>
+    <a href="contact.html?topic=custom">Холбогдох</a>
   </div>
 </div>
 
-<section style="background:#0e3b2e;color:#fff;padding:36px 20px;text-align:center;"><p style="margin:0 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;opacity:.7;">BusinessBI санхүүгийн програм</p><h2 style="margin:0 0 10px;font-size:24px;font-weight:700;">Журналаа бич. Тайлан нь бэлэн.</h2><p style="margin:0 auto 18px;max-width:560px;opacity:.85;font-size:15px;line-height:1.5;">Гүйлгээгээ бүртгэхэд СТ-1–СТ-4 санхүүгийн тайлан, татварын тайлан автоматаар — Сангийн сайдын 361-р тушаалын дагуу.</p><a href="businessbi_journal.html" style="display:inline-block;background:#fff;color:#0e3b2e;font-weight:600;padding:12px 26px;border-radius:8px;text-decoration:none;">14 хоног үнэгүй турших →</a></section>
-<footer>
-  <div class="container foot-inner">
-    <div>
-      <a href="index.html" class="logo" style="display:block;margin-bottom:8px">Business<span>BI</span></a>
-      <p>Тоо баримтыг шийдвэр болгоно. © 2026</p>
-    </div>
-    <div class="foot-links">
-      <a href="tools.html">Хэрэгслүүд</a>
-      <a href="accountants.html">Тайлан гаргах үйлчилгээ</a>
-      <a href="learn.html">Сургалт</a>
-      <a href="index.html#contact">Холбоо барих</a>
-    </div>
-  </div>
-</footer>
+<section class="bbi-band"><p class="k">BusinessBI санхүүгийн програм</p><h2>Журналаа бич. Тайлан нь бэлэн.</h2><p>Гүйлгээгээ бүртгэхэд СТ-1–СТ-4 санхүүгийн тайлан, татварын тайлан автоматаар — Сангийн сайдын 361-р тушаалын дагуу.</p><a href="businessbi_journal.html">14 хоног үнэгүй турших →</a></section>
 
-<script>
-// burger
-const burger=document.getElementById('burger'), menu=document.getElementById('menu');
-burger.addEventListener('click',()=>{burger.classList.toggle('open');menu.classList.toggle('open');});
-</script>
 </body>
 </html>

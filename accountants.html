@@ -4,7 +4,26 @@
 <meta charset="UTF-8">
 <script src="gate.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="site.css">
+<script src="site.js" defer></script>
+
 <title>Нягтлан холбох — BusinessBI.mn</title>
+<meta name="description" content="Баталгаажсан нягтлан бодогчдоос сонгож тайлангаа гаргуулна. Үнэ, туршлага, мэргэшлээр хайх.">
+<link rel="canonical" href="https://businessbi.mn/accountants.html">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#216a4c">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BusinessBI.mn">
+<meta property="og:title" content="Нягтлан холбох — BusinessBI.mn">
+<meta property="og:description" content="Баталгаажсан нягтлан бодогчдоос сонгож тайлангаа гаргуулна. Үнэ, туршлага, мэргэшлээр хайх.">
+<meta property="og:url" content="https://businessbi.mn/accountants.html">
+<meta property="og:image" content="https://businessbi.mn/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="mn_MN">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -154,27 +173,14 @@ footer{background:#111;color:#fff;padding:50px 0 36px}
 </head>
 <body>
 
-<header>
-  <div class="container navbar">
-    <a href="index.html" class="logo">Business<span>BI</span></a>
-    <nav class="menu" id="menu">
-      <a href="index.html#tools">Хэрэгслүүд</a>
-      <a href="businessbi_journal.html">Санхүүгийн програм</a>
-      <a href="accountants.html" class="active">Тайлан гаргах үйлчилгээ</a>
-      <a href="index.html#contact" class="cta">Холбогдох</a>
-    </nav>
-    <button class="burger" id="burger" aria-label="Цэс"><span></span><span></span><span></span></button>
-  </div>
-</header>
 
 <div class="container">
   <section class="page-head">
     <div class="tag">Нягтлан холбох · Аутсорсинг</div>
     <h1>Итгэмжтэй <em>нягтлантай</em> холбоно</h1>
-    <p>Тайлан хийлгэх хүн хайж зовох хэрэггүй. Манай баталгаажсан, үнэлгээтэй нягтлангуудаас сонгоод шууд холбогд. Бид зуучлагч биш — итгэл, баталгаа өгч холбоно.</p>
+    <p>Тайлан хийлгэх хүн хайж зовох хэрэггүй. Бүртгэлтэй, баталгаажсан нягтлангуудаас туршлага, мэргэшил, үнээр нь харьцуулж сонгоод шууд холбогд. Үнэлгээг зөвхөн бодитоор ажиллуулсан хэрэглэгч өгнө.</p>
   </section>
 
-  <div class="notice" id="notice">Одоогоор жишээ мэдээлэл харагдаж байна — жинхэнэ нягтлангууд удахгүй нэмэгдэнэ.</div>
 
   <div class="filters">
     <input type="text" id="search" placeholder="🔍 Нэр, чиглэлээр хайх...">
@@ -213,20 +219,6 @@ footer{background:#111;color:#fff;padding:50px 0 36px}
   </div>
 </div>
 
-<footer>
-  <div class="container foot-inner">
-    <div>
-      <a href="index.html" class="logo" style="display:block;margin-bottom:8px">Business<span>BI</span></a>
-      <p>Тоо баримтыг шийдвэр болгоно. © 2026</p>
-    </div>
-    <div class="foot-links">
-      <a href="index.html#tools">Хэрэгслүүд</a>
-      <a href="accountants.html">Тайлан гаргах үйлчилгээ</a>
-      <a href="accountant_signup.html">Нягтлан болж элсэх</a>
-      <a href="index.html#contact">Холбоо барих</a>
-    </div>
-  </div>
-</footer>
 
 <!-- MODAL -->
 <div class="modal-bg" id="modalBg">
@@ -240,40 +232,14 @@ const SB_URL = 'https://mpfjceziasadnswwnkpc.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wZmpjZXppYXNhZG5zd3dua3BjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDY3MDMsImV4cCI6MjA5ODI4MjcwM30.LJ1Fh2TGjyPDv6EeTDzlhcR0S3WkUHhy2yRxnop940A';
 const sb = window.supabase.createClient(SB_URL, SB_KEY);
 
-/* ===== FALLBACK ЖИШЭЭ ДАТА (DB хоосон/алдаатай үед л харагдана) ===== */
-const SAMPLE = [
-  {id:'s1', name:"Б. Оюунчимэг", photo_url:"https://i.pravatar.cc/160?img=47", verified:true,
-   location:"Улаанбаатар", specialties:["Татварын тайлан","НӨАТ","Жижиг бизнес"],
-   bio:"15 жилийн туршлагатай ТМЗ. Жижиг, дунд бизнесийн татвар, санхүүгийн тайланг хариуцлагатай хийнэ.",
-   experience:15, price_from:150000, rating:4.9, review_count:38,
-   phone:"99112233", messenger:"businessbi", email:"oyunchimeg@example.mn", sample:true},
-  {id:'s2', name:"Г. Батбаяр", photo_url:"https://i.pravatar.cc/160?img=12", verified:true,
-   location:"Улаанбаатар", specialties:["Санхүүгийн тайлан","Аудит"],
-   bio:"Аудитор, CPA. Компанийн санхүүгийн тайлан, дотоод хяналт, аудитад мэргэшсэн.",
-   experience:12, price_from:300000, rating:4.8, review_count:24,
-   phone:"99223344", messenger:"businessbi", email:"batbayar@example.mn", sample:true},
-  {id:'s3', name:"С. Энхтуяа", photo_url:"https://i.pravatar.cc/160?img=32", verified:true,
-   location:"Дархан", specialties:["Цалин, НДШ","Жижиг бизнес"],
-   bio:"Цалин бодолт, НДШ, ХХОАТ суутгал, ажилтны бүртгэлийг бүрэн хариуцна. Хурдан, найдвартай.",
-   experience:8, price_from:120000, rating:4.7, review_count:19,
-   phone:"99334455", messenger:"businessbi", email:"enkhtuya@example.mn", sample:true},
-  {id:'s4', name:"Д. Мөнхзул", photo_url:"https://i.pravatar.cc/160?img=45", verified:false,
-   location:"Улаанбаатар", specialties:["Татварын тайлан","Цалин, НДШ"],
-   bio:"Жижиг бизнес эрхлэгчдэд зориулсан сар бүрийн татвар, цалингийн тайлан. Боломжийн үнэ.",
-   experience:5, price_from:90000, rating:4.6, review_count:11,
-   phone:"99445566", messenger:"businessbi", email:"munkhzul@example.mn", sample:true},
-  {id:'s5', name:"Т. Ганболд", photo_url:"https://i.pravatar.cc/160?img=15", verified:true,
-   location:"Эрдэнэт", specialties:["Санхүүгийн тайлан","НӨАТ","Татварын тайлан"],
-   bio:"Уул уурхай, үйлдвэрлэлийн салбарын санхүү, татварын тайланд туршлагатай нягтлан.",
-   experience:18, price_from:250000, rating:5.0, review_count:42,
-   phone:"99556677", messenger:"businessbi", email:"ganbold@example.mn", sample:true},
-  {id:'s6', name:"Н. Сарантуяа", photo_url:"https://i.pravatar.cc/160?img=20", verified:true,
-   location:"Улаанбаатар", specialties:["Жижиг бизнес","НӨАТ","Цалин, НДШ"],
-   bio:"Старт-ап болон жижиг бизнест ээлтэй. Эрхэт, e-Tax системээр хурдан, цэгцтэй ажиллана.",
-   experience:7, price_from:110000, rating:4.8, review_count:27,
-   phone:"99667788", messenger:"businessbi", email:"sarantuya@example.mn", sample:true},
-];
-
+/* Хоосон/алдаатай үед зохиомол нягтлан харуулахгүй — шударга хоосон төлөв (доорх EMPTY_HTML) */
+const EMPTY_HTML = `<div class="empty" style="padding:48px 20px;text-align:center">
+  <div style="font-size:40px;margin-bottom:10px">🤝</div>
+  <h3 style="font-size:20px;margin-bottom:8px">Эхний нягтлангууд бүртгэгдэж байна</h3>
+  <p style="color:#6b7670;max-width:52ch;margin:0 auto 18px;line-height:1.6">Баталгаажсан нягтлангийн профайлууд энд гарна. Одоохондоо тайлан гаргуулах хэрэгцээгээ бидэнд илгээвэл тохирох нягтлантай гараар холбож өгнө.</p>
+  <a href="contact.html?topic=accountant" class="btn-dark" style="display:inline-block;background:#216a4c;color:#fff;text-decoration:none;font-weight:600;padding:12px 22px;border-radius:10px">Нягтлан хүсэх →</a>
+  <a href="accountant_signup.html" style="display:inline-block;margin-left:10px;color:#216a4c;font-weight:600;text-decoration:none">Нягтлан бол бүртгүүлэх →</a>
+</div>`;
 let ACCOUNTANTS = [];
 
 const VERIFIED_ICON = `<svg class="verified" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 1.8 3-.3 1 2.8 2.6 1.5-.8 2.9.8 2.9-2.6 1.5-1 2.8-3-.3L12 22l-2.4-1.8-3 .3-1-2.8L3 16.5l.8-2.9L3 10.7l2.6-1.5 1-2.8 3 .3L12 2z" fill="#b79a63"/><path d="M8.5 12l2.3 2.3 4.7-4.7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
@@ -306,16 +272,10 @@ async function loadAccountants(){
       .order('verified',{ascending:false})
       .order('rating',{ascending:false});
     if(error) throw error;
-    if(data && data.length){
-      ACCOUNTANTS = data;
-    } else {
-      ACCOUNTANTS = SAMPLE;
-      document.getElementById('notice').style.display='block';
-    }
+    ACCOUNTANTS = (data && data.length) ? data : [];
   }catch(e){
     console.error('mp load:', e);
-    ACCOUNTANTS = SAMPLE;
-    document.getElementById('notice').style.display='block';
+    ACCOUNTANTS = [];
   }
   render();
 }
@@ -350,8 +310,8 @@ function render(){
   });
   const s = fSort.value;
   list.sort((x,y)=> s==='priceLow' ? x.price_from-y.price_from : s==='exp' ? y.experience-x.experience : y.rating-x.rating);
-  grid.innerHTML = list.length ? list.map(cardHTML).join('') : `<div class="empty">Тохирох нягтлан олдсонгүй. Шүүлтүүрээ өөрчилж үзээрэй.</div>`;
-  count.textContent = `${list.length} нягтлан`;
+  grid.innerHTML = list.length ? list.map(cardHTML).join('') : (ACCOUNTANTS.length ? `<div class="empty">Тохирох нягтлан олдсонгүй. Шүүлтүүрээ өөрчилж үзээрэй.</div>` : EMPTY_HTML);
+  count.textContent = ACCOUNTANTS.length ? `${list.length} нягтлан` : '';
 }
 
 /* ===== MODAL ===== */
@@ -557,10 +517,6 @@ grid.addEventListener('click', e=>{
 document.getElementById('modalBg').addEventListener('click', e=>{ if(e.target.id==='modalBg') closeModal(); });
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
 [search,fLoc,fSpec,fSort].forEach(el=>el.addEventListener('input',render));
-
-// burger
-const burger=document.getElementById('burger'), menu=document.getElementById('menu');
-burger.addEventListener('click',()=>{burger.classList.toggle('open');menu.classList.toggle('open');});
 
 loadAccountants();
 </script>

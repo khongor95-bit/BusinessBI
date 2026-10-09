@@ -3,28 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="site.css">
+<script src="site.js" defer></script>
+
 <title>Холбоо барих — BusinessBI.mn</title>
+<meta name="description" content="BusinessBI-тэй холбогдох: хэрэгсэл, програм, нягтлан холбуулах, сургалт, захиалгат ажил.">
+<link rel="canonical" href="https://businessbi.mn/contact.html">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#216a4c">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BusinessBI.mn">
+<meta property="og:title" content="Холбоо барих — BusinessBI.mn">
+<meta property="og:description" content="BusinessBI-тэй холбогдох: хэрэгсэл, програм, нягтлан холбуулах, сургалт, захиалгат ажил.">
+<meta property="og:url" content="https://businessbi.mn/contact.html">
+<meta property="og:image" content="https://businessbi.mn/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="mn_MN">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="shared.css">
 </head>
 <body>
 
-<nav>
-  <div class="wrap nav-inner">
-    <a class="logo" href="index.html" style="text-decoration:none">Business<span>BI</span>.mn</a>
-    <div class="nav-links">
-      <a href="businessbi_journal.html">Санхүүгийн програм</a>
-      <a href="tools.html">Хэрэгслүүд</a>
-      <a href="learn.html">Сургалт</a>
-      <a href="accountants.html">Тайлан гаргах үйлчилгээ</a>
-      <a href="contact.html" class="active">Холбоо барих</a>
-      <a href="businessbi_journal.html" class="nav-cta">Программ турших</a>
-    </div>
-    <button class="menu-btn" id="menuBtn" aria-label="Цэс нээх"><span></span><span></span><span></span></button>
-  </div>
-</nav>
 
 <header class="page-hero">
   <div class="wrap">
@@ -37,39 +42,45 @@
 <section>
   <div class="wrap">
     <div class="contact-grid">
-      <div class="reveal">
+      <form class="reveal" id="leadForm" novalidate>
         <div class="field">
-          <label for="name">Нэр</label>
-          <input id="name" type="text" placeholder="Таны нэр">
+          <label for="name">Нэр <span style="color:var(--amber)">*</span></label>
+          <input id="name" type="text" placeholder="Таны нэр" required autocomplete="name">
         </div>
         <div class="field">
-          <label for="phone">Утас</label>
-          <input id="phone" type="tel" placeholder="9911-2233">
+          <label for="phone">Утас <span style="color:var(--amber)">*</span></label>
+          <input id="phone" type="tel" placeholder="8800-0000" required autocomplete="tel" inputmode="tel">
+        </div>
+        <div class="field">
+          <label for="email">И-мэйл <span style="font-weight:400;color:var(--ink-soft)">(заавал биш)</span></label>
+          <input id="email" type="email" placeholder="name@example.com" autocomplete="email">
         </div>
         <div class="field">
           <label for="topic">Юу сонирхож байна?</label>
           <select id="topic">
-            <option>Ухаалаг хэрэгсэл авах</option>
-            <option>Нягтлан холбуулах</option>
-            <option>Нягтлан болж бүртгүүлэх</option>
-            <option>Сургалтад бүртгүүлэх</option>
-            <option>Power BI / захиалгат ажил</option>
-            <option>Бусад</option>
+            <option value="tools">Хэрэгслүүд ашиглах</option>
+            <option value="journal">Санхүүгийн програм (журнал)</option>
+            <option value="accountant">Нягтлан холбуулах</option>
+            <option value="become_accountant">Нягтлан болж бүртгүүлэх</option>
+            <option value="training">Сургалтад бүртгүүлэх</option>
+            <option value="corporate">Байгууллагын сургалт</option>
+            <option value="waitlist">Шинэ бүтээгдэхүүний хүлээлгийн жагсаалт</option>
+            <option value="custom">Power BI / захиалгат ажил</option>
+            <option value="other">Бусад</option>
           </select>
         </div>
         <div class="field">
           <label for="msg">Дэлгэрэнгүй</label>
           <textarea id="msg" placeholder="Бизнесийнхээ талаар товч бичээрэй..."></textarea>
         </div>
-        <button class="btn-primary" id="sendBtn" type="button">Илгээх</button>
-        <p id="formNote" style="margin-top:14px;font-size:14px;color:var(--ink-soft);display:none">Хүсэлт хүлээж авлаа. Удахгүй холбогдоно.</p>
-      </div>
-
+        <button class="btn-primary" id="sendBtn" type="submit">Илгээх</button>
+        <p id="formNote" style="margin-top:14px;font-size:14px;color:var(--ink-soft);display:none"></p>
+        <p style="margin-top:14px;font-size:12.5px;color:var(--ink-soft)">Илгээснээр <a href="privacy.html" style="color:var(--teal)">нууцлалын бодлого</a>-г зөвшөөрч байна. Мэдээллийг зөвхөн тантай холбогдоход ашиглана.</p>
+      </form>
       <aside class="contact-side reveal">
-        <h3>Шууд холбогдох</h3>
-        <div class="contact-row"><span class="k">Утас</span><span class="v">+976 9911-2233</span></div>
-        <div class="contact-row"><span class="k">И-мэйл</span><span class="v">hello@financetools.mn</span></div>
-        <div class="contact-row"><span class="k">Facebook</span><span class="v">fb.com/financetools.mn</span></div>
+        <h3 class="serif">Шууд холбогдох</h3>
+        <div class="contact-row"><span class="k">Утас</span><span class="v"><a href="tel:+97699112233" style="color:inherit;text-decoration:none">+976 9911-2233</a></span></div>
+        <div class="contact-row"><span class="k">И-мэйл</span><span class="v"><a href="mailto:hello@businessbi.mn" style="color:inherit;text-decoration:none">hello@businessbi.mn</a></span></div>
         <div class="contact-row"><span class="k">Цаг</span><span class="v">Даваа–Баасан, 09:00–18:00</span></div>
         <div class="contact-row"><span class="k">Хаяг</span><span class="v">Улаанбаатар, Монгол</span></div>
       </aside>
@@ -77,25 +88,54 @@
   </div>
 </section>
 
-<footer>
-  <div class="wrap foot-inner">
-    <div>
-      <a class="logo" href="index.html" style="text-decoration:none;display:block;margin-bottom:8px">Business<span>BI</span>.mn</a>
-      <p>Санхүүгийн ажлыг үр дүн болгоно. © 2026</p>
-    </div>
-    <div class="foot-links">
-      <a href="businessbi_journal.html">Санхүүгийн програм</a>
-      <a href="tools.html">Хэрэгслүүд</a>
-      <a href="learn.html">Сургалт</a>
-      <a href="accountants.html">Тайлан гаргах үйлчилгээ</a>
-      <a href="contact.html">Холбоо барих</a>
-    </div>
-  </div>
-</footer>
 <script src="shared.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-  const btn=document.getElementById('sendBtn');
-  if(btn){btn.addEventListener('click',()=>{document.getElementById('formNote').style.display='block';});}
+// ── Lead форм: Firestore `leads` коллекцид бичнэ (firestore.rules: create-only) ──
+// Firebase бэлэн биш/алдаа гарвал mailto fallback — хүсэлт ямар ч тохиолдолд алдагдахгүй.
+(function(){
+  const $=id=>document.getElementById(id);
+  const form=$('leadForm'), note=$('formNote'), btn=$('sendBtn');
+  // URL-ээс урьдчилан бөглөх: ?topic=training&course=…
+  const q=new URLSearchParams(location.search);
+  if(q.get('topic')){ const sel=$('topic'); if([...sel.options].some(o=>o.value===q.get('topic'))) sel.value=q.get('topic'); }
+  if(q.get('course')) $('msg').value='Сургалт: '+q.get('course')+'\n';
+  if(q.get('product')) $('msg').value='Сонирхож буй бүтээгдэхүүн: '+q.get('product')+'\n';
+
+  let db=null;
+  try{
+    if(window.firebase && !firebase.apps.length){
+      firebase.initializeApp({apiKey:"AIzaSyAXslBVU1__Ibhk3P7TEeJRS2oi-8fi6Jc",authDomain:"businessbi.firebaseapp.com",projectId:"businessbi",storageBucket:"businessbi.firebasestorage.app",messagingSenderId:"84765528435",appId:"1:84765528435:web:edf7066e6399dbc76af506"});
+    }
+    if(window.firebase) db=firebase.firestore();
+  }catch(e){ console.warn('firebase init', e); }
+
+  const show=(msg,ok)=>{ note.style.display='block'; note.style.color=ok?'var(--teal)':'#c0492b'; note.textContent=msg; };
+  form.addEventListener('submit', async e=>{
+    e.preventDefault();
+    const name=$('name').value.trim(), phone=$('phone').value.trim(), email=$('email').value.trim();
+    const topic=$('topic').value, topicText=$('topic').options[$('topic').selectedIndex].text, msg=$('msg').value.trim();
+    if(!name||!phone){ show('Нэр, утасны дугаараа оруулна уу.', false); return; }
+    if(!/^\+?[\d\s\-]{8,15}$/.test(phone)){ show('Утасны дугаар буруу байна (8 орон).', false); return; }
+    btn.disabled=true; btn.textContent='Илгээж байна…';
+    const lead={name, phone, email, topic, topicText, message:msg, page:location.href, ua:navigator.userAgent.slice(0,160), status:'new'};
+    try{
+      if(!db) throw new Error('no firestore');
+      await db.collection('leads').add({...lead, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
+      form.reset();
+      show('Баярлалаа — хүсэлтийг хүлээж авлаа. Нэг ажлын өдрийн дотор '+phone+' дугаарт холбогдоно.', true);
+      btn.textContent='Илгээгдлээ ✓';
+    }catch(err){
+      console.warn('lead save failed', err);
+      // Fallback: имэйл клиент нээнэ
+      const body=encodeURIComponent(`Нэр: ${name}\nУтас: ${phone}\nИ-мэйл: ${email}\nСэдэв: ${topicText}\n\n${msg}`);
+      location.href=`mailto:hello@businessbi.mn?subject=${encodeURIComponent('BusinessBI хүсэлт — '+topicText)}&body=${body}`;
+      show('Шууд илгээж чадсангүй — имэйл програм нээгдэнэ. Эсвэл +976 9911-2233 руу залгаарай.', false);
+      btn.disabled=false; btn.textContent='Илгээх';
+    }
+  });
+})();
 </script>
 </body>
 </html>

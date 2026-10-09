@@ -45,7 +45,7 @@ firebase functions:secrets:set WIRE_WEBHOOK_SECRET    # WIRE dashboard → Webho
 Firestore индекс (createPayment-ийн query-д хэрэгтэй):
 
 ```bash
-firebase deploy --only firestore:indexes
+firebase deploy --only firestore:rules,firestore:indexes
 ```
 
 ## 2. Deploy
