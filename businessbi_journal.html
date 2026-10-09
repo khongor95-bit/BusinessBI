@@ -1552,14 +1552,42 @@ async function impLoadPdf(buf){
   }catch(e){ console.error(e); toast('PDF уншихад алдаа: '+e.message, true); }
 }
 // НДШ тайлангийн мөр задлагч — НДШ/ХХОАТ хөрвүүлэгчээс порт хийсэн, батлагдсан логик
-const NDSH_REG_RE=/[А-ЯӨҮЁ]\s*[А-ЯӨҮЁ]\s*\d{8}/;
+// (хөрвүүлэгчтэй ИЖИЛ байлгана: тэнд засвар хийвэл энд ч хийнэ)
+const NDSH_REG_RE=/[А-ЯӨҮЁ]\s*[А-ЯӨҮЁ]\s*\d{8}/;           // Монгол иргэн: 2 кирилл + 8 орон
 const NDSH_NUM_RE=/^[\d,]+\.?\d*$/;
+// Гадаад иргэн: F-регистр (13 тэмдэгт) / паспорт (латин 1–3 + 5–9 орон) / тоон дугаар —
+// бүгд "үсэг-тоо холимог, ≥4 орон" гэсэн нийтлэг шинжээр танигдана
+const NDSH_FOREIGN_ID_RE=/^(?=(?:.*\d){4})[A-ZА-ЯӨҮЁ0-9\-\/]{5,20}$/i;
+function ndshSplitName(items){
+  let splitIdx=-1, maxGap=0;
+  for(let i=1;i<items.length;i++){
+    const gap=items[i].x-(items[i-1].x+items[i-1].w);
+    if(gap>maxGap){ maxGap=gap; splitIdx=i; }
+  }
+  const join=arr=>arr.map(s=>String(s.str)).join('').replace(/\s+/g,'');
+  if(splitIdx>0 && maxGap>=4) return {lastName:join(items.slice(0,splitIdx)), firstName:join(items.slice(splitIdx))};
+  return {lastName:'', firstName:join(items)};
+}
+function ndshParseAfterId(items, num){
+  // Дугаарын дараах баганууд: төрөл(5 орон), мэргэжил(NNNN-NN),
+  // дараа нь мөнгөн дүнгүүд тогтсон дараалалтай: цалин, нийт НДШ, ажил олгогч, даатгуулагч
+  let type='', occ='';
+  const moneys=[];
+  items.forEach(it=>{
+    const t=String(it.str).trim();
+    if(/^\d{5}$/.test(t) && !type) type=t;
+    else if(/^\d{3,4}-\d{2}$/.test(t) && !occ) occ=t;
+    else if(NDSH_NUM_RE.test(t)) moneys.push(num(t));
+  });
+  return {type, occ, salary:moneys[0]||0, totalNdsh:moneys[1]||0, employer:moneys[2]||0, employee:moneys[3]||0};
+}
 function ndshExtract(lines, metaText){
   const meta={};
   let mYm=metaText.match(/(\d{4})\s*оны\s*(\d{1,2})\s*сарын\s*нийгмийн\s*даатгал/);
   if(!mYm) mYm=metaText.match(/(\d{4})\s*оны\s*(\d{1,2})\s*сар/);
   if(mYm){ meta.year=+mYm[1]; meta.month=+mYm[2]; }
   const num=s=>parseFloat(String(s).replace(/,/g,''))||0;
+  const hasDigit=s=>/\d/.test(String(s||''));
   const rows=[];
   lines.forEach(line=>{
     const its=line.items;
@@ -1569,43 +1597,50 @@ function ndshExtract(lines, metaText){
     if(!/^\d{1,3}$/.test(first)) return;
     const rowNo=+first;
     if(rowNo<1||rowNo>500) return;
-    // Регистрийг олж, x-байрлалыг нь тэмдэглэнэ
+
+    // А. Монгол иргэн — регистрийг regex-ээр олж, x-байрлалаар нь зүүн/баруун хуваана
     let concat='', map=[];
-    its.forEach(it=>{ for(const ch of it.str){ concat+=ch; map.push(it.x); } });
+    its.forEach(it=>{ for(const ch of String(it.str)){ concat+=ch; map.push(it.x); } });
     const rm=concat.match(NDSH_REG_RE);
-    if(!rm) return;
-    const reg=rm[0].replace(/\s+/g,'');
-    const regStartX=map[rm.index];
-    const regEndX=map[rm.index+rm[0].length-1];
-    // Регистрийн өмнөх item-үүд = овог + нэр; хамгийн том x-завсраар салгана
-    const beforeReg=its.filter(it=>it.x < regStartX-2 && it.x>its[0].x+1);
-    let splitIdx=-1, maxGap=0;
-    for(let i=1;i<beforeReg.length;i++){
-      const gap=beforeReg[i].x-(beforeReg[i-1].x+beforeReg[i-1].w);
-      if(gap>maxGap){ maxGap=gap; splitIdx=i; }
+    if(rm){
+      const reg=rm[0].replace(/\s+/g,'');
+      const regStartX=map[rm.index];
+      const regEndX=map[rm.index+rm[0].length-1];
+      const beforeReg=its.filter(it=>it.x < regStartX-2 && it.x>its[0].x+1);
+      const {lastName, firstName}=ndshSplitName(beforeReg);
+      const afterReg=its.filter(it=>it.x > regEndX+1).sort((a,b)=>a.x-b.x);
+      rows.push({lastName, firstName, reg, foreign:false, ...ndshParseAfterId(afterReg, num)});
+      return;
     }
-    let lastName='', firstName='';
-    if(splitIdx>0 && maxGap>=4){
-      lastName=beforeReg.slice(0,splitIdx).map(s=>s.str).join('').replace(/\s+/g,'');
-      firstName=beforeReg.slice(splitIdx).map(s=>s.str).join('').replace(/\s+/g,'');
-    } else {
-      firstName=beforeReg.map(s=>s.str).join('').replace(/\s+/g,'');
+
+    // Б. Гадаад иргэн — регистр олдохгүй; даатгуулагчийн төрлийн 5 оронт кодыг (эсвэл
+    //    мэргэжлийн кодыг) зангуу болгож, зүүн тал = [нэрс..., дугаар], баруун = тоон баганууд
+    let anchor=-1;
+    for(let i=2;i<its.length;i++){
+      const t=String(its[i].str).trim();
+      if(/^\d{5}$/.test(t)){
+        const nx=its[i+1]?String(its[i+1].str).trim():'';
+        if((typeof NDSH_RATE_BY_CODE!=='undefined' && NDSH_RATE_BY_CODE[t]!==undefined) || /^\d{3,4}-\d{2}$/.test(nx) || NDSH_NUM_RE.test(nx)){ anchor=i; break; }
+      }
     }
-    // Регистрийн дараах баганууд: төрөл(5 орон), мэргэжил(NNNN-NN),
-    // дараа нь мөнгөн дүнгүүд тогтсон дараалалтай: цалин, нийт НДШ, ажил олгогч, даатгуулагч
-    const afterReg=its.filter(it=>it.x > regEndX+1).sort((a,b)=>a.x-b.x);
-    let type='', occ='';
-    const moneys=[];
-    afterReg.forEach(it=>{
-      const t=String(it.str).trim();
-      if(/^\d{5}$/.test(t) && !type) type=t;
-      else if(/^\d{3,4}-\d{2}$/.test(t) && !occ) occ=t;
-      else if(NDSH_NUM_RE.test(t)) moneys.push(num(t));
-    });
-    rows.push({
-      lastName, firstName, reg, type, occ,
-      salary:moneys[0]||0, totalNdsh:moneys[1]||0, employer:moneys[2]||0, employee:moneys[3]||0
-    });
+    if(anchor<0){
+      for(let i=2;i<its.length;i++){ if(/^\d{3,4}-\d{2}$/.test(String(its[i].str).trim())){ anchor=i; break; } }
+    }
+    if(anchor<0) return;
+    const pre=its.slice(1, anchor);
+    let idStart=pre.length;
+    while(idStart>0 && hasDigit(pre[idStart-1].str)) idStart--;
+    if(idStart>0 && idStart<pre.length && /^\d/.test(String(pre[idStart].str).trim())
+       && /^[A-Za-z]{1,3}$/.test(String(pre[idStart-1].str).trim())){
+      const gap=pre[idStart].x-(pre[idStart-1].x+pre[idStart-1].w);
+      if(gap<6) idStart--;
+    }
+    let reg=pre.slice(idStart).map(s=>String(s.str)).join('').replace(/\s+/g,'').toUpperCase();
+    if(!NDSH_FOREIGN_ID_RE.test(reg)) reg=reg||('NOID-'+rowNo);
+    const {lastName, firstName}=ndshSplitName(pre.slice(0,idStart));
+    const cols=ndshParseAfterId(its.slice(anchor), num);
+    if(!cols.salary && !cols.employee) return;
+    rows.push({lastName, firstName, reg, foreign:true, ...cols});
   });
   return {rows, meta};
 }

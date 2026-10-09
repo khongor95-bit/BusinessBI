@@ -565,9 +565,46 @@ async function parsePDF(file){
   return extractRows(allLines, metaText);
 }
 
-// Регистрийн загвар: 2 кирилл үсэг + 8 орон (худал зай тэвчинэ)
+// Регистрийн загвар: 2 кирилл үсэг + 8 орон (худал зай тэвчинэ) — Монгол иргэн
 const REG_RE=/[А-ЯӨҮЁ]\s*[А-ЯӨҮЁ]\s*\d{8}/;
 const NUM_RE=/^[\d,]+\.?\d*$/;
+// Гадаад иргэний дугаар: НД тайланд регистрийн оронд
+//   • F-регистр (ГИХГ олгодог 13 тэмдэгт: улсын товчлол + төрсөн огноо + хүйс + дугаар),
+//   • паспортын дугаар (латин үсэг 1–3 + 5–9 орон, ж: E12345678, AB1234567),
+//   • эсвэл дан тоон дугаар (9–13 орон)
+// гэсэн гурван хэлбэрийн аль нэг нь байдаг. Бүгд "үсэг/тоо холимог, дор хаяж 4 оронтой"
+// гэсэн нийтлэг шинжтэй тул тэр шинжээр танина. Нэрийг хуваахад ашиглахгүй — тоо агуулсан
+// бол нэр биш гэж үзнэ.
+const FOREIGN_ID_RE=/^(?=(?:.*\d){4})[A-ZА-ЯӨҮЁ0-9\-\/]{5,20}$/i;
+const hasDigit=s=>/\d/.test(String(s||''));
+// Монгол регистр эсэх (бүхэлд нь)
+const isMnReg=s=>/^[А-ЯӨҮЁ]{2}\d{8}$/.test(String(s||'').replace(/\s+/g,'').toUpperCase());
+
+// Овог | нэр-ийн заагийг хамгийн том x-завсраар олно (нэр доторх худал зай үүнээс жижиг).
+function splitName(items){
+  let splitIdx=-1, maxGap=0;
+  for(let i=1;i<items.length;i++){
+    const gap=items[i].x-(items[i-1].x+items[i-1].w);
+    if(gap>maxGap){maxGap=gap; splitIdx=i;}
+  }
+  const join=arr=>arr.map(s=>s.str).join('').replace(/\s+/g,'');
+  if(splitIdx>0 && maxGap>=4) return {lastName:join(items.slice(0,splitIdx)), firstName:join(items.slice(splitIdx))};
+  return {lastName:'', firstName:join(items)};
+}
+
+// Регистрийн дараах баганууд: төрөл(5 орон), мэргэжил(NNNN-NN), дараа нь мөнгөн дүнгүүд
+// тогтсон дараалалтай: [цалин, нийт НДШ, ажил олгогч, даатгуулагч]
+function parseAfterId(items, num){
+  let type='', occ='';
+  const moneys=[];
+  items.forEach(it=>{
+    const t=it.str.trim();
+    if(/^\d{5}$/.test(t) && !type) type=t;                 // даатгуулагчийн төрөл
+    else if(/^\d{3,4}-\d{2}$/.test(t) && !occ) occ=t;       // мэргэжлийн ангилал
+    else if(NUM_RE.test(t)) moneys.push(num(t));            // мөнгөн дүнгүүд
+  });
+  return {type, occ, salary:moneys[0]||0, totalNdsh:moneys[1]||0, employer:moneys[2]||0, employee:moneys[3]||0};
+}
 
 function extractRows(lines, metaText){
   const meta={};
@@ -593,67 +630,71 @@ function extractRows(lines, metaText){
     const rowNo=+first;
     if(rowNo<1||rowNo>500) return;
 
-    // 1) Регистрийг олох: бүх item-ийн текстийг нэгтгээд regex-ээр хайна.
-    //    Регистрийн x-байрлалыг тэмдэглэж, түүгээр овог/нэр/тоонуудыг хуваана.
-    let regToken=null, regStartX=null, regEndX=null;
-    // item-үүдийг нэгтгэж регистр хайхдаа x-ийг хадгална
+    // ── А. МОНГОЛ ИРГЭН: регистрийг (2 кирилл + 8 орон) regex-ээр олно ──────────
+    //    Бүх item-ийн текстийг нэгтгээд хайна; регистрийн x-байрлалаар
+    //    овог/нэр (зүүн тал) ба тоон баганууд (баруун тал)-ыг хуваана.
     let concat='', map=[];
     its.forEach(it=>{ for(const ch of it.str){ concat+=ch; map.push(it.x); } });
     const rm=concat.match(REG_RE);
-    let reg='';
     if(rm){
-      reg=rm[0].replace(/\s+/g,'');
-      regStartX=map[rm.index];
-      regEndX=map[rm.index+rm[0].length-1];
-    }
-    if(!reg) return; // регистргүй мөр — алгасна
-
-    // 2) Овог, нэрийг x-границаар хуваана.
-    //    Регистрийн өмнөх item-үүд = овог+нэр. Нэр баганын эхлэлийг
-    //    тухайн мөрийн item-үүдийн x-завсраас динамикаар олно.
-    const beforeReg=its.filter(it=>it.x < regStartX-2 && it.x>its[0].x+1);
-    // Овог|нэр-ийн заагийг хоёр аргаар олно:
-    //  (a) хамгийн том x-завсар (нэр доторх худал зай үүнээс жижиг);
-    //  (b) нэр баганын ойролцоо абсолют x (≈ регистрийн эхлэлээс ~80px зүүн).
-    //  Хоёрын аль найдвартайг сонгоно.
-    let splitIdx=-1, maxGap=0;
-    for(let i=1;i<beforeReg.length;i++){
-      const gap=beforeReg[i].x-(beforeReg[i-1].x+beforeReg[i-1].w);
-      if(gap>maxGap){maxGap=gap; splitIdx=i;}
-    }
-    let lastName='', firstName='';
-    if(splitIdx>0 && maxGap>=4){
-      lastName=beforeReg.slice(0,splitIdx).map(s=>s.str).join('').replace(/\s+/g,'');
-      firstName=beforeReg.slice(splitIdx).map(s=>s.str).join('').replace(/\s+/g,'');
-    }else{
-      lastName=''; firstName=beforeReg.map(s=>s.str).join('').replace(/\s+/g,'');
+      const reg=rm[0].replace(/\s+/g,'');
+      const regStartX=map[rm.index];
+      const regEndX=map[rm.index+rm[0].length-1];
+      const beforeReg=its.filter(it=>it.x < regStartX-2 && it.x>its[0].x+1);
+      let {lastName, firstName}=splitName(beforeReg);
+      const afterReg=its.filter(it=>it.x > regEndX+1).sort((a,b)=>a.x-b.x);
+      const cols=parseAfterId(afterReg, num);
+      // Сонголтоор: тодорхой регистрийн нэрийг гараар тольд зааж өгсөн бол давуу эрхээр авна
+      if(NAME_DB[reg]){ lastName=NAME_DB[reg][0]; firstName=NAME_DB[reg][1]; }
+      rows.push({lastName, firstName, reg, nameSource:'auto', foreign:false, ...cols});
+      return;
     }
 
-    // 3) Регистрийн дараах тоон баганууд: x-ээр эрэмбэлж тоонуудыг түүнэ.
-    //    Дараалал: төрөл(5орон), мэргэжил(NNNN-NN), цалин, нийтНДШ, аж олгогч, даатгуулагч
-    const afterReg=its.filter(it=>it.x > regEndX+1).sort((a,b)=>a.x-b.x);
-    // Зөвхөн "цэвэр тоо" (таслал/цэгтэй) болон код утгуудыг ялгана
-    let type='', occ='';
-    const moneys=[];
-    afterReg.forEach(it=>{
-      const t=it.str.trim();
-      if(/^\d{5}$/.test(t) && !type) type=t;                 // даатгуулагчийн төрөл
-      else if(/^\d{3,4}-\d{2}$/.test(t) && !occ) occ=t;       // мэргэжлийн ангилал
-      else if(NUM_RE.test(t)) moneys.push(num(t));            // мөнгөн дүнгүүд
-    });
-    // мөнгөн баганууд: [цалин, нийт НДШ, ажил олгогч, даатгуулагч]
-    const salary=moneys[0]||0;
-    const totalNdsh=moneys[1]||0;
-    const employer=moneys[2]||0;
-    const employee=moneys[3]||0;
+    // ── Б. ГАДААД ИРГЭН: регистр биш дугаартай (F-регистр / паспорт / тоон) ─────
+    //    Монгол регистр олдохгүй бол мөрийг хаяхгүй. Зангуу болгож даатгуулагчийн
+    //    төрлийн 5 оронт кодыг (эсвэл мэргэжлийн NNNN-NN кодыг) олно: түүнээс
+    //    ЗҮҮН тал = [нэрс..., дугаар], БАРУУН тал = тоон баганууд.
+    //    Дугаар = зангуугийн яг өмнөх, тоо агуулсан item-үүд (хэд хэдэн хэсэгт
+    //    хуваагдсан байж болно); нэрс = түүнээс зүүн талын үлдсэн item-үүд.
+    let anchor=-1;
+    for(let i=2;i<its.length;i++){
+      const t=its[i].str.trim();
+      if(/^\d{5}$/.test(t)){
+        // 5 оронтой боловч нэрийн/дугаарын хэсэг байж болзошгүй → дараагийн item нь
+        // мэргэжлийн код эсвэл мөнгөн дүн байвал л төрлийн код гэж итгэнэ.
+        const nx=its[i+1]?its[i+1].str.trim():'';
+        if(TYPE_DICT.name[t] || /^\d{3,4}-\d{2}$/.test(nx) || NUM_RE.test(nx)){ anchor=i; break; }
+      }
+    }
+    if(anchor<0){
+      for(let i=2;i<its.length;i++){ if(/^\d{3,4}-\d{2}$/.test(its[i].str.trim())){ anchor=i; break; } }
+    }
+    if(anchor<0) return; // зангуу олдсонгүй — ажилтны мөр биш
 
-    // Сонголтоор: тодорхой регистрийн нэрийг гараар тольд зааж өгсөн бол давуу эрхээр авна
+    const pre=its.slice(1, anchor);           // мөрийн дугаарын дараа, зангуугийн өмнө
+    // Дугаарын хэсгүүд: төгсгөлөөс эхлэн тоо агуулсан item-үүд (мөн тэдгээрийн шууд
+    // өмнөх 1–3 латин үсэгт угтвар, ж: "E" + "12345678")
+    let idStart=pre.length;
+    while(idStart>0 && hasDigit(pre[idStart-1].str)) idStart--;
+    // "E" + "12345678" маягаар үсэгт угтвар нь тусдаа item болж салсан бол нийлүүлнэ —
+    // зөвхөн дугаарын хэсэг тоогоор эхэлж байгаа бөгөөд угтвар нь нааш нь наалдсан (<6px) үед.
+    if(idStart>0 && idStart<pre.length && /^\d/.test(pre[idStart].str.trim())
+       && /^[A-Za-z]{1,3}$/.test(pre[idStart-1].str.trim())){
+      const gap=pre[idStart].x-(pre[idStart-1].x+pre[idStart-1].w);
+      if(gap<6) idStart--;
+    }
+    const idItems=pre.slice(idStart), nameItems=pre.slice(0,idStart);
+    let reg=idItems.map(s=>s.str).join('').replace(/\s+/g,'').toUpperCase();
+    if(!FOREIGN_ID_RE.test(reg)){
+      // Дугаар танигдсангүй — мөрийг алдахгүйн тулд нэрээр түлхүүр үүсгэнэ
+      // (dashboard-д харагдана, ТТД модалд гараар нөхөж болно).
+      reg=reg||('NOID-'+rowNo);
+    }
+    let {lastName, firstName}=splitName(nameItems);
+    const cols=parseAfterId(its.slice(anchor), num);
+    if(!cols.salary && !cols.employee) return; // мөнгөн багана огт байхгүй — хуурамч таарц
     if(NAME_DB[reg]){ lastName=NAME_DB[reg][0]; firstName=NAME_DB[reg][1]; }
-
-    rows.push({
-      lastName, firstName, reg, type, occ, nameSource:'auto',
-      salary, totalNdsh, employer, employee
-    });
+    rows.push({lastName, firstName, reg, nameSource:'auto', foreign:true, ...cols});
   });
   return {rows, meta};
 }
@@ -795,7 +836,7 @@ function aggregateByRegister(){
       if(!map[r.reg]){
         map[r.reg]={
           reg:r.reg, lastName:r.lastName, firstName:r.firstName,
-          type:r.type, occ:r.occ, nameSource:r.nameSource,
+          type:r.type, occ:r.occ, nameSource:r.nameSource, foreign:!!r.foreign,
           salary:0, totalNdsh:0, employer:0, employee:0,
           months:new Set(), monthly:[]
         };
@@ -1012,9 +1053,18 @@ function refreshSummary(){
     const el=$('codeWarn'); if(!el) return;
     const ex=list.filter(r=>String(r.type||'').startsWith('70'));
     const nc=list.filter(r=>String(r.type||'').startsWith('40'));
-    if(!ex.length && !nc.length){ el.style.display='none'; el.innerHTML=''; return; }
-    const nm=r=>r.name||r.reg||'?';
+    const fo=list.filter(r=>r.foreign);
+    if(!ex.length && !nc.length && !fo.length){ el.style.display='none'; el.innerHTML=''; return; }
+    const nm=r=>((r.lastName||'')+' '+(r.firstName||'')).trim()||r.reg||'?';
     let html='';
+    if(fo.length){
+      const noid=fo.filter(r=>String(r.reg).startsWith('NOID-'));
+      html+=`<div><b>ℹ Гадаад иргэн ${fo.length} ажилтан</b> — регистрийн оронд F-регистр/паспортын дугаараар танигдлаа: ${fo.map(r=>`${nm(r)} (${r.reg})`).join(', ')}. `
+        +`ХХОАТ-ыг Монголын иргэнтэй адил (10%, сарын хөнгөлөлттэй) тооцсон — энэ нь Монголд <b>оршин суугч</b> (жилд 183+ хоног) ажилтанд зөв. `
+        +`<b>Оршин суугч бус</b> ажилтны орлогод ХХОАТ хуулиар 20%, хөнгөлөлтгүй ногдуулдаг тул тэр тохиолдолд маягтад гараар засна уу. Нас, хүйс регистрээс гардаггүй тул «Тодорхойгүй» гарна.`
+        +(noid.length?`<br><b>⚠ ${noid.length} ажилтны дугаар танигдсангүй</b> — ТТД модалд нэрээр нь ТТД-г гараар оруулна уу.`:'')
+        +`</div>`;
+    }
     if(ex.length){
       html+=`<div><b>⚠ 70 кодтой ${ex.length} ажилтан</b> — ХЧА тэтгэвэр тогтоолгосон тул ХХОАТ-аас <b>чөлөөлж</b> тооцлоо (хуулийн 22.1.2). ЭХМК-ын дүгнэлт, ХБ үнэмлэхтэй эсэхийг заавал шалгана уу: ${ex.map(nm).join(', ')}</div>`;
     }
@@ -1457,7 +1507,9 @@ $('ttdFileInput').onchange=async e=>{
     // Одоогийн ажилтнуудын овог нэр → регистр индекс (нэрээр тулгахад)
     const empList=aggregateByRegister().list;
     const byName={};
+    const knownIds=new Set();   // одоогийн ажилтнуудын дугаар (гадаад иргэний F-регистр/паспорт ч орно)
     empList.forEach(r=>{
+      knownIds.add(normRegKey(r.reg));
       const k=nameKey(r.lastName,r.firstName);
       if(k==='|') return;
       (byName[k]=byName[k]||[]).push(normRegKey(r.reg));
@@ -1470,7 +1522,7 @@ $('ttdFileInput').onchange=async e=>{
         let reg='', ttd='', ttdIdx=-1;
         row.forEach((cell,ci)=>{
           const s=String(cell).trim();
-          if(!reg){ const k=normRegKey(s); if(REG_FULL_RE.test(k)) reg=k; }
+          if(!reg){ const k=normRegKey(s); if(REG_FULL_RE.test(k) || (k.length>=5 && knownIds.has(k))) reg=k; }
           if(!ttd){ const d=s.replace(/[\s\-]/g,''); if(TTD_FULL_RE.test(d)){ ttd=d; ttdIdx=ci; } }
         });
         if(!ttd) return;
@@ -1537,7 +1589,7 @@ function renderTTDTable(){
     return `<tr class="${miss?'miss':''}">
       <td style="color:var(--muted)">${i+1}</td>
       <td>${r.lastName||''}</td><td><b>${r.firstName||''}</b></td>
-      <td style="font-family:monospace">${r.reg}</td>
+      <td style="font-family:monospace">${r.reg}${r.foreign?' <span title="Гадаад иргэн — F-регистр/паспортын дугаар" style="font-family:Inter,sans-serif;font-size:10px;color:var(--gold);font-weight:600">🌐</span>':''}</td>
       <td><input maxlength="12" inputmode="numeric" placeholder="12 оронт ТТД" value="${v}" data-reg="${r.reg}"></td>
     </tr>`;
   }).join('');
