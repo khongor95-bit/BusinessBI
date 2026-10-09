@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <script src="gate.js"></script>
+<script src="pay.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>НДШ → ХХОАТ хөрвүүлэгч</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -106,6 +107,8 @@
   .dl-btn:hover{background:#1a5840}
   .dl-btn:disabled{background:#d2d6d3; color:#fff; cursor:not-allowed}
   .hint{font-size:12px; color:var(--muted); margin-top:13px; line-height:1.55}
+  .price-tag{display:inline-block; margin-left:8px; background:#faf3e4; color:#8a6410; border:1px solid #efd9a3; border-radius:6px; padding:1px 7px; font-size:10px; letter-spacing:.3px; text-transform:none; font-weight:700; vertical-align:middle}
+  .paid-tag{display:inline-block; margin-left:8px; background:var(--green-soft); color:var(--green); border:1px solid #bfe0cc; border-radius:6px; padding:1px 7px; font-size:10px; letter-spacing:.3px; text-transform:none; font-weight:700; vertical-align:middle}
   .hidden{display:none}
   /* ТТД (татвар төлөгчийн дугаар) panel */
   .ttd-actions{display:flex; flex-direction:column; gap:8px; margin-top:12px}
@@ -283,7 +286,7 @@
   </div>
 </nav>
 <div class="wrap">
-<details class="bbi-guide" style="max-width:1100px;margin:16px auto;background:#f2f7f4;border:1px solid #d7e5dc;border-radius:10px;"><summary style="cursor:pointer;padding:13px 18px;font-weight:600;color:#0e3b2e;display:flex;align-items:center;gap:8px;">📖 Ашиглах заавар <span style="font-weight:400;font-size:13px;color:#5b7365;">— 1 минут уншаад эхлээрэй</span></summary><ol style="margin:0;padding:4px 22px 14px 40px;color:#243b30;font-size:14.5px;line-height:1.75;"><li style="margin:4px 0;">Нийгмийн даатгалын цахим системээс сарын <b>НДШ тайлангаа PDF</b> хэлбэрээр татаж авна.</li><li style="margin:4px 0;">PDF файлаа энэ хуудсанд чирж оруулах эсвэл сонгоно — тайлант сар автоматаар танигдана.</li><li style="margin:4px 0;">Хэд хэдэн сарын тайланг дараалан нэмж болно; сар бүр жагсаалтад харагдах ба × товчоор устгаж болно.</li><li style="margin:4px 0;">Алхам 2-т ажилтнуудын <b>12 оронт ТТД</b> (татвар төлөгчийн дугаар)-г тулгана — өмнөх улирлын ХХОАТ маягт эсвэл etax-ийн ажилтны жагсаалтыг оруулбал автоматаар танигдана. Нэг удаа оруулсан ТТД хөтөчид хадгалагдаж дараагийн тайланд өөрөө бөглөгдөнө.</li><li style="margin:4px 0;">Тойм самбараас Цалин / Ажилтан / НДШ үзүүлэлтүүдээ шалгана.</li><li style="margin:4px 0;"><b>«⬇ Excel файл татах»</b> товчоор ХХОАТ тайланд бэлэн хүснэгтээ авна.</li></ol><p style="margin:0;padding:0 22px 14px;font-size:13px;color:#5b7365;">💡 PDF тань браузер дээр уншигдана. Нэг дор олон сар оруулбал улирал, жилийн харьцуулалт автоматаар гарна.</p></details>
+<details class="bbi-guide" style="max-width:1100px;margin:16px auto;background:#f2f7f4;border:1px solid #d7e5dc;border-radius:10px;"><summary style="cursor:pointer;padding:13px 18px;font-weight:600;color:#0e3b2e;display:flex;align-items:center;gap:8px;">📖 Ашиглах заавар <span style="font-weight:400;font-size:13px;color:#5b7365;">— 1 минут уншаад эхлээрэй</span></summary><ol style="margin:0;padding:4px 22px 14px 40px;color:#243b30;font-size:14.5px;line-height:1.75;"><li style="margin:4px 0;">Нийгмийн даатгалын цахим системээс сарын <b>НДШ тайлангаа PDF</b> хэлбэрээр татаж авна.</li><li style="margin:4px 0;">PDF файлаа энэ хуудсанд чирж оруулах эсвэл сонгоно — тайлант сар автоматаар танигдана.</li><li style="margin:4px 0;">Хэд хэдэн сарын тайланг дараалан нэмж болно; сар бүр жагсаалтад харагдах ба × товчоор устгаж болно.</li><li style="margin:4px 0;">Алхам 2-т ажилтнуудын <b>12 оронт ТТД</b> (татвар төлөгчийн дугаар)-г тулгана — өмнөх улирлын ХХОАТ маягт эсвэл etax-ийн ажилтны жагсаалтыг оруулбал автоматаар танигдана. Нэг удаа оруулсан ТТД хөтөчид хадгалагдаж дараагийн тайланд өөрөө бөглөгдөнө.</li><li style="margin:4px 0;">Тойм самбараас Цалин / Ажилтан / НДШ үзүүлэлтүүдээ шалгана.</li><li style="margin:4px 0;"><b>«⬇ Excel файл татах»</b> товчоор ХХОАТ тайланд бэлэн хүснэгтээ авна — <b>1 тайлан 5,000₮</b>, WIRE.mn-ээр төлнө (төлснөөс хойш 24 цаг дахин татах үнэгүй).</li></ol><p style="margin:0;padding:0 22px 14px;font-size:13px;color:#5b7365;">💡 PDF тань браузер дээр уншигдана. Нэг дор олон сар оруулбал улирал, жилийн харьцуулалт автоматаар гарна.</p></details>
 
  <div class="layout">
   <!-- LEFT: month input + download -->
@@ -307,9 +310,10 @@
     </div>
 
     <div class="panel" id="dlPanel">
-      <div class="step-label">Алхам 3 — Татах</div>
+      <div class="step-label">Алхам 3 — Татах <span class="price-tag">5,000₮ / тайлан</span></div>
       <button class="dl-btn" id="dlBtn" disabled>⬇ Excel файл татах</button>
       <p class="hint" id="dlHint">Дор хаяж нэг сарын тайлан оруулна уу.</p>
+      <p class="hint" id="payHint" style="margin-top:8px">Урьдчилан харах, ТТД тулгах үнэгүй. Excel маягт татахад <b>5,000₮</b> — WIRE.mn-ээр (банкны апп / QR / хэтэвч). Төлснөөс хойш <b>24 цагийн</b> дотор дахин татах үнэгүй.</p>
     </div>
 
     <details class="ref-panel">
@@ -406,7 +410,7 @@
   </div><!-- /col-right -->
  </div><!-- /layout -->
 
-  <p class="foot">Бүх боловсруулалт таны хөтөч дотор хийгдэнэ — өгөгдөл хаашаа ч илгээгдэхгүй.</p>
+  <p class="foot">Бүх боловсруулалт таны хөтөч дотор хийгдэнэ — ажилтны өгөгдөл хаашаа ч илгээгдэхгүй. Серверт зөвхөн нэвтрэлт, төлбөрийн бүртгэл (хэрэгсэл, тайлант үе, дүн) хадгалагдана.</p>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -1625,13 +1629,32 @@ $('ttdExportBtn').onclick=()=>{
 };
 
 // ---- Excel export (4-sheet structure) ----
-// gate.js ачаалагдаагүй үед (файлыг дангаар нь нээх г.м.) товч ажиллахгүй
-// болохоос сэргийлж хамгаалалттай fallback ашиглана.
+// Татах = төлбөртэй (5,000₮ / тайлан, WIRE.mn). Дараалал:
+//   1) gate.js — нэвтрээгүй бол нэвтрэх modal
+//   2) pay.js  — хүчинтэй тасалбар (24 цаг) байхгүй бол төлбөрийн modal → WIRE checkout
+//   3) buildExcel()
+// gate.js / pay.js ачаалагдаагүй үед (файлыг дангаар нь нээх г.м.) ТАТАХЫГ ЗӨВШӨӨРӨХГҮЙ —
+// төлбөрийн хаалгыг тойрох боломж үлдээхгүй.
 const gateProtect=(fn,meta)=>(window.BBIGate&&BBIGate.protect)?BBIGate.protect(fn,meta):fn;
-$('dlBtn').onclick = gateProtect(() => buildExcel(), {
+const payProtect=(opts,fn)=>(window.BBIPay&&BBIPay.require)?BBIPay.require(opts,fn):()=>toast('Төлбөрийн модуль ачаалагдсангүй — хуудсыг businessbi.mn-ээс нээнэ үү');
+$('dlBtn').onclick = gateProtect(payProtect({
+  tool: 'ndsh_hhoat',
+  title: 'ХХОАТ маягт татах',
+  desc: 'etax-д шууд оруулахад бэлэн Excel маягт (Маягт · Хяналт · Хассан · Задаргаа).',
+  meta: () => { const q=detectQuarter(); return { period: `${state.year||''} ${q.label||''}`.trim(), months: ALL_MONTHS.filter(m=>state.data[m]&&!state.data[m].error).join(',') }; }
+}, () => { buildExcel(); refreshPayTag(); }), {
   tool: 'НДШ/ХХОАТ хөрвүүлэгч',
   action: 'download'
 });
+
+// Хүчинтэй тасалбартай бол "24 цагийн дотор дахин татах үнэгүй" гэдгийг товчны дэргэд харуулна
+function refreshPayTag(){
+  const lbl=document.querySelector('#dlPanel .step-label'); if(!lbl) return;
+  const old=lbl.querySelector('.paid-tag'); if(old) old.remove();
+  const t=(window.BBIPay&&BBIPay.ticketInfo)?BBIPay.ticketInfo('ndsh_hhoat'):null;
+  if(t){ const s=document.createElement('span'); s.className='paid-tag'; s.textContent='Төлсөн — '+t.leftText+' дахин татах үнэгүй'; lbl.appendChild(s); }
+}
+refreshPayTag(); setInterval(refreshPayTag, 60000);
 
 function buildExcel(){
   const months=ALL_MONTHS;

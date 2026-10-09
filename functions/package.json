@@ -1,0 +1,17 @@
+{
+  "name": "businessbi-payments",
+  "description": "BusinessBI — WIRE.mn төлбөрийн функцүүд (createPayment / checkPayment / wireWebhook / mockCheckout)",
+  "private": true,
+  "engines": { "node": "20" },
+  "main": "index.js",
+  "scripts": {
+    "serve": "firebase emulators:start --only functions,firestore",
+    "deploy": "firebase deploy --only functions:payments",
+    "logs": "firebase functions:log",
+    "test": "node test/wire.test.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.6.0",
+    "firebase-functions": "^6.1.0"
+  }
+}

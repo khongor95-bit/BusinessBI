@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Төлбөр — BusinessBI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f0f3f1;font-family:Inter,system-ui,sans-serif;color:#1a2b25}
+  .c{background:#fff;border:1px solid #e3e7e4;border-radius:18px;padding:34px 32px;width:min(460px,92vw);text-align:center;box-shadow:0 10px 40px rgba(20,40,30,.08)}
+  .ic{width:64px;height:64px;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:30px}
+  .ok .ic{background:#eaf3ee;color:#216a4c}.no .ic{background:#fcf2ee;color:#c0492b}
+  h1{font-size:20px;margin:0 0 8px}p{font-size:14px;color:#6b7670;line-height:1.6;margin:0 0 18px}
+  a.b{display:inline-block;background:#216a4c;color:#fff;text-decoration:none;font-weight:600;padding:12px 22px;border-radius:10px}
+  .s{font-size:12px;color:#9aa39d;margin-top:14px}
+</style>
+</head>
+<body>
+<div class="c" id="card">
+  <div class="ic" id="ic">…</div>
+  <h1 id="h">Шалгаж байна…</h1>
+  <p id="p"></p>
+  <a class="b" href="ndsh_hhoat_converter.html" id="back">Хөрвүүлэгч рүү буцах</a>
+  <div class="s" id="s"></div>
+</div>
+<script>
+(function(){
+  const q=new URLSearchParams(location.search);
+  const ok=q.get('ok')==='1', pid=q.get('pid')||'';
+  const card=document.getElementById('card');
+  card.className='c '+(ok?'ok':'no');
+  document.getElementById('ic').textContent=ok?'✓':'✕';
+  document.getElementById('h').textContent=ok?'Төлбөр амжилттай':'Төлбөр хийгдсэнгүй';
+  document.getElementById('p').textContent=ok
+    ?'Хөрвүүлэгчийн цонх руу буцвал Excel файл автоматаар татагдана. Энэ цонхыг хааж болно.'
+    :'Төлбөр цуцлагдсан буюу амжилтгүй болсон. Хөрвүүлэгч рүү буцаж дахин оролдоно уу.';
+  document.getElementById('s').textContent=pid?('Төлбөрийн дугаар: '+pid):'';
+  // Хөрвүүлэгчийн цонх (opener) руу дохио өгнө — тэр талд төлөв шууд шалгагдана
+  try{ if(window.opener && !window.opener.closed){ window.opener.postMessage({type:ok?'bbi-pay-success':'bbi-pay-cancel', pid}, '*'); } }catch(e){}
+  if(ok){
+    // popup байсан бол 2.5 сек дараа өөрөө хаана
+    setTimeout(()=>{ try{ if(window.opener) window.close(); }catch(e){} }, 2500);
+    document.getElementById('back').style.display = window.opener ? 'none' : 'inline-block';
+  }
+})();
+</script>
+</body>
+</html>
