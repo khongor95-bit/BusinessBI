@@ -71,6 +71,8 @@ h1 span{color:#b79a63}
       <button class="tab on" data-tab="acc">Нягтлан <span class="badge" id="bAcc">0</span></button>
       <button class="tab" data-tab="leads">Хүсэлт <span class="badge" id="bLeads">0</span></button>
       <button class="tab" data-tab="revs">Үнэлгээ <span class="badge" id="bRevs">0</span></button>
+      <button class="tab" data-tab="reqs">Сүлжээний хүсэлт <span class="badge" id="bReqs">0</span></button>
+      <button class="tab" data-tab="cons">Гэрээ <span class="badge" id="bCons">0</span></button>
     </div>
     <div id="content"><div class="empty">Ачааллаж байна…</div></div>
   </div>
@@ -108,15 +110,20 @@ document.getElementById('btnLogout').onclick = async ()=>{ await sb.auth.signOut
 
 /* ===== LOAD ===== */
 async function loadAll(){
-  const [a, l, r] = await Promise.all([
+  const [a, l, r, q, k] = await Promise.all([
     sb.from('mp_accountants').select('*').order('created_at',{ascending:false}),
     sb.from('mp_leads').select('*, mp_accountants(name)').order('created_at',{ascending:false}),
     sb.from('mp_reviews').select('*, mp_accountants(name)').order('created_at',{ascending:false}),
+    sb.from('mp_requests').select('*, mp_accountants(name)').order('created_at',{ascending:false}),
+    sb.from('mp_contracts').select('*, mp_accountants(name)').order('created_at',{ascending:false}),
   ]);
+  DATA.reqs = q.data || []; DATA.cons = k.data || [];
+  document.getElementById('bReqs').textContent = DATA.reqs.filter(x=>x.status==='new').length;
+  document.getElementById('bCons').textContent = DATA.cons.filter(x=>x.status==='active').length;
   if(a.error || l.error || r.error){
     // RLS-ээр хаагдсан = админ биш хаяг
     if((l.error||a.error||r.error)) {
-      showMsg('Дата уншиж чадсангүй. Энэ имэйл mp_admins хүснэгтэд байгаа эсэхийг шалгаарай.');
+      showMsg('Дата уншиж чадсангүй. Админ имэйл (supabase/schema.sql → mp_is_admin) мөн эсэхийг шалгаарай.');
     }
   }
   DATA.acc = a.data || [];
@@ -193,6 +200,26 @@ function render(){
           <button class="btn btn-red btn-sm" onclick="delRev('${r.id}')">Устгах</button>
         </div>
       </div>`).join('') : `<div class="empty">Үнэлгээ алга.</div>`;
+  }
+  if(TAB==='reqs'){
+    const ST={new:'Шинэ',offered:'Санал илгээсэн',contracted:'Гэрээ байгуулсан',declined:'Татгалзсан',closed:'Хаагдсан'};
+    c.innerHTML = DATA.reqs.length ? DATA.reqs.map(q=>`
+      <div class="card"><div class="head"><div><div class="title">${esc(q.company_name)} ${q.company_reg?'· '+esc(q.company_reg):''}</div>
+        <div class="sub">${q.accountant_id?'→ '+esc(q.mp_accountants?.name||'?'):'→ сүлжээнд нээлттэй'} · ${dt(q.created_at)}</div></div>
+        <span class="pill ${q.status==='new'?'p-pending':'p-approved'}">${ST[q.status]||esc(q.status)}</span></div>
+        <div class="meta">${(q.services||[]).join(', ')} ${q.employees?'· '+q.employees+' ажилтан':''} ${q.budget?'· төсөв '+Number(q.budget).toLocaleString()+'₮':''}<br>${esc(q.contact_name)} · ${esc(q.contact_phone)} ${q.contact_email?'· '+esc(q.contact_email):''}${q.message?'<br><i>'+esc(q.message)+'</i>':''}</div>
+      </div>`).join('') : `<div class="empty">Хүсэлт алга.</div>`;
+  }
+  if(TAB==='cons'){
+    const ST={draft:'Ноорог',sent:'Илгээсэн',signed_accountant:'Нягтлан зурсан',signed_client:'Компани зурсан',active:'Хүчинтэй',terminated:'Цуцлагдсан',declined:'Татгалзсан'};
+    const mrr=DATA.cons.filter(x=>x.status==='active').reduce((s,x)=>s+(x.fee_monthly||0),0);
+    c.innerHTML = `<div class="meta" style="margin-bottom:10px">Хүчинтэй гэрээний сарын нийт үнэ: <b>${mrr.toLocaleString()}₮</b></div>` + (DATA.cons.length ? DATA.cons.map(k=>`
+      <div class="card"><div class="head"><div><div class="title">${esc(k.contract_no||'')} — ${esc(k.company_name)}</div>
+        <div class="sub">Нягтлан: ${esc(k.mp_accountants?.name||'?')} · ${Number(k.fee_monthly||0).toLocaleString()}₮/сар · ${k.start_date} +${k.term_months} сар · ${dt(k.created_at)}</div></div>
+        <span class="pill ${k.status==='active'?'p-approved':'p-pending'}">${ST[k.status]||esc(k.status)}</span></div>
+        <div class="meta">${(k.services||[]).join(', ')}<br>${esc(k.client_name||'')} ${esc(k.client_phone||'')} ${esc(k.client_email||'')} ${k.bbi_company_id?'· журнал: '+esc(k.bbi_company_id):''}</div>
+        <div class="actions"><a class="btn btn-gray btn-sm" href="contract.html?id=${k.id}" target="_blank">Гэрээ үзэх</a></div>
+      </div>`).join('') : `<div class="empty">Гэрээ алга.</div>`);
   }
 }
 

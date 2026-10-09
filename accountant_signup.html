@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="site.css">
+<script src="mp.js"></script>
 <script src="site.js" defer></script>
 
 <title>Нягтлан болж бүртгүүлэх — BusinessBI.mn</title>
@@ -99,7 +100,7 @@ footer{background:#111;color:#fff;padding:50px 0 36px;margin-top:40px}
 *:focus-visible{outline:2px solid #b79a63;outline-offset:3px}
 </style>
 </head>
-<body>
+<body data-auth="supabase">
 
 
 <div class="container">
@@ -107,15 +108,16 @@ footer{background:#111;color:#fff;padding:50px 0 36px;margin-top:40px}
     <section class="page-head">
       <div class="tag">Нягтлангуудад зориулав</div>
       <h1>Захиалга <em>танд ирдэг</em> болно</h1>
-      <p>BusinessBI-ийн нягтлан холбох үйлчилгээнд профайлаа нэмээд, тайлан хийлгэх гэж буй бизнесүүдээс шууд хүсэлт хүлээж аваарай. Бүртгэл үнэгүй.</p>
+      <p>Нягтлангийн сүлжээнд профайлаа нэмээд компаниудаас хүсэлт хүлээн ав, гэрээг онлайнаар байгуул, харилцагч бүрээ BusinessBI журналд нэг дороос хөтөл. Бүртгэл үнэгүй.</p>
     </section>
 
     <div class="benefits">
       <div class="benefit"><b>Тогтмол захиалга</b><span>Хэрэглэгч хайх биш — хэрэглэгч таныг олно</span></div>
       <div class="benefit"><b>Баталгаажсан тэмдэг</b><span>Итгэл нэмдэг verified badge-тэй профайл</span></div>
-      <div class="benefit"><b>Үнэлгээний систем</b><span>Сайн ажил тань дараагийн захиалгыг авчирна</span></div>
+      <div class="benefit"><b>Онлайн гэрээ + журнал</b><span>Гэрээ зурмагц компани журналд тань нээгдэнэ</span></div>
     </div>
 
+    <div id="loginGate" style="display:none;background:#fff8e6;border:1px solid #f0e2bb;border-radius:14px;padding:16px 18px;margin-bottom:16px;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div><b>Эхлээд нэвтэрнэ үү</b><div style="font-size:13px;color:#7a6534;margin-top:3px">Профайл таны бүртгэлтэй холбогдож, гэрээ, самбар, журнал нэг нэвтрэлтээр ажиллана.</div></div><button class="btn-gold" id="loginGateBtn" type="button" style="margin:0">Нэвтрэх</button></div>
     <div class="form-card" id="formCard">
       <div id="errBox"></div>
 
@@ -181,18 +183,33 @@ footer{background:#111;color:#fff;padding:50px 0 36px;margin-top:40px}
 </div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 const SB_URL = 'https://mpfjceziasadnswwnkpc.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wZmpjZXppYXNhZG5zd3dua3BjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDY3MDMsImV4cCI6MjA5ODI4MjcwM30.LJ1Fh2TGjyPDv6EeTDzlhcR0S3WkUHhy2yRxnop940A';
-const sb = window.supabase.createClient(SB_URL, SB_KEY);
+let sb = null; // mp.js-ийн client-ийг ашиглана (нэг нэвтрэлт)
 
 // Чиглэл сонгох chip-үүд
 document.getElementById('specs').addEventListener('click', e=>{
   if(e.target.classList.contains('spec-chip')) e.target.classList.toggle('on');
 });
 
+// Нягтлангийн профайл нэвтэрсэн бүртгэлтэй холбогдоно (гэрээ, самбар, журнал нэг бүртгэлээр)
+let CUR_USER=null;
+BBIMP.onAuth(async u=>{
+  sb=BBIMP.sb; CUR_USER=u;
+  const card=document.getElementById('formCard'); const gateEl=document.getElementById('loginGate');
+  if(!u){ gateEl.style.display='flex'; card.style.opacity='.45'; card.style.pointerEvents='none'; return; }
+  gateEl.style.display='none'; card.style.opacity=''; card.style.pointerEvents='';
+  if(!document.getElementById('fEmail').value) document.getElementById('fEmail').value=u.email||'';
+  const nm=u.user_metadata&&(u.user_metadata.full_name||u.user_metadata.name); if(nm&&!document.getElementById('fName').value) document.getElementById('fName').value=nm;
+  // Аль хэдийн профайлтай бол самбар руу
+  const mine=await BBIMP.myAccountant();
+  if(mine){ card.innerHTML=`<div class="form-ok">Та аль хэдийн бүртгэлтэй (${mine.name}) — төлөв: ${mine.status==='approved'?'батлагдсан':'хүлээгдэж байна'}.<br><br><a href="partner.html" style="color:#1b5e20;font-weight:700">Нягтлангийн самбар руу →</a></div>`; }
+});
+document.getElementById('loginGateBtn').addEventListener('click', ()=>BBIMP.loginModal({title:'Нягтлан болж бүртгүүлэхийн тулд нэвтэрнэ үү', text:'Профайл, гэрээ, журнал — нэг бүртгэлээр.'}));
+
 document.getElementById('fSend').addEventListener('click', async ()=>{
+  if(!CUR_USER){ BBIMP.loginModal(); return; }
   const err = document.getElementById('errBox');
   err.innerHTML = '';
   const val = id => document.getElementById(id).value.trim();
@@ -224,6 +241,7 @@ document.getElementById('fSend').addEventListener('click', async ()=>{
   btn.disabled = true; btn.textContent = 'Илгээж байна…';
   try{
     const { error } = await sb.from('mp_accountants').insert({
+      user_id: CUR_USER.id,
       name, location, phone: phone.replace(/\s/g,''),
       email: val('fEmail') || null,
       messenger: val('fMessenger') || null,
@@ -239,7 +257,7 @@ document.getElementById('fSend').addEventListener('click', async ()=>{
     document.getElementById('formCard').innerHTML =
       `<div class="form-ok">✓ Бүртгэл амжилттай илгээгдлээ!<br><br>
        Бид мэдээллийг тань шалгаад ${phone} дугаараар холбогдож баталгаажуулна.
-       Батлагдсаны дараа профайл тань <a href="accountants.html" style="color:#1b5e20">нягтлангуудын жагсаалтад</a> нийтлэгдэнэ.</div>`;
+       Батлагдсаны дараа профайл тань <a href="accountants.html" style="color:#1b5e20">нягтлангийн сүлжээнд</a> нийтлэгдэж, <a href="partner.html" style="color:#1b5e20;font-weight:700">Нягтлангийн самбар</a>-аас хүсэлт, гэрээгээ удирдана.</div>`;
     window.scrollTo({top:0, behavior:'smooth'});
   }catch(e){
     console.error('signup:', e);

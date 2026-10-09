@@ -35,7 +35,7 @@
   <div class="wrap">
     <p class="eyebrow">Холбоо барих</p>
     <h1 class="serif">Юунаас <em>эхлэх</em> вэ?</h1>
-    <p class="lede">Хэрэгсэл сонгох, нягтлан холбуулах, эсвэл зүгээр асуух зүйл байна уу — бичээрэй. Нэг ажлын өдөрт хариулна.</p>
+    <p class="lede">Хэрэгсэл, програм, нягтлангийн сүлжээ, захиалгат ажил — эсвэл зүгээр асуух зүйл байна уу? Бичээрэй, нэг ажлын өдөрт хариулна.</p>
   </div>
 </header>
 
@@ -60,10 +60,8 @@
           <select id="topic">
             <option value="tools">Хэрэгслүүд ашиглах</option>
             <option value="journal">Санхүүгийн програм (журнал)</option>
-            <option value="accountant">Нягтлан холбуулах</option>
+            <option value="accountant">Нягтлан хайж байна</option>
             <option value="become_accountant">Нягтлан болж бүртгүүлэх</option>
-            <option value="training">Сургалтад бүртгүүлэх</option>
-            <option value="corporate">Байгууллагын сургалт</option>
             <option value="waitlist">Шинэ бүтээгдэхүүний хүлээлгийн жагсаалт</option>
             <option value="custom">Power BI / захиалгат ажил</option>
             <option value="other">Бусад</option>
@@ -97,10 +95,9 @@
 (function(){
   const $=id=>document.getElementById(id);
   const form=$('leadForm'), note=$('formNote'), btn=$('sendBtn');
-  // URL-ээс урьдчилан бөглөх: ?topic=training&course=…
+  // URL-ээс урьдчилан бөглөх: ?topic=…&product=…
   const q=new URLSearchParams(location.search);
   if(q.get('topic')){ const sel=$('topic'); if([...sel.options].some(o=>o.value===q.get('topic'))) sel.value=q.get('topic'); }
-  if(q.get('course')) $('msg').value='Сургалт: '+q.get('course')+'\n';
   if(q.get('product')) $('msg').value='Сонирхож буй бүтээгдэхүүн: '+q.get('product')+'\n';
 
   let db=null;

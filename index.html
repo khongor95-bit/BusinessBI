@@ -82,14 +82,13 @@ a{color:inherit}
 .pfoot .go{color:var(--bbi-green)}
 .pfoot .st{color:var(--bbi-muted);font-weight:500;font-size:13px}
 
-/* SERVICES */
-.svc{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.svc a{display:grid;grid-template-columns:56px 1fr auto;gap:18px;align-items:center;background:var(--bbi-bg);border:1px solid var(--bbi-line);border-radius:16px;padding:22px 24px;text-decoration:none;color:inherit;transition:.2s}
-.svc a:hover{border-color:#cfe3d7;background:var(--bbi-green-soft)}
-.svc .ic{width:56px;height:56px;border-radius:14px;background:#fff;border:1px solid var(--bbi-line);display:flex;align-items:center;justify-content:center;font-size:26px}
-.svc h4{font-size:18px;font-weight:700}
-.svc p{font-size:14px;color:var(--bbi-muted);margin-top:3px}
-.svc .arrow{color:var(--bbi-green);font-weight:700;font-size:20px}
+/* NETWORK */
+.net-box{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center;background:var(--bbi-bg);border:1px solid var(--bbi-line);border-radius:20px;padding:40px}
+.net-steps{list-style:none;padding:0;margin:0;display:grid;gap:12px;counter-reset:n}
+.net-steps li{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start;background:#fff;border:1px solid var(--bbi-line);border-radius:12px;padding:14px 16px;counter-increment:n}
+.net-steps li::before{content:counter(n);width:30px;height:30px;border-radius:50%;background:var(--bbi-green);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+.net-steps b{display:block;font-size:15px}.net-steps span{display:block;font-size:13px;color:var(--bbi-muted);margin-top:2px}
+@media(max-width:900px){.net-box{grid-template-columns:1fr;padding:26px}}
 
 /* STEPS */
 .steps{background:var(--bbi-bg);border-top:1px solid var(--bbi-line);border-bottom:1px solid var(--bbi-line)}
@@ -118,7 +117,7 @@ a{color:inherit}
 }
 @media(max-width:640px){
   .hero{padding:40px 0 32px}
-  .product-grid,.pgrid,.svc{grid-template-columns:1fr}
+  .product-grid,.pgrid{grid-template-columns:1fr}
   .sec{padding:44px 0}
   .cta-box{padding:32px 22px}
 }
@@ -221,19 +220,24 @@ a{color:inherit}
   </div>
 </section>
 
-<section class="sec" style="padding-top:0">
+<section class="sec" style="padding-top:0" id="network">
   <div class="container">
-    <div class="svc">
-      <a href="accountants.html">
-        <div class="ic">🤝</div>
-        <div><h4>Нягтлан холбох</h4><p>Тайлангаа гаргуулах нягтлан хайж байна уу? Баталгаажсан нягтлангуудаас сонгоно.</p></div>
-        <span class="arrow">→</span>
-      </a>
-      <a href="learn.html">
-        <div class="ic">🎓</div>
-        <div><h4>Сургалт</h4><p>Excel, Power BI, татварын тайлангийн автоматжуулалт — практик хичээлүүд.</p></div>
-        <span class="arrow">→</span>
-      </a>
+    <div class="net-box">
+      <div>
+        <p class="bbi-eyebrow" style="margin-bottom:10px">Нягтлангийн сүлжээ</p>
+        <h2 class="sec-title">Нягтлангаа ол, <em>онлайн гэрээ</em> байгуул</h2>
+        <p class="sec-sub" style="max-width:56ch">Баталгаажсан нягтлангуудаас сонгоод хүсэлт илгээнэ. Нягтлан гэрээний санал үүсгэж, хоёр тал онлайнаар гарын үсэг зурмагц тайлан гаргах ажил BusinessBI програм дээр эхэлнэ — компани тайлангийнхаа явцыг самбараасаа харна.</p>
+        <div class="btns" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:18px">
+          <a href="accountants.html" class="bbi-btn">Нягтлан хайх →</a>
+          <a href="accountant_signup.html" class="bbi-btn ghost">Нягтлан бол сүлжээнд элсэх</a>
+        </div>
+      </div>
+      <ol class="net-steps">
+        <li><b>Хүсэлт</b><span>Компани хэрэгцээгээ бичиж, нягтлан сонгоно</span></li>
+        <li><b>Гэрээний санал</b><span>Нягтлан үйлчилгээ, үнэ, хугацааг тодорхойлно</span></li>
+        <li><b>Онлайн гарын үсэг</b><span>Хоёр тал нэвтэрч баталгаажуулна, PDF хадгална</span></li>
+        <li><b>Ажил эхэлнэ</b><span>Компани нягтлангийн журналд автоматаар нээгдэнэ</span></li>
+      </ol>
     </div>
   </div>
 </section>

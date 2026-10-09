@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Миний самбар — BusinessBI.mn</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="site.css">
+<script src="mp.js"></script>
+<script src="site.js" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 24px 72px}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.head h1{font-size:26px;font-weight:800;letter-spacing:-.02em}.head p{color:var(--bbi-muted);font-size:14px;margin-top:4px}
+.sec{margin-bottom:28px}.sec h2{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--bbi-muted);margin-bottom:10px}
+.list{display:grid;gap:12px}
+.item{background:#fff;border:1px solid var(--bbi-line);border-radius:14px;padding:16px 18px;display:grid;grid-template-columns:1fr auto;gap:14px;align-items:start}
+.item.hi{border-color:var(--bbi-gold);box-shadow:0 0 0 3px var(--bbi-gold-soft)}
+.item h3{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.item .meta{font-size:13px;color:var(--bbi-muted);margin-top:4px;line-height:1.6}
+.item .acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.sm{padding:8px 12px;font-size:13px;border-radius:8px}
+.empty{background:#fff;border:1px dashed var(--bbi-line);border-radius:14px;padding:28px 20px;text-align:center;color:var(--bbi-muted);line-height:1.6}
+.acc-card{background:var(--bbi-green-soft);border:1px solid #cfe3d7;border-radius:14px;padding:18px 20px;display:grid;grid-template-columns:56px 1fr;gap:14px;align-items:center}
+.ph{width:56px;height:56px;border-radius:50%;background:#fff;color:var(--bbi-green);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:18px;object-fit:cover}
+.center{text-align:center;padding:60px 20px;color:var(--bbi-muted)}.center .bbi-btn{margin-top:14px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:24px}
+.step{background:#fff;border:1px solid var(--bbi-line);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--bbi-muted)}
+.step b{display:block;color:var(--bbi-ink);font-size:13.5px;margin-bottom:2px}.step.done{border-color:#cfe3d7;background:var(--bbi-green-soft)}.step.done b::before{content:"✓ ";color:var(--bbi-green)}
+.mbg{position:fixed;inset:0;background:rgba(17,30,23,.55);z-index:500;display:none;align-items:center;justify-content:center;padding:16px}.mbg.open{display:flex}
+.modal{background:#fff;border-radius:18px;width:min(560px,100%);padding:28px;position:relative}.mx{position:absolute;top:14px;right:14px;width:34px;height:34px;border:none;background:#f0f3f1;border-radius:50%;cursor:pointer;font-size:18px}
+.field{margin-bottom:12px}.field label{display:block;font-size:13px;font-weight:600;margin-bottom:5px}.field textarea,.field input{width:100%;padding:11px 13px;border:1.5px solid var(--bbi-line);border-radius:10px;font:inherit;font-size:14px}
+.stars span{font-size:28px;cursor:pointer;color:#d8ddd9}.stars span.on{color:var(--bbi-gold)}
+@media(max-width:760px){.item{grid-template-columns:1fr}.item .acts{justify-content:flex-start}.steps{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body class="bbi-page" data-auth="supabase">
+<div class="wrap"><div id="root" class="center">Ачааллаж байна…</div></div>
+<div class="mbg" id="mbg"><div class="modal" id="modal"></div></div>
+<script>
+(function(){
+  const { esc, fmtMNT, fmtDate, REQ_STATUS, conBadge, badge } = BBIMP;
+  const $=id=>document.getElementById(id);
+  let me=null, REQ=[], CON=[], ACCS={};
+  const mbg=$('mbg'), modal=$('modal');
+  const open=html=>{ modal.innerHTML=`<button class="mx" id="mx">×</button>`+html; mbg.classList.add('open'); $('mx').onclick=close; };
+  const close=()=>mbg.classList.remove('open');
+  const initials=n=>String(n||'').replace(/\./g,' ').trim().split(/\s+/).map(p=>p[0]||'').slice(0,2).join('').toUpperCase();
+
+  async function boot(){
+    const sb=await BBIMP.ready(); me=BBIMP.user;
+    if(!me){ $('root').innerHTML=`<p style="font-size:18px;font-weight:700;color:var(--bbi-ink);margin-bottom:6px">Миний самбар</p><p>Илгээсэн хүсэлт, гэрээний санал, нягтлангийн ажлын явцыг харахын тулд нэвтэрнэ үү.</p><button class="bbi-btn" id="lg">Нэвтрэх</button>`; $('lg').onclick=()=>BBIMP.loginModal(); return; }
+    const r=await sb.from('mp_requests').select('*').eq('client_user_id',me.id).order('created_at',{ascending:false}); REQ=r.data||[];
+    // RLS (mp_is_party) зөвхөн миний тал болсон гэрээг буцаана; нягтлангийн хувиар үүсгэснийг хасна
+    const c=await sb.from('mp_contracts').select('*').neq('accountant_user_id',me.id).order('created_at',{ascending:false}); CON=c.data||[];
+    const ids=[...new Set(CON.map(x=>x.accountant_id))];
+    if(ids.length){ const a=await sb.from('mp_accountants').select('id,name,photo_url,phone,email,company_name,location').in('id',ids); (a.data||[]).forEach(x=>ACCS[x.id]=x); }
+    render();
+  }
+  function render(){
+    const toSign=CON.filter(c=>c.status==='signed_accountant'||c.status==='sent');
+    const active=CON.filter(c=>c.status==='active');
+    const name=(me.user_metadata&&(me.user_metadata.full_name||me.user_metadata.name))||me.email;
+    const st=[['Хүсэлт илгээсэн',REQ.length>0||CON.length>0],['Гэрээний санал ирсэн',CON.length>0],['Гарын үсэг зурсан',active.length>0||CON.some(c=>c.client_signed_at)],['Бүртгэл явагдаж байна',active.some(c=>c.bbi_company_id)]];
+    $('root').className=''; $('root').innerHTML=`
+      <div class="head"><div><h1>Миний самбар</h1><p>${esc(name)} · компанийн төлөөлөгч</p></div><a href="accountants.html" class="bbi-btn">Нягтлан хайх / хүсэлт илгээх →</a></div>
+      <div class="steps">${st.map(([t,d],i)=>`<div class="step ${d?'done':''}"><b>${i+1}. ${t}</b>${['Нягтлангийн сүлжээнээс','Нягтлан үйлчилгээ, үнэ, хугацааг санал болгоно','Нэвтэрч нэрээ бичиж баталгаажуулна','Нягтлан журналд хөтөлж, тайлан гаргана'][i]}</div>`).join('')}</div>
+      ${toSign.length?`<div class="sec"><h2>Гарын үсэг хүлээж буй гэрээ</h2><div class="list">${toSign.map(c=>item(c,true)).join('')}</div></div>`:''}
+      <div class="sec"><h2>Миний нягтлан, хүчинтэй гэрээ</h2>${active.length?`<div class="list">${active.map(c=>item(c,false)).join('')}</div>`:`<div class="empty">Хүчинтэй гэрээ алга. ${CON.length?'Гэрээний саналд гарын үсэг зурмагц энд гарна.':'Нягтлангийн сүлжээнээс нягтлан сонгож хүсэлт илгээнэ үү.'}</div>`}</div>
+      <div class="sec"><h2>Миний хүсэлтүүд</h2>${REQ.length?`<div class="list">${REQ.map(r=>`<div class="item"><div><h3>${esc(r.company_name)} ${badge(REQ_STATUS[r.status]||r.status,r.status==='contracted'?'#216a4c':r.status==='offered'?'#b8862f':'#6b7670')}</h3><div class="meta">${(r.services||[]).join(', ')} · ${fmtDate(r.created_at)}${r.accountant_id?'':' · сүлжээнд нээлттэй'}</div></div></div>`).join('')}</div>`:`<div class="empty">Хүсэлт илгээгээгүй байна.</div>`}</div>
+      ${CON.filter(c=>['terminated','declined','signed_client'].includes(c.status)).length?`<div class="sec"><h2>Бусад гэрээ</h2><div class="list">${CON.filter(c=>['terminated','declined','signed_client'].includes(c.status)).map(c=>item(c,false)).join('')}</div></div>`:''}`;
+    document.querySelectorAll('[data-review]').forEach(b=>b.onclick=()=>review(CON.find(c=>c.id===b.dataset.review)));
+  }
+  function item(c,hi){
+    const a=ACCS[c.accountant_id]||{};
+    return `<div class="item ${hi?'hi':''}"><div><h3>${esc(c.company_name)} ${conBadge(c.status)}</h3>
+      <div class="meta">Нягтлан: <b style="color:var(--bbi-ink)">${esc(a.name||'—')}</b>${a.company_name?' · '+esc(a.company_name):''}${c.status==='active'&&a.phone?' · '+esc(a.phone):''}<br>№ ${esc(c.contract_no||'—')} · ${fmtMNT(c.fee_monthly)}/сар${c.fee_vat?' (НӨАТ орсон)':''} · ${fmtDate(c.start_date)}-аас ${c.term_months} сар · ${(c.services||[]).join(', ')}${c.status==='active'?'<br>'+(c.bbi_company_id?'✓ Нягтлан компанийг BusinessBI журналд нээсэн — бүртгэл явагдаж байна':'Нягтлан журналд компанийг нээхээр бэлтгэж байна'):''}</div></div>
+      <div class="acts">${hi?`<a class="bbi-btn sm" href="contract.html?id=${c.id}">Гэрээ үзэж гарын үсэг зурах →</a>`:`<a class="bbi-btn ghost sm" href="contract.html?id=${c.id}">Гэрээ</a>`}${c.status==='active'?`<button class="bbi-btn ghost sm" data-review="${c.id}">Үнэлгээ өгөх</button>`:''}</div></div>`;
+  }
+  function review(c){
+    let picked=0;
+    open(`<h2 style="font-size:20px;margin-bottom:4px">Нягтлангаа үнэлэх</h2><p style="color:var(--bbi-muted);font-size:13.5px;margin-bottom:14px">${esc((ACCS[c.accountant_id]||{}).name||'')} — гэрээ № ${esc(c.contract_no||'')}. Үнэлгээ шалгагдсаны дараа нийтлэгдэнэ.</p>
+      <div class="stars" id="stars">${[1,2,3,4,5].map(v=>`<span data-v="${v}">★</span>`).join('')}</div>
+      <div class="field" style="margin-top:10px"><label>Сэтгэгдэл</label><textarea id="rvC" placeholder="Хугацаа, харилцаа, тайлангийн чанар…"></textarea></div>
+      <div id="rvErr"></div><div style="display:flex;gap:10px"><button class="bbi-btn" id="rvSend">Илгээх</button><button class="bbi-btn ghost" id="rvCancel">Болих</button></div>`);
+    $('rvCancel').onclick=close;
+    $('stars').onclick=e=>{ const v=+e.target.dataset.v; if(!v) return; picked=v; [...$('stars').children].forEach((s,i)=>s.classList.toggle('on',i<v)); };
+    $('rvSend').onclick=async()=>{
+      if(!picked){ $('rvErr').innerHTML='<p style="color:#c0492b;font-size:13px;margin-bottom:8px">Од сонгоно уу.</p>'; return; }
+      const nm=(me.user_metadata&&(me.user_metadata.full_name||me.user_metadata.name))||c.client_name||c.company_name;
+      const {error}=await BBIMP.sb.from('mp_reviews').insert({accountant_id:c.accountant_id, contract_id:c.id, reviewer_user_id:me.id, reviewer_name:nm, rating:picked, comment:$('rvC').value.trim()||null, approved:false});
+      if(error){ $('rvErr').innerHTML='<p style="color:#c0492b;font-size:13px;margin-bottom:8px">'+esc(error.message)+'</p>'; return; }
+      modal.innerHTML='<button class="mx" id="mx">×</button><p style="color:var(--bbi-green);font-weight:600">✓ Баярлалаа — үнэлгээ шалгагдсаны дараа нийтлэгдэнэ.</p>'; $('mx').onclick=close;
+    };
+  }
+  BBIMP.onAuth(()=>boot());
+})();
+</script>
+</body>
+</html>

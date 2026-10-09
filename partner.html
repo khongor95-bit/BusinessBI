@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Нягтлангийн самбар — BusinessBI.mn</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="site.css">
+<script src="mp.js"></script>
+<script src="site.js" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 24px 72px}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.head h1{font-size:26px;font-weight:800;letter-spacing:-.02em}
+.head p{color:var(--bbi-muted);font-size:14px;margin-top:4px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.kpi{background:#fff;border:1px solid var(--bbi-line);border-radius:14px;padding:16px 18px}
+.kpi b{display:block;font-size:26px;color:var(--bbi-green);letter-spacing:-.02em}.kpi span{font-size:12.5px;color:var(--bbi-muted)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--bbi-line);margin-bottom:18px;overflow-x:auto}
+.tab{background:none;border:none;padding:12px 16px;font:inherit;font-size:14px;font-weight:600;color:var(--bbi-muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.tab.on{color:var(--bbi-green);border-bottom-color:var(--bbi-green)}
+.tab .n{display:inline-block;min-width:20px;padding:1px 6px;border-radius:50px;background:var(--bbi-gold-soft);color:var(--bbi-gold);font-size:11px;margin-left:6px}
+.panel{display:none}.panel.on{display:block}
+.list{display:grid;gap:12px}
+.item{background:#fff;border:1px solid var(--bbi-line);border-radius:14px;padding:16px 18px;display:grid;grid-template-columns:1fr auto;gap:14px;align-items:start}
+.item h3{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.item .meta{font-size:13px;color:var(--bbi-muted);margin-top:4px;line-height:1.6}
+.item .acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.sm{padding:8px 12px;font-size:13px;border-radius:8px}
+.empty{background:#fff;border:1px dashed var(--bbi-line);border-radius:14px;padding:36px 20px;text-align:center;color:var(--bbi-muted);line-height:1.6}
+.mbg{position:fixed;inset:0;background:rgba(17,30,23,.55);backdrop-filter:blur(3px);z-index:500;display:none;align-items:center;justify-content:center;padding:16px}
+.mbg.open{display:flex}
+.modal{background:#fff;border-radius:18px;width:min(720px,100%);max-height:92vh;overflow:auto;position:relative;padding:28px;box-shadow:0 24px 70px -20px rgba(0,0,0,.45)}
+.mx{position:absolute;top:14px;right:14px;width:34px;height:34px;border:none;background:#f0f3f1;border-radius:50%;cursor:pointer;font-size:18px;color:#6b7670}
+.modal h2{font-size:20px;margin-bottom:4px}.modal .sub{font-size:13.5px;color:var(--bbi-muted);margin-bottom:16px}
+.field{margin-bottom:12px}.field label{display:block;font-size:13px;font-weight:600;margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;padding:11px 13px;border:1.5px solid var(--bbi-line);border-radius:10px;font:inherit;font-size:14px}
+.field textarea{min-height:80px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--bbi-green)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{font-size:13px;border:1.5px solid var(--bbi-line);border-radius:50px;padding:6px 12px;cursor:pointer;user-select:none}
+.chip.on{background:var(--bbi-green);color:#fff;border-color:var(--bbi-green)}
+.err{background:#fcf2ee;border:1px solid #e6c0b5;color:#c0492b;border-radius:10px;padding:12px;font-size:13.5px;margin-bottom:10px}
+.ok{background:var(--bbi-green-soft);border:1px solid #cfe3d7;color:var(--bbi-green);border-radius:10px;padding:14px;font-weight:600;line-height:1.5}
+.center{text-align:center;padding:60px 20px;color:var(--bbi-muted)}
+.center .bbi-btn{margin-top:14px}
+@media(max-width:800px){.kpis{grid-template-columns:1fr 1fr}.item{grid-template-columns:1fr}.item .acts{justify-content:flex-start}.row2,.row3{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="bbi-page" data-auth="supabase">
+<div class="wrap">
+  <div id="root" class="center">Ачааллаж байна…</div>
+</div>
+<div class="mbg" id="mbg"><div class="modal" id="modal"></div></div>
+
+<script>
+(function(){
+  const { esc, fmtMNT, fmtDate, fmtDT, SERVICES, REQ_STATUS, conBadge, badge, contractUrl } = BBIMP;
+  const $=id=>document.getElementById(id);
+  let me=null, acc=null, REQ=[], CON=[], tab='req';
+  const mbg=$('mbg'), modal=$('modal');
+  const open=html=>{ modal.innerHTML=`<button class="mx" id="mx">×</button>`+html; mbg.classList.add('open'); document.body.style.overflow='hidden'; $('mx').onclick=close; };
+  const close=()=>{ mbg.classList.remove('open'); document.body.style.overflow=''; };
+  mbg.addEventListener('click',e=>{ if(e.target===mbg) close(); });
+
+  async function boot(){
+    const sb=await BBIMP.ready(); me=BBIMP.user;
+    if(!me){ $('root').innerHTML=`<p style="margin-bottom:6px;font-size:18px;font-weight:700;color:var(--bbi-ink)">Нягтлангийн самбар</p><p>Хүсэлт, гэрээ, харилцагч компаниудаа удирдахын тулд нэвтэрнэ үү.</p><button class="bbi-btn" id="lg">Нэвтрэх</button>`; $('lg').onclick=()=>BBIMP.loginModal(); return; }
+    acc=await BBIMP.myAccountant();
+    if(!acc){ $('root').innerHTML=`<p style="font-size:18px;font-weight:700;color:var(--bbi-ink)">Та сүлжээнд бүртгэлгүй байна</p><p>${esc(me.email||'')} бүртгэлтэй холбоотой нягтлангийн профайл алга. Профайл үүсгээд батлагдмагц хүсэлт хүлээн авч, гэрээ байгуулж эхэлнэ.</p><a href="accountant_signup.html" class="bbi-btn">Нягтлангийн профайл үүсгэх →</a><p style="margin-top:18px;font-size:13px">Компани төлөөлж байгаа бол <a href="my.html" style="color:var(--bbi-green);font-weight:600">Миний самбар</a> руу орно уу.</p>`; return; }
+    if(acc.status!=='approved'){ $('root').innerHTML=`<p style="font-size:18px;font-weight:700;color:var(--bbi-ink)">Профайл шалгагдаж байна</p><p>${esc(acc.name)} — таны профайлыг BusinessBI баталгаажуулж байна (ихэвчлэн 1 ажлын өдөр). Батлагдмагц ${esc(acc.phone||'')} дугаарт мэдэгдэнэ; дараа нь энэ самбараас хүсэлт, гэрээгээ удирдана.</p><p style="margin-top:10px;font-size:13px">Төлөв: ${badge(acc.status==='pending'?'Хүлээгдэж байна':acc.status,'#b8862f')}</p>`; return; }
+    await loadAll(); render();
+  }
+  async function loadAll(){
+    const sb=BBIMP.sb;
+    const r=await sb.from('mp_requests').select('*').or(`accountant_id.eq.${acc.id},accountant_id.is.null`).order('created_at',{ascending:false});
+    REQ=r.data||[]; if(r.error) console.error(r.error);
+    const c=await sb.from('mp_contracts').select('*').eq('accountant_user_id',me.id).order('created_at',{ascending:false});
+    CON=c.data||[]; if(c.error) console.error(c.error);
+  }
+  function render(){
+    const openReq=REQ.filter(r=>r.status==='new'||r.status==='offered');
+    const active=CON.filter(c=>c.status==='active');
+    const pending=CON.filter(c=>['sent','signed_accountant','signed_client','draft'].includes(c.status));
+    const mrr=active.reduce((s,c)=>s+(c.fee_monthly||0),0);
+    $('root').className=''; $('root').innerHTML=`
+      <div class="head"><div><h1>Нягтлангийн самбар</h1><p>${esc(acc.name)}${acc.company_name?' · '+esc(acc.company_name):''} · ${acc.verified?'✓ баталгаажсан':'баталгаажуулалт хүлээгдэж байна'}</p></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="bbi-btn" id="newCon">+ Шинэ гэрээний санал</button><a href="businessbi_journal.html" class="bbi-btn ghost">Журнал нээх →</a></div></div>
+      <div class="kpis"><div class="kpi"><b>${openReq.length}</b><span>нээлттэй хүсэлт</span></div><div class="kpi"><b>${pending.length}</b><span>гарын үсэг хүлээж буй гэрээ</span></div><div class="kpi"><b>${active.length}</b><span>харилцагч компани</span></div><div class="kpi"><b>${fmtMNT(mrr)}</b><span>сарын гэрээт орлого</span></div></div>
+      <div class="tabs">${[['req','Хүсэлтүүд',openReq.length],['con','Гэрээнүүд',pending.length],['cli','Харилцагчид',active.length],['prof','Профайл',0]].map(([k,t,n])=>`<button class="tab ${tab===k?'on':''}" data-t="${k}">${t}${n?`<span class="n">${n}</span>`:''}</button>`).join('')}</div>
+      <div class="panel ${tab==='req'?'on':''}" id="p-req">${renderReq()}</div>
+      <div class="panel ${tab==='con'?'on':''}" id="p-con">${renderCon(CON.filter(c=>c.status!=='active'))}</div>
+      <div class="panel ${tab==='cli'?'on':''}" id="p-cli">${renderCli(active)}</div>
+      <div class="panel ${tab==='prof'?'on':''}" id="p-prof">${renderProf()}</div>`;
+    document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ tab=b.dataset.t; render(); });
+    $('newCon').onclick=()=>openOffer(null);
+    bind();
+  }
+  function renderReq(){
+    const list=REQ.filter(r=>r.status!=='closed');
+    if(!list.length) return `<div class="empty">Хүсэлт ирээгүй байна. Таны профайл <a href="accountants.html" style="color:var(--bbi-green)">сүлжээнд</a> харагдаж байгаа — компани хүсэлт илгээмэгц энд гарна.</div>`;
+    return `<div class="list">${list.map(r=>`<div class="item"><div><h3>${esc(r.company_name)} ${badge(r.accountant_id?'Танд илгээсэн':'Нээлттэй','#216a4c')} ${badge(REQ_STATUS[r.status]||r.status,r.status==='new'?'#b8862f':'#6b7670')}</h3>
+      <div class="meta">${(r.services||[]).join(', ')||'—'}${r.employees?` · ${r.employees} ажилтан`:''}${r.docs_per_month?` · сард ~${r.docs_per_month} баримт`:''}${r.budget?` · төсөв ${fmtMNT(r.budget)}/сар`:''}<br>${esc(r.contact_name)} · ${esc(r.contact_phone)}${r.contact_email?' · '+esc(r.contact_email):''} · ${fmtDate(r.created_at)}${r.message?`<br><i>${esc(r.message)}</i>`:''}</div></div>
+      <div class="acts"><button class="bbi-btn sm" data-offer="${r.id}">Гэрээний санал үүсгэх</button>${r.accountant_id?`<button class="bbi-btn ghost sm" data-decline="${r.id}">Татгалзах</button>`:''}</div></div>`).join('')}</div>`;
+  }
+  function renderCon(list){
+    if(!list.length) return `<div class="empty">Хүлээгдэж буй гэрээ алга. Хүсэлтээс эсвэл «+ Шинэ гэрээний санал» товчоор үүсгэнэ.</div>`;
+    return `<div class="list">${list.map(c=>`<div class="item"><div><h3>${esc(c.company_name)} ${conBadge(c.status)}</h3><div class="meta">№ ${esc(c.contract_no||'—')} · ${fmtMNT(c.fee_monthly)}/сар · ${fmtDate(c.start_date)}-аас ${c.term_months} сар · ${(c.services||[]).join(', ')}<br>${esc(c.client_name||'')} ${esc(c.client_email||'')} ${esc(c.client_phone||'')}</div></div>
+      <div class="acts"><a class="bbi-btn sm" href="contract.html?id=${c.id}">${c.accountant_signed_at?'Гэрээ үзэх':'Гарын үсэг зурах'}</a><button class="bbi-btn ghost sm" data-copy="${c.id}">Линк хуулах</button></div></div>`).join('')}</div>`;
+  }
+  function renderCli(list){
+    if(!list.length) return `<div class="empty">Хүчинтэй гэрээтэй харилцагч байхгүй байна. Хоёр тал гарын үсэг зурмагц компани энд гарч, журналд нээх боломжтой болно.</div>`;
+    return `<div class="list">${list.map(c=>`<div class="item"><div><h3>${esc(c.company_name)} ${conBadge(c.status)} ${c.bbi_company_id?badge('Журналд нээлттэй','#2e8b62'):''}</h3><div class="meta">№ ${esc(c.contract_no||'—')} · ${fmtMNT(c.fee_monthly)}/сар · ${fmtDate(c.start_date)} – ${c.term_months} сар · ${(c.services||[]).join(', ')}<br>${esc(c.client_name||'')} · ${esc(c.client_phone||'')} · ${esc(c.client_email||'')}</div></div>
+      <div class="acts">${c.bbi_company_id?`<a class="bbi-btn sm" href="businessbi_journal.html?company=${encodeURIComponent(c.bbi_company_id)}">Журналд ажиллах →</a>`:`<button class="bbi-btn sm" data-openco="${c.id}">Журналд компани нээх</button>`}<a class="bbi-btn ghost sm" href="contract.html?id=${c.id}">Гэрээ</a></div></div>`).join('')}</div>`;
+  }
+  function renderProf(){
+    return `<div class="item" style="grid-template-columns:1fr"><div><h3>${esc(acc.name)}</h3><div class="meta">${esc(acc.location||'')} · ${acc.experience||0} жил · эхлэх үнэ ${fmtMNT(acc.price_from)}/сар<br>${(acc.specialties||[]).join(', ')}<br>${esc(acc.phone||'')} · ${esc(acc.email||'')}${acc.company_name?'<br>'+esc(acc.company_name):''}${acc.tin?' · ТТД '+esc(acc.tin):''}</div>
+      <p style="font-size:13.5px;margin-top:10px;color:var(--bbi-ink-soft)">${esc(acc.bio||'')}</p></div>
+      <div class="acts" style="justify-content:flex-start;margin-top:12px"><button class="bbi-btn sm" id="editProf">Профайл засах</button><a class="bbi-btn ghost sm" href="accountants.html">Сүлжээнд хэрхэн харагдаж буйг үзэх</a></div></div>
+      <p class="bbi-note" style="margin-top:14px">Гэрээнд таны нэр, компани, ТТД, утас, имэйл орно — бүрэн бөглөнө үү. Баталгаажсан тэмдэг (✓) болон үнэлгээг BusinessBI тохируулна.</p>`;
+  }
+  function bind(){
+    document.querySelectorAll('[data-offer]').forEach(b=>b.onclick=()=>openOffer(REQ.find(r=>r.id===b.dataset.offer)));
+    document.querySelectorAll('[data-decline]').forEach(b=>b.onclick=async()=>{ if(!confirm('Хүсэлтээс татгалзах уу?')) return; const {error}=await BBIMP.sb.from('mp_requests').update({status:'declined'}).eq('id',b.dataset.decline); if(error) alert(error.message); else { await loadAll(); render(); } });
+    document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>navigator.clipboard.writeText(contractUrl(b.dataset.copy)).then(()=>{ b.textContent='✓ Хуулагдлаа — Messenger/имэйлээр илгээнэ үү'; setTimeout(()=>b.textContent='Линк хуулах',2500); }));
+    document.querySelectorAll('[data-openco]').forEach(b=>b.onclick=()=>openCompany(CON.find(c=>c.id===b.dataset.openco)));
+    const ep=$('editProf'); if(ep) ep.onclick=editProfile;
+  }
+
+  // ── Гэрээний санал үүсгэх (хүсэлтээс эсвэл шинээр) ──
+  function openOffer(r){
+    const d=new Date(); const start=d.toISOString().slice(0,10);
+    open(`<h2>Гэрээний санал</h2><div class="sub">${r?'Хүсэлт: '+esc(r.company_name)+' — '+esc(r.contact_name):'Шинэ харилцагч — компанийн төлөөлөгчийн имэйлээр гэрээ очно'}</div><div id="oErr"></div>
+      <div class="row2"><div class="field"><label>Компанийн нэр *</label><input id="oCompany" value="${esc(r?r.company_name:'')}"></div><div class="field"><label>Регистр / ТТД</label><input id="oReg" value="${esc(r?r.company_reg||'':'')}"></div></div>
+      <div class="row3"><div class="field"><label>Төлөөлөгчийн нэр</label><input id="oName" value="${esc(r?r.contact_name:'')}"></div><div class="field"><label>Утас</label><input id="oPhone" value="${esc(r?r.contact_phone:'')}"></div><div class="field"><label>Имэйл ${r?'':'*'}</label><input id="oEmail" type="email" value="${esc(r?r.contact_email||'':'')}" placeholder="гарын үсэг зурах хүний имэйл"></div></div>
+      <div class="field"><label>Үйлчилгээ *</label><div class="chips" id="oSvc">${SERVICES.map(s=>`<span class="chip ${r&&(r.services||[]).includes(s)?'on':''}">${esc(s)}</span>`).join('')}</div></div>
+      <div class="row3"><div class="field"><label>Сарын төлбөр (₮) *</label><input id="oFee" type="number" min="0" step="10000" value="${r&&r.budget?r.budget:(acc.price_from||'')}"></div><div class="field"><label>НӨАТ</label><select id="oVat"><option value="0">Ороогүй</option><option value="1">Орсон</option></select></div><div class="field"><label>Төлөх өдөр (сар бүрийн)</label><input id="oPay" type="number" min="1" max="28" value="10"></div></div>
+      <div class="row2"><div class="field"><label>Эхлэх огноо *</label><input id="oStart" type="date" value="${start}"></div><div class="field"><label>Хугацаа (сар)</label><select id="oTerm"><option>3</option><option>6</option><option selected>12</option><option>24</option></select></div></div>
+      <div class="field"><label>Нэмэлт нөхцөл</label><textarea id="oExtra" placeholder="ж: Баримтыг сар бүрийн 5-ны дотор Messenger-ээр хүлээн авна. Жилийн тайлангийн нэмэлт төлбөр …"></textarea></div>
+      <div class="field"><label>Таны гарын үсэг (бүтэн нэр) *</label><input id="oSig" value="${esc(acc.name)}"><div style="font-size:12px;color:var(--bbi-muted);margin-top:4px">Санал илгээхдээ та гэрээнд гарын үсгээ зурна; компани зурмагц хүчинтэй болно.</div></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px"><button class="bbi-btn" id="oSend">Гарын үсэг зурж санал илгээх</button><button class="bbi-btn ghost" id="oCancel">Болих</button></div>`);
+    $('oCancel').onclick=close;
+    $('oSvc').onclick=e=>{ if(e.target.classList.contains('chip')) e.target.classList.toggle('on'); };
+    $('oSend').onclick=async()=>{
+      const v=id=>$(id).value.trim(); const err=$('oErr'); err.innerHTML='';
+      const services=[...document.querySelectorAll('#oSvc .chip.on')].map(c=>c.textContent);
+      if(!v('oCompany')||!services.length||!+v('oFee')||!v('oStart')||v('oSig').length<3||(!r&&!v('oEmail'))){ err.innerHTML='<div class="err">Компани, үйлчилгээ, төлбөр, эхлэх огноо, гарын үсэг (шинэ харилцагчид имэйл) — заавал.</div>'; return; }
+      const b=$('oSend'); b.disabled=true; b.textContent='Үүсгэж байна…';
+      try{
+        const sb=BBIMP.sb;
+        const row={ request_id:r?r.id:null, accountant_id:acc.id, accountant_user_id:me.id, client_user_id:r?r.client_user_id:null, client_email:v('oEmail')||null,
+          company_name:v('oCompany'), company_reg:v('oReg')||null, client_name:v('oName')||null, client_phone:v('oPhone')||null, services, fee_monthly:+v('oFee'), fee_vat:v('oVat')==='1', pay_day:+v('oPay')||10,
+          start_date:v('oStart'), term_months:+v('oTerm')||12, extra_terms:v('oExtra')||null, status:'sent' };
+        const ins=await sb.from('mp_contracts').insert(row).select().single(); if(ins.error) throw ins.error;
+        await sb.from('mp_contract_events').insert({contract_id:ins.data.id, actor_user_id:me.id, type:'created'});
+        const sg=await sb.rpc('mp_sign_contract',{p_contract_id:ins.data.id, p_signature:v('oSig')}); if(sg.error) throw sg.error;
+        if(r) await sb.from('mp_requests').update({status:'offered'}).eq('id',r.id);
+        const url=contractUrl(ins.data.id);
+        modal.innerHTML=`<button class="mx" id="mx">×</button><div class="ok">✓ Гэрээний санал үүсч, таны гарын үсэг зурагдлаа.</div><p style="margin:14px 0 8px;font-size:14px">Компанийн төлөөлөгч нэвтэрч гарын үсэг зурмагц гэрээ хүчинтэй болно. ${r?'Хүсэлт илгээсэн хэрэглэгчийн «Миний самбар»-т гарна; мөн':'Доорх'} линкийг Messenger/имэйлээр илгээнэ үү:</p><input readonly value="${esc(url)}" style="width:100%;padding:10px;border:1.5px solid var(--bbi-line);border-radius:8px;font:inherit;font-size:13px" onclick="this.select()"><div style="display:flex;gap:10px;margin-top:12px"><a class="bbi-btn" href="${esc(url)}">Гэрээ үзэх</a><button class="bbi-btn ghost" id="oDone">Хаах</button></div>`;
+        $('mx').onclick=close; $('oDone').onclick=async()=>{ close(); await loadAll(); tab='con'; render(); };
+      }catch(e){ console.error(e); b.disabled=false; b.textContent='Гарын үсэг зурж санал илгээх'; err.innerHTML='<div class="err">Алдаа: '+esc(e.message||'')+'</div>'; }
+    };
+  }
+
+  // ── Журналд компани нээх (companies хүснэгт — журналын cloud) ──
+  async function openCompany(c){
+    if(!confirm(`«${c.company_name}» компанийг таны BusinessBI журналд шинэ компани болгон нээх үү?`)) return;
+    const sb=BBIMP.sb; const cid='mp-'+c.id.replace(/-/g,'').slice(0,10);
+    const ins=await sb.from('companies').upsert({user_id:me.id, id:cid, name:c.company_name, meta:{contract_id:c.id, reg:c.company_reg||null, source:'marketplace'}},{onConflict:'user_id,id'});
+    if(ins.error){ alert('Журналд нээж чадсангүй: '+ins.error.message+'\n(Журналын cloud тохиргоо / companies хүснэгтийн эрхийг шалгана уу)'); return; }
+    const up=await sb.from('mp_contracts').update({bbi_company_id:cid}).eq('id',c.id);
+    if(up.error){ alert('Холбоос хадгалж чадсангүй: '+up.error.message); return; }
+    await loadAll(); render();
+  }
+
+  // ── Профайл засах ──
+  function editProfile(){
+    open(`<h2>Профайл засах</h2><div class="sub">Сүлжээнд болон гэрээнд харагдах мэдээлэл</div><div id="pErr"></div>
+      <div class="row2"><div class="field"><label>Нэр *</label><input id="pName" value="${esc(acc.name||'')}"></div><div class="field"><label>Байршил</label><select id="pLoc">${['Улаанбаатар','Дархан','Эрдэнэт','Орон нутаг'].map(l=>`<option ${acc.location===l?'selected':''}>${l}</option>`).join('')}</select></div></div>
+      <div class="row2"><div class="field"><label>Утас *</label><input id="pPhone" value="${esc(acc.phone||'')}"></div><div class="field"><label>Имэйл</label><input id="pEmail" value="${esc(acc.email||me.email||'')}"></div></div>
+      <div class="row2"><div class="field"><label>Компани (байвал)</label><input id="pCo" value="${esc(acc.company_name||'')}"></div><div class="field"><label>ТТД / Регистр (гэрээнд)</label><input id="pTin" value="${esc(acc.tin||'')}"></div></div>
+      <div class="field"><label>Мэргэшил</label><div class="chips" id="pSpec">${SERVICES.map(s=>`<span class="chip ${(acc.specialties||[]).includes(s)?'on':''}">${esc(s)}</span>`).join('')}</div></div>
+      <div class="row2"><div class="field"><label>Ажилласан жил</label><input id="pExp" type="number" min="0" value="${acc.experience||0}"></div><div class="field"><label>Эхлэх үнэ (₮/сар)</label><input id="pPrice" type="number" min="0" step="10000" value="${acc.price_from||0}"></div></div>
+      <div class="field"><label>Танилцуулга</label><textarea id="pBio">${esc(acc.bio||'')}</textarea></div>
+      <div class="field"><label>Зургийн холбоос</label><input id="pPhoto" value="${esc(acc.photo_url||'')}"></div>
+      <div style="display:flex;gap:10px"><button class="bbi-btn" id="pSave">Хадгалах</button><button class="bbi-btn ghost" id="pCancel">Болих</button></div>`);
+    $('pCancel').onclick=close; $('pSpec').onclick=e=>{ if(e.target.classList.contains('chip')) e.target.classList.toggle('on'); };
+    $('pSave').onclick=async()=>{
+      const v=id=>$(id).value.trim();
+      if(!v('pName')||!v('pPhone')){ $('pErr').innerHTML='<div class="err">Нэр, утас заавал.</div>'; return; }
+      const patch={ name:v('pName'), location:v('pLoc'), phone:v('pPhone'), email:v('pEmail')||null, company_name:v('pCo')||null, tin:v('pTin')||null, specialties:[...document.querySelectorAll('#pSpec .chip.on')].map(c=>c.textContent), experience:+v('pExp')||0, price_from:+v('pPrice')||0, bio:v('pBio'), photo_url:v('pPhoto')||null };
+      const {error}=await BBIMP.sb.from('mp_accountants').update(patch).eq('id',acc.id);
+      if(error){ $('pErr').innerHTML='<div class="err">'+esc(error.message)+'</div>'; return; }
+      Object.assign(acc,patch); close(); render();
+    };
+  }
+  BBIMP.onAuth(()=>boot());
+})();
+</script>
+</body>
+</html>
