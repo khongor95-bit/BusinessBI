@@ -48,8 +48,14 @@
     });
   }
 
+  let degraded = false;              // Firebase SDK ачаалагдаагүй (офлайн/блок) — товчнууд нэвтрэлтгүйгээр ажиллана
   async function init() {
-    for (const src of SDK) await loadScript(src);
+    try { for (const src of SDK) await loadScript(src); }
+    catch (e) {
+      console.warn("BBIGate: Firebase SDK ачаалагдсангүй — нэвтрэлтгүй горимоор үргэлжилнэ", e);
+      degraded = true; ready = true; readyCbs.splice(0).forEach(cb => cb(null));
+      return;
+    }
     firebase.initializeApp(firebaseConfig);
     auth = firebase.auth();
     db = firebase.firestore();
@@ -138,7 +144,7 @@
         readyCbs.push(() => protect(fn, opts).call(this, ev));
         return;
       }
-      if (currentUser) {
+      if (currentUser || degraded) {
         runNow();
       } else {
         // Нэвтрээгүй — modal нээгээд, нэвтэрсний дараа үйлдлээ үргэлжлүүлнэ

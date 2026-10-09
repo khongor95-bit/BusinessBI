@@ -57,7 +57,7 @@
             <a href="ndsh_hhoat_converter.html">НДШ / ХХОАТ хөрвүүлэгч</a>
             <a href="noat_matcher.html">НӨАТ тулгагч</a>
             <a href="payroll.html">Цалин бодогч</a>
-            <a href="budget.html">Төсөв боловсруулагч</a>
+            <a href="budget.html">Бизнес төлөвлөлт</a>
             <a href="invoice_generator.html">Нэхэмжлэх үүсгэгч</a>
             <a href="financial_dashboard.html">Санхүүгийн шинжилгээ</a>
           </div>
