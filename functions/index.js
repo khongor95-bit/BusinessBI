@@ -16,7 +16,8 @@
 
    Нууц утгууд (firebase functions:secrets:set):
      WIRE_SECRET_KEY, WIRE_WEBHOOK_SECRET, ANTHROPIC_API_KEY (receiptExtract)
-   Параметр (.env):  WIRE_MODE = mock | live,  SITE_URL = https://businessbi.mn
+   Параметр (.env):  WIRE_MODE = mock | test | live,  SITE_URL = https://businessbi.mn,  WIRE_OPERATORS = qpay,…
+   WIRE API: wire.js (docs.wire.mn-тэй тулгасан: intent → checkout session, WirePayment-Signature webhook)
    ============================================================ */
 "use strict";
 const { onCall, onRequest, HttpsError } = require("firebase-functions/v2/https");
@@ -34,8 +35,11 @@ const db = admin.firestore();
 
 const WIRE_SECRET_KEY = defineSecret("WIRE_SECRET_KEY");
 const WIRE_WEBHOOK_SECRET = defineSecret("WIRE_WEBHOOK_SECRET");
-const WIRE_MODE = defineString("WIRE_MODE", { default: "mock" });      // mock | live
+const WIRE_MODE = defineString("WIRE_MODE", { default: "mock" });      // mock | test | live  (test = WIRE API + sk_test_ түлхүүр + sandbox оператор)
 const SITE_URL = defineString("SITE_URL", { default: "https://businessbi.mn" });
+// Live-д dashboard → Холболтууд дээр идэвхжүүлсэн операторын id-ууд (таслалаар). Хоосон бол WIRE өөрөө сонгоно.
+const WIRE_OPERATORS = defineString("WIRE_OPERATORS", { default: "" });
+const useWire = (mode) => mode === "live" || mode === "test";
 
 // ── Үнийн жагсаалт (сервер эрх мэдэлтэй; клиент дээрх тоо зөвхөн харуулахад) ──
 const PRODUCTS = {
@@ -90,8 +94,8 @@ exports.createPayment = onCall(CALL_OPTS, async (req) => {
   const cleanMeta = {};
   for (const k of Object.keys(meta).slice(0, 8)) cleanMeta[String(k).slice(0, 32)] = String(meta[k]).slice(0, 120);
 
-  // Сүүлийн 30 минутад үүссэн, төлөгдөөгүй нэхэмжлэл байвал дахин ашиглана (intent бөөгнөрөхөөс сэргийлнэ)
-  const since = admin.firestore.Timestamp.fromMillis(Date.now() - 30 * 60 * 1000);
+  // Сүүлийн 8 минутад үүссэн, төлөгдөөгүй нэхэмжлэл байвал дахин ашиглана (WIRE intent 10 минутын дараа өөрөө canceled болдог)
+  const since = admin.firestore.Timestamp.fromMillis(Date.now() - 8 * 60 * 1000);
   const pend = await db.collection("payments")
     .where("uid", "==", auth.uid).where("tool", "==", tool).where("status", "==", "pending")
     .where("createdAt", ">=", since).orderBy("createdAt", "desc").limit(1).get();
@@ -105,26 +109,31 @@ exports.createPayment = onCall(CALL_OPTS, async (req) => {
   const base = {
     uid: auth.uid, email: (auth.token && auth.token.email) || "", tool,
     amount: product.amount, currency: product.currency, status: "pending",
-    provider: mode === "live" ? "wire" : "mock", providerIntentId: null, checkoutUrl: null,
+    provider: useWire(mode) ? "wire" : "mock", livemode: mode === "live", providerIntentId: null, checkoutUrl: null,
     meta: cleanMeta, createdAt: nowTs(), paidAt: null, expiresAt: null, downloads: 0,
   };
   const successUrl = `${SITE_URL.value()}/pay_done.html?pid=${ref.id}&ok=1`;
   const cancelUrl = `${SITE_URL.value()}/pay_done.html?pid=${ref.id}&ok=0`;
 
-  if (mode === "live") {
+  if (useWire(mode)) {
     let intent;
     try {
+      const ops = WIRE_OPERATORS.value().split(",").map(x => x.trim()).filter(Boolean);
       intent = await wire.createIntent(WIRE_SECRET_KEY.value(), {
         amount: product.amount, currency: product.currency,
         description: `BusinessBI — ${product.title}`,
         metadata: { paymentId: ref.id, uid: auth.uid, tool },
         successUrl, cancelUrl,
+        operators: mode === "test" ? ["sandbox"] : ops,
       });
     } catch (e) {
       console.error("WIRE createIntent failed", e.message, e.body);
-      throw new HttpsError("unavailable", "WIRE.mn-тэй холбогдож чадсангүй. Дараа дахин оролдоно уу.");
+      const hint = e.code === "connector_required" || e.code === "settlement_account_required"
+        ? " (WIRE dashboard → Холболтууд дээр оператор идэвхжүүлж, орлого хүлээн авах данс холбоно уу)" : "";
+      throw new HttpsError("unavailable", "WIRE.mn-тэй холбогдож чадсангүй. Дараа дахин оролдоно уу." + hint);
     }
     base.providerIntentId = intent.intentId;
+    base.providerSessionId = intent.sessionId;
     base.checkoutUrl = intent.checkoutUrl;
     base.providerRaw = JSON.stringify(intent.raw).slice(0, 2000);
   } else {
@@ -173,7 +182,7 @@ exports.checkPayment = onCall(CALL_OPTS, async (req) => {
 });
 
 // ─────────────────────────────────────────────────────────────
-// 3) wireWebhook — WIRE.mn dashboard-д бүртгэх URL:
+// 3) wireWebhook — WIRE-д бүртгэх URL (scripts/register_webhook.js ашиглана; dashboard-д биш, API-аар):
 //    https://asia-northeast1-<project>.cloudfunctions.net/wireWebhook
 // ─────────────────────────────────────────────────────────────
 exports.wireWebhook = onRequest({ secrets: [WIRE_SECRET_KEY, WIRE_WEBHOOK_SECRET] }, async (req, res) => {
@@ -186,8 +195,12 @@ exports.wireWebhook = onRequest({ secrets: [WIRE_SECRET_KEY, WIRE_WEBHOOK_SECRET
   let event = req.body;
   if (Buffer.isBuffer(event) || typeof event === "string") { try { event = JSON.parse(String(event)); } catch (_) { event = {}; } }
   const ev = wire.parseWebhookEvent(event || {});
-  // Эвентийг хадгалах (аудит)
-  await db.collection("paymentEvents").add({ receivedAt: nowTs(), type: ev.type, intentId: ev.intentId, status: ev.status, raw: JSON.stringify(event).slice(0, 4000) });
+  // Endpoint бүртгэсний дараах шалгалтын ping — 2xx буцаахад WIRE endpoint-ийг "verified" болгоно
+  if (ev.verification) { res.status(200).send("verified"); return; }
+  // Эвентийг хадгалах (аудит) + давхардал: нэг эвент хэд хэдэн удаа ирж болно → id-гаар нэг л удаа
+  const evRef = ev.eventId ? db.collection("paymentEvents").doc(String(ev.eventId).replace(/[\/]/g, "_")) : db.collection("paymentEvents").doc();
+  if (ev.eventId) { const seen = await evRef.get(); if (seen.exists) { res.status(200).send("duplicate"); return; } }
+  await evRef.set({ receivedAt: nowTs(), type: ev.type, intentId: ev.intentId, status: ev.status, livemode: !!(event && event.livemode), raw: JSON.stringify(event).slice(0, 4000) });
 
   let ref = null, p = null;
   if (ev.reference) { const s = await db.collection("payments").doc(String(ev.reference)).get(); if (s.exists) { ref = s.ref; p = s.data(); } }
@@ -206,7 +219,7 @@ exports.wireWebhook = onRequest({ secrets: [WIRE_SECRET_KEY, WIRE_WEBHOOK_SECRET
 //    WIRE_MODE=live үед идэвхгүй.
 // ─────────────────────────────────────────────────────────────
 exports.mockCheckout = onRequest({ secrets: [WIRE_WEBHOOK_SECRET] }, async (req, res) => {
-  if (WIRE_MODE.value() === "live") { res.status(404).send("mock checkout is disabled in live mode"); return; }
+  if (useWire(WIRE_MODE.value())) { res.status(404).send("mock checkout is disabled in test/live mode"); return; }
   const pid = String(req.query.pid || (req.body && req.body.pid) || "");
   const sig = String(req.query.sig || (req.body && req.body.sig) || "");
   const expect = crypto.createHmac("sha256", mockSecret()).update(pid).digest("hex").slice(0, 32);

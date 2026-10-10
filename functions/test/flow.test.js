@@ -85,20 +85,27 @@ const mkRes = () => { const r = { code: 200, headers: {}, body: "", redirectTo: 
   res = mkRes(); await fns.wireWebhook({ method: "POST", headers: {}, rawBody: Buffer.from("{}"), body: {} }, res); assert.strictEqual(res.code, 401);
   // 14. webhook — зөв гарын үсэгтэй, reference(metadata.paymentId)-ээр олж paid болгоно
   store.payments[c3.paymentId].provider = "wire"; store.payments[c3.paymentId].providerIntentId = "pi_777";
-  const evBody = Buffer.from(JSON.stringify({ type: "payment_intent.succeeded", data: { object: { id: "pi_777", status: "succeeded", metadata: { paymentId: c3.paymentId } } } }));
-  const hex = crypto.createHmac("sha256", "whsec_abc").update(evBody).digest("hex");
-  res = mkRes(); await fns.wireWebhook({ method: "POST", headers: { "wire-signature": hex }, rawBody: evBody, body: JSON.parse(evBody) }, res);
+  const wsig = (b) => { const t = Math.floor(Date.now() / 1000); return `t=${t},v1=` + crypto.createHmac("sha256", "whsec_abc").update(Buffer.concat([Buffer.from(t + "."), b])).digest("hex"); };
+  const evBody = Buffer.from(JSON.stringify({ id: "evt_1", object: "event", type: "payment_intent.succeeded", livemode: false, data: { id: "pi_777", object: "payment_intent", status: "succeeded", metadata: { paymentId: c3.paymentId } } }));
+  res = mkRes(); await fns.wireWebhook({ method: "POST", headers: { "WirePayment-Signature": wsig(evBody) }, rawBody: evBody, body: JSON.parse(evBody) }, res);
   assert.strictEqual(res.code, 200, "webhook body=" + res.body);
   assert.strictEqual(store.payments[c3.paymentId].status, "paid"); assert.strictEqual(store.payments[c3.paymentId].paidVia, "webhook");
-  assert.ok(Object.keys(store.paymentEvents || {}).length >= 1, "эвент аудит хадгалагдсан");
-  // 15. webhook — intentId-гаар олох (reference байхгүй), өөр толгой/бүтэц
+  assert.ok(store.paymentEvents && store.paymentEvents.evt_1, "эвент аудит id-гаар хадгалагдсан");
+  // 14b. ижил эвент дахин ирвэл давхардал гэж үзнэ (200, өөрчлөлтгүй)
+  res = mkRes(); await fns.wireWebhook({ method: "POST", headers: { "WirePayment-Signature": wsig(evBody) }, rawBody: evBody, body: JSON.parse(evBody) }, res);
+  assert.strictEqual(res.body, "duplicate");
+  // 14c. endpoint.verification ping → 200
+  const ping = Buffer.from(JSON.stringify({ id: "evt_v", type: "endpoint.verification" }));
+  res = mkRes(); await fns.wireWebhook({ method: "POST", headers: { "WirePayment-Signature": wsig(ping) }, rawBody: ping, body: JSON.parse(ping) }, res);
+  assert.strictEqual(res.code, 200); assert.strictEqual(res.body, "verified");
+  // 15. webhook — intentId-гаар олох (metadata байхгүй)
   const c4 = await fns.createPayment.run({ data: { tool: "ndsh_hhoat" }, auth: { uid: "u9", token: {} } });
   store.payments[c4.paymentId].provider = "wire"; store.payments[c4.paymentId].providerIntentId = "pi_888";
-  const ev2 = Buffer.from(JSON.stringify({ event: "payment.completed", data: { id: "pi_888", state: "PAID" } }));
-  res = mkRes(); await fns.wireWebhook({ method: "POST", headers: { "x-wire-signature": crypto.createHmac("sha256", "whsec_abc").update(ev2).digest("hex") }, rawBody: ev2, body: JSON.parse(ev2) }, res);
+  const ev2 = Buffer.from(JSON.stringify({ id: "evt_2", type: "payment_intent.succeeded", data: { id: "pi_888", status: "succeeded" } }));
+  res = mkRes(); await fns.wireWebhook({ method: "POST", headers: { "wirepayment-signature": wsig(ev2) }, rawBody: ev2, body: JSON.parse(ev2) }, res);
   assert.strictEqual(store.payments[c4.paymentId].status, "paid");
   // 16. live горимд mockCheckout хаалттай
   process.env.WIRE_MODE = "live";
   res = mkRes(); await fns.mockCheckout({ method: "GET", query: { pid, sig }, body: {}, headers: {} }, res); assert.strictEqual(res.code, 404);
-  console.log("flow.test.js: ALL OK (16 шалгалт)");
+  console.log("flow.test.js: ALL OK (18 шалгалт)");
 })().catch(e => { console.error("FAIL", e); process.exit(1); });
