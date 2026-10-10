@@ -73,8 +73,11 @@ export async function getIntentStatus(secretKey: string, intentId: string): Prom
 
 export async function registerWebhook(secretKey: string, url: string, events?: string[]) {
   const body = { url, enabled_events: events?.length ? events : ["payment_intent.succeeded"] };
-  const r = await wireFetch(secretKey, "POST", "/webhook_endpoints", body, "wh-" + await sha256hex(url + Date.now()));
-  return { id: r.id as string, url: r.url as string, secret: (r.secret as string) ?? null, status: (r.status as string) ?? null, raw: r };
+  const raw = await wireFetch(secretKey, "POST", "/webhook_endpoints", body, "wh-" + await sha256hex(url + Date.now()));
+  const r = raw?.data && typeof raw.data === "object" && !Array.isArray(raw.data) ? raw.data : raw;   // {data:{…}} боож ирвэл
+  const secret = r?.secret ?? r?.signing_secret ?? r?.webhook_secret ?? r?.secret_key ?? (typeof r?.secret === "object" ? r.secret?.value : null) ?? null;
+  console.log("registerWebhook: response keys", Object.keys(r ?? {}).join(","), "secret:", secret ? "yes" : "no");
+  return { id: r?.id as string, url: r?.url as string, secret: secret ? String(secret) : null, status: (r?.status as string) ?? null, keys: Object.keys(r ?? {}), raw: r };
 }
 export async function listWebhooks(secretKey: string): Promise<any[]> {
   const r = await wireFetch(secretKey, "GET", "/webhook_endpoints");

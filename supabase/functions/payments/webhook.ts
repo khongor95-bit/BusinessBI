@@ -8,15 +8,17 @@ import { parseWebhookEvent, verifyWebhookSignature } from "../_shared/wire.ts";
 export const handler = async (req: Request): Promise<Response> => {
   if (req.method !== "POST") return new Response("POST only", { status: 405 });
   const raw = new Uint8Array(await req.arrayBuffer());
-  const secret = await getSecret("wire_webhook_secret");
-  if (!(await verifyWebhookSignature(req.headers, raw, secret))) {
-    console.warn("webhook: bad signature", [...req.headers.keys()]);
-    return new Response("invalid signature", { status: 401 });
-  }
   let event: any = {};
   try { event = JSON.parse(new TextDecoder().decode(raw)); } catch { event = {}; }
   const ev = parseWebhookEvent(event);
-  if (ev.verification) return new Response("verified", { status: 200 });
+  // endpoint.verification ping — endpoint бүртгэгдмэгц ирдэг тул secret хараахан хадгалагдаагүй байж болно (race);
+  // энэ ping ямар ч төлбөрт нөлөөлөхгүй учир гарын үсэггүй ч 200 буцаана, бусад бүх эвент гарын үсэгтэй байх ёстой.
+  if (ev.verification) { console.log("webhook: endpoint.verification ping"); return new Response("verified", { status: 200 }); }
+  const secret = await getSecret("wire_webhook_secret");
+  if (!(await verifyWebhookSignature(req.headers, raw, secret))) {
+    console.warn("webhook: bad signature", ev.type, [...req.headers.keys()].filter((h) => /signature|wire/i.test(h)));
+    return new Response("invalid signature", { status: 401 });
+  }
   const db = admin();
   // давхардал: нэг эвент хэд хэдэн удаа ирж болно → id-гаар нэг л удаа
   const evId = ev.eventId ? String(ev.eventId).slice(0, 120) : crypto.randomUUID();

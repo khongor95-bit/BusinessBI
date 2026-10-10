@@ -19,7 +19,10 @@ export const handler = callable(async (data) => {
     const { count: total } = await db.from("payments").select("*", { count: "exact", head: true });
     const { count: paid } = await db.from("payments").select("*", { count: "exact", head: true }).eq("status", "paid");
     const { data: last } = await db.from("payments").select("id,tool,amount,status,provider,livemode,paid_via,created_at,paid_at,email").order("created_at", { ascending: false }).limit(20);
+    let wire_endpoints: unknown = null;
+    if (key()) { try { wire_endpoints = (await listWebhooks(key())).map((e: any) => ({ id: e.id, url: e.url, status: e.status, livemode: e.livemode, enabled_events: e.enabled_events })); } catch (e) { wire_endpoints = { error: (e as Error).message }; } }
     return {
+      wire_endpoints,
       mode: await getSetting("wire_mode", "mock"), site_url: await getSetting("site_url", ""), wire_operators: await getSetting("wire_operators", ""),
       receipt_model: await getSetting("receipt_model", ""), key: keyKind(), anthropic_key: !!Deno.env.get("ANTHROPIC_API_KEY"),
       webhook_secret: !!(await getSecret("wire_webhook_secret")), webhook_url: functionsBase() + "/payments/webhook",
@@ -51,7 +54,7 @@ export const handler = callable(async (data) => {
       const url = functionsBase() + "/payments/webhook";
       if (data.replace) for (const ep of await listWebhooks(k)) { if (ep?.id) await deleteWebhook(k, ep.id); }
       const r = await registerWebhook(k, url, ["payment_intent.succeeded", "payment_intent.canceled"]);
-      if (!r.secret) throw new HttpsError("unavailable", "WIRE хариунд signing secret ирсэнгүй: " + JSON.stringify(r.raw).slice(0, 200));
+      if (!r.secret) throw new HttpsError("unavailable", "WIRE хариунд signing secret ирсэнгүй (талбарууд: " + r.keys.join(", ") + "). Endpoint үүссэн бол дахин «Webhook бүртгэх» дарна — хуучныг устгаад шинээр авна.");
       await setSecret("wire_webhook_secret", r.secret);
       await setSetting("wire_webhook_key_kind", keyKind());
       return { ok: true, id: r.id, url: r.url, status: r.status, key: keyKind() };
