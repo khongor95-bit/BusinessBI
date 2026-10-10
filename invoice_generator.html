@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <script src="gate.js"></script>
+<script src="ebarimt.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="site.css">
 <script src="site.js" defer></script>
@@ -58,6 +59,10 @@ body{background:var(--bg);color:var(--ink)}
 .field label{display:block;font-size:12px;font-weight:600;margin-bottom:3px;color:#374151}
 .field input,.field textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit}
 .field input:focus,.field textarea:focus{outline:2px solid var(--brand);border-color:transparent}
+.eb-status{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:10px;font-size:10.5px;font-weight:600;line-height:1.5;vertical-align:middle;white-space:nowrap}
+.eb-status:empty{display:none}
+.eb-status.vat{background:#dcfce7;color:#166534}.eb-status.novat{background:#fef3c7;color:#92400e}
+.eb-status.none{background:#f3f4f6;color:#6b7280}.eb-status.wait{color:#9ca3af;font-weight:500}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 /* party color accents */
@@ -249,7 +254,7 @@ body{background:var(--bg);color:var(--ink)}
         </div>
       </div>
       <div class="row2">
-        <div class="field"><label>Регистр</label><input id="fromReg" value="12345678"></div>
+        <div class="field"><label>Регистр <span id="fromRegStatus" class="eb-status"></span></label><input id="fromReg" value="12345678" placeholder="РД эсвэл ТТД" title="ebarimt.mn-ээс нэр, НӨАТ төлөгч эсэхийг автоматаар татна"></div>
         <div class="field"><label>Утас</label><input id="fromPhone" value="99112233"></div>
       </div>
       <div class="row2">
@@ -262,7 +267,7 @@ body{background:var(--bg);color:var(--ink)}
       <h3>Харилцагч (Худалдан авагч)</h3>
       <div class="row3">
         <div class="field"><label>Нэр</label><input id="toName" value=""></div>
-        <div class="field"><label>Регистр</label><input id="toReg" value=""></div>
+        <div class="field"><label>Регистр <span id="toRegStatus" class="eb-status"></span></label><input id="toReg" value="" placeholder="РД эсвэл ТТД" title="ebarimt.mn-ээс нэр, НӨАТ төлөгч эсэхийг автоматаар татна"></div>
         <div class="field"><label>Утас</label><input id="toPhone" value=""></div>
       </div>
       </div>
@@ -455,6 +460,13 @@ function render(){
 document.querySelectorAll('.form input,.form textarea').forEach(el=>{if(el.type!=='file')el.addEventListener('input',render)});
 document.getElementById('invDate').valueAsDate=new Date();
 const d2=new Date();d2.setDate(d2.getDate()+11);document.getElementById('dueDate').valueAsDate=d2;
+// ebarimt.mn лавлагаа: регистр оруулахад нэрийг автоматаар бөглөж, НӨАТ төлөгч эсэхийг харуулна
+if(window.BBIEbarimt){
+  [['fromReg','fromName','fromRegStatus'],['toReg','toName','toRegStatus']].forEach(([reg,name,st])=>{
+    const stEl=document.getElementById(st);
+    BBIEbarimt.attach(document.getElementById(reg),{name:document.getElementById(name),onResult:r=>{const b=BBIEbarimt.badge(r);stEl.textContent=b.text;stEl.className='eb-status '+b.cls;}});
+  });
+}
 document.getElementById('dlBtn').onclick = BBIGate.protect(()=>{const el=document.getElementById('page');html2pdf().set({margin:0,filename:'nehemjleh_'+g('invNo')+'.pdf',image:{type:'jpeg',quality:.98},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).from(el).save();}, {tool:'Автомат нэхэмжлэх', action:'download'});
 function fitPreview(){
   if(window.innerWidth<=900){

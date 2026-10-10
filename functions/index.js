@@ -6,6 +6,8 @@
      checkPayment   (callable) — төлбөрийн төлөв; pending бол WIRE-ээс шууд лавлана (webhook хоцорсон ч ажиллана)
      wireWebhook    (https)    — WIRE.mn-ээс ирэх гарын үсэгтэй мэдэгдэл → payments/{id}.status='paid'
      mockCheckout   (https)    — WIRE_MODE=mock үед жинхэнэ WIRE-гүйгээр урсгалыг бүтнээр нь турших хуудас
+     receiptExtract (callable) — ebarimt/НӨАТ баримтын зургаас бүртгэлийн саналын JSON (receipt.js, Claude vision)
+     ebarimtLookup  (callable) — ebarimt.mn татвар төлөгчийн лавлагаа (РД/ТТД → нэр, НӨАТ төлөгч эсэх); ebarimt.js
 
    Firestore: payments/{paymentId}
      uid, email, tool, amount, currency, status: pending|paid|failed,
@@ -13,7 +15,7 @@
      createdAt, paidAt, expiresAt (= paidAt + 24ц: энэ хугацаанд дахин татах үнэгүй), downloads
 
    Нууц утгууд (firebase functions:secrets:set):
-     WIRE_SECRET_KEY, WIRE_WEBHOOK_SECRET
+     WIRE_SECRET_KEY, WIRE_WEBHOOK_SECRET, ANTHROPIC_API_KEY (receiptExtract)
    Параметр (.env):  WIRE_MODE = mock | live,  SITE_URL = https://businessbi.mn
    ============================================================ */
 "use strict";
@@ -23,6 +25,8 @@ const { setGlobalOptions } = require("firebase-functions/v2");
 const admin = require("firebase-admin");
 const crypto = require("crypto");
 const wire = require("./wire");
+const receipt = require("./receipt");
+const ebarimt = require("./ebarimt");
 
 setGlobalOptions({ region: "asia-northeast1", maxInstances: 10 });
 admin.initializeApp();
@@ -236,3 +240,15 @@ ${p.status === "paid" ? `<p class="m">✓ Энэ нэхэмжлэл аль хэ�
 <p class="m" style="margin-top:16px">Жинхэнэ горимд энэ хуудсыг WIRE.mn-ийн checkout орлоно (банкны апп / QR / хэтэвч).</p>
 </div></body></html>`);
 });
+
+// ─────────────────────────────────────────────────────────────
+// 5) ebarimtLookup — {reg?, tin?} → {tin, reg, name, vatPayer, found, cachedAt}
+//    Нэвтрэлт шаардахгүй; ebarimt_cache коллекцид 30 хоног кэшлэнэ. Логик: ebarimt.js
+// ─────────────────────────────────────────────────────────────
+exports.ebarimtLookup = ebarimt.makeHandler(db, { cors: ALLOWED_ORIGINS });
+
+// ─────────────────────────────────────────────────────────────
+// 6) receiptExtract — {image:base64, mime, hint?} → {ok, receipt, model, usage}
+//    Хэрэгжүүлэлт receipt.js-д; нууц ANTHROPIC_API_KEY-г тэнд өөрөө зарласан.
+// ─────────────────────────────────────────────────────────────
+exports.receiptExtract = receipt.makeReceiptExtract({ cors: ALLOWED_ORIGINS });

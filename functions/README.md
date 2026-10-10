@@ -88,3 +88,18 @@ node test/flow.test.js        # бүтэн урсгал — санах ойн Fi
 ## Үнэ өөрчлөх / шинэ хэрэгсэл нэмэх
 
 `index.js` → `PRODUCTS` (сервер эрх мэдэлтэй) ба `../pay.js` → `PRICES` (зөвхөн харуулах) хоёуланд нь.
+
+## receiptExtract — ebarimt/НӨАТ баримтын зураг → бүртгэлийн санал (JSON)
+
+Хэрэгжүүлэлт: `receipt.js` (callable) + `receipt_rules.js` (схем, систем промпт, шалгагч, НӨАТ-ын тоон шалгалт). Клиент: `../receipt.js` (`BBIReceipt.extract(file, {hint})`).
+Загвар: Claude (`claude-opus-5-5`, `.env` дэх `RECEIPT_MODEL`-оор солино), structured outputs (`output_config.format` json_schema) тул хариу үргэлж схемтэй JSON.
+
+```bash
+firebase functions:secrets:set ANTHROPIC_API_KEY   # console.anthropic.com → API keys
+cd functions && npm install                         # @anthropic-ai/sdk нэмэгдсэн
+npm test                                            # wire + receipt дүрмийн тест
+firebase deploy --only functions:payments           # эсвэл --only functions:receiptExtract
+```
+
+URL: `https://asia-northeast1-businessbi.cloudfunctions.net/receiptExtract` (callable протокол: `{data:{image,mime,hint?}}` → `{result:{ok,receipt,model,usage}}`, `Authorization: Bearer <ID token>`).
+Дүрэм: `total`=«Төлөх дүн» (Бүртгэгдсэн/Дэд дүн биш), `vat_amount`=«НӨАТ» («НХАТ» → `city_tax`), `vat_check`: НӨАТ ≈ total×10/110 ±1₮. Зураг дээрх заавар маягийн текст → `suspicious_text:true`, `review_required:true`.

@@ -21,6 +21,7 @@
 <meta property="og:locale" content="mn_MN">
 <meta name="twitter:card" content="summary_large_image">
 <script src="tax.js"></script>
+<script src="ebarimt.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -1461,14 +1462,29 @@ function renderPartners(){
   rows.forEach((p,i)=>{
     html+=`<tr><td>${i+1}</td>
       <td><input class="pill-input" value="${esc(p.name)}" onchange="updPartner('${p.id}','name',this.value)"></td>
-      <td><input class="pill-input" value="${esc(p.tin)}" onchange="updPartner('${p.id}','tin',this.value)"></td>
+      <td><input class="pill-input" value="${esc(p.tin)}" onchange="updPartner('${p.id}','tin',this.value)"><div id="ebst-${p.id}" style="font-size:10px;margin-top:2px;">${p.vatPayer===true?'<span class="badge ok">НӨАТ төлөгч</span>':p.vatPayer===false?'<span class="badge warn">НӨАТ төлөгч биш</span>':''}</div></td>
       <td><input class="pill-input" value="${esc(p.phone)}" onchange="updPartner('${p.id}','phone',this.value)"></td>
       <td><input class="pill-input" value="${esc(p.note)}" onchange="updPartner('${p.id}','note',this.value)"></td>
-      <td><span class="link" style="color:var(--red);" onclick="delPartner('${p.id}')">устгах</span></td></tr>`;
+      <td style="white-space:nowrap;"><span class="link" onclick="ebarimtCheckPartner('${p.id}')" title="ebarimt.mn бүртгэлээс нэр, НӨАТ төлөгч эсэхийг шалгах">шалгах</span> · <span class="link" style="color:var(--red);" onclick="delPartner('${p.id}')">устгах</span></td></tr>`;
   });
   html+='</tbody>';
   document.getElementById('ptTable').innerHTML=html;
   fillPartnerDatalist();
+}
+/* ebarimt.mn-ийн нийтийн бүртгэлээс харилцагчийг шалгах (Firebase функц proxy, 30 хоног кэш) */
+async function ebarimtCheckPartner(id){
+  const p=DB.partners.find(x=>x.id===id); if(!p) return;
+  const key=String(p.tin||'').trim(); if(key.length<5){ toast('ТТД эсвэл РД оруулна уу', true); return; }
+  if(!window.BBIEbarimt){ toast('ebarimt.js ачаалагдаагүй', true); return; }
+  const st=document.getElementById('ebst-'+id); if(st) st.innerHTML='<span class="badge info">шалгаж байна…</span>';
+  try{
+    const r=await BBIEbarimt.lookup(/^\d{7}$/.test(key)?{tin:key}:{reg:key});
+    if(!r||!r.found){ if(st) st.innerHTML='<span class="badge err">олдсонгүй</span>'; toast('ebarimt бүртгэлд олдсонгүй: '+key, true); return; }
+    if(!p.name||p.name===key) p.name=r.name||p.name;
+    if(r.tin) p.tin=r.tin; if(r.reg) p.reg=r.reg;
+    p.vatPayer=!!r.vatPayer; p.ebarimtAt=new Date().toISOString();
+    save(); renderPartners(); toast((r.name||key)+' — '+(r.vatPayer?'НӨАТ төлөгч':'НӨАТ төлөгч биш'));
+  }catch(e){ if(st) st.innerHTML='<span class="badge err">шалгаж чадсангүй</span>'; toast('ebarimt шалгалт амжилтгүй: '+e.message, true); }
 }
 function fillPartnerDatalist(){
   document.getElementById('partnerList').innerHTML=DB.partners.filter(p=>p.name).map(p=>`<option value="${esc(p.name)}">`).join('');

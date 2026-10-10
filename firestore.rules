@@ -36,6 +36,11 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // ebarimt.mn лавлагааны кэш (ebarimtLookup функц, admin SDK): клиент хандахгүй
+    match /ebarimt_cache/{id} {
+      allow read, write: if false;
+    }
+
     // Бусад бүх зүйл хаалттай
     match /{document=**} {
       allow read, write: if false;
