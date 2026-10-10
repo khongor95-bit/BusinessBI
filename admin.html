@@ -159,13 +159,8 @@
     </div>
   </div>
   <div class="panel full" id="payPanel">
-    <h2>Төлбөр (WIRE.mn) <span id="payCount" style="font-weight:400;color:var(--ink-soft);font-size:13px"></span></h2>
-    <div style="overflow-x:auto">
-      <table>
-        <thead><tr><th>Огноо</th><th>Хэрэглэгч</th><th>Хэрэгсэл</th><th>Дүн</th><th>Төлөв</th><th>Сувг</th><th>Татсан</th></tr></thead>
-        <tbody id="payRows"><tr><td colspan="7" style="color:var(--ink-soft)">Уншиж байна…</td></tr></tbody>
-      </table>
-    </div>
+    <h2>Төлбөр (WIRE.mn) ба хэрэгслийн хэрэглээ</h2>
+    <p style="color:var(--ink-soft);font-size:14px;margin:0">Төлбөр, WIRE горим, webhook, хэрэгслийн хэрэглээний лог одоо Supabase дээр — <a href="marketplace_admin.html">Админ самбар → «Төлбөр · WIRE», «Хэрэглээ»</a>. Энэ хуудас зөвхөн холбоо барих хүсэлт (Firestore <code>leads</code>) болон хуучин <code>activityLogs</code>-ийг харуулна.</p>
   </div>
   <div class="panel full">
     <h2>Сүүлийн үйлдлүүд</h2>
@@ -289,23 +284,9 @@ async function loadLeads(){
     tb.querySelectorAll('select[data-lead]').forEach(sel=>sel.onchange=()=>db.collection('leads').doc(sel.dataset.lead).update({status:sel.value}).catch(e=>alert('Хадгалж чадсангүй: '+e.message)));
   }catch(e){ tb.innerHTML=`<tr><td colspan="7" style="color:var(--err)">Уншиж чадсангүй: ${esc(e.message)} (firestore.rules deploy хийсэн эсэхээ шалгана уу)</td></tr>`; }
 }
-async function loadPayments(){
-  if(!db) return;
-  const tb=document.getElementById('payRows'); if(!tb) return;
-  try{
-    const snap=await db.collection('payments').orderBy('createdAt','desc').limit(200).get();
-    const paid=snap.docs.filter(d=>d.data().status==='paid');
-    const sum=paid.reduce((a,d)=>a+(d.data().amount||0),0);
-    document.getElementById('payCount').textContent=snap.size?`(${paid.length} төлөгдсөн · ${sum.toLocaleString('en-US')}₮)`:'';
-    if(snap.empty){ tb.innerHTML='<tr><td colspan="7" style="color:var(--ink-soft)">Төлбөр байхгүй.</td></tr>'; return; }
-    const ST={paid:'<b style="color:var(--teal)">Төлсөн</b>',pending:'Хүлээгдэж буй',failed:'<span style="color:var(--err)">Амжилтгүй</span>'};
-    tb.innerHTML=snap.docs.map(d=>{const p=d.data();
-      return `<tr><td>${tsStr(p.paidAt||p.createdAt)}</td><td>${esc(p.email||p.uid||'')}</td><td>${esc(p.tool||'')} ${p.meta&&p.meta.period?'<span style="color:var(--ink-soft)">'+esc(p.meta.period)+'</span>':''}</td><td>${(p.amount||0).toLocaleString('en-US')}₮</td><td>${ST[p.status]||esc(p.status||'')}</td><td>${esc(p.provider||'')}${p.paidVia?' / '+esc(p.paidVia):''}</td><td>${p.downloads||0}</td></tr>`;}).join('');
-  }catch(e){ tb.innerHTML=`<tr><td colspan="7" style="color:var(--err)">Уншиж чадсангүй: ${esc(e.message)}</td></tr>`; }
-}
 
 async function loadData(){
-  loadLeads(); loadPayments();
+  loadLeads();
   if(notConfigured){ render(filterDemo()); return; }
   const days = parseInt(document.getElementById('range').value);
   const actionF = document.getElementById('actionFilter').value;

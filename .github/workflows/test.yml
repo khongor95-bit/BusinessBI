@@ -13,14 +13,20 @@ jobs:
           node-version: 20
       - name: Татварын параметр, журналын тооцооллын хөдөлгүүр
         run: node test/tax.test.js && node test/journal_core.test.js
-      - name: Firebase функцүүд (төлбөр, ebarimt, баримтын зураг)
-        run: cd functions && node test/wire.test.js && node test/ebarimt.test.js && node test/receipt.test.js
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Supabase Edge Functions (WIRE адаптер, баримтын дүрэм, type-check)
+        run: |
+          cd supabase/functions
+          deno test --allow-env --minimum-dependency-age 0 _shared/wire_test.ts _shared/receipt_rules_test.ts
+          deno check --minimum-dependency-age 0 payments/index.ts ebarimt-lookup/index.ts receipt-extract/index.ts
       - name: HTML хуудсуудын inline script-ийн синтакс
         run: |
           node -e '
             const fs=require("fs");let bad=0;
             for(const f of fs.readdirSync(".").filter(f=>f.endsWith(".html"))){
-              const s=fs.readFileSync(f,"utf8");const re=/<script(?![^>]*src)[^>]*>([\s\S]*?)<\/script>/g;let m;
+              const s=fs.readFileSync(f,"utf8");const re=/<script(?![^>]*(?:src|type="module"))[^>]*>([\s\S]*?)<\/script>/g;let m;
               while((m=re.exec(s))){ try{ new Function(m[1]); }catch(e){ console.log(f,"SYNTAX ERROR:",e.message); bad++; } }
             }
             if(bad) process.exit(1); console.log("inline scripts ok");'

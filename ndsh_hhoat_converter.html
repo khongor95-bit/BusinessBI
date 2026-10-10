@@ -2,7 +2,7 @@
 <html lang="mn">
 <head>
 <meta charset="UTF-8">
-<script src="gate.js"></script>
+<script src="mp.js"></script>
 <script src="tax.js"></script>
 <script src="pay.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -262,7 +262,7 @@
 </style>
 
 </head>
-<body data-nav-title="НДШ / ХХОАТ хөрвүүлэгч">
+<body data-nav-title="НДШ / ХХОАТ хөрвүүлэгч" data-auth="supabase">
 <div class="wrap">
 <details class="bbi-guide" style="max-width:1100px;margin:16px auto;background:#f2f7f4;border:1px solid #d7e5dc;border-radius:10px;"><summary style="cursor:pointer;padding:13px 18px;font-weight:600;color:#0e3b2e;display:flex;align-items:center;gap:8px;">📖 Ашиглах заавар <span style="font-weight:400;font-size:13px;color:#5b7365;">— 1 минут уншаад эхлээрэй</span></summary><ol style="margin:0;padding:4px 22px 14px 40px;color:#243b30;font-size:14.5px;line-height:1.75;"><li style="margin:4px 0;">Нийгмийн даатгалын цахим системээс сарын <b>НДШ тайлангаа PDF</b> хэлбэрээр татаж авна.</li><li style="margin:4px 0;">PDF файлаа энэ хуудсанд чирж оруулах эсвэл сонгоно — тайлант сар автоматаар танигдана.</li><li style="margin:4px 0;">Хэд хэдэн сарын тайланг дараалан нэмж болно; сар бүр жагсаалтад харагдах ба × товчоор устгаж болно.</li><li style="margin:4px 0;">Алхам 2-т ажилтнуудын <b>12 оронт ТТД</b> (татвар төлөгчийн дугаар)-г тулгана — өмнөх улирлын ХХОАТ маягт эсвэл etax-ийн ажилтны жагсаалтыг оруулбал автоматаар танигдана. Нэг удаа оруулсан ТТД хөтөчид хадгалагдаж дараагийн тайланд өөрөө бөглөгдөнө.</li><li style="margin:4px 0;">Тойм самбараас Цалин / Ажилтан / НДШ үзүүлэлтүүдээ шалгана.</li><li style="margin:4px 0;"><b>«⬇ Excel файл татах»</b> товчоор ХХОАТ тайланд бэлэн хүснэгтээ авна — <b>1 тайлан 5,000₮</b>, WIRE.mn-ээр төлнө (төлснөөс хойш 24 цаг дахин татах үнэгүй).</li></ol><p style="margin:0;padding:0 22px 14px;font-size:13px;color:#5b7365;">💡 PDF тань браузер дээр уншигдана. Нэг дор олон сар оруулбал улирал, жилийн харьцуулалт автоматаар гарна.</p></details>
 
@@ -415,7 +415,7 @@
 <script>
 // Worker-ийг идэвхгүй болгож үндсэн thread дээр ажиллуулна — ингэснээр
 // file:// (локал) болон https (сервер) хоёуланд нь алдаагүй ажиллана.
-pdfjsLib.GlobalWorkerOptions.workerSrc='';
+if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc=''; else console.warn('pdf.js ачаалагдсангүй — PDF уншилт ажиллахгүй');
 
 // ───────────────────────────────────────────────────────────
 // Баталгаажсан нэрсийн толь: регистр -> [Эцэг/эхийн нэр, Нэр]

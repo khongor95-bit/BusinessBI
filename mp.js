@@ -97,7 +97,7 @@
       loginModal(opts);
       const h = u => { if (u) { const i = listeners.indexOf(h); if (i >= 0) listeners.splice(i, 1); const ov = document.getElementById("mpLoginOv"); if (ov) ov.classList.remove("show"); cb(u); } };
       listeners.push(h);
-    });
+    }).catch(e => { console.error("Supabase холболт:", e); alert("Нэвтрэлтийн систем ачаалагдсангүй — интернэт холболтоо шалгаад хуудсаа дахин ачаална уу."); });
   }
 
   // ── Туслахууд ────────────────────────────────────────────
@@ -120,6 +120,51 @@
   }
   function contractUrl(id) { return location.origin + location.pathname.replace(/[^/]*$/, "") + "contract.html?id=" + id; }
 
+  // ── Edge Functions (callable протокол) ───────────────────
+  // POST {data} → {result} | {error:{status,message}}. Нэвтэрсэн бол Bearer access token дагалдана.
+  const FN_BASE = CFG.url + "/functions/v1";
+  async function accessToken() { await ready(); const { data } = await sb.auth.getSession(); return data && data.session ? data.session.access_token : null; }
+  async function callFn(name, data, opts) {
+    const token = await accessToken();
+    const headers = { "Content-Type": "application/json", apikey: CFG.anonKey };
+    if (token) headers.Authorization = "Bearer " + token;
+    const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), (opts && opts.timeoutMs) || 30000);
+    try {
+      const res = await fetch(FN_BASE + "/" + name, { method: "POST", headers, body: JSON.stringify({ data: data || {} }), signal: ctrl.signal });
+      let j = {}; try { j = await res.json(); } catch (_) {}
+      if (j && j.error) { const e = new Error(j.error.message || j.error.status || "error"); e.code = j.error.status || ("http-" + res.status); e.http = res.status; throw e; }
+      if (!res.ok) { const e = new Error("HTTP " + res.status); e.code = "http-" + res.status; e.http = res.status; throw e; }
+      return j.result;
+    } finally { clearTimeout(t); }
+  }
+
+  // ── gate.js-тэй нийцтэй API (BBIGate) — Supabase нэвтрэлт дээр ──
+  // Хэрэгслийн хуудсууд (хөрвүүлэгч, баримт уншигч, нэхэмжлэх …) gate.js-ийн оронд mp.js залгахад
+  // BBIGate.protect / logActivity / getUser хэвээр ажиллана; лог нь Firestore биш activity_logs хүснэгтэд.
+  function gateUser() {
+    if (!user) return null;
+    const md = user.user_metadata || {};
+    return { uid: user.id, email: user.email || "", displayName: md.full_name || md.name || "", getIdToken: accessToken, raw: user };
+  }
+  function logActivity(action, details) {
+    ready().then(() => {
+      if (!user) return;
+      let d = details || {}; try { if (JSON.stringify(d).length > 3000) d = { truncated: true }; } catch (_) { d = {}; }
+      sb.from("activity_logs").insert({ uid: user.id, email: user.email || "", action: String(action || "use_tool").slice(0, 64), details: d, device: String(navigator.userAgent || "").slice(0, 200) }).then(() => {}, () => {});
+    }).catch(() => {});
+  }
+  function protect(fn, opts) {
+    opts = opts || {};
+    return function (ev) {
+      const self = this;
+      requireLogin(() => { logActivity(opts.action || "use_tool", { toolName: opts.tool || document.title }); fn.call(self, ev); },
+        { title: "Нэвтрэх", text: "Хэрэгслийг ашиглахын тулд нэвтэрнэ үү — Google эсвэл имэйлийн нэг удаагийн линкээр. Үнэгүй." });
+    };
+  }
+  function onReady(cb) { ready().then(() => cb(gateUser())).catch(() => cb(null)); }
+  if (!window.BBIGate) window.BBIGate = { protect, logActivity, onReady, isLoggedIn: () => !!user, getUser: gateUser, signOut, openLogin: () => loginModal(), supabase: true };
+
   window.BBIMP = { ready, onAuth, get sb() { return sb; }, get user() { return user; }, signInGoogle, signInEmail, signOut, loginModal, requireLogin,
-    esc, fmtMNT, fmtDate, fmtDT, SERVICES, REQ_STATUS, CON_STATUS, CON_COLOR, badge, conBadge, myAccountant, contractUrl };
+    esc, fmtMNT, fmtDate, fmtDT, SERVICES, REQ_STATUS, CON_STATUS, CON_COLOR, badge, conBadge, myAccountant, contractUrl,
+    callFn, accessToken, FN_BASE, CFG };
 })();

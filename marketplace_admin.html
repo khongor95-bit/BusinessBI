@@ -30,6 +30,11 @@ h1 span{color:#b79a63}
 .tab{background:#fff;border:1.5px solid #e5e5e5;border-radius:20px;padding:10px 20px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;color:#555}
 .tab.on{background:#111;border-color:#111;color:#fff}
 .tab .badge{background:#b79a63;color:#fff;border-radius:10px;padding:1px 8px;font-size:12px;margin-left:6px}
+.kv{display:grid;grid-template-columns:180px 1fr;gap:6px 14px;font-size:14px;margin:8px 0}.kv b{color:#555;font-weight:600}
+.mode{display:inline-block;padding:3px 10px;border-radius:12px;font-weight:700;font-size:12px}.mode.mock{background:#eee;color:#555}.mode.test{background:#fff4d6;color:#8a6410}.mode.live{background:#e1f3e8;color:#1a6b43}
+table.t{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}table.t th,table.t td{border-bottom:1px solid #eee;padding:7px 8px;text-align:left;white-space:nowrap}table.t th{background:#f7f7f7;font-size:12px;color:#666}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row input{padding:8px 10px;border:1.5px solid #e5e5e5;border-radius:8px;font:inherit;font-size:13px;min-width:220px}
+.ok{color:#1a6b43;font-weight:700}.bad{color:#b3261e;font-weight:700}
 
 .card{background:#fff;border-radius:18px;padding:22px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .card .head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
@@ -73,6 +78,8 @@ h1 span{color:#b79a63}
       <button class="tab" data-tab="revs">Үнэлгээ <span class="badge" id="bRevs">0</span></button>
       <button class="tab" data-tab="reqs">Сүлжээний хүсэлт <span class="badge" id="bReqs">0</span></button>
       <button class="tab" data-tab="cons">Гэрээ <span class="badge" id="bCons">0</span></button>
+      <button class="tab" data-tab="pay">Төлбөр · WIRE <span class="badge" id="bPay">0</span></button>
+      <button class="tab" data-tab="logs">Хэрэглээ</button>
     </div>
     <div id="content"><div class="empty">Ачааллаж байна…</div></div>
   </div>
@@ -118,6 +125,7 @@ async function loadAll(){
     sb.from('mp_contracts').select('*, mp_accountants(name)').order('created_at',{ascending:false}),
   ]);
   DATA.reqs = q.data || []; DATA.cons = k.data || [];
+  loadPay(); loadLogs();
   document.getElementById('bReqs').textContent = DATA.reqs.filter(x=>x.status==='new').length;
   document.getElementById('bCons').textContent = DATA.cons.filter(x=>x.status==='active').length;
   if(a.error || l.error || r.error){
@@ -135,9 +143,78 @@ async function loadAll(){
   render();
 }
 
+/* ===== PAY (WIRE) — Edge Function payments/admin ===== */
+async function callAdmin(action, extra){
+  const { data:{ session } } = await sb.auth.getSession();
+  const res = await fetch(SB_URL + '/functions/v1/payments/admin', { method:'POST', headers:{ 'Content-Type':'application/json', apikey: SB_KEY, Authorization: 'Bearer ' + (session ? session.access_token : '') }, body: JSON.stringify({ data: Object.assign({ action }, extra || {}) }) });
+  const j = await res.json().catch(()=>({}));
+  if(j.error) throw new Error(j.error.message || j.error.status);
+  return j.result;
+}
+async function loadPay(){
+  try { DATA.pay = await callAdmin('status'); document.getElementById('bPay').textContent = DATA.pay.counts.paid; }
+  catch(e){ DATA.pay = { error: e.message }; }
+  if(TAB==='pay') render();
+}
+async function loadLogs(){
+  const { data } = await sb.from('activity_logs').select('*').order('created_at',{ascending:false}).limit(200);
+  DATA.logs = data || [];
+  if(TAB==='logs') render();
+}
+async function payAction(action, extra, confirmText){
+  if(confirmText && !confirm(confirmText)) return;
+  try { const r = await callAdmin(action, extra); showMsg(action + ': ' + JSON.stringify(r).slice(0, 300)); }
+  catch(e){ showMsg('Алдаа: ' + e.message); }
+  await loadPay();
+}
+function setSettingPrompt(key, cur, label){
+  const v = prompt(label, cur || ''); if(v === null) return;
+  payAction('set_setting', { key, value: v.trim() });
+}
+
 /* ===== RENDER ===== */
 function render(){
   const c = document.getElementById('content');
+  if(TAB==='pay'){
+    const p = DATA.pay;
+    if(!p){ c.innerHTML = '<div class="empty">Ачааллаж байна…</div>'; return; }
+    if(p.error){ c.innerHTML = `<div class="card"><div class="title">Төлбөрийн самбар</div><div class="meta">Уншиж чадсангүй: ${esc(p.error)}</div></div>`; return; }
+    const keyTxt = {none:'<span class="bad">тохируулаагүй</span>', test:'<span class="ok">sk_test_ (тест)</span>', live:'<span class="ok">sk_live_ (жинхэнэ)</span>', unknown:'<span class="bad">танигдахгүй</span>'}[p.key] || esc(p.key);
+    const ST = {pending:'Хүлээгдэж буй', paid:'Төлөгдсөн', failed:'Амжилтгүй'};
+    c.innerHTML = `
+      <div class="card">
+        <div class="head"><div><div class="title">WIRE.mn холболт</div><div class="sub">Сервер: Supabase Edge Function «payments» · Горим өөрчлөхөд deploy хэрэггүй</div></div><span class="mode ${esc(p.mode)}">${esc(p.mode.toUpperCase())}</span></div>
+        <div class="kv">
+          <b>WIRE_SECRET_KEY</b><span>${keyTxt} <small style="color:#888">— Supabase → Edge Functions → Secrets дээр солино</small></span>
+          <b>ANTHROPIC_API_KEY</b><span>${p.anthropic_key?'<span class="ok">тохируулсан</span>':'<span class="bad">тохируулаагүй</span>'} <small style="color:#888">(баримт уншигчид)</small></span>
+          <b>Webhook URL</b><span><code>${esc(p.webhook_url)}</code></span>
+          <b>Webhook secret</b><span>${p.webhook_secret?'<span class="ok">хадгалагдсан</span>'+(p.webhook_registered_for?' ('+esc(p.webhook_registered_for)+' түлхүүрээр бүртгэсэн)':''):'<span class="bad">бүртгээгүй</span>'}</span>
+          <b>Сайтын хаяг</b><span>${esc(p.site_url)} <button class="btn btn-gray btn-sm" onclick="setSettingPrompt('site_url','${esc(p.site_url)}','Сайтын хаяг (pay_done.html энд байрлана)')">засах</button></span>
+          <b>Оператор (live)</b><span>${esc(p.wire_operators)||'<i>автомат</i>'} <button class="btn btn-gray btn-sm" onclick="setSettingPrompt('wire_operators','${esc(p.wire_operators)}','WIRE dashboard → Холболтууд дээр идэвхжүүлсэн операторын id (таслалаар). Хоосон = WIRE өөрөө сонгоно')">засах</button></span>
+          <b>Баримт уншигч загвар</b><span>${esc(p.receipt_model)} <button class="btn btn-gray btn-sm" onclick="setSettingPrompt('receipt_model','${esc(p.receipt_model)}','Anthropic загварын нэр')">засах</button></span>
+          <b>Төлбөр</b><span>нийт ${p.counts.total} · төлөгдсөн ${p.counts.paid}</span>
+        </div>
+        <div class="actions">
+          <button class="btn btn-gray btn-sm" onclick="payAction('test_wire')">WIRE холболт шалгах</button>
+          <button class="btn btn-gold btn-sm" onclick="payAction('register_webhook',{replace:true},'WIRE дээр webhook endpoint бүртгэж (хуучныг устгаж), signing secret-ийг серверт хадгална. Үргэлжлүүлэх үү?')">Webhook бүртгэх</button>
+          <button class="btn btn-gray btn-sm" onclick="payAction('list_webhooks')">Webhook жагсаалт</button>
+          <span style="width:12px"></span>
+          <button class="btn btn-gray btn-sm" onclick="payAction('set_mode',{mode:'mock'},'MOCK горим: WIRE-гүй тест хуудас. Шилжих үү?')">→ mock</button>
+          <button class="btn btn-gold btn-sm" onclick="payAction('set_mode',{mode:'test'},'TEST горим: жинхэнэ WIRE API, sandbox оператор, мөнгө шилжихгүй. sk_test_ түлхүүр + webhook бүртгэлтэй байх ёстой. Шилжих үү?')">→ test</button>
+          <button class="btn btn-green btn-sm" onclick="payAction('set_mode',{mode:'live'},'LIVE горим: ЖИНХЭНЭ ТӨЛБӨР. sk_live_ түлхүүр + live webhook + идэвхжсэн оператор хэрэгтэй. Шилжих үү?')">→ live</button>
+        </div>
+      </div>
+      <div class="card"><div class="title">Сүүлийн 20 төлбөр</div>
+        ${p.last.length ? `<table class="t"><tr><th>Огноо</th><th>Имэйл</th><th>Хэрэгсэл</th><th>Дүн</th><th>Төлөв</th><th>Арга</th></tr>${p.last.map(x=>`<tr><td>${dt(x.created_at)}</td><td>${esc(x.email)}</td><td>${esc(x.tool)}</td><td>${Number(x.amount).toLocaleString()}₮</td><td>${ST[x.status]||esc(x.status)}${x.livemode?' · live':''}</td><td>${esc(x.provider)}${x.paid_via?' / '+esc(x.paid_via):''}</td></tr>`).join('')}</table>` : '<div class="empty">Төлбөр алга.</div>'}
+      </div>`;
+    return;
+  }
+  if(TAB==='logs'){
+    const L = DATA.logs || [];
+    c.innerHTML = `<div class="card"><div class="title">Хэрэгслийн хэрэглээ (сүүлийн 200)</div>
+      ${L.length ? `<table class="t"><tr><th>Огноо</th><th>Имэйл</th><th>Үйлдэл</th><th>Хэрэгсэл / дэлгэрэнгүй</th></tr>${L.map(x=>`<tr><td>${dt(x.created_at)}</td><td>${esc(x.email)}</td><td>${esc(x.action)}</td><td>${esc((x.details&&(x.details.toolName||JSON.stringify(x.details)))||'')}</td></tr>`).join('')}</table>` : '<div class="empty">Лог алга.</div>'}</div>`;
+    return;
+  }
   if(TAB==='acc'){
     const list = [...DATA.acc].sort((x,y)=> (x.status==='pending'?-1:1) - (y.status==='pending'?-1:1));
     c.innerHTML = list.length ? list.map(a=>`

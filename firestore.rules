@@ -26,21 +26,7 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    // Төлбөр: зөвхөн сервер (Functions, admin SDK) бичнэ; хэрэглэгч өөрийнхөө бичлэгийг уншина
-    match /payments/{id} {
-      allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
-      allow write: if false;
-    }
-    match /paymentEvents/{id} {
-      allow read: if isAdmin();
-      allow write: if false;
-    }
-
-    // ebarimt.mn лавлагааны кэш (ebarimtLookup функц, admin SDK): клиент хандахгүй
-    match /ebarimt_cache/{id} {
-      allow read, write: if false;
-    }
-
+    // Төлбөр (payments), ebarimt кэш, хэрэгслийн лог — 2026-10-10-аас Supabase дээр (supabase/migrations)
     // Бусад бүх зүйл хаалттай
     match /{document=**} {
       allow read, write: if false;

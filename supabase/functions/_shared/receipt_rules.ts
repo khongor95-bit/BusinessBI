@@ -1,5 +1,7 @@
+// deno-lint-ignore-file no-explicit-any
 /* ============================================================
-   receipt_rules.js — ebarimt/НӨАТ баримт уншилтын ЦЭВЭР дүрмүүд
+   receipt_rules.ts — ebarimt/НӨАТ баримт уншилтын ЦЭВЭР дүрмүүд (Deno/ESM хувилбар)
+   (Firebase functions/receipt_rules.js-ээс шилжүүлсэн; тест: receipt_rules_test.ts)
    ------------------------------------------------------------
    Энд firebase/anthropic импорт БАЙХГҮЙ: схем, систем промпт,
    шалгагч (validator) ба НӨАТ-ын тоон шалгалт. receipt.js (callable)
@@ -12,7 +14,6 @@
      Зураг дээрх заавар маягийн текст («батлах», «зааврыг үл тоо» ...) → үл тоож
      suspicious_text=true, review_required=true болгоно.
    ============================================================ */
-"use strict";
 
 const VAT_TOLERANCE_MNT = 1;
 const PAYMENT_TYPES = ["cash", "card", "transfer", "qpay", "unknown"];
@@ -21,8 +22,8 @@ const CONF_FIELDS = ["seller_name", "seller_tin", "seller_reg", "ddtd", "lottery
 // ── JSON схем (output_config.format) ────────────────────────
 // Structured outputs: бүх object-д additionalProperties:false, бүх талбар required.
 // Тоон хязгаар (0..1 г.м) API дэмжихгүй тул validateReceipt() дотор шалгана.
-const nullable = (t, extra) => ({ anyOf: [Object.assign({ type: t }, extra || {}), { type: "null" }] });
-const confProps = {};
+const nullable = (t: string, extra?: any) => ({ anyOf: [Object.assign({ type: t }, extra || {}), { type: "null" }] });
+const confProps: Record<string, any> = {};
 for (const k of CONF_FIELDS) confProps[k] = { type: "number", description: k + " талбарын итгэл 0..1" };
 
 const RECEIPT_SCHEMA = {
@@ -87,16 +88,16 @@ const SYSTEM_PROMPT = `Та Монгол Улсын ebarimt (НӨАТ-ын ца�
 Баримт/нэхэмжлэх биш зураг бол бүх талбарыг null, lines хоосон, notes-д «баримт биш» гэж бичнэ.`;
 
 // ── Туслахууд ───────────────────────────────────────────────
-const isNum = (v) => typeof v === "number" && Number.isFinite(v);
-const isNullOr = (v, pred) => v === null || pred(v);
-const digitsOnly = (s) => String(s).replace(/[^0-9]/g, "");
-const round2 = (n) => Math.round(n * 100) / 100;
+const isNum = (v: any) => typeof v === "number" && Number.isFinite(v);
+const isNullOr = (v: any, pred: (x: any) => boolean) => v === null || pred(v);
+const digitsOnly = (s: any) => String(s).replace(/[^0-9]/g, "");
+const round2 = (n: number) => Math.round(n * 100) / 100;
 
 /**
  * НӨАТ-ын тоон шалгалт: vat_amount ≈ total × 10/110 (±tolerance ₮).
  * total/vat аль нэг нь байхгүй бол ok=null (шалгах боломжгүй).
  */
-function vatCheck(total, vat_amount, tolerance) {
+function vatCheck(total: any, vat_amount: any, tolerance?: any) {
   const tol = isNum(tolerance) ? tolerance : VAT_TOLERANCE_MNT;
   if (!isNum(total) || !isNum(vat_amount)) {
     return { expected: isNum(total) ? round2(total * 10 / 110) : null, diff: null, tolerance: tol, ok: null };
@@ -111,15 +112,15 @@ function vatCheck(total, vat_amount, tolerance) {
  * Буцаах: { ok:true, receipt, warnings[] } | { ok:false, error, errors[] }
  * receipt = хэвийн болгосон хуулбар + vat_check, vat_check_ok, review_required.
  */
-function validateReceipt(input) {
-  const errors = [], warnings = [];
+function validateReceipt(input: any): any {
+  const errors: string[] = [], warnings: string[] = [];
   if (!input || typeof input !== "object" || Array.isArray(input)) {
     return { ok: false, error: "JSON объект биш", errors: ["root: object биш"] };
   }
   const extra = Object.keys(input).filter((k) => !RECEIPT_SCHEMA.required.includes(k));
   if (extra.length) errors.push("илүү талбар: " + extra.join(","));
 
-  const r = {};
+  const r: any = {};
   // Текст талбарууд
   for (const k of ["seller_name", "seller_tin", "seller_reg", "ddtd", "lottery", "date", "time"]) {
     const v = input[k];
@@ -139,10 +140,10 @@ function validateReceipt(input) {
   if (!Array.isArray(input.lines)) errors.push("lines: массив биш");
   else {
     r.lines = [];
-    input.lines.forEach((ln, i) => {
+    input.lines.forEach((ln: any, i: number) => {
       if (!ln || typeof ln !== "object" || Array.isArray(ln)) { errors.push(`lines[${i}]: object биш`); return; }
       if (typeof ln.name !== "string") { errors.push(`lines[${i}].name: string биш`); return; }
-      const out = { name: ln.name.trim() };
+      const out: any = { name: ln.name.trim() };
       for (const k of ["qty", "unit_price", "amount"]) {
         const v = ln[k] === undefined ? null : ln[k];
         if (!isNullOr(v, isNum)) { errors.push(`lines[${i}].${k}: number|null биш`); return; }
@@ -191,7 +192,7 @@ function validateReceipt(input) {
   }
   if (r.total !== null && r.vat_amount !== null && r.vat_amount > r.total) warnings.push("vat_amount > total");
   if (r.lines.length && r.total !== null) {
-    const sum = r.lines.reduce((s, l) => s + (isNum(l.amount) ? l.amount : 0), 0);
+    const sum = r.lines.reduce((s: number, l: any) => s + (isNum(l.amount) ? l.amount : 0), 0);
     if (sum > 0 && Math.abs(sum - r.total) > Math.max(VAT_TOLERANCE_MNT, r.total * 0.01)) warnings.push(`мөрүүдийн нийлбэр (${round2(sum)}) ≠ total (${r.total})`);
   }
 
@@ -209,4 +210,4 @@ function validateReceipt(input) {
   return { ok: true, receipt: r, warnings };
 }
 
-module.exports = { RECEIPT_SCHEMA, SYSTEM_PROMPT, PAYMENT_TYPES, CONF_FIELDS, VAT_TOLERANCE_MNT, vatCheck, validateReceipt };
+export { RECEIPT_SCHEMA, SYSTEM_PROMPT, PAYMENT_TYPES, CONF_FIELDS, VAT_TOLERANCE_MNT, vatCheck, validateReceipt };

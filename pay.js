@@ -1,8 +1,8 @@
 /* ============================================================
-   pay.js — BusinessBI төлбөртэй хэрэгслийн клиент модуль (WIRE.mn)
+   pay.js — BusinessBI төлбөртэй хэрэгслийн клиент модуль (WIRE.mn, Supabase Edge Functions)
    ------------------------------------------------------------
-   Хэрэглэх (gate.js-ийн ДАРАА залгана):
-     <script src="gate.js"></script>
+   Хэрэглэх (mp.js-ийн ДАРАА залгана — mp.js нь BBIGate-тэй нийцтэй API-г Supabase дээр өгнө):
+     <script src="mp.js"></script>
      <script src="pay.js"></script>
      ...
      $('dlBtn').onclick = BBIGate.protect(
@@ -11,33 +11,26 @@
 
    Урсгал:
      1. localStorage-д хүчинтэй тасалбар (24 цаг) байвал → сервер дээр баталгаажуулж → шууд cb()
-     2. Үгүй бол төлбөрийн modal → createPayment → WIRE checkout-ийг ШИНЭ ЦОНХОНД нээнэ
+     2. Үгүй бол төлбөрийн modal → payments/create → WIRE checkout-ийг ШИНЭ ЦОНХОНД нээнэ
         (хуудсыг солихгүй — хэрэглэгчийн PDF-ээс уншсан өгөгдөл санах ойд байдаг тул)
-     3. 3 сек тутам checkPayment-аар шалгана; pay_done.html-ээс postMessage ирвэл шууд шалгана
+     3. 3 сек тутам payments/check-ээр шалгана; pay_done.html-ээс postMessage ирвэл шууд шалгана
      4. Төлөгдмөгц тасалбар хадгалж, modal хааж, cb() ажиллуулна
    ============================================================ */
 (function () {
   "use strict";
-  const REGION = "asia-northeast1";
-  const FUNCTIONS_SDK = "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js";
   const PRICES = { ndsh_hhoat: { amount: 5000, label: "1 тайлан татах", validHours: 24 }, receipt: { amount: 5000, label: "24 цагийн эрх — баримтын зураг уншуулах", validHours: 24 } };
   const POLL_MS = 3000, POLL_MAX_MS = 20 * 60 * 1000;
 
-  let fns = null, loading = null;
-  function ensureFunctions() {
-    if (fns) return Promise.resolve(fns);
+  // Сервер тал: Supabase Edge Function "payments" (supabase/functions/payments) — mp.js-ийн callFn-ээр дуудна
+  let loading = null;
+  function ensureMp() {
+    if (window.BBIMP && BBIMP.callFn) return Promise.resolve();
     if (loading) return loading;
-    loading = new Promise((res, rej) => {
-      const go = () => {
-        try { fns = firebase.app().functions(REGION); res(fns); } catch (e) { rej(e); }
-      };
-      if (window.firebase && firebase.functions) return go();
-      const s = document.createElement("script"); s.src = FUNCTIONS_SDK; s.onload = go; s.onerror = () => rej(new Error("functions SDK ачаалагдсангүй"));
-      document.head.appendChild(s);
-    });
+    loading = new Promise((res, rej) => { const s = document.createElement("script"); s.src = "mp.js"; s.onload = () => res(); s.onerror = () => rej(new Error("mp.js ачаалагдсангүй")); document.head.appendChild(s); });
     return loading;
   }
-  const call = async (name, data) => (await ensureFunctions()).httpsCallable(name)(data).then(r => r.data);
+  const ROUTE = { createPayment: "payments/create", checkPayment: "payments/check" };
+  const call = async (name, data) => { await ensureMp(); return BBIMP.callFn(ROUTE[name] || name, data); };
 
   // ── Тасалбар (localStorage) ─────────────────────────────────
   const tkey = tool => "bbi_pay_ticket_" + tool;
@@ -170,7 +163,8 @@
       const code = (e && e.code) || "";
       let text;
       if (/unauthenticated|нэвтэрнэ/i.test(msg + code)) text = "Эхлээд нэвтэрнэ үү.";
-      else if (/not-found|functions\/not-found|SDK ачаалагдсангүй|Failed to fetch|NetworkError/i.test(msg + code)) text = "Төлбөрийн систем одоогоор тохируулагдаж байна — түр хүлээгээд дахин оролдоно уу. (Серверийн функц хараахан deploy хийгдээгүй.)";
+      else if (/failed-precondition/i.test(code)) text = msg;
+      else if (/not-found|mp\.js ачаалагдсангүй|Failed to fetch|NetworkError|aborted/i.test(msg + code)) text = "Төлбөрийн системтэй холбогдож чадсангүй — интернэтээ шалгаад дахин оролдоно уу.";
       else text = "Төлбөр эхлүүлж чадсангүй: " + msg;
       setStatus(text, "err");
       btn.disabled = false;

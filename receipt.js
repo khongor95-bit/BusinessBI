@@ -1,8 +1,8 @@
 /* ============================================================
    receipt.js — ebarimt/НӨАТ баримтын зураг → бүртгэлийн санал (клиент модуль)
    ------------------------------------------------------------
-   Хэрэглэх (gate.js-ийн ДАРАА залгана):
-     <script src="gate.js"></script>
+   Хэрэглэх (mp.js-ийн ДАРАА залгана — Supabase нэвтрэлт):
+     <script src="mp.js"></script>
      <script src="receipt.js"></script>
      ...
      const res = await BBIReceipt.extract(fileInput.files[0], { hint: "Оффисын хангамж" });
@@ -12,22 +12,19 @@
 
    Урсгал:
      1. Зургийг canvas-аар урт тал ≤1600px, JPEG q=0.85 болгож багасгана (5 MB хязгаарт багтаана)
-     2. base64 → callable URL руу POST (Firebase callable протокол: body {data}, хариу {result}|{error})
-        Authorization: Bearer <Firebase ID token>  (BBIGate.getUser().getIdToken())
-   Callable URL: https://asia-northeast1-<project>.cloudfunctions.net/receiptExtract
+     2. base64 → Edge Function руу POST (callable протокол: body {data}, хариу {result}|{error})
+        Authorization: Bearer <Supabase access token>  (BBIGate.getUser().getIdToken() — mp.js-ийн shim)
+   URL: https://<project>.supabase.co/functions/v1/receipt-extract
+   Эрх: сервер дээр 'receipt' хэрэгслийн төлбөр (5,000₮ / 24 цаг) шалгагдана.
    ============================================================ */
 (function () {
   "use strict";
-  const REGION = "asia-northeast1";                 // pay.js-тэй ижил бүс
-  const FALLBACK_PROJECT = "businessbi";            // gate.js firebaseConfig.projectId
+  const SUPABASE_URL = (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url) || "https://mpfjceziasadnswwnkpc.supabase.co";
   const MAX_SIDE = 1600, JPEG_QUALITY = 0.85;
   const MAX_BYTES = 5 * 1024 * 1024;                // серверийн хязгаартай ижил
   const ACCEPT = ["image/jpeg", "image/png", "image/webp"];
 
-  function projectId() {
-    try { return firebase.app().options.projectId || FALLBACK_PROJECT; } catch (_) { return FALLBACK_PROJECT; }
-  }
-  function callableUrl(name) { return `https://${REGION}-${projectId()}.cloudfunctions.net/${name}`; }
+  function callableUrl(name) { return SUPABASE_URL + "/functions/v1/" + name; }
 
   function err(code, message, details) { const e = new Error(message); e.code = code; if (details !== undefined) e.details = details; return e; }
 
@@ -101,7 +98,7 @@
     return { base64: await blobToBase64(blob), mime: "image/jpeg", bytes: blob.size, width: w, height: h };
   }
 
-  // ── Callable дуудлага (raw HTTP, Firebase callable протокол) ──
+  // ── Edge Function дуудлага (raw HTTP, callable протокол) ──
   async function callFunction(name, data, idToken) {
     let res;
     try {
@@ -136,11 +133,11 @@
     prog("upload");
     const data = { image: img.base64, mime: img.mime };
     if (opts.hint) data.hint = String(opts.hint).slice(0, 300);
-    const result = await callFunction("receiptExtract", data, idToken);
+    const result = await callFunction("receipt-extract", data, idToken);
     prog("done");
     try { if (window.BBIGate && BBIGate.logActivity) BBIGate.logActivity("receipt_extract", { ok: !!(result && result.ok), review: !!(result && result.receipt && result.receipt.review_required) }); } catch (_) {}
     return Object.assign({}, result, { image: { bytes: img.bytes, width: img.width, height: img.height } });
   }
 
-  window.BBIReceipt = { extract, downscale, callableUrl, REGION, MAX_SIDE, JPEG_QUALITY, MAX_BYTES };
+  window.BBIReceipt = { extract, downscale, callableUrl, MAX_SIDE, JPEG_QUALITY, MAX_BYTES };
 })();

@@ -1,8 +1,7 @@
 /* ============================================================
    ebarimt.js — ebarimt.mn татвар төлөгчийн лавлагаа (клиент модуль)
    ------------------------------------------------------------
-   Хэрэглэх (gate.js-ийн ДАРАА залгана):
-     <script src="gate.js"></script>
+   Хэрэглэх (бие даасан — нэвтрэлт шаардахгүй):
      <script src="ebarimt.js"></script>
      ...
      BBIEbarimt.lookup({reg:'6183689'}).then(r => r.name)   // {tin,reg,name,vatPayer,found}
@@ -12,22 +11,18 @@
 
    Урсгал:
      1. localStorage-д 30 хоногийн кэш (bbi_eb_<reg|tin>) байвал шууд буцаана
-     2. Үгүй бол ebarimtLookup callable функцийг fetch-ээр дуудна (Firebase SDK шаардахгүй):
-        POST https://asia-northeast1-<project>.cloudfunctions.net/ebarimtLookup  {data:{reg,tin}}
-        Project id-г gate.js-ийн эхлүүлсэн firebase app-аас авна; үгүй бол "businessbi".
+     2. Үгүй бол Supabase Edge Function ebarimt-lookup-ийг fetch-ээр дуудна (SDK шаардахгүй):
+        POST https://<project>.supabase.co/functions/v1/ebarimt-lookup  {data:{reg,tin}}
+     3. Сервер ebarimt.mn-д хүрч чадаагүй (error:"upstream") бол хөтчөөс шууд оролдоно
+        (api.ebarimt.mn гадаад IP-д хаалттай байж болзошгүй; CORS зөвшөөрвөл ажиллана).
    ============================================================ */
 (function () {
   "use strict";
-  const REGION = "asia-northeast1";
-  const FALLBACK_PROJECT = "businessbi";
+  const SUPABASE_URL = (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url) || "https://mpfjceziasadnswwnkpc.supabase.co";
+  const EBARIMT_DIRECT = "https://api.ebarimt.mn/api/info/check";
   const TTL_MS = 30 * 24 * 3600 * 1000;
-  const TIMEOUT_MS = 10000;
-
-  function projectId() {
-    try { const p = window.firebase && firebase.apps && firebase.apps.length && firebase.app().options.projectId; if (p) return p; } catch (_) {}
-    return FALLBACK_PROJECT;
-  }
-  const endpoint = () => `https://${REGION}-${projectId()}.cloudfunctions.net/ebarimtLookup`;
+  const TIMEOUT_MS = 12000;
+  const endpoint = () => SUPABASE_URL + "/functions/v1/ebarimt-lookup";
 
   // Оролт хэвийн болгох (сервертэй ижил дүрэм)
   function norm(q) {
@@ -51,10 +46,24 @@
     try {
       const res = await fetch(endpoint(), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ data }), signal: ctrl.signal });
       const j = await res.json().catch(() => ({}));
-      if (j.error) throw new Error(j.error.message || j.error.status || "ebarimtLookup error");
+      if (j.error) throw new Error(j.error.message || j.error.status || "ebarimt-lookup error");
       if (!res.ok) throw new Error("HTTP " + res.status);
-      return j.result || {};
+      const r = j.result || {};
+      if (r.error === "upstream") { const d = await directLookup(data).catch(() => null); if (d) return d; }
+      return r;
     } finally { clearTimeout(t); }
+  }
+  // Сервер ebarimt.mn-д хүрээгүй үед хөтчөөс шууд (Монголын IP). CORS хаалттай бол TypeError → null.
+  async function directLookup(q) {
+    const get = async (u) => { const r = await fetch(u, { headers: { Accept: "application/json" } }); if (!r.ok) throw new Error("HTTP " + r.status); const tx = await r.text(); try { return JSON.parse(tx); } catch (_) { return tx; } };
+    const unwrap = (o) => { for (let i = 0; i < 3 && o && typeof o === "object"; i++) { const inner = o.data !== undefined ? o.data : (o.result !== undefined ? o.result : undefined); if (inner === undefined || inner === null) break; o = inner; if (typeof o !== "object") break; } return o; };
+    let tin = q.tin;
+    if (!tin && q.reg) { const o = unwrap(await get(`${EBARIMT_DIRECT}/getTinInfo?regNo=${encodeURIComponent(q.reg)}`)); tin = String(typeof o === "object" ? (o.tin || o.value || "") : (o || "")).replace(/\D/g, ""); if (!tin && /^\d+$/.test(q.reg)) tin = q.reg; }
+    if (!tin) return { tin: "", reg: q.reg, name: "", vatPayer: false, found: false };
+    const o = unwrap(await get(`${EBARIMT_DIRECT}/getInfo?tin=${encodeURIComponent(tin)}`)) || {};
+    const name = String(o.name || o.fullName || o.companyName || "").trim();
+    const found = o.found !== undefined ? !!o.found : !!name;
+    return { tin, reg: q.reg, name, vatPayer: found && !!(o.vatPayer || o.vatpayer || o.isVatPayer), found, via: "direct" };
   }
 
   const inflight = {};

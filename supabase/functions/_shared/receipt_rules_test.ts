@@ -1,11 +1,14 @@
-// receiptExtract-ийн цэвэр дүрмийн тест (сүлжээгүй, node_modules шаардахгүй):
+// deno-lint-ignore-file no-explicit-any
+// receipt-extract-ийн цэвэр дүрмийн тест (сүлжээгүй):
 //   validateReceipt (схем шалгагч + хэвийн болгох) ба vatCheck (НӨАТ ≈ total×10/110 ±1₮)
-//   node test/receipt.test.js
-const assert = require("assert");
-const { validateReceipt, vatCheck, RECEIPT_SCHEMA, SYSTEM_PROMPT, CONF_FIELDS } = require("../receipt_rules");
+//   deno test supabase/functions/_shared/receipt_rules_test.ts
+import assert from "node:assert";
+import { validateReceipt, vatCheck, RECEIPT_SCHEMA, SYSTEM_PROMPT, CONF_FIELDS } from "./receipt_rules.ts";
 
-const conf = (v) => { const c = {}; for (const k of CONF_FIELDS) c[k] = v === undefined ? 0.95 : v; return c; };
-const sample = (over) => Object.assign({
+Deno.test("receipt_rules", () => {
+
+const conf = (v?: number) => { const c: any = {}; for (const k of CONF_FIELDS) c[k] = v === undefined ? 0.95 : v; return c; };
+const sample = (over?: any): any => Object.assign({
   seller_name: "Номин Трейд ХХК", seller_tin: "1234567", seller_reg: "2550431",
   ddtd: "123456789012345678901234567890123", lottery: "AB 12345678",
   date: "2026-03-14", time: "14:05:33",
@@ -15,7 +18,7 @@ const sample = (over) => Object.assign({
 }, over || {});
 
 // 1) vatCheck
-let vc = vatCheck(110000, 10000);
+let vc: any = vatCheck(110000, 10000);
 assert.deepStrictEqual([vc.expected, vc.diff, vc.ok], [10000, 0, true], "exact 10/110");
 vc = vatCheck(110000, 10001);
 assert.strictEqual(vc.ok, true, "+1₮ within tolerance");
@@ -35,7 +38,7 @@ vc = vatCheck(110000, 10005, 10);
 assert.strictEqual(vc.ok, true, "custom tolerance");
 
 // 2) validateReceipt — хэвийн баримт
-let v = validateReceipt(sample());
+let v: any = validateReceipt(sample());
 assert.ok(v.ok, v.error);
 assert.strictEqual(v.receipt.vat_check_ok, true);
 assert.strictEqual(v.receipt.review_required, false);
@@ -83,7 +86,7 @@ assert.strictEqual(v.receipt.ddtd.length, 33);
 assert.strictEqual(v.receipt.time, "09:05");
 assert.strictEqual(v.receipt.date, null);
 assert.strictEqual(v.receipt.confidence.date, 0);
-assert.ok(v.warnings.some((w) => w.startsWith("date ISO биш")));
+assert.ok(v.warnings.some((w: string) => w.startsWith("date ISO биш")));
 v = validateReceipt(sample({ seller_tin: "123", ddtd: "999" }));
 assert.ok(v.ok);
 assert.ok(v.warnings.includes("seller_tin 7 орон биш") && v.warnings.includes("ddtd 33 орон биш"));
@@ -91,10 +94,10 @@ assert.ok(v.warnings.includes("seller_tin 7 орон биш") && v.warnings.incl
 // 9) Мөрүүдийн нийлбэр ≠ total → warning (алдаа биш)
 v = validateReceipt(sample({ lines: [{ name: "A", qty: 1, unit_price: 50000, amount: 50000 }] }));
 assert.ok(v.ok);
-assert.ok(v.warnings.some((w) => w.includes("≠ total")));
+assert.ok(v.warnings.some((w: string) => w.includes("≠ total")));
 
 // 10) Схемд нийцэхгүй → ok:false
-const bad = [
+const bad: [any, string][] = [
   [null, "null"],
   [[], "array"],
   [sample({ payment_type: "crypto" }), "bad enum"],
@@ -125,4 +128,5 @@ assert.strictEqual(RECEIPT_SCHEMA.properties.confidence.additionalProperties, fa
 assert.ok(SYSTEM_PROMPT.includes("Төлөх дүн") && SYSTEM_PROMPT.includes("Бүртгэгдсэн дүн") && SYSTEM_PROMPT.includes("НХАТ"));
 assert.ok(SYSTEM_PROMPT.includes("suspicious_text"));
 
-console.log("receipt.test.js: ALL OK");
+});
+

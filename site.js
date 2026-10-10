@@ -6,7 +6,7 @@
      <script src="site.js" defer></script>
    Хуудсанд хуучин header/nav/footer байвал (header#bbi-old, nav.ubbi-nav,
    nav .nav-inner, footer) тэдгээрийг СОЛИНО — хуудас бүрт markup хуулахгүй.
-   Нэвтрэлтийн төлөв: gate.js (BBIGate) байхгүй бол өөрөө ачаална.
+   Нэвтрэлтийн төлөв: Supabase (mp.js) — байхгүй бол өөрөө ачаална; data-auth="firebase" хуудсанд gate.js.
    Хуудасны гарчгийг nav-д харуулах бол <body data-nav-title="…">.
    ============================================================ */
 (function () {
@@ -115,8 +115,8 @@
 
     // 4) Нэвтрэлтийн төлөв
     const loginEl = document.getElementById("bbiLogin");
-    if (body.dataset.auth === "supabase") {
-      // Маркетплэйс/журналын хуудсууд: Supabase Auth (mp.js)
+    if (body.dataset.auth !== "firebase") {
+      // Бүх хуудас: Supabase Auth (mp.js). Firebase gate зөвхөн data-auth="firebase" гэж заасан хуучин хуудсанд.
       const wireSb = () => {
         loginEl.addEventListener("click", e => { if (!BBIMP.user) { e.preventDefault(); BBIMP.loginModal(); } });
         BBIMP.onAuth(async u => {
@@ -128,6 +128,7 @@
             const acc = await BBIMP.myAccountant();
             const a = document.createElement("a"); a.className = "bbi-dash"; a.href = acc ? "partner.html" : "my.html"; a.textContent = acc ? "Нягтлангийн самбар" : "Миний самбар";
             menu.insertBefore(a, menu.querySelector(".bbi-cta"));
+            if ((u.email || "").toLowerCase() === ADMIN_EMAIL) { const ad = document.createElement("a"); ad.className = "bbi-dash bbi-admin"; ad.href = "marketplace_admin.html"; ad.textContent = "⚙ Админ"; menu.insertBefore(ad, menu.querySelector(".bbi-cta")); }
             const o = document.createElement("a"); o.className = "bbi-dash"; o.href = "#"; o.textContent = "Гарах"; o.onclick = e => { e.preventDefault(); if (confirm("Гарах уу?")) BBIMP.signOut(); };
             menu.insertBefore(o, menu.querySelector(".bbi-cta"));
           }
