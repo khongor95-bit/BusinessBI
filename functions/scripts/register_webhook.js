@@ -10,6 +10,9 @@
    Дараа нь:
      firebase functions:secrets:set WIRE_WEBHOOK_SECRET   ← хэвлэгдсэн whsec_… утгыг оруулна
      firebase deploy --only functions:payments
+   Эсвэл secret-ийг дэлгэцэнд ч харуулалгүй шууд Secret Manager руу (--secret-only: stdout-д зөвхөн whsec):
+     WIRE_SECRET_KEY=$(cat ~/.wire_key) node scripts/register_webhook.js <url> --replace --secret-only \
+       | firebase functions:secrets:set WIRE_WEBHOOK_SECRET --data-file=-
 */
 "use strict";
 const wire = require("../wire");
@@ -27,6 +30,12 @@ const wire = require("../wire");
     for (const ep of await wire.listWebhooks(key)) { console.log("устгаж байна:", ep.id, ep.url); await wire.deleteWebhook(key, ep.id); }
   }
   const r = await wire.registerWebhook(key, url, ["payment_intent.succeeded", "payment_intent.canceled"]);
+  if (args.includes("--secret-only")) {
+    console.error("Бүртгэгдлээ:", r.id, r.url, "status:", r.status);
+    if (!r.secret) { console.error("Хариунд secret ирсэнгүй:", JSON.stringify(r.raw)); process.exit(1); }
+    process.stdout.write(r.secret);
+    return;
+  }
   console.log("\nБүртгэгдлээ:", r.id, r.url, "status:", r.status);
   if (r.secret) {
     console.log("\nSigning secret (ЗӨВХӨН НЭГ УДАА харагдана — одоо Secret Manager-т хадгал):\n\n  " + r.secret + "\n");
