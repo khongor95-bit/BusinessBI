@@ -3301,7 +3301,9 @@ function lockPeriod(through, reason){
   const b=computeBalance(); if(!b.balanced){ toast('Гүйлгээ баланс тэнцэхгүй байна — түгжихийн өмнө засна уу', true); return false; }
   DB.locks=DB.locks||[]; DB.locks.push({through, at:new Date().toISOString(), by:who(), reason:reason||''});
   logEvent('lock','',through+' хүртэл түгжив'+(reason?' — '+reason:''));
-  save(); return true;
+  save();
+  if(CLOUD.user) CLOUD.snapshot('ТҮГЖЭЭ '+through, true, true);
+  return true;
 }
 function unlockPeriod(reason){
   const lt=lockedThrough(); if(!lt) return false;
@@ -4994,6 +4996,7 @@ function runClosing(){
   }
   logEvent('closing',doc,plan.length+' мөр');
   save(); renderClosing(); toast('Хаалтын бичилт хийгдлээ — '+plan.length+' мөр');
+  if(CLOUD.user) CLOUD.snapshot('ХААЛТ '+date, true, true);
 }
 function undoClosing(){
   const cnt=DB.journal.filter(j=>j.source==='closing').length;
@@ -5015,6 +5018,8 @@ function runChecks(){
   }catch(e){}
   { const nd=new Set(DB.journal.filter(j=>!isPosted(j)).map(j=>j.doc)).size; if(nd) checks.push({state:'warn', text:nd+' ноорог баримт батлагдаагүй — журналаас «батлах» (хаалт, түгжээний өмнө заавал)'}); }
   if(lockedThrough()) checks.push({state:'ok', text:'Үе түгжигдсэн: '+lockedThrough()+' хүртэл'});
+  if(DB.journal.length && !(CLOUD.user&&CLOUD.enabled())) checks.push({state:'warn', text:'Дата зөвхөн энэ хөтөчид (localStorage) — 10 жил хадгалах шаардлага (НББ-ийн хууль 11.1) хангагдахгүй. Cloud-д нэвтэрч хадгалуулна уу (дээд мөрний «Нэвтрэх»).'});
+  else if(CLOUD.user && CLOUD.status==='err') checks.push({state:'err', text:'Cloud sync алдаатай — өөрчлөлт cloud-д очихгүй байна (эрх дууссан эсвэл сүлжээ)'});
   if(!DB.accounts.length){ checks.push({state:'err', text:'Дансны төлөвлөгөө хоосон — стандарт төлөвлөгөө ачаална уу'}); return checks; }
   const obDt=DB.accounts.reduce((x,a)=>x+(a.obDt||0),0), obKt=DB.accounts.reduce((x,a)=>x+(a.obKt||0),0);
   if(Math.abs(r2(obDt-obKt))>=0.01) checks.push({state:'err', text:'Эхний үлдэгдлийн ДТ/КТ тэнцэхгүй: зөрүү '+fmtZ(r2(obDt-obKt))});
@@ -5292,9 +5297,18 @@ const CLOUD={
         if(!ok){ this.setSync('err'); return; }
       }
       const co=CO.list.find(x=>x.id===cid)||{name:cid};
+      /* Зөрчлийн хамгаалалт: cloud дээрх мөр бидний сүүлд татсан/бичсэнээс хойш өөр төхөөрөмжөөс шинэчлэгдсэн бол дарж бичихийн өмнө асууна */
+      { const cur=await this.sb.from('companies').select('updated_at,journal_count').eq('user_id',uid).eq('id',cid);
+        const crow=cur.data&&cur.data[0];
+        if(crow && this.cloudUpdatedAt && String(crow.updated_at)>this.cloudUpdatedAt && crow.journal_count!==localCount){
+          const ok=confirm('АНХААР: Cloud дээрх дата '+String(crow.updated_at).slice(0,16).replace('T',' ')+'-д өөр төхөөрөмжөөс шинэчлэгдсэн ('+crow.journal_count+' бичилт; энд '+localCount+'). Энэ төхөөрөмжийн датагаар дарж бичих үү?\n\n«Cancel» = илгээхгүй; хуудсаа refresh хийж cloud-ын датаг татна уу.');
+          if(!ok){ this.setSync('err'); return; }
+        } }
+      const nowIso=new Date().toISOString();
       let r=await this.sb.from('companies').upsert({user_id:uid, id:cid, name:co.name,
-        meta:this.metaOf(DB), journal_count:localCount, updated_at:new Date().toISOString()}, {onConflict:'user_id,id'});
+        meta:this.metaOf(DB), journal_count:localCount, updated_at:nowIso}, {onConflict:'user_id,id'});
       if(r.error) throw r.error;
+      this.cloudUpdatedAt=nowIso;
       const months=this.monthsOf(DB);
       for(const mo of Object.keys(months)){
         const js=JSON.stringify(months[mo]);
@@ -5318,9 +5332,10 @@ const CLOUD={
   async pull(){
     if(!this.user||!this.sb) return;
     const uid=this.user.id, cid=CO.current;
-    let r=await this.sb.from('companies').select('name,meta,journal_count').eq('user_id',uid).eq('id',cid);
+    let r=await this.sb.from('companies').select('name,meta,journal_count,updated_at').eq('user_id',uid).eq('id',cid);
     if(r.error) throw r.error;
     const row=r.data&&r.data[0];
+    this.cloudUpdatedAt=row?String(row.updated_at||''):'';
     if(!row){
       this.cloudJournalCount=0; this.lastPush={};
       await this.push();
@@ -5357,22 +5372,23 @@ const CLOUD={
     }
     saveCO(); updateCompanyUI();
   },
-  async snapshot(label){
-    if(!this.user||!this.sb){ toast('Сэргээх цэг үүсгэхэд cloud-д нэвтэрсэн байх шаардлагатай', true); return; }
+  /* keep=true (жилийн хаалт, үеийн түгжээ) — хэзээ ч автоматаар устгахгүй: 10 жилийн хадгалалт (НББ-ийн хууль 11.1) */
+  async snapshot(label, keep, silent){
+    if(!this.user||!this.sb){ if(!silent) toast('Сэргээх цэг үүсгэхэд cloud-д нэвтэрсэн байх шаардлагатай', true); return; }
     try{
       let r=await this.sb.from('snapshots').insert({user_id:this.user.id, company_id:CO.current,
-        label:label||'', journal_count:DB.journal.length, data:JSON.parse(JSON.stringify(DB))});
+        label:label||'', journal_count:DB.journal.length, keep:!!keep, data:JSON.parse(JSON.stringify(DB))});
       if(r.error) throw r.error;
-      r=await this.sb.from('snapshots').select('id,created_at').eq('user_id',this.user.id).eq('company_id',CO.current);
-      if(!r.error && r.data && r.data.length>10){
-        const old=r.data.sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at))).slice(10);
-        for(const s of old) await this.sb.from('snapshots').delete().eq('user_id',this.user.id).eq('id',s.id);
+      r=await this.sb.from('snapshots').select('id,created_at,keep').eq('user_id',this.user.id).eq('company_id',CO.current);
+      if(!r.error && r.data){
+        const prunable=r.data.filter(x=>!x.keep).sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)));
+        for(const s of prunable.slice(10)) await this.sb.from('snapshots').delete().eq('user_id',this.user.id).eq('id',s.id);
       }
-      toast('Сэргээх цэг үүслээ');
-    }catch(e){ console.error(e); toast('Snapshot алдаа: '+e.message, true); }
+      if(!silent) toast(keep?'Хамгаалагдсан сэргээх цэг үүслээ (10 жил хадгалагдана)':'Сэргээх цэг үүслээ');
+    }catch(e){ console.error(e); if(!silent) toast('Snapshot алдаа: '+e.message, true); }
   },
   async listSnapshots(){
-    const r=await this.sb.from('snapshots').select('id,created_at,label,journal_count').eq('user_id',this.user.id).eq('company_id',CO.current);
+    const r=await this.sb.from('snapshots').select('id,created_at,label,journal_count,keep').eq('user_id',this.user.id).eq('company_id',CO.current);
     if(r.error) throw r.error;
     return (r.data||[]).sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)));
   },
@@ -5382,9 +5398,12 @@ const CLOUD={
     const row=r.data&&r.data[0];
     if(!row||!row.data){ toast('Сэргээх цэг олдсонгүй', true); return; }
     const d=row.data;
+    const prevEvents=DB.events||[];
     DB={ settings:Object.assign({...DEFAULT_SETTINGS}, d.settings||{}), accounts:d.accounts||[],
          partners:d.partners||[], journal:d.journal||[], rules:d.rules||[],
-         payroll:d.payroll||[], assets:d.assets||[], seq:d.seq||{doc:100000,batch:1}, employees:d.employees||{} };
+         payroll:d.payroll||[], assets:d.assets||[], seq:d.seq||{doc:100000,batch:1}, employees:d.employees||{},
+         events:Array.isArray(d.events)?d.events:prevEvents, locks:Array.isArray(d.locks)?d.locks:[], bankLayouts:d.bankLayouts||{} };
+    logEvent('restore','','cloud сэргээх цэг '+id);
     save(); renderAll(); refreshDots();
     toast('Сэргээгдлээ — '+DB.journal.length+' бичилт');
   }
@@ -5470,7 +5489,7 @@ async function openSnapshotList(){
     if(!rows.length){ el.innerHTML='<div class="empty"><b>Цэг алга</b>Дээрх товчоор эхнийхээ үүсгээрэй</div>'; return; }
     el.innerHTML=rows.map(s=>`<div style="display:flex;align-items:center;gap:10px;padding:7px 4px;border-bottom:1px solid var(--bdr-soft);font-size:12px;">
       <span class="mono">${esc(String(s.created_at).slice(0,16).replace('T',' '))}</span>
-      <span style="flex:1;">${esc(s.label||'')}</span>
+      <span style="flex:1;">${esc(s.label||'')}${s.keep?' <span class="badge ok" title="Хамгаалагдсан — автоматаар устгагдахгүй (10 жил)">10 жил</span>':''}</span>
       <span class="mono" style="color:var(--txt-muted);">${s.journal_count} бичилт</span>
       <button class="btn sm" onclick="if(confirm('Энэ цэг рүү сэргээх үү? Одоогийн дата солигдоно.'))CLOUD.restoreSnapshot(${s.id}).then(()=>closeModal('snapModal'))">сэргээх</button>
     </div>`).join('');
