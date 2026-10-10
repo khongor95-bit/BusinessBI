@@ -1,0 +1,26 @@
+name: tests
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Татварын параметр, журналын тооцооллын хөдөлгүүр
+        run: node test/tax.test.js && node test/journal_core.test.js
+      - name: Firebase функцүүд (төлбөр, ebarimt, баримтын зураг)
+        run: cd functions && node test/wire.test.js && node test/ebarimt.test.js && node test/receipt.test.js
+      - name: HTML хуудсуудын inline script-ийн синтакс
+        run: |
+          node -e '
+            const fs=require("fs");let bad=0;
+            for(const f of fs.readdirSync(".").filter(f=>f.endsWith(".html"))){
+              const s=fs.readFileSync(f,"utf8");const re=/<script(?![^>]*src)[^>]*>([\s\S]*?)<\/script>/g;let m;
+              while((m=re.exec(s))){ try{ new Function(m[1]); }catch(e){ console.log(f,"SYNTAX ERROR:",e.message); bad++; } }
+            }
+            if(bad) process.exit(1); console.log("inline scripts ok");'
