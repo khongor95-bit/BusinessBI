@@ -1,0 +1,28 @@
+<!doctype html><html lang="mn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>ebarimt.mn холболтын шалгалт</title>
+<style>body{font-family:Inter,system-ui,sans-serif;max-width:720px;margin:30px auto;padding:0 16px;color:#1a2b25}pre{background:#f4f6f5;padding:12px;border-radius:8px;white-space:pre-wrap;word-break:break-all;font-size:13px}
+.ok{color:#216a4c;font-weight:700}.bad{color:#c0492b;font-weight:700}button{padding:10px 16px;border-radius:8px;border:none;background:#216a4c;color:#fff;font:inherit;cursor:pointer}input{padding:9px 12px;border:1.5px solid #e3e7e4;border-radius:8px;font:inherit}</style></head>
+<body><h2>ebarimt.mn холболтын шалгалт</h2>
+<p>Энэ хуудас 3 замаар ebarimt.mn-ээс лавлагаа авч үзээд үр дүнг харуулна. Регистр: <input id="reg" value="6183689"> <button id="go">Шалгах</button></p>
+<pre id="out">…</pre>
+<script>
+const out=document.getElementById('out'); const log=(s,cls)=>{ out.innerHTML += (cls?`<span class="${cls}">`:'')+s+(cls?'</span>':'')+"\n"; };
+async function run(){
+  out.innerHTML=''; const reg=document.getElementById('reg').value.trim();
+  const t=(a)=>Math.round(performance.now()-a)+'ms';
+  // 1) Supabase Edge Function (сервер Токио)
+  let a=performance.now();
+  try{ const r=await fetch('https://mpfjceziasadnswwnkpc.supabase.co/functions/v1/ebarimt-lookup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:{reg}})}); const j=await r.json(); log('1) Сервер (Supabase): HTTP '+r.status+' '+t(a)+' → '+JSON.stringify(j), j.result&&j.result.found?'ok':(j.result&&j.result.error?'bad':'')); }
+  catch(e){ log('1) Сервер (Supabase): АЛДАА '+e.message,'bad'); }
+  // 2) Хөтчөөс шууд getTinInfo
+  a=performance.now();
+  try{ const r=await fetch('https://api.ebarimt.mn/api/info/check/getTinInfo?regNo='+encodeURIComponent(reg),{headers:{Accept:'application/json'}}); const tx=await r.text(); log('2) Хөтчөөс шууд getTinInfo: HTTP '+r.status+' '+t(a)+' → '+tx.slice(0,300),'ok'); }
+  catch(e){ log('2) Хөтчөөс шууд getTinInfo: АЛДАА '+e.message+' (CORS хаалттай эсвэл хүрэхгүй)','bad'); }
+  // 3) Хөтчөөс шууд getInfo (ТТД гэж үзээд)
+  a=performance.now();
+  try{ const r=await fetch('https://api.ebarimt.mn/api/info/check/getInfo?tin='+encodeURIComponent(reg),{headers:{Accept:'application/json'}}); const tx=await r.text(); log('3) Хөтчөөс шууд getInfo: HTTP '+r.status+' '+t(a)+' → '+tx.slice(0,300),'ok'); }
+  catch(e){ log('3) Хөтчөөс шууд getInfo: АЛДАА '+e.message,'bad'); }
+  log('\nШинэ таб дээр нээж үзэх: https://api.ebarimt.mn/api/info/check/getTinInfo?regNo='+reg+'  — JSON гарвал ebarimt Монголоос хүрч байна гэсэн үг.');
+}
+document.getElementById('go').onclick=run; run();
+</script></body></html>

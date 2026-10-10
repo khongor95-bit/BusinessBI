@@ -120,11 +120,15 @@
       const wireSb = () => {
         loginEl.addEventListener("click", e => { if (!BBIMP.user) { e.preventDefault(); BBIMP.loginModal(); } });
         BBIMP.onAuth(async u => {
-          if (!u) { loginEl.innerHTML = USER_ICON + "<span>Нэвтрэх</span>"; loginEl.href = "#"; return; }
+          if (!u) { loginEl.innerHTML = USER_ICON + "<span>Нэвтрэх</span>"; loginEl.href = "#"; menu.querySelectorAll(".bbi-dash").forEach(x => x.remove()); delete menu.dataset.dashFor; return; }
           const name = (u.user_metadata && (u.user_metadata.full_name || u.user_metadata.name)) || (u.email || "").split("@")[0];
           loginEl.innerHTML = USER_ICON + "<span>" + esc(name) + "</span>";
           loginEl.href = "my.html"; loginEl.title = "Миний самбар";
-          if (!menu.querySelector(".bbi-dash")) {
+          // onAuth нэг session-д хэд хэдэн удаа дуудагдана (INITIAL_SESSION, SIGNED_IN, TOKEN_REFRESHED) —
+          // await-ээс ӨМНӨ тэмдэглэж давхар холбоос үүсэхээс сэргийлнэ
+          if (menu.dataset.dashFor !== u.id) {
+            menu.dataset.dashFor = u.id;
+            menu.querySelectorAll(".bbi-dash").forEach(x => x.remove());
             const acc = await BBIMP.myAccountant();
             const a = document.createElement("a"); a.className = "bbi-dash"; a.href = acc ? "partner.html" : "my.html"; a.textContent = acc ? "Нягтлангийн самбар" : "Миний самбар";
             menu.insertBefore(a, menu.querySelector(".bbi-cta"));

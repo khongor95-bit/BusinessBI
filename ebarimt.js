@@ -76,6 +76,8 @@
     if (inflight[k]) return inflight[k];
     inflight[k] = callFn(n).then((r) => {
       const out = { tin: r.tin || n.tin || "", reg: r.reg || n.reg || "", name: r.name || "", vatPayer: !!r.vatPayer, found: !!r.found };
+      if (r.error) out.error = r.error;
+      if (r.via) out.via = r.via;
       if (out.found) { cacheSet(k, out); if (out.tin) cacheSet(ckey({ tin: out.tin }), out); }
       return out;
     }).finally(() => { delete inflight[k]; });
@@ -86,7 +88,8 @@
   function badge(r) {
     if (!r) return { text: "", cls: "" };
     if (r.pending) return { text: "Шалгаж байна…", cls: "wait" };
-    if (r.error === "upstream" || r.error === "network") return { text: "Шалгаж чадсангүй", cls: "none" };
+    if (r.error === "upstream") return { text: "ebarimt.mn-тэй холбогдсонгүй", cls: "none" };
+    if (r.error === "network") return { text: "Шалгаж чадсангүй", cls: "none" };
     if (!r.found) return { text: "Олдсонгүй", cls: "none" };
     return r.vatPayer ? { text: "НӨАТ төлөгч", cls: "vat" } : { text: "НӨАТ төлөгч биш", cls: "novat" };
   }
