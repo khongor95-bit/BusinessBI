@@ -1,0 +1,43 @@
+<!doctype html><html lang="mn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Тест төлбөр — WIRE.mn (mock) · BusinessBI</title><meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<style>body{font-family:Inter,system-ui,sans-serif;background:#f4f6f5;margin:0;display:flex;min-height:100vh;align-items:center;justify-content:center}
+.c{background:#fff;border:1px solid #e3e7e4;border-radius:16px;padding:28px 30px;width:min(420px,92vw);box-shadow:0 10px 40px rgba(0,0,0,.08)}
+h1{font-size:18px;margin:0 0 6px}.m{color:#6b7670;font-size:13px;margin:0 0 18px;line-height:1.5}.a{font-size:30px;font-weight:800;color:#1a4d38;margin:0 0 18px}
+button{width:100%;padding:13px;border-radius:10px;border:none;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px;font-family:inherit}
+button:disabled{opacity:.6;cursor:wait}.p{background:#216a4c;color:#fff}.x{background:#fff;color:#c0492b;border:1.5px solid #e6c0b5}
+.t{display:inline-block;background:#fff4d6;color:#8a6410;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;margin-bottom:12px}.err{color:#c0492b}</style></head>
+<body><div class="c"><span class="t">ТЕСТ ГОРИМ — жинхэнэ мөнгө шилжихгүй</span>
+<h1>BusinessBI төлбөр</h1><p class="m" id="info">Уншиж байна…</p><div class="a" id="amt"></div>
+<div id="btns" style="display:none"><button class="p" id="pay">Төлөх (тест)</button><button class="x" id="cancel">Цуцлах</button></div>
+<p class="m" style="margin-top:16px">Жинхэнэ горимд энэ хуудсыг WIRE.mn-ийн checkout (pay.wire.mn — QR, банкны апп) орлоно.</p></div>
+<script>
+(function(){
+  const SB = "https://mpfjceziasadnswwnkpc.supabase.co/functions/v1/payments/mock";
+  const q = new URLSearchParams(location.search), pid = q.get("pid") || "", sig = q.get("sig") || "";
+  const $ = id => document.getElementById(id);
+  async function call(action){
+    const r = await fetch(SB, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ data:{ pid, sig, action } }) });
+    const j = await r.json().catch(()=>({}));
+    if (j.error) throw new Error(j.error.message || j.error.status);
+    return j.result;
+  }
+  async function load(){
+    try {
+      const r = await call("info"); const p = r.payment;
+      $("info").textContent = p.title + " · " + (p.email || "");
+      $("amt").textContent = Number(p.amount).toLocaleString("en-US") + " ₮";
+      if (p.status === "paid") { $("info").textContent += " — ✓ аль хэдийн төлөгдсөн"; return; }
+      if (p.status === "failed") { $("info").textContent += " — цуцлагдсан"; return; }
+      $("btns").style.display = "block";
+    } catch(e){ $("info").innerHTML = '<span class="err">' + (e.message || "Алдаа") + '</span>'; }
+  }
+  async function act(action){
+    $("pay").disabled = $("cancel").disabled = true;
+    try { const r = await call(action); location.href = r.redirect; }
+    catch(e){ $("info").innerHTML = '<span class="err">' + (e.message || "Алдаа") + '</span>'; $("pay").disabled = $("cancel").disabled = false; }
+  }
+  $("pay").onclick = () => act("pay"); $("cancel").onclick = () => act("cancel");
+  load();
+})();
+</script></body></html>

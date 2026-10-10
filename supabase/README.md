@@ -35,7 +35,7 @@
 | `payments` | `POST /functions/v1/payments/create` | хэрэглэгч | нэхэмжлэл + WIRE checkout URL (эсвэл mock хуудас) |
 | | `POST /functions/v1/payments/check` | хэрэглэгч | төлөв; pending бол WIRE-ээс лавлана; `consume:true` → татсан тоо +1 |
 | | `POST /functions/v1/payments/webhook` | WIRE гарын үсэг | `payment_intent.succeeded` → `payments.status='paid'`; `endpoint.verification` → 200 |
-| | `GET/POST /functions/v1/payments/mock` | линкийн sig | `wire_mode=mock` үеийн тест «банкны хуудас» |
+| | `POST /functions/v1/payments/mock` | линкийн sig | `wire_mode=mock` үеийн тест төлбөрийн JSON API; хуудас нь сайт дээр `mock_checkout.html` (edge gateway HTML-ийг text/plain + CSP sandbox болгодог тул функц HTML буцаахгүй) |
 | | `POST /functions/v1/payments/admin` | админ | горим солих, webhook бүртгэх, тохиргоо, сүүлийн төлбөрүүд |
 | `ebarimt-lookup` | `POST /functions/v1/ebarimt-lookup` | нийтийн | ebarimt.mn РД/ТТД → нэр, НӨАТ төлөгч эсэх; `ebarimt_cache` 30 хоног |
 | `receipt-extract` | `POST /functions/v1/receipt-extract` | хэрэглэгч + `receipt` төлбөр | баримтын зураг → Claude → `receipt_rules` схемээр баталгаажсан JSON |

@@ -2,7 +2,7 @@
    Нэвтэрсэн хэрэглэгчид нэхэмжлэл үүсгэж WIRE checkout URL (эсвэл mock хуудас) буцаана.
    8 минутын дотор үүссэн төлөгдөөгүй нэхэмжлэл байвал түүнийг дахин ашиглана. */
 import { admin, callable, getSetting, HttpsError } from "../_shared/http.ts";
-import { PRODUCTS, REUSE_PENDING_MS, publicView, mockSig, wireMode, useWire, functionsBase, type Payment } from "../_shared/payments.ts";
+import { PRODUCTS, REUSE_PENDING_MS, publicView, mockSig, wireMode, useWire, type Payment } from "../_shared/payments.ts";
 import { createIntent, WireError } from "../_shared/wire.ts";
 
 export const handler = callable(async (data, { user }) => {
@@ -53,7 +53,7 @@ export const handler = callable(async (data, { user }) => {
     }
   } else {
     row.provider_intent_id = "mock_" + id;
-    row.checkout_url = `${functionsBase()}/payments/mock?pid=${id}&sig=${await mockSig(id)}`;
+    row.checkout_url = `${site}/mock_checkout.html?pid=${id}&sig=${await mockSig(id)}`;
   }
   const { data: ins, error } = await db.from("payments").insert(row).select().single();
   if (error) { console.error(error); throw new HttpsError("internal", "Төлбөр бүртгэж чадсангүй"); }
