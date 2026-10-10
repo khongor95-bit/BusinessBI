@@ -500,6 +500,7 @@ tr.set-detail>td{background:var(--bg-row)!important;padding:8px 10px 12px 34px;}
 
     </div>
     <div id="impPreview" class="tbl-wrap" style="max-height:200px;overflow-y:auto;margin:10px 0;"></div>
+    <div id="impLayoutSt" class="note" style="display:none;"></div>
     <button class="btn primary" onclick="impToStage3()">Үргэлжлүүлэх →</button>
   </div>
   <div id="impStage3" class="card" style="display:none;">
@@ -988,7 +989,7 @@ const DEFAULT_SETTINGS = {
   accSummary:'920101', accTaxExp:'910101', accTaxPay:'311003',
   accProfit:'910201', accRetained:'440101', accVatIn:'121001', accVatOut:'311002',
   accPayable:'310101', accReceivable:'120100',
-  ndshEmpPct:BBITax.get('ndsh.employee.default',new Date()), ndshCoPct:BBITax.ndshEmployer(new Date(),1), hhoatCredit:BBITax.hhoatMonthlyCredit(0,new Date()), accDeprExp:'701014'
+  ndshEmpPct:BBITax.get('ndsh.employee.default',new Date()), ndshCoPct:BBITax.ndshEmployer(new Date(),1), hhoatCredit:BBITax.hhoatMonthlyCredit(0,new Date()), accDeprExp:'701014', accBankFee:'750101'
 };
 let DB = { settings:{...DEFAULT_SETTINGS}, accounts:[], partners:[], journal:[], rules:[], payroll:[], assets:[], seq:{doc:100000, batch:1}, events:[], locks:[] };
 
@@ -1019,6 +1020,7 @@ function load(){
         DB.seq      = Object.assign({doc:100000,batch:1}, d.seq||{});
         DB.events   = Array.isArray(d.events)? d.events : [];   // үйл явдлын бүртгэл (append-only)
         DB.locks    = Array.isArray(d.locks)?  d.locks  : [];   // үеийн түгжээ
+        DB.bankLayouts = (d.bankLayouts&&typeof d.bankLayouts==='object')? d.bankLayouts : {};  // банк тус бүрийн хуулгын загвар
       }
     }
   }catch(e){ console.error('load failed', e); toast('Хадгалсан өгөгдлийг уншихад алдаа гарлаа', true); }
@@ -1598,6 +1600,7 @@ function impRefreshSelectors(){
 }
 function impLoadFile(input){
   const file=input.files[0]; if(!file) return;
+  IMP.fileName=file.name;
   const reader=new FileReader();
   reader.onerror=()=>toast('Файл уншихад алдаа гарлаа', true);
   reader.onload=ev=>{
@@ -1864,6 +1867,7 @@ function impFillColumnSelects(){
     if(filled>=2 && hit/filled>=0.8){ iDir=i; break; }
   }
   G('cmDir').value=String(iDir);
+  if(IMP.type==='bank'){ impApplySavedLayout(); impBalanceProof(); }
   if(IMP.type!=='bank' && IMP.type!=='ndsh'){
     G('cmVat').value  = find(['нөат','нэмэгдсэн өртг','vat']);
     G('cmTotal').value= find(['нийт дүн','нийт үнэ','бүгд дүн','total']);
@@ -1873,7 +1877,60 @@ function impFillColumnSelects(){
                                               : find(['худалдан авагч','нэр','харилцагч','байгууллага']);
   }
   impRenderPreview();
-  ['cmDate','cmDesc','cmPartner','cmIn','cmOut','cmAmt','cmDir','cmVat','cmTotal','cmNet','cmTin'].forEach(id=>G(id).onchange=impRenderPreview);
+  ['cmDate','cmDesc','cmPartner','cmIn','cmOut','cmAmt','cmDir','cmVat','cmTotal','cmNet','cmTin'].forEach(id=>G(id).onchange=()=>{ impRenderPreview(); if(IMP.type==='bank') impBalanceProof(true); });
+}
+
+/* ═══ Хуулгын загвар (банк тус бүр) + үлдэгдлээр нотлох ═══ */
+const BANK_COLS=['cmDate','cmDesc','cmPartner','cmIn','cmOut','cmAmt','cmDir'];
+function impLayoutSig(){ return IMP.headers.map(h=>String(h).toLowerCase().replace(/\s+/g,' ').trim()).join('|'); }
+function impCurrentCols(){ const o={}; BANK_COLS.forEach(id=>o[id]=parseInt(document.getElementById(id).value)); return o; }
+function impApplySavedLayout(){
+  DB.bankLayouts=DB.bankLayouts||{};
+  const L=DB.bankLayouts[impLayoutSig()]; IMP.layoutHit=null;
+  if(!L) return;
+  BANK_COLS.forEach(id=>{ if(L.cols&&L.cols[id]!=null) document.getElementById(id).value=String(L.cols[id]); });
+  IMP.layoutHit=L;
+}
+function impSaveLayout(name){
+  DB.bankLayouts=DB.bankLayouts||{};
+  const sig=impLayoutSig(); const old=DB.bankLayouts[sig]||{};
+  DB.bankLayouts[sig]={name:name||old.name||'Банк', cols:IMP.ci?{cmDate:IMP.ci.date,cmDesc:IMP.ci.desc,cmPartner:IMP.ci.partner,cmIn:IMP.ci.inc,cmOut:IMP.ci.out,cmAmt:IMP.ci.amt,cmDir:IMP.ci.dir}:old.cols, verified:!!(IMP.balanceProof&&IMP.balanceProof.ok), at:new Date().toISOString(), uses:(old.uses||0)+1, headers:IMP.headers.slice(0,20)};
+}
+function impForgetLayout(){ DB.bankLayouts=DB.bankLayouts||{}; delete DB.bankLayouts[impLayoutSig()]; save(); IMP.layoutHit=null; impFillColumnSelects(); toast('Загвар устгагдлаа — багана дахин автоматаар танигдав'); }
+/* Үлдэгдлийн баганаар баганын сонголтыг нотлох: үлдэгдэл[i] = үлдэгдэл[i−1] + орлого − зарлага.
+   4 таамаглал (мөрийн дараалал дээрээс/доороос × орлого-зарлага солигдсон эсэх) — хамгийн олон мөрөнд таарсан нь зөв.
+   Солигдсон нь илт байвал (≥80%) орлого/зарлагын баганыг автоматаар сольж, тэмдэглэнэ. */
+function impBalanceProof(manual){
+  const G=id=>document.getElementById(id); const st=G('impLayoutSt'); if(!st) return;
+  const ci=impCurrentCols();
+  let ib=-1; for(let i=0;i<IMP.headers.length;i++){ if(/үлдэгдэл|balance|үлд\./i.test(String(IMP.headers[i]))){ ib=i; break; } }
+  const lay=IMP.layoutHit? `<b>Хадгалсан загвар:</b> ${esc(IMP.layoutHit.name)} (${IMP.layoutHit.uses||1} удаа${IMP.layoutHit.verified?', үлдэгдлээр нотлогдсон':''}) <span class="link" onclick="impForgetLayout()">мартах</span> · ` : '';
+  if(ib<0||(ci.cmIn<0&&ci.cmOut<0&&ci.cmAmt<0)){ IMP.balanceProof=null; st.style.display=''; st.innerHTML=lay+'Үлдэгдлийн багана олдсонгүй — баганын сонголтыг үлдэгдлээр нотлох боломжгүй; доорх жишээ мөрүүдээр нүдээр шалгана уу.'; return; }
+  const rows=IMP.rows.filter(r=>r&&r.some(c=>c!==''&&c!=null));
+  const mv=r=>{ if(ci.cmIn>=0||ci.cmOut>=0){ const i=ci.cmIn>=0?Math.abs(parseNum(r[ci.cmIn])):0, o=ci.cmOut>=0?Math.abs(parseNum(r[ci.cmOut])):0; return i-o; } const v=parseNum(r[ci.cmAmt]); return v; };
+  const bal=rows.map(r=>parseNum(r[ib]));
+  const hyp={fwd:0,fwdSwap:0,bwd:0,bwdSwap:0}; let n=0;
+  for(let i=1;i<rows.length;i++){
+    if(bal[i]===0&&bal[i-1]===0) continue; if(!isFinite(bal[i])||!isFinite(bal[i-1])) continue;
+    const m=mv(rows[i]); if(!m) continue; n++;
+    if(Math.abs(bal[i]-(bal[i-1]+m))<=1) hyp.fwd++;
+    if(Math.abs(bal[i]-(bal[i-1]-m))<=1) hyp.fwdSwap++;
+    const mp=mv(rows[i-1]);
+    if(Math.abs(bal[i-1]-(bal[i]+mp))<=1) hyp.bwd++;
+    if(Math.abs(bal[i-1]-(bal[i]-mp))<=1) hyp.bwdSwap++;
+  }
+  if(n<2){ IMP.balanceProof=null; st.style.display=''; st.innerHTML=lay+'Үлдэгдлээр нотлоход мөр хүрэлцэхгүй.'; return; }
+  const best=Object.entries(hyp).sort((a,b)=>b[1]-a[1])[0]; const pct=Math.round(best[1]/n*100); const swapped=/Swap/.test(best[0]);
+  if(swapped && pct>=80 && !manual){
+    if(ci.cmIn>=0||ci.cmOut>=0){ G('cmIn').value=String(ci.cmOut); G('cmOut').value=String(ci.cmIn); }
+    IMP.signFlip=ci.cmAmt>=0; impRenderPreview();
+    IMP.balanceProof={ok:true,pct,swapped:true,n,order:best[0].startsWith('bwd')?'bwd':'fwd'};
+    st.style.display=''; st.innerHTML=lay+`<b>Орлого/зарлагын багана солигдсон байсан — үлдэгдлээр нотлоод автоматаар солив</b> (${pct}% мөр таарав, ${n} мөр).`; return;
+  }
+  IMP.signFlip=false;
+  IMP.balanceProof={ok:pct>=80,pct,swapped:false,n,order:best[0].startsWith('bwd')?'bwd':'fwd'};
+  st.style.display='';
+  st.innerHTML=lay+(pct>=80? `<b>Багана үлдэгдлээр нотлогдлоо</b> — ${pct}% мөрөнд үлдэгдэл = өмнөх + орлого − зарлага (${n} мөр${best[0].startsWith('bwd')?', хуулга шинэ→хуучин дараалалтай':''}).` : `<b style="color:var(--red)">Анхаар:</b> үлдэгдлийн тэнцэтгэл зөвхөн ${pct}% мөрөнд таарч байна — орлого/зарлага/дүнгийн багана буруу байж магадгүй. Сонголтоо шалгана уу.`);
 }
 function impRenderPreview(){
   let html='<table class="tbl"><thead><tr>'+IMP.headers.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>';
@@ -1890,6 +1947,7 @@ function impToStage3(){
   const ci={date:gi('cmDate'),desc:gi('cmDesc'),partner:gi('cmPartner'),inc:gi('cmIn'),out:gi('cmOut'),amt:gi('cmAmt'),dir:gi('cmDir')};
   if(ci.date<0){ toast('Огнооны баганаа сонгоно уу', true); return; }
   if(ci.inc<0 && ci.out<0 && ci.amt<0){ toast('Дүнгийн багана сонгоно уу', true); return; }
+  IMP.ci=ci;
   const fmtHint=document.getElementById('impDateFmt').value;
   IMP.mapped=[];
   const skip={noDate:0, noAmt:0, blank:0, samples:[]};
@@ -1906,7 +1964,7 @@ function impToStage3(){
       if(ai>0.004 && ai>=ao){ amount=r2(ai); dir='in'; }
       else if(ao>0.004){ amount=r2(ao); dir='out'; }
     } else {
-      const v=parseNum(r[ci.amt]);
+      const v=parseNum(r[ci.amt])*(IMP.signFlip?-1:1);   // үлдэгдлээр нотлоход тэмдэг урвуу байсан бол эргүүлнэ
       if(Math.abs(v)>0.004){ amount=r2(Math.abs(v)); dir=v>=0?'in':'out'; }
     }
     // Чиглэлийн багана байвал давуу эрхтэй (жш. "Дүн" + "Гүйлгээний төрөл: Зарлага")
@@ -2302,6 +2360,36 @@ const ACC_KEYWORDS=[
   {acc:'130101', dir:'out', re:/бараа авав|түүхий эд|материал худалдан|бэлэн бүтээгдэхүүн/i},
   {acc:'510101', dir:'in',  re:/борлуулалт|худалдааны орлого|үйлчилгээний орлого/i},
 ];
+const BANK_FEE_RE=/шимтгэл|хураамж|комисс|commission|service charge|sms[- ]?мэдэгдэл|мэдэгдлийн төлбөр|картын хураамж|гүйлгээний хураамж|жилийн хураамж/i;
+/* Өөрийн дансууд хоорондын шилжүүлэг: журналд өөр мөнгөн данснаас аль хэдийн бичигдсэн эсрэг талын мөртэй
+   (дүн ±1₮, огноо ±1 хоног, утганд ≥8 оронтой ижил тооны бүлэг эсвэл «шилжүүлэг» түлхүүр үг) тулгана.
+   Эсрэг тал нь энэ дансыг аль хэдийн харьцуулсан бол давхардал гэж тэмдэглээд импортоос хасна. */
+function impPairTransfers(){
+  const mainAcc=(document.getElementById('impMainAcc')||{}).value||'';
+  const money=new Set(DB.accounts.filter(a=>a.cat==='10'||a.cat==='11').map(a=>a.code));
+  if(!money.size) return 0;
+  const digits=t=>(String(t||'').match(/\d{8,}/g)||[]);
+  const dayDiff=(a,b)=>Math.abs((new Date(a)-new Date(b))/86400000);
+  let n=0;
+  for(const row of IMP.mapped){
+    if(row.acc||row.transfer) continue;
+    const dg=digits(row.desc); const kw=/шилжүүл|transfer|өөрийн данс|дотоод|хоорондын/i.test(row.desc);
+    if(!dg.length && !kw) continue;
+    const cand=DB.journal.find(j=>{
+      if(Math.abs(j.amt-row.amount)>1 || dayDiff(j.date,row.date)>1) return false;
+      const other=row.dir==='out'? j.dt : j.kt;              // зарлага → нөгөө данс руу орсон (Дт нөгөө); орлого → нөгөө данснаас гарсан (Кт нөгөө)
+      if(!money.has(other) || other===mainAcc) return false;
+      const jd=digits(j.desc);
+      return (dg.length&&jd.some(x=>dg.includes(x))) || (kw && /шилжүүл|transfer|өөрийн данс|дотоод|хоорондын/i.test(j.desc));
+    });
+    if(!cand) continue;
+    const other=row.dir==='out'? cand.dt : cand.kt; const counter=row.dir==='out'? cand.kt : cand.dt;
+    if(counter===mainAcc){ row.transfer='dup'; row.include=false; row.acc=other; }   // нөгөө талд бүрэн бичигдсэн → давхардал
+    else { row.transfer='pair'; row.acc=other; row.transferDoc=cand.doc; }
+    row.vat='plain'; n++;
+  }
+  return n;
+}
 function suggestFromKeywords(text, dir){
   const t=String(text||'');
   if(t.trim().length<3) return null;
@@ -2420,6 +2508,13 @@ function impApplyRules(silent){
     });
     if(rule){ row.acc=rule.acc; if(IMP.type==='bank') row.vat=rule.vat||'plain'; hit++; }
   }
+  // ── Банкны шимтгэл: түлхүүр үгтэй зарлагын мөр → шимтгэлийн данс (дүрэм, санах ойноос өмнө) ──
+  let fees=0, xfers=0;
+  if(IMP.type==='bank'){
+    const feeAcc=DB.settings.accBankFee||'750101';
+    for(const row of IMP.mapped){ if(!row.acc && row.dir==='out' && BANK_FEE_RE.test(row.desc) && accByCode(feeAcc)){ row.acc=feeAcc; row.vat='plain'; row.fee=true; fees++; } }
+    xfers=impPairTransfers();
+  }
   // ── Санах ой: дүрэм, тулгалтад өртөөгүй мөрүүдэд ──
   let hist=0, pmem=0, kw=0;
   if(IMP.type==='bank'){
@@ -2461,6 +2556,8 @@ function impApplyRules(silent){
     if(pmem) parts.push(pmem+' харилцагчийн санах ой');
     if(hist) parts.push(hist+' түүх');
     if(kw) parts.push(kw+' түлхүүр үг');
+    if(fees) parts.push(fees+' шимтгэл');
+    if(xfers) parts.push(xfers+' дотоод шилжүүлэг');
     const left=IMP.mapped.filter(r=>r.include&&!r.acc).length;
     toast(parts.length
       ? ('Автоматаар бөглөв — '+parts.join(', ')+(left? ('. Үлдсэн '+left+' мөрийг гараар сонгоно уу') : '. Бүх мөр данстай ✓'))
@@ -2773,7 +2870,7 @@ function impRenderRows(){
     return `<tr class="${child!==null&&child!==undefined&&child!==''? 'grp-child grp-c'+child : ''}">
       <td><input type="checkbox" ${r.include?'checked':''} onchange="impSetRow(${i},'include',this.checked)"></td>
       <td class="mono">${esc(r.date)}</td>
-      <td style="max-width:240px;">${esc(r.desc)}${r.matched?' <span class="badge ok">тулгалт: '+esc(r.matched)+'</span>':''}${impSrcBadge(r)}${impLinkBadge(r,i)}</td>
+      <td style="max-width:240px;">${esc(r.desc)}${r.matched?' <span class="badge ok">тулгалт: '+esc(r.matched)+'</span>':''}${r.fee?' <span class="badge info" title="Банкны шимтгэлийн түлхүүр үг — шимтгэлийн данс автоматаар">шимтгэл</span>':''}${r.transfer==='pair'?' <span class="badge hist" title="Өөрийн дансууд хоорондын шилжүүлэг — журналын №'+esc(r.transferDoc||'')+' бичилттэй тулгав">дотоод шилжүүлэг</span>':''}${r.transfer==='dup'?' <span class="badge err" title="Энэ шилжүүлэг нөгөө дансны хуулгаас аль хэдийн бүрэн бичигдсэн — давхардахгүйн тулд хасав">аль хэдийн бичигдсэн</span>':''}${impSrcBadge(r)}${impLinkBadge(r,i)}</td>
       <td><input class="pill-input" style="min-width:110px;" list="partnerList" value="${esc(r.partner)}" onchange="impSetRow(${i},'partner',this.value)"></td>
       <td class="num mono">${fmtZ(r.amount)}</td>
       <td><select class="pill-input" style="min-width:92px;" onchange="impSetRow(${i},'dir',this.value)">
@@ -3011,6 +3108,7 @@ function impPost(){
         if(!DB.rules.some(x=>x.pattern===pat)){ DB.rules.push({pattern:pat, acc:r.acc, vat:r.vat, dir:r.dir}); newRules++; }
       }
     }
+    impSaveLayout(accLabel(mainAcc));
     logEvent('import_bank','',inc.length+' гүйлгээ, '+lines+' бичилт — '+(IMP.fileName||''));
     save();
     toast(inc.length+' гүйлгээ ('+lines+' бичилт) журналд бичигдлээ'+(newRules?', '+newRules+' дүрэм хадгалагдлаа':''));
@@ -5171,7 +5269,7 @@ const CLOUD={
   metaOf(db){
     return {settings:db.settings, accounts:db.accounts, partners:db.partners,
             rules:db.rules, payroll:db.payroll, assets:db.assets, seq:db.seq, employees:db.employees||{},
-            events:db.events||[], locks:db.locks||[]};
+            events:db.events||[], locks:db.locks||[], bankLayouts:db.bankLayouts||{}};
   },
   async push(){
     if(!this.user||!this.sb) return;
@@ -5244,7 +5342,7 @@ const CLOUD={
          accounts:meta.accounts||[], partners:meta.partners||[], journal,
          rules:meta.rules||[], payroll:meta.payroll||[], assets:meta.assets||[],
          seq:meta.seq||{doc:100000,batch:1}, employees:meta.employees||{},
-         events:Array.isArray(meta.events)?meta.events:[], locks:Array.isArray(meta.locks)?meta.locks:[] };
+         events:Array.isArray(meta.events)?meta.events:[], locks:Array.isArray(meta.locks)?meta.locks:[], bankLayouts:meta.bankLayouts||{} };
     try{ localStorage.setItem(LS_KEY, JSON.stringify(DB)); }catch(e){}
     this.cloudJournalCount=journal.length;
     renderAll(); refreshDots();
