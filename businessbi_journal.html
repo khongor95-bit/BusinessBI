@@ -375,6 +375,7 @@ tr.set-detail>td{background:var(--bg-row)!important;padding:8px 10px 12px 34px;}
         <div class="field"><label>Захирал</label><input id="stDirector"></div>
         <div class="field"><label>Нягтлан бодогч</label><input id="stAccountant"></div>
       </div>
+      <label style="display:flex;gap:8px;align-items:flex-start;font-size:12px;margin-top:8px;cursor:pointer;"><input type="checkbox" id="stStrict" style="margin-top:2px;"><span><b>Хатуу горим</b> (Сангийн яамны зөвшөөрөгдсөн програмын шаардлага): гар бичилт ноорогоор үүсч «батлах»-аар баталгаажна; батлагдсан бичилтийг засах, устгахгүй — зөвхөн шалтгаантай сторно; анхан шатны баримтын дугаар заавал (13.7). Унтраавал хуучин шиг чөлөөтэй засна, гэхдээ үйл явдлын бүртгэл хэвээр хөтлөгдөнө.</span></label>
     </div>
     <div class="card"><h3>Татварын хувь</h3>
       <div class="grid2">
@@ -534,6 +535,7 @@ tr.set-detail>td{background:var(--bg-row)!important;padding:8px 10px 12px 34px;}
     </select>
     <input class="pill-input" style="width:200px;" id="jFltSearch" placeholder="Хайх — утга, данс, харилцагч" oninput="renderJournal()">
     <div class="spacer"></div>
+    <button class="btn sm primary" id="jBulkPost" disabled onclick="bulkPostDocs()">Сонгосныг батлах</button>
     <button class="btn sm" id="jBulkStorno" disabled onclick="bulkStornoDocs()">Сонгосныг сторно</button>
     <button class="btn sm danger" id="jBulkDel" disabled onclick="bulkDeleteDocs()">Сонгосныг устгах</button>
   </div>
@@ -686,6 +688,21 @@ tr.set-detail>td{background:var(--bg-row)!important;padding:8px 10px 12px 34px;}
     </div>
     <div class="note">Хаалтын бичилтүүд журналд <b>Хаалт</b> эх сурвалжтайгаар бичигдэнэ. Буцаах товчоор бүгдийг нэг дор устгаж болно — үүний дараа гүйлгээ нэмээд дахин хааж болно.</div>
   </div>
+  <div class="grid2" style="margin-top:14px;">
+    <div class="card"><h3>Үеийн түгжээ (сарын хаалт)</h3>
+      <div class="note">Түгжсэн огноо хүртэлх бүх бичилт өөрчлөгдөхгүй: шинэ бичилт, сторно, устгах, импорт тэр үед орохгүй. Залруулга дараагийн нээлттэй сард сторно + шинэ бичилтээр хийгдэнэ. Тайлах бол шалтгаан бүртгэгдэнэ.</div>
+      <div id="lockBox"></div>
+      <div class="grid2" style="margin-top:8px;align-items:end;">
+        <div class="field"><label>Хүртэл түгжих (сар)</label><input type="month" id="lockMonth"></div>
+        <div class="field"><label>Тайлбар</label><input id="lockReason" placeholder="ж: 3-р сарын тайлан илгээсэн"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px;"><button class="btn primary" onclick="uiLock()">Түгжих</button><button class="btn danger" id="unlockBtn" onclick="uiUnlock()">Сүүлийн түгжээг тайлах</button></div>
+    </div>
+    <div class="card"><h3>Үйл явдлын бүртгэл <span style="font-weight:400;font-size:11px;color:var(--muted);">хэн · хэзээ · юу (устгагдахгүй)</span></h3>
+      <div class="tbl-wrap" style="max-height:320px;overflow-y:auto;"><table class="tbl" id="evTable"></table></div>
+      <div style="display:flex;gap:8px;margin-top:8px;"><button class="btn" onclick="exportEvents()">Бүртгэл — Excel</button><label style="font-size:12px;display:flex;align-items:center;gap:6px;"><input type="checkbox" id="stStrictQuick" onchange="DB.settings.strict=this.checked;logEvent('settings','','хатуу горим '+(this.checked?'асаав':'унтраав'));save();renderClosing();renderJournal();"> Хатуу горим (МЯ-ны шаардлага)</label></div>
+    </div>
+  </div>
 </section>
 
 <!-- ═══════════ НӨӨЦЛӨЛТ ═══════════ -->
@@ -735,6 +752,10 @@ tr.set-detail>td{background:var(--bg-row)!important;padding:8px 10px 12px 34px;}
     <div class="field"><label>Огноо</label><input type="date" id="jeDate"></div>
     <div class="field"><label>Гүйлгээний утга</label><input id="jeDesc" placeholder="Тайлбар"></div>
     <div class="field"><label>Харилцагч</label><input id="jePartner" list="partnerList" placeholder="Нэр"></div>
+  </div>
+  <div class="grid2">
+    <div class="field"><label>Анхан шатны баримтын төрөл (НББ-ийн хууль 13.7)</label><select id="jeDocType"><option value="">— сонгох —</option><option value="ebarimt">И-баримт / НӨАТ падаан</option><option value="invoice">Нэхэмжлэх</option><option value="bank">Банкны хуулга</option><option value="cash">Кассын ордер</option><option value="contract">Гэрээ, акт</option><option value="payroll">Цалингийн хүснэгт</option><option value="calc">Тооцооллын баримт</option><option value="other">Бусад баримт</option><option value="none">Баримтгүй (шалтгаантай)</option></select></div>
+    <div class="field"><label>Баримтын дугаар / шалтгаан</label><input id="jeDocNo" placeholder="ж: ДДТД, падаан №, хуулгын мөр"></div>
   </div>
   <div style="font-size:11.5px;font-weight:700;color:var(--sub);margin:8px 0 4px;" class="jline"><span>Дебит данс</span><span>Кредит данс</span><span>Дебит дүн</span><span>Кредит дүн</span><span></span></div>
   <div id="jeLines"></div>
@@ -962,7 +983,7 @@ const DEFAULT_SETTINGS = {
   accPayable:'310101', accReceivable:'120100',
   ndshEmpPct:BBITax.get('ndsh.employee.default',new Date()), ndshCoPct:BBITax.ndshEmployer(new Date(),1), hhoatCredit:BBITax.hhoatMonthlyCredit(0,new Date()), accDeprExp:'701014'
 };
-let DB = { settings:{...DEFAULT_SETTINGS}, accounts:[], partners:[], journal:[], rules:[], payroll:[], assets:[], seq:{doc:100000, batch:1} };
+let DB = { settings:{...DEFAULT_SETTINGS}, accounts:[], partners:[], journal:[], rules:[], payroll:[], assets:[], seq:{doc:100000, batch:1}, events:[], locks:[] };
 
 function save(){
   try{ localStorage.setItem(LS_KEY, JSON.stringify(DB)); }
@@ -973,7 +994,7 @@ function save(){
 function load(){
   // Шинэ түлхүүрт шилжихэд өмнөх компанийн санах ойн дата үлдэхээс сэргийлж
   // ҮРГЭЛЖ цэвэр төлвөөс эхэлнэ
-  DB={settings:{...DEFAULT_SETTINGS}, accounts:[], partners:[], journal:[], rules:[], payroll:[], assets:[], seq:{doc:100000,batch:1}, employees:{}};
+  DB={settings:{...DEFAULT_SETTINGS}, accounts:[], partners:[], journal:[], rules:[], payroll:[], assets:[], seq:{doc:100000,batch:1}, employees:{}, events:[], locks:[]};
   try{
     const raw = localStorage.getItem(LS_KEY);
     if(raw){
@@ -989,6 +1010,8 @@ function load(){
         DB.assets   = Array.isArray(d.assets)?   d.assets   : [];
         DB.employees= (d.employees && typeof d.employees==='object')? d.employees : {};  // ТТД толь алдагдахгүй
         DB.seq      = Object.assign({doc:100000,batch:1}, d.seq||{});
+        DB.events   = Array.isArray(d.events)? d.events : [];   // үйл явдлын бүртгэл (append-only)
+        DB.locks    = Array.isArray(d.locks)?  d.locks  : [];   // үеийн түгжээ
       }
     }
   }catch(e){ console.error('load failed', e); toast('Хадгалсан өгөгдлийг уншихад алдаа гарлаа', true); }
@@ -1105,6 +1128,7 @@ function renderSettings(){
     stVat:'vatPct',stCitMode:'citMode',stAccSummary:'accSummary',stAccTaxExp:'accTaxExp',stAccTaxPay:'accTaxPay',
     stAccProfit:'accProfit',stAccRetained:'accRetained',stAccVatIn:'accVatIn',stAccVatOut:'accVatOut',stAccPayable:'accPayable',stAccReceivable:'accReceivable',stNdshEmp:'ndshEmpPct',stNdshCo:'ndshCoPct',stHhoatCredit:'hhoatCredit'};
   for(const [id,key] of Object.entries(M)) document.getElementById(id).value=s[key];
+  document.getElementById('stStrict').checked=strictMode();
 }
 /* Тайлант үед хүчинтэй татварын параметрууд — tax.js-ээс, эх сурвалж, ишлэлтэй */
 function renderTaxParams(){
@@ -1136,6 +1160,8 @@ function saveSettings(){
   s.accProfit=g('stAccProfit'); s.accRetained=g('stAccRetained'); s.accVatIn=g('stAccVatIn'); s.accVatOut=g('stAccVatOut');
   s.accPayable=g('stAccPayable'); s.accReceivable=g('stAccReceivable');
   s.ndshEmpPct=parseFloat(g('stNdshEmp'))||0; s.ndshCoPct=parseFloat(g('stNdshCo'))||0; s.hhoatCredit=parseFloat(g('stHhoatCredit'))||0;
+  const newStrict=document.getElementById('stStrict').checked; if(newStrict!==strictMode()) logEvent('settings','','хатуу горим '+(newStrict?'асаав':'унтраав')); s.strict=newStrict;
+  logEvent('settings','','тохиргоо хадгалав');
   for(const code of [s.accSummary,s.accTaxExp,s.accTaxPay,s.accProfit,s.accRetained,s.accVatIn,s.accVatOut]){
     if(code && DB.accounts.length && !accByCode(code)) toast('Анхаар: '+code+' данс төлөвлөгөөнд алга', true);
   }
@@ -1983,7 +2009,7 @@ function postPayrollJournal(p){
   p.rows.forEach(e=>{ const c=calcEmp(e); tG=r2(tG+e.gross); tN=r2(tN+e.ndshE); tH=r2(tH+c.hhoat); co=r2(co+coOf(e,p.coPct)); });
   const date=monthEnd(p.month);
   const doc='ЦАЛИН-'+p.month;
-  const base={doc, date, partner:'Ажилчид', source:'salary', batch:p.batch};
+  const base={doc, date, partner:'Ажилчид', source:'salary', batch:p.batch, posted:true, by:who(), at:new Date().toISOString(), docRef:{type:'payroll', no:'НДШ тайлан '+p.month}};
   DB.journal.push({...base, desc:p.month+' сарын бодогдсон цалин', dt:'700101', kt:'313001', amt:tG});
   if(co>0.004)  DB.journal.push({...base, desc:p.month+' — ажил олгогчийн НДШ', dt:'700103', kt:'311001', amt:co});
   if(tN>0.004)  DB.journal.push({...base, desc:p.month+' — ажилтны НДШ суутгал', dt:'313001', kt:'311001', amt:tN});
@@ -1994,8 +2020,10 @@ function impPostNdsh(){
   const inc=IMP.mapped.filter(e=>e.include);
   const month=document.getElementById('nMonth').value;
   const s=DB.settings;
+  if(!assertDateOpen(monthEnd(month),'цалингийн бичилт')) return;
   try{
     const old=DB.payroll.find(p=>p.month===month);
+    logEvent('payroll_post','ЦАЛИН-'+month,inc.length+' ажилтан'+(old?' (дахин)':''));
     if(old){ DB.journal=DB.journal.filter(j=>j.batch!==old.batch); DB.payroll=DB.payroll.filter(p=>p.month!==month); }
     const p={month, coPct:s.ndshCoPct, batch:nextBatch(),
       rows:inc.map(e=>({name:e.name, lastName:e.lastName||'', firstName:e.firstName||'', reg:e.reg, type:e.type||'',
@@ -2873,11 +2901,13 @@ function impPost(){
   const vr=s.vatPct/100;
   const batch=nextBatch();
   let lines=0, newRules=0;
+  { const bad=inc.find(r=>dateLocked(r.date)); if(bad){ toast(bad.date+' — түгжигдсэн үеийн гүйлгээ байна ('+lockedThrough()+' хүртэл). Тухайн мөрүүдийг хасна уу эсвэл түгжээг тайлна уу.', true); return; } }
+  const postedAt=new Date().toISOString();
   try{
     for(const r of inc){
       const doc=nextDocNo();
       ensurePartner(r.partner);
-      const base={doc, date:r.date, desc:r.desc, partner:r.partner, source:'import', batch};
+      const base={doc, date:r.date, desc:r.desc, partner:r.partner, source:'import', batch, posted:true, by:who(), at:postedAt, docRef:{type:'bank', no:(IMP.fileName||'хуулга')+' · '+r.date}};
       if(r.vat==='payable'||r.vat==='receivable'){
         const pay=r.vat==='payable';
         const lbl=pay?'өглөгийн төлөлт':'авлагын орлого';
@@ -2913,6 +2943,7 @@ function impPost(){
         if(!DB.rules.some(x=>x.pattern===pat)){ DB.rules.push({pattern:pat, acc:r.acc, vat:r.vat, dir:r.dir}); newRules++; }
       }
     }
+    logEvent('import_bank','',inc.length+' гүйлгээ, '+lines+' бичилт — '+(IMP.fileName||''));
     save();
     toast(inc.length+' гүйлгээ ('+lines+' бичилт) журналд бичигдлээ'+(newRules?', '+newRules+' дүрэм хадгалагдлаа':''));
     const keepType=IMP.type||'bank';
@@ -2930,11 +2961,13 @@ function impPostVat(){
   const batch=nextBatch();
   const src=isBuy?'vatbuy':'vatsale';
   let lines=0, newRules=0;
+  { const bad=inc.find(r=>dateLocked(r.date)); if(bad){ toast(bad.date+' — түгжигдсэн үеийн падаан байна ('+lockedThrough()+' хүртэл)', true); return; } }
+  const postedAt=new Date().toISOString();
   try{
     for(const r of inc){
       const doc=nextDocNo();
       ensurePartner(r.partner, r.tin);
-      const base={doc, date:r.date, partner:r.partner, source:src, batch};
+      const base={doc, date:r.date, partner:r.partner, source:src, batch, posted:true, by:who(), at:postedAt, docRef:{type:'ebarimt', no:(r.tin?r.tin+' · ':'')+r.date}};
       if(isBuy){
         DB.journal.push({...base, desc:r.desc, dt:r.acc, kt:s.accPayable, amt:r.net});
         if(r.vat>0.004) DB.journal.push({...base, desc:r.desc+' — НӨАТ', dt:s.accVatIn, kt:s.accPayable, amt:r.vat});
@@ -2948,6 +2981,7 @@ function impPostVat(){
         if(!DB.rules.some(x=>x.pattern===pat)){ DB.rules.push({pattern:pat, acc:r.acc, vat:src, dir:null}); newRules++; }
       }
     }
+    logEvent(isBuy?'import_vatbuy':'import_vatsale','',inc.length+' падаан, '+lines+' бичилт');
     save();
     toast(inc.length+' падаан ('+lines+' бичилт) '+(isBuy?'өглөгөөр':'авлагаар')+' журналд бичигдлээ'+(newRules?', '+newRules+' дүрэм хадгалагдлаа':''));
     impReset();
@@ -2969,7 +3003,8 @@ function jBulkRefresh(visibleDocs){
   // сонголтыг зөвхөн харагдаж буй баримтуудаар цэвэрлэнэ
   if(visibleDocs) for(const d of [...JSEL]) if(!visibleDocs.has(d)) JSEL.delete(d);
   const n=JSEL.size;
-  const st=document.getElementById('jBulkStorno'), del=document.getElementById('jBulkDel');
+  const st=document.getElementById('jBulkStorno'), del=document.getElementById('jBulkDel'), ps=document.getElementById('jBulkPost');
+  if(ps){ const nd=[...JSEL].filter(d=>docEntries(d).some(e=>!isPosted(e))).length; ps.disabled=!nd; ps.textContent=nd?`Сонгосныг батлах (${nd})`:'Сонгосныг батлах'; }
   if(st){ st.disabled=!n; st.textContent=n?`Сонгосныг сторно (${n})`:'Сонгосныг сторно'; }
   if(del){ del.disabled=!n; del.textContent=n?`Сонгосныг устгах (${n})`:'Сонгосныг устгах'; }
 }
@@ -3000,8 +3035,8 @@ function renderJournal(){
       <td class="mono" title="${esc(accLabel(j.dt))}">${esc(j.dt)}</td>
       <td class="mono" title="${esc(accLabel(j.kt))}">${esc(j.kt)}</td>
       <td class="num mono">${fmtZ(j.amt)}</td>
-      <td><span class="badge info">${SOURCE_LABEL[j.source]||esc(j.source)}</span>${j.edited?' <span class="badge warn" title="Анхны бичилтээс өөрчлөгдсөн">зассан</span>':''}</td>
-      <td style="white-space:nowrap;">${newDoc?`<span class="link" onclick="editDoc('${esc(j.doc)}')">засах</span> · <span class="link" onclick="stornoDoc('${esc(j.doc)}')" title="Урвуу бичилтээр цуцлах">сторно</span> · <span class="link" style="color:var(--red);" onclick="deleteDoc('${esc(j.doc)}')">устгах</span>`:''}</td>
+      <td style="white-space:nowrap;"><span class="badge info">${SOURCE_LABEL[j.source]||esc(j.source)}</span> <span class="badge" style="background:#F1F5F9;color:#475569;cursor:help;" title="${esc(citeOf(j))}">§</span>${j.edited?' <span class="badge warn" title="Анхны бичилтээс өөрчлөгдсөн">зассан</span>':''}${!isPosted(j)?' <span class="badge warn" title="Батлагдаагүй — засаж, устгаж болно">ноорог</span>':''}${j.reverses?` <span class="badge hist" title="${esc('Сторно: '+(j.reason||'')+' · '+(j.by||''))}">сторно №${esc(j.reverses)}</span>`:''}${j.reversedBy?` <span class="badge err" title="Сторно №${esc(j.reversedBy)}-оор буцаагдсан">буцаагдсан</span>`:''}${newDoc&&docRefText(j)?`<div style="font-size:10px;color:var(--muted);margin-top:2px;">${esc(docRefText(j))}</div>`:''}</td>
+      <td style="white-space:nowrap;">${newDoc?(isPosted(j)?`${(strictMode()&&!SOURCE_HOME[j.source])?'':`<span class="link" onclick="editDoc('${esc(j.doc)}')">засах</span> · `}<span class="link" onclick="stornoDoc('${esc(j.doc)}')" title="Урвуу бичилтээр цуцлах (шалтгаантай)">сторно</span>${(strictMode()&&!SOURCE_HOME[j.source])?'':` · <span class="link" style="color:var(--red);" onclick="deleteDoc('${esc(j.doc)}')">устгах</span>`}`:`<span class="link" style="color:var(--green);font-weight:700;" onclick="postDoc('${esc(j.doc)}')">батлах</span> · <span class="link" onclick="editDoc('${esc(j.doc)}')">засах</span> · <span class="link" style="color:var(--red);" onclick="deleteDoc('${esc(j.doc)}')">устгах</span>`):''}</td>
     </tr>`;
   }
   html+='</tbody>';
@@ -3033,17 +3068,20 @@ function bulkMutableDocs(){
   for(const doc of JSEL){
     const es=docEntries(doc);
     if(!es.length) continue;
-    if(SOURCE_HOME[es[0].source]) skipped.push(doc); else ok.push(doc);
+    if(SOURCE_HOME[es[0].source] || dateLocked(es[0].date)) skipped.push(doc); else ok.push(doc);
   }
   return {ok, skipped};
 }
 function bulkDeleteDocs(){
   const r=bulkMutableDocs(); if(!r) return;
-  const {ok, skipped}=r;
+  let {ok, skipped}=r;
+  if(strictMode()){ const posted=ok.filter(d=>docEntries(d).every(isPosted)); if(posted.length){ skipped=skipped.concat(posted); ok=ok.filter(d=>!posted.includes(d)); } }
+  if(!ok.length&&skipped.length){ toast('Сонгосон баримтууд батлагдсан эсвэл хамгаалагдсан — хатуу горимд устгахгүй, сторно хийнэ', true); return; }
   if(!ok.length){ toast('Сонгосон баримтууд бүгд хамгаалагдсан эх сурвалжтай (цалин/элэгдэл/хаалт) — тухайн хуудаснаас нь засна', true); return; }
   const lines=ok.reduce((x,d)=>x+docEntries(d).length,0);
   if(!confirm(ok.length+' баримтын '+lines+' бичилтийг устгах уу?'+(skipped.length?'\n('+skipped.length+' хамгаалагдсан баримт алгасагдана)':''))) return;
   const okSet=new Set(ok);
+  logEvent('delete','',ok.join(', ')+' — '+lines+' бичилт');
   DB.journal=DB.journal.filter(j=>!okSet.has(j.doc));
   JSEL.clear();
   save(); renderJournal();
@@ -3051,22 +3089,75 @@ function bulkDeleteDocs(){
 }
 function bulkStornoDocs(){
   const r=bulkMutableDocs(); if(!r) return;
-  const {ok, skipped}=r;
+  let {ok, skipped}=r;
+  { const drafts=ok.filter(d=>docEntries(d).some(e=>!isPosted(e))); if(drafts.length){ skipped=skipped.concat(drafts); ok=ok.filter(d=>!drafts.includes(d)); } }
   if(!ok.length){ toast('Сонгосон баримтууд бүгд хамгаалагдсан эх сурвалжтай (цалин/элэгдэл/хаалт) — тухайн хуудаснаас нь засна', true); return; }
   if(!confirm(ok.length+' баримтыг сторно (урвуу бичилтээр цуцлах) хийх үү? Анхны бичилтүүд хэвээр үлдэж, урвуу баримтууд шинээр үүснэ.'+(skipped.length?'\n('+skipped.length+' хамгаалагдсан баримт алгасагдана)':''))) return;
   const sdate=stornoDate(docEntries(ok[0])[0].date); if(!sdate) return;
+  if(!assertDateOpen(sdate,'сторно')) return;
+  const meta=stornoMeta(); if(!meta) return;
   const batch=nextBatch();
   for(const doc of ok){
     const newDoc=nextDocNo();
     for(const e of docEntries(doc)){
       DB.journal.push({doc:newDoc, date:sdate, desc:'СТОРНО №'+doc+' — '+(e.desc||''), partner:e.partner||'',
-        dt:e.kt, kt:e.dt, amt:e.amt, source:'manual', batch});
+        dt:e.kt, kt:e.dt, amt:e.amt, source:'manual', batch, reverses:doc, reason:meta.reason, by:meta.by, at:meta.at, docRef:{type:'calc', no:'СТОРНО '+doc}});
+      e.reversedBy=newDoc;
     }
+    logEvent('storno',doc,'→ №'+newDoc+' — '+meta.reason);
   }
   JSEL.clear();
   save(); renderJournal();
   toast(ok.length+' баримт сторно хийгдлээ'+(skipped.length?' — '+skipped.length+' хамгаалагдсан баримт алгасав':''));
 }
+/* ═══ COMPLIANCE — хатуу горим, үеийн түгжээ, үйл явдлын бүртгэл, баримтын лавлагаа, хуулийн ишлэл
+   (НББ-ийн тухай хууль 13.7 — анхан шатны баримтгүй бичилт хориглоно; 15.1 — залруулга буцаалтаар;
+    11.1 — 10 жил хадгална. Сангийн яамны зөвшөөрөгдсөн програмын шалгуур 17.1.11) ═══ */
+function who(){ return (typeof CLOUD!=='undefined'&&CLOUD.user&&CLOUD.user.email)||DB.settings.accountant||'локал'; }
+function strictMode(){ return DB.settings.strict!==false; }   // анхдагч: АСААЛТТАЙ
+function isPosted(e){ return e.posted!==false; }               // хуучин мөр (талбаргүй) = батлагдсан
+function logEvent(action, doc, detail){
+  DB.events=DB.events||[];
+  DB.events.push({t:new Date().toISOString(), by:who(), action, doc:doc||'', detail:detail||''});
+  if(DB.events.length>10000) DB.events=DB.events.slice(-10000);
+}
+function lockedThrough(){ return (DB.locks||[]).reduce((m,l)=>l.through>m?l.through:m,''); }
+function dateLocked(d){ const lt=lockedThrough(); return !!lt && String(d)<=lt; }
+function assertDateOpen(date, what){
+  if(!assertOpen(what)) return false;
+  if(dateLocked(date)){ toast((date||'')+' — энэ огноо түгжигдсэн үед ('+lockedThrough()+' хүртэл) багтаж байна; '+(what||'бичилт')+' хийх боломжгүй. «3. Хаалт → Үеийн түгжээ»-ээс шалтгаантайгаар тайлна уу.', true); return false; }
+  return true;
+}
+function lockPeriod(through, reason){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(through||'')){ toast('Огноо буруу', true); return false; }
+  const drafts=DB.journal.filter(j=>!isPosted(j)&&j.date<=through);
+  if(drafts.length){ toast(drafts.length+' ноорог бичилт '+through+' хүртэлх үед батлагдаагүй байна — эхлээд батална эсвэл устгана уу', true); return false; }
+  const b=computeBalance(); if(!b.balanced){ toast('Гүйлгээ баланс тэнцэхгүй байна — түгжихийн өмнө засна уу', true); return false; }
+  DB.locks=DB.locks||[]; DB.locks.push({through, at:new Date().toISOString(), by:who(), reason:reason||''});
+  logEvent('lock','',through+' хүртэл түгжив'+(reason?' — '+reason:''));
+  save(); return true;
+}
+function unlockPeriod(reason){
+  const lt=lockedThrough(); if(!lt) return false;
+  DB.locks=(DB.locks||[]).filter(l=>l.through!==lt);
+  logEvent('unlock','',lt+' хүртэлх түгжээг тайлав — '+reason);
+  save(); return true;
+}
+/* Хуулийн ишлэл — бичилтийн эх сурвалж/төрлөөр (автомат бичилтэд «яагаад ингэж бичсэн»-ийг харуулна) */
+const CITE={
+  salary:'ХХОАТ-ын тухай хууль 24.1 — цалингаас суутган тооцох; НДЕХ 15 — шимтгэл; Заавар 116: 70 (зардал), 313 (цалингийн өглөг), 31 (НДШ, ХХОАТ-ын өглөг)',
+  vatbuy:'НӨАТ-ын тухай хууль 14.1 — худалдан авалтын НӨАТ-ыг хасах; НББ-ийн хууль 13.7 — анхан шатны баримт (падаан); Заавар 116: 12 (НӨАТ-ын авлага), 31 (өглөг)',
+  vatsale:'НӨАТ-ын тухай хууль 7, 12 — борлуулалтад ногдуулах; Заавар 116: 12 (авлага), 51 (орлого), 31 (НӨАТ-ын өглөг)',
+  depr:'ААНОАТ-ын тухай хууль 13 — элэгдлийн зардал; Заавар 116: 20 (хуримтлагдсан элэгдэл), 70 (зардал)',
+  closing:'НББ-ийн хууль 10 — тайлант үеийн хаалт; ААНОАТ-ын хууль 20.1 / 20.2.7; Заавар 116: 92 (нэгдсэн данс), 91 (татварын зардал), 44 (хуримтлагдсан ашиг)',
+  storno:'НББ-ийн хууль 15.1 — залруулгыг буцаалтын (сторно) бичилтээр; анхны бичилт өөрчлөгдөхгүй',
+  import:'НББ-ийн хууль 13.7 — анхан шатны баримт: банкны хуулга; Заавар 116: 11 (банк)',
+  settle:'Заавар 116: 12 (авлага) / 31 (өглөг) — тооцоо хаалт; баримт: төлбөрийн баримт, падаан',
+  manual:'НББ-ийн хууль 13.7 — анхан шатны баримтын үндсэн дээр гар бичилт'
+};
+function citeOf(j){ if(j.reverses) return CITE.storno; if(j.kind==='settle') return CITE.settle; return CITE[j.source]||CITE.manual; }
+const DOC_TYPES={ebarimt:'И-баримт / НӨАТ падаан', invoice:'Нэхэмжлэх', bank:'Банкны хуулга', cash:'Кассын ордер', contract:'Гэрээ, акт', payroll:'Цалингийн хүснэгт', calc:'Тооцооллын баримт', other:'Бусад баримт', none:'Баримтгүй (шалтгаантай)'};
+function docRefText(j){ const r=j.docRef; if(!r) return ''; return (DOC_TYPES[r.type]||r.type||'')+(r.no?' №'+r.no:''); }
 function periodClosed(){ return DB.journal.some(j=>j.source==='closing'); }
 // Хаалт хийгдсэн тайлант үед шинэ бичилт оруулахыг хориглоно (Excel-ийн «хуудас хамгаалах» шиг)
 function assertOpen(what){ if(periodClosed()){ toast('Тайлант үе хаагдсан — '+(what||'бичилт')+' хийх боломжгүй. Эхлээд «3. Хаалт → Хаалт буцаах».', true); return false; } return true; }
@@ -3082,11 +3173,14 @@ function guardMutable(doc){
   const src=es[0].source;
   if(SOURCE_HOME[src]){ toast(SOURCE_HOME[src].msg, true); nav(SOURCE_HOME[src].page); return null; }
   if(periodClosed()){ toast('Тайлант үе хаагдсан тул бичилт өөрчлөх боломжгүй — эхлээд Хаалт хуудаснаас хаалтыг буцаана уу', true); return null; }
+  if(dateLocked(es[0].date)){ toast('Баримт №'+doc+' түгжигдсэн үед ('+lockedThrough()+' хүртэл) багтаж байна — засах/устгах боломжгүй, зөвхөн сторно', true); return null; }
+  if(strictMode() && es.every(isPosted)){ toast('Баримт №'+doc+' батлагдсан — хатуу горимд засах/устгах боломжгүй (НББ-ийн хууль 15.1). Залруулгыг «сторно»-оор хийнэ.', true); return null; }
   return es;
 }
 function deleteDoc(doc){
   const es=guardMutable(doc); if(!es) return;
   if(!confirm(doc+' дугаартай баримтын '+es.length+' бичилтийг устгах уу?')) return;
+  logEvent('delete',doc,es.length+' бичилт — '+(es[0].desc||''));
   DB.journal=DB.journal.filter(j=>j.doc!==doc);
   save(); renderJournal(); toast('Баримт устгагдлаа');
 }
@@ -3098,6 +3192,8 @@ function editDoc(doc){
   document.getElementById('jeDate').value=es[0].date;
   document.getElementById('jeDesc').value=es[0].desc||'';
   document.getElementById('jePartner').value=es[0].partner||'';
+  document.getElementById('jeDocType').value=(es[0].docRef&&es[0].docRef.type)||'';
+  document.getElementById('jeDocNo').value=(es[0].docRef&&es[0].docRef.no)||'';
   const wrap=document.getElementById('jeLines');
   wrap.innerHTML='';
   for(const e of es){
@@ -3121,16 +3217,57 @@ function stornoDate(orig){
   if(!inPeriod(d) && !confirm('Огноо тайлант үеэс ('+DB.settings.from+' — '+DB.settings.to+') гадуур байна. Үргэлжлүүлэх үү?')) return null;
   return d;
 }
+// Сторно хийж болох эсэх: батлагдсан баримтад ч болно (яг тэдэнд зориулагдсан); хамгаалагдсан эх сурвалж, хаагдсан үе, давхар сторно — болохгүй
+function guardStornable(doc){
+  const es=docEntries(doc);
+  if(!es.length) return null;
+  const src=es[0].source;
+  if(SOURCE_HOME[src]){ toast(SOURCE_HOME[src].msg, true); nav(SOURCE_HOME[src].page); return null; }
+  if(periodClosed()){ toast('Тайлант үе хаагдсан тул сторно хийх боломжгүй — эхлээд Хаалт хуудаснаас хаалтыг буцаана уу', true); return null; }
+  if(es.some(e=>e.reversedBy) && !confirm('Баримт №'+doc+' аль хэдийн сторно №'+es[0].reversedBy+'-оор буцаагдсан. Дахин сторно хийх үү?')) return null;
+  if(es.some(e=>!isPosted(e))){ toast('Ноорог баримтыг сторно хийхгүй — засах эсвэл устгана уу', true); return null; }
+  return es;
+}
 function stornoDoc(doc){
-  const es=guardMutable(doc); if(!es) return;
+  const es=guardStornable(doc); if(!es) return;
   if(!confirm(doc+' баримтыг сторно (урвуу бичилтээр цуцлах) хийх үү? Анхны бичилт хэвээр үлдэж, урвуу баримт шинээр үүснэ.')) return;
   const sdate=stornoDate(es[0].date); if(!sdate) return;
+  if(!assertDateOpen(sdate,'сторно')) return;
+  const meta=stornoMeta(); if(!meta) return;
   const newDoc=nextDocNo(); const batch=nextBatch();
   for(const e of es){
     DB.journal.push({doc:newDoc, date:sdate, desc:'СТОРНО №'+doc+' — '+(e.desc||''), partner:e.partner||'',
-      dt:e.kt, kt:e.dt, amt:e.amt, source:'manual', batch});
+      dt:e.kt, kt:e.dt, amt:e.amt, source:'manual', batch, reverses:doc, reason:meta.reason, by:meta.by, at:meta.at, docRef:{type:'calc', no:'СТОРНО '+doc}});
+    e.reversedBy=newDoc;
   }
+  logEvent('storno',doc,'→ №'+newDoc+' — '+meta.reason);
   save(); renderJournal(); toast('Сторно бичигдлээ — баримт №'+newDoc);
+}
+// Сторнын шалтгаан + баталсан хүн (хатуу горимд заавал; НББ-ийн хууль 15.1)
+function stornoMeta(){
+  const reason=prompt('Залруулгын шалтгаан (заавал):','');
+  if(reason===null) return null;
+  if(!String(reason).trim()){ if(strictMode()){ toast('Шалтгаангүй сторно хийхгүй (хатуу горим)', true); return null; } }
+  const by=prompt('Баталсан хүн:', who()); if(by===null) return null;
+  return {reason:String(reason).trim(), by:String(by).trim()||who(), at:new Date().toISOString()};
+}
+// Ноорог баримтыг батлах — батлагдсаны дараа засах/устгахгүй, зөвхөн сторно
+function postDoc(doc){
+  const es=docEntries(doc); if(!es.length) return;
+  if(es.every(isPosted)){ toast('Аль хэдийн батлагдсан', true); return; }
+  if(!assertDateOpen(es[0].date,'батлах')) return;
+  if(strictMode() && !(es[0].docRef&&(es[0].docRef.no||es[0].docRef.type==='none'))){ toast('Анхан шатны баримтын төрөл, дугаар шаардлагатай (13.7) — «засах» дарж бөглөнө үү', true); return; }
+  const at=new Date().toISOString(), by=who();
+  es.forEach(e=>{ e.posted=true; e.by=by; e.at=at; });
+  logEvent('post',doc,es.length+' бичилт — '+(es[0].desc||''));
+  save(); renderJournal(); toast('Баримт №'+doc+' батлагдлаа');
+}
+function bulkPostDocs(){
+  const docs=[...JSEL].filter(d=>docEntries(d).some(e=>!isPosted(e)));
+  if(!docs.length){ toast('Сонгосонд ноорог алга', true); return; }
+  let n=0; const at=new Date().toISOString(), by=who();
+  for(const d of docs){ const es=docEntries(d); if(dateLocked(es[0].date)) continue; if(strictMode() && !(es[0].docRef&&(es[0].docRef.no||es[0].docRef.type==='none'))) continue; es.forEach(e=>{ e.posted=true; e.by=by; e.at=at; }); logEvent('post',d,es.length+' бичилт'); n++; }
+  JSEL.clear(); save(); renderJournal(); toast(n+' баримт батлагдлаа'+(n<docs.length?' — '+(docs.length-n)+' баримт түгжигдсэн эсвэл баримтын дугааргүй':''));
 }
 /* Manual entry *//* Manual entry */
 function openJEntry(){
@@ -3142,6 +3279,7 @@ function openJEntry(){
   document.getElementById('jeDate').value=todayISO();
   document.getElementById('jeDesc').value='';
   document.getElementById('jePartner').value='';
+  document.getElementById('jeDocType').value=''; document.getElementById('jeDocNo').value='';
   document.getElementById('jeLines').innerHTML='';
   addJeLine(); addJeLine();
   jeBalanceCheck();
@@ -3192,6 +3330,11 @@ function postJEntry(){
   if(!date){ toast('Огноо сонгоно уу', true); return; }
   if(!desc){ toast('Гүйлгээний утга бичнэ үү', true); return; }
   if(!lines.length){ toast('Дор хаяж нэг мөр бөглөнө үү', true); return; }
+  if(!assertDateOpen(date,'гар бичилт')) return;
+  const docType=document.getElementById('jeDocType').value, docNo=document.getElementById('jeDocNo').value.trim();
+  if(strictMode() && !docNo && docType!=='none'){ toast('Анхан шатны баримтын дугаар бичнэ үү (НББ-ийн хууль 13.7); баримтгүй бол төрлөөс «Баримтгүй» сонгоод шалтгаанаа дугаарын талбарт бичнэ', true); return; }
+  if(docType==='none' && !docNo){ toast('Баримтгүй бичилтийн шалтгаанаа дугаарын талбарт бичнэ үү', true); return; }
+  const docRef=(docType||docNo)?{type:docType||'other', no:docNo}:null;
   const tDt=r2(lines.reduce((s,l)=>s+l.dta,0)), tKt=r2(lines.reduce((s,l)=>s+l.kta,0));
   if(Math.abs(tDt-tKt)>=0.01){ toast('Дебит, кредит тэнцэхгүй байна', true); return; }
   for(const l of lines){
@@ -3207,22 +3350,26 @@ function postJEntry(){
   const credits=lines.filter(l=>l.kta>0).map(l=>({acc:l.kt, amt:l.kta}));
   // Засварын горим: хуучин баримтын дугаар, эх сурвалж, batch-ийг хадгална
   const editDocNo=document.getElementById('jeEditDoc').value;
-  let outDoc=doc, outSource='manual', outBatch=batch, edited=false;
+  let outDoc=doc, outSource='manual', outBatch=batch, edited=false, wasPosted=false;
   if(editDocNo){
     const old=DB.journal.filter(j=>j.doc===editDocNo);
-    if(old.length){ outDoc=editDocNo; outSource=old[0].source; outBatch=old[0].batch; edited=true; }
+    if(old.length){ outDoc=editDocNo; outSource=old[0].source; outBatch=old[0].batch; edited=true; wasPosted=old.every(isPosted); }
     DB.journal=DB.journal.filter(j=>j.doc!==editDocNo);
   }
+  // Хатуу горимд шинэ гар бичилт НООРОГ (posted:false) — «батлах» дарсны дараа л өөрчлөгдөхгүй болно
+  const draft=strictMode() && !(edited&&wasPosted);
+  const stamp={posted:!draft, by:who(), at:new Date().toISOString(), ...(docRef?{docRef}:{})};
   // Greedy pairing to double-entry rows
   let di=0, ki=0, dRem=debits.length?debits[0].amt:0, kRem=credits.length?credits[0].amt:0;
   while(di<debits.length&&ki<credits.length){
     const amt=r2(Math.min(dRem,kRem));
-    if(amt>0) DB.journal.push({doc:outDoc, date, desc, partner, dt:debits[di].acc, kt:credits[ki].acc, amt, source:outSource, batch:outBatch, ...(edited?{edited:true}:{})});
+    if(amt>0) DB.journal.push({doc:outDoc, date, desc, partner, dt:debits[di].acc, kt:credits[ki].acc, amt, source:outSource, batch:outBatch, ...(edited?{edited:true}:{}), ...stamp});
     dRem=r2(dRem-amt); kRem=r2(kRem-amt);
     if(dRem<=0.004){ di++; dRem=di<debits.length?debits[di].amt:0; }
     if(kRem<=0.004){ ki++; kRem=ki<credits.length?credits[ki].amt:0; }
   }
-  save(); closeModal('jeModal'); renderJournal(); toast(edited?('Баримт №'+outDoc+' шинэчлэгдлээ'):('Бичилт хадгалагдлаа — баримт №'+outDoc));
+  logEvent(edited?'edit':'create',outDoc,desc+(draft?' (ноорог)':''));
+  save(); closeModal('jeModal'); renderJournal(); toast(edited?('Баримт №'+outDoc+' шинэчлэгдлээ'):(draft?('Ноорог хадгалагдлаа — баримт №'+outDoc+' · журналаас «батлах»'):('Бичилт хадгалагдлаа — баримт №'+outDoc)));
 }
 
 /* Salary template */
@@ -3249,12 +3396,14 @@ function postSalary(){
   if(!date||gross<=0){ toast('Огноо болон нийт цалингаа оруулна уу', true); return; }
   const need=['700101','313001','700103','311001','311004'];
   for(const c of need) if(!accByCode(c)){ toast('Данс алга: '+c+' — стандарт төлөвлөгөө ачаална уу', true); return; }
+  if(!assertDateOpen(date,'цалингийн бичилт')) return;
   const doc=nextDocNo(); const batch=nextBatch();
-  const base={doc, date, partner:'Ажилчид', source:'salary', batch};
+  const base={doc, date, partner:'Ажилчид', source:'salary', batch, posted:true, by:who(), at:new Date().toISOString(), docRef:{type:'payroll', no:note}};
   DB.journal.push({...base, desc:note+' — бодогдсон цалин', dt:'700101', kt:'313001', amt:gross});
   if(ndshO>0) DB.journal.push({...base, desc:note+' — ажил олгогчийн НДШ', dt:'700103', kt:'311001', amt:ndshO});
   if(ndshE>0) DB.journal.push({...base, desc:note+' — ажилтны НДШ суутгал', dt:'313001', kt:'311001', amt:ndshE});
   if(hhoat>0) DB.journal.push({...base, desc:note+' — ХХОАТ суутгал', dt:'313001', kt:'311004', amt:hhoat});
+  logEvent('salary_tpl',doc,note);
   save(); closeModal('salModal'); renderJournal(); toast('Цалингийн бичилт журналд орлоо — баримт №'+doc);
 }
 
@@ -3385,6 +3534,8 @@ function delSalRow(i){
 function repostSalaryMonth(){
   if(!assertOpen('цалингийн бичилт')) return;
   const p=salCurrent(); if(!p){ toast('Хүснэгт алга', true); return; }
+  if(!assertDateOpen(monthEnd(p.month),'цалингийн бичилт')) return;
+  logEvent('payroll_repost','ЦАЛИН-'+p.month,'');
   DB.journal=DB.journal.filter(j=>j.batch!==p.batch);
   p.batch=nextBatch();
   postPayrollJournal(p);
@@ -3395,6 +3546,8 @@ function deleteSalaryMonth(){
   if(!assertOpen('цалингийн сар устгах')) return;
   const p=salCurrent(); if(!p) return;
   if(!confirm(p.month+' сарын цалингийн хүснэгт болон журналын бичилтийг устгах уу?')) return;
+  if(!assertDateOpen(monthEnd(p.month),'цалингийн сар устгах')) return;
+  logEvent('payroll_delete','ЦАЛИН-'+p.month,'');
   DB.journal=DB.journal.filter(j=>j.batch!==p.batch);
   DB.payroll=DB.payroll.filter(x=>x.month!==p.month);
   save(); renderSalary(); toast(p.month+' сар устгагдлаа');
@@ -3515,9 +3668,12 @@ function runDepr(){
   const total=r2(plan.reduce((x,p)=>x+p.amt,0));
   if(!confirm(month+' сарын элэгдэл: '+plan.length+' хөрөнгө, нийт '+fmtZ(total)+'. Журналд бичих үү?')) return;
   const date=monthEnd(month);
+  if(!assertDateOpen(date,'элэгдэл')) return;
+  const at=new Date().toISOString();
   for(const {a,amt} of plan){
-    DB.journal.push({doc:'ЭЛЭГДЭЛ-'+month, date, desc:'Сарын элэгдэл — '+a.name, partner:'', dt:s.accDeprExp, kt:a.deprAcc, amt, source:'depr', batch, ref:a.id});
+    DB.journal.push({doc:'ЭЛЭГДЭЛ-'+month, date, desc:'Сарын элэгдэл — '+a.name, partner:'', dt:s.accDeprExp, kt:a.deprAcc, amt, source:'depr', batch, ref:a.id, posted:true, by:who(), at, docRef:{type:'calc', no:'Элэгдлийн тооцоо '+month}});
   }
+  logEvent('depr_post','ЭЛЭГДЭЛ-'+month,plan.length+' хөрөнгө, '+fmtZ(total));
   save(); renderAssets(); toast(month+' сарын элэгдэл бичигдлээ — '+fmtZ(total));
 }
 function undoDepr(){
@@ -3527,6 +3683,8 @@ function undoDepr(){
   const cnt=DB.journal.filter(j=>j.batch===batch).length;
   if(!cnt){ toast(month+' сард бичигдсэн элэгдэл алга', true); return; }
   if(!confirm(month+' сарын '+cnt+' элэгдлийн бичилтийг буцаах уу?')) return;
+  if(!assertDateOpen(monthEnd(month),'элэгдэл буцаах')) return;
+  logEvent('depr_undo','ЭЛЭГДЭЛ-'+month,cnt+' бичилт');
   DB.journal=DB.journal.filter(j=>j.batch!==batch);
   save(); renderAssets(); toast(month+' сарын элэгдэл буцаагдлаа');
 }
@@ -3709,13 +3867,15 @@ function postSettle(){
   if(!date||amt<=0){ toast('Огноо болон дүнгээ шалгана уу', true); return; }
   if(!accByCode(acc)){ toast('Харьцсан данс сонгоно уу', true); return; }
   const ref=document.getElementById('smRef').value||'';
-  const doc=nextDocNo(); const batch=nextBatch();
+  if(!assertDateOpen(date,'тооцоо')) return;
+  const doc=nextDocNo(); const batch=nextBatch(); const stamp={kind:'settle', posted:true, by:who(), at:new Date().toISOString(), docRef:{type:ref?'invoice':'bank', no:ref||date}};
   const via=accByCode(acc).cat==='11'?(acc==='100101'?'кассаар':'мөнгөн дансаар'):'эзний тооцоогоор';
   const refTxt=ref?' (падаан №'+ref+')':'';
   if(kind==='payable')
-    DB.journal.push({doc, date, desc:'Өглөг хаалт — '+via+refTxt, partner, dt:s.accPayable, kt:acc, amt, source:'manual', batch, ...(ref?{ref}:{})});
+    DB.journal.push({doc, date, desc:'Өглөг хаалт — '+via+refTxt, partner, dt:s.accPayable, kt:acc, amt, source:'manual', batch, ...(ref?{ref}:{}), ...stamp});
   else
-    DB.journal.push({doc, date, desc:'Авлага хаалт — '+via+refTxt, partner, dt:acc, kt:s.accReceivable, amt, source:'manual', batch, ...(ref?{ref}:{})});
+    DB.journal.push({doc, date, desc:'Авлага хаалт — '+via+refTxt, partner, dt:acc, kt:s.accReceivable, amt, source:'manual', batch, ...(ref?{ref}:{}), ...stamp});
+  logEvent('settle',doc,kind+' '+partner+' '+fmtZ(amt));
   save(); closeModal('settleModal'); renderSettle(); toast('Тооцоо хаагдлаа — баримт №'+doc);
 }
 /* ── Бөөнөөр хаах ── */
@@ -3754,17 +3914,19 @@ function postBulkSettle(){
   const ui=SETTLE_UI[kind];
   const rows=ui.rows.filter(r=>ui.sel.has(r.p) && r.bal>0.004);
   if(!rows.length){ closeModal('bulkSettleModal'); return; }
-  const batch=nextBatch();
+  if(!assertDateOpen(date,'тооцоо')) return;
+  const batch=nextBatch(); const stamp={kind:'settle', posted:true, by:who(), at:new Date().toISOString(), docRef:{type:'bank', no:date}};
   const via=accByCode(acc).cat==='11'?(acc==='100101'?'кассаар':'мөнгөн дансаар'):'эзний тооцоогоор';
   let total=0;
   for(const r of rows){
     const doc=nextDocNo();
     if(kind==='payable')
-      DB.journal.push({doc, date, desc:'Өглөг хаалт — '+via, partner:r.p, dt:s.accPayable, kt:acc, amt:r.bal, source:'manual', batch});
+      DB.journal.push({doc, date, desc:'Өглөг хаалт — '+via, partner:r.p, dt:s.accPayable, kt:acc, amt:r.bal, source:'manual', batch, ...stamp});
     else
-      DB.journal.push({doc, date, desc:'Авлага хаалт — '+via, partner:r.p, dt:acc, kt:s.accReceivable, amt:r.bal, source:'manual', batch});
+      DB.journal.push({doc, date, desc:'Авлага хаалт — '+via, partner:r.p, dt:acc, kt:s.accReceivable, amt:r.bal, source:'manual', batch, ...stamp});
     total=r2(total+r.bal);
   }
+  logEvent('settle_bulk','',rows.length+' харилцагч, '+fmtZ(total));
   ui.sel.clear();
   save(); closeModal('bulkSettleModal'); renderSettle();
   toast(rows.length+' харилцагчийн тооцоо хаагдлаа — нийт '+fmtZ(total));
@@ -4598,7 +4760,41 @@ function closingPlan(){
   }
   return {plan, profit, tax, net};
 }
+function renderLocks(){
+  const box=document.getElementById('lockBox'); if(!box) return;
+  const locks=(DB.locks||[]).slice().sort((a,b)=>a.through.localeCompare(b.through));
+  box.innerHTML=locks.length? `<div style="font-size:12px;margin:6px 0;">Түгжигдсэн: <b>${esc(lockedThrough())}</b> хүртэл</div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Хүртэл</th><th>Хэн</th><th>Хэзээ</th><th>Тайлбар</th></tr></thead><tbody>${locks.map(l=>`<tr><td class="mono">${esc(l.through)}</td><td>${esc(l.by)}</td><td class="mono">${esc((l.at||'').slice(0,16).replace('T',' '))}</td><td>${esc(l.reason||'')}</td></tr>`).join('')}</tbody></table></div>` : '<div style="font-size:12px;color:var(--muted);margin:6px 0;">Түгжээ алга — бүх үе нээлттэй.</div>';
+  const ub=document.getElementById('unlockBtn'); if(ub) ub.style.display=locks.length?'':'none';
+  const q=document.getElementById('stStrictQuick'); if(q) q.checked=strictMode();
+}
+function uiLock(){
+  const m=document.getElementById('lockMonth').value; if(!m){ toast('Сараа сонгоно уу', true); return; }
+  const through=monthEnd(m);
+  if(lockedThrough() && through<=lockedThrough()){ toast('Аль хэдийн '+lockedThrough()+' хүртэл түгжигдсэн', true); return; }
+  if(!confirm(through+' хүртэлх бүх бичилтийг түгжих үү? Энэ үеийн бичилт дахин өөрчлөгдөхгүй.')) return;
+  if(lockPeriod(through, document.getElementById('lockReason').value.trim())){ toast(through+' хүртэл түгжигдлээ'); renderClosing(); }
+}
+function uiUnlock(){
+  const lt=lockedThrough(); if(!lt) return;
+  const reason=prompt(lt+' хүртэлх түгжээг тайлах шалтгаан (заавал, бүртгэгдэнэ):',''); if(reason===null) return;
+  if(!reason.trim()){ toast('Шалтгаангүй тайлахгүй', true); return; }
+  unlockPeriod(reason.trim()); toast('Түгжээ тайлагдлаа'); renderClosing();
+}
+const EVENT_LABEL={create:'Бичилт үүсгэв',post:'Батлав',edit:'Засав',delete:'Устгав',storno:'Сторно',import_bank:'Хуулга импорт',import_vatbuy:'НӨАТ ХА импорт',import_vatsale:'НӨАТ Борл импорт',payroll_post:'Цалин бичив',payroll_repost:'Цалин дахин бичив',payroll_delete:'Цалин устгав',salary_tpl:'Цалингийн загвар',depr_post:'Элэгдэл бичив',depr_undo:'Элэгдэл буцаав',settle:'Тооцоо хаав',settle_bulk:'Тооцоо бөөнөөр',closing:'Хаалт',closing_undo:'Хаалт буцаав',lock:'Түгжив',unlock:'Түгжээ тайлав',settings:'Тохиргоо',restore:'Нөөцөөс сэргээв',wipe_journal:'Журнал цэвэрлэв',wipe_all:'Бүгдийг устгав',receipt:'Баримтын зураг'};
+function renderEvents(){
+  const t=document.getElementById('evTable'); if(!t) return;
+  const ev=(DB.events||[]).slice(-300).reverse();
+  if(!ev.length){ t.innerHTML='<tbody><tr><td><div class="empty"><b>Бүртгэл хоосон</b>Бичилт үүсгэх, батлах, сторно, түгжих бүр энд бүртгэгдэнэ</div></td></tr></tbody>'; return; }
+  t.innerHTML='<thead><tr><th>Хэзээ</th><th>Хэн</th><th>Үйлдэл</th><th>Баримт</th><th>Тайлбар</th></tr></thead><tbody>'+ev.map(e=>`<tr><td class="mono">${esc((e.t||'').slice(0,16).replace('T',' '))}</td><td>${esc(e.by)}</td><td>${esc(EVENT_LABEL[e.action]||e.action)}</td><td class="mono">${esc(e.doc)}</td><td style="max-width:320px;">${esc(e.detail)}</td></tr>`).join('')+'</tbody>';
+}
+function exportEvents(){
+  const aoa=[['Хэзээ','Хэн','Үйлдэл','Баримт','Тайлбар']];
+  (DB.events||[]).forEach(e=>aoa.push([e.t,e.by,EVENT_LABEL[e.action]||e.action,e.doc,e.detail]));
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), 'Үйл явдал');
+  XLSX.writeFile(wb, 'Үйл_явдлын_бүртгэл_'+(DB.settings.company||'компани')+'.xlsx');
+}
 function renderClosing(){
+  renderLocks(); renderEvents();
   const closed=DB.journal.filter(j=>j.source==='closing');
   document.getElementById('clUndoBtn').style.display=closed.length?'':'none';
   document.getElementById('clRunBtn').style.display=closed.length?'none':'';
@@ -4625,15 +4821,19 @@ function runClosing(){
   const {plan}=closingPlan();
   if(!plan.length){ toast('Хаах зүйл алга', true); return; }
   if(!confirm(plan.length+' хаалтын бичилт үүсгэх үү? Дараа нь «Буцаах» товчоор устгаж болно.')) return;
-  const doc='99999-ХААЛТ'; const batch=nextBatch(); const date=DB.settings.to;
+  { const drafts=DB.journal.filter(j=>!isPosted(j)); if(drafts.length){ toast(drafts.length+' ноорог бичилт батлагдаагүй байна — хаалтын өмнө журналаас батална эсвэл устгана уу', true); return; } }
+  const doc='99999-ХААЛТ'; const batch=nextBatch(); const date=DB.settings.to; const at=new Date().toISOString();
   for(const p of plan){
-    DB.journal.push({doc, date, desc:p.why, partner:'', dt:p.dt, kt:p.kt, amt:p.amt, source:'closing', batch});
+    DB.journal.push({doc, date, desc:p.why, partner:'', dt:p.dt, kt:p.kt, amt:p.amt, source:'closing', batch, posted:true, by:who(), at, docRef:{type:'calc', no:'Хаалтын тооцоо '+date}});
   }
+  logEvent('closing',doc,plan.length+' мөр');
   save(); renderClosing(); toast('Хаалтын бичилт хийгдлээ — '+plan.length+' мөр');
 }
 function undoClosing(){
   const cnt=DB.journal.filter(j=>j.source==='closing').length;
   if(!confirm(cnt+' хаалтын бичилтийг устгах уу?')) return;
+  let reason=''; if(strictMode()){ reason=prompt('Хаалт буцаах шалтгаан (заавал):',''); if(reason===null) return; if(!reason.trim()){ toast('Шалтгаангүй буцаахгүй (хатуу горим)', true); return; } }
+  logEvent('closing_undo','99999-ХААЛТ',cnt+' бичилт — '+reason);
   DB.journal=DB.journal.filter(j=>j.source!=='closing');
   save(); renderClosing(); toast('Хаалт буцаагдлаа');
 }
@@ -4647,6 +4847,8 @@ function runChecks(){
   try{ const lb=localStorage.getItem('bbi_lastBackup'); const days=lb? Math.round((new Date(todayISO())-new Date(lb))/86400000) : null;
     if(DB.journal.length && (days===null||days>7) && !(CLOUD.user&&CLOUD.status==='ok')) checks.push({state:'warn', text:(days===null?'Нөөц файл хэзээ ч татаагүй':'Сүүлийн нөөц '+days+' хоногийн өмнө')+' — «Нөөц татах» (Ctrl+S) дарж хадгална уу'});
   }catch(e){}
+  { const nd=new Set(DB.journal.filter(j=>!isPosted(j)).map(j=>j.doc)).size; if(nd) checks.push({state:'warn', text:nd+' ноорог баримт батлагдаагүй — журналаас «батлах» (хаалт, түгжээний өмнө заавал)'}); }
+  if(lockedThrough()) checks.push({state:'ok', text:'Үе түгжигдсэн: '+lockedThrough()+' хүртэл'});
   if(!DB.accounts.length){ checks.push({state:'err', text:'Дансны төлөвлөгөө хоосон — стандарт төлөвлөгөө ачаална уу'}); return checks; }
   const obDt=DB.accounts.reduce((x,a)=>x+(a.obDt||0),0), obKt=DB.accounts.reduce((x,a)=>x+(a.obKt||0),0);
   if(Math.abs(r2(obDt-obKt))>=0.01) checks.push({state:'err', text:'Эхний үлдэгдлийн ДТ/КТ тэнцэхгүй: зөрүү '+fmtZ(r2(obDt-obKt))});
@@ -4791,6 +4993,8 @@ function restoreBackup(input){
       DB.accounts=d.accounts; DB.partners=d.partners||[]; DB.journal=d.journal;
       DB.rules=d.rules||[]; DB.seq=Object.assign({doc:100000,batch:1}, d.seq||{});
       DB.payroll=Array.isArray(d.payroll)?d.payroll:[]; DB.assets=Array.isArray(d.assets)?d.assets:[]; DB.employees=(d.employees&&typeof d.employees==='object')?d.employees:{};
+      const prevEvents=DB.events||[]; DB.events=Array.isArray(d.events)?d.events:prevEvents; DB.locks=Array.isArray(d.locks)?d.locks:[];
+      logEvent('restore','',file.name+' — '+d.journal.length+' бичилт');
       save(); nav('home'); toast('Өгөгдөл сэргээгдлээ');
     }catch(e){ toast('Сэргээхэд алдаа: '+e.message, true); }
     input.value='';
@@ -4800,13 +5004,15 @@ function restoreBackup(input){
 function wipeJournal(){
   if(!confirm('Журналын БҮХ бичилтийг устгах уу? Данс, харилцагч, тохиргоо хэвээр үлдэнэ.')) return;
   if(!confirm('Итгэлтэй байна уу? Энэ үйлдлийг буцаах боломжгүй — нөөц файл татсан эсэхээ шалгана уу.')) return;
-  DB.journal=[]; DB.seq.doc=100000;
+  logEvent('wipe_journal','',DB.journal.length+' бичилт устгав');
+  DB.journal=[]; DB.seq.doc=100000; DB.locks=[];
   save(); nav('home'); toast('Журнал цэвэрлэгдлээ');
 }
 function wipeAll(){
   if(!confirm('БҮХ өгөгдлийг устгах уу — данс, харилцагч, журнал, тохиргоо?')) return;
   if(!confirm('Итгэлтэй байна уу? Энэ үйлдлийг буцаах боломжгүй.')) return;
-  DB={settings:{...DEFAULT_SETTINGS}, accounts:[], partners:[], journal:[], rules:[], payroll:[], assets:[], seq:{doc:100000,batch:1}, employees:{}};
+  const ev=DB.events||[]; DB={settings:{...DEFAULT_SETTINGS}, accounts:[], partners:[], journal:[], rules:[], payroll:[], assets:[], seq:{doc:100000,batch:1}, employees:{}, events:ev, locks:[]};
+  logEvent('wipe_all','','бүх өгөгдөл устгав');
   save(); nav('home'); toast('Бүх өгөгдөл устгагдлаа');
 }
 
@@ -4896,7 +5102,8 @@ const CLOUD={
   },
   metaOf(db){
     return {settings:db.settings, accounts:db.accounts, partners:db.partners,
-            rules:db.rules, payroll:db.payroll, assets:db.assets, seq:db.seq, employees:db.employees||{}};
+            rules:db.rules, payroll:db.payroll, assets:db.assets, seq:db.seq, employees:db.employees||{},
+            events:db.events||[], locks:db.locks||[]};
   },
   async push(){
     if(!this.user||!this.sb) return;
@@ -4968,7 +5175,8 @@ const CLOUD={
     DB={ settings:Object.assign({...DEFAULT_SETTINGS}, meta.settings||{}),
          accounts:meta.accounts||[], partners:meta.partners||[], journal,
          rules:meta.rules||[], payroll:meta.payroll||[], assets:meta.assets||[],
-         seq:meta.seq||{doc:100000,batch:1}, employees:meta.employees||{} };
+         seq:meta.seq||{doc:100000,batch:1}, employees:meta.employees||{},
+         events:Array.isArray(meta.events)?meta.events:[], locks:Array.isArray(meta.locks)?meta.locks:[] };
     try{ localStorage.setItem(LS_KEY, JSON.stringify(DB)); }catch(e){}
     this.cloudJournalCount=journal.length;
     renderAll(); refreshDots();
