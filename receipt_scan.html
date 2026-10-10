@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<script src="gate.js"></script>
+<script src="pay.js"></script>
+<script src="tax.js"></script>
+<script src="ebarimt.js"></script>
+<script src="receipt.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Баримтын зураг → журналын бичилт — BusinessBI.mn</title>
+<meta name="description" content="И-баримт, падааны зургийг уншуулж, НӨАТ-ын дүрмээр журналын бичилтийн санал авна. Нягтлан батлахаас өмнө юу ч бичигдэхгүй. 24 цагийн эрх 5,000₮.">
+<link rel="canonical" href="https://businessbi.mn/receipt_scan.html">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="site.css">
+<script src="site.js" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--acc:#217346;--acc-d:#1A5C38;--acc-soft:#E6F2EB;--ink:#1F2937;--sub:#4B5563;--muted:#6B7280;--line:#E5E7EB;--bg:#F8FAFC;--warn:#B45309;--warn-soft:#FFFBEB;--bad:#DC2626;--bad-soft:#FEF2F2;--ok:#1b9e5a;--ok-soft:#ECFDF5;--r:8px}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Inter',-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:22px 20px 70px}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.head h1{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0}.head p{margin:4px 0 0;color:var(--muted);font-size:13px;max-width:78ch;line-height:1.55}
+.layout{display:grid;grid-template-columns:400px 1fr;gap:16px;align-items:start}
+.panel{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+.panel h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);margin:0 0 10px;font-weight:700}
+.step{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc);font-weight:700;margin-bottom:4px}
+.drop{border:2px dashed #cfe3d7;border-radius:var(--r);padding:22px 14px;text-align:center;color:var(--muted);font-size:13px;cursor:pointer;background:#fafdfb;transition:.12s}
+.drop:hover,.drop.over{border-color:var(--acc);background:var(--acc-soft);color:var(--acc-d)}
+.drop b{display:block;color:var(--ink);font-size:14px;margin-bottom:4px}
+.prev{margin-top:10px;display:none}.prev img{max-width:100%;max-height:360px;border-radius:6px;border:1px solid var(--line);display:block;margin:0 auto}
+.f{display:flex;flex-direction:column;gap:4px;margin-top:10px}.f label{font-size:11.5px;font-weight:600;color:var(--sub)}
+.f input,.f select,.f textarea{padding:8px 10px;border:1px solid var(--line);border-radius:6px;font:inherit;font-size:13.5px;background:#fff}
+.f input:focus,.f select:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-soft)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:6px;border:1px solid var(--line);background:#fff;font:inherit;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink)}
+.btn:hover{border-color:var(--acc);color:var(--acc-d);background:var(--acc-soft)}.btn.p{background:var(--acc);border-color:var(--acc);color:#fff}.btn.p:hover{background:var(--acc-d);color:#fff}
+.btn:disabled{opacity:.5;cursor:not-allowed}.btn.sm{padding:5px 10px;font-size:12px}
+.toggle{display:flex;align-items:center;gap:8px;font-size:12.5px;margin-top:10px;cursor:pointer}
+.note{font-size:12.5px;color:var(--sub);background:var(--acc-soft);border:1px solid #cfe3d7;border-left:3px solid var(--acc);border-radius:6px;padding:9px 12px;line-height:1.55;margin-top:10px}
+.warn{font-size:12.5px;background:var(--warn-soft);border:1px solid #f1dca0;border-left:3px solid #f2a900;border-radius:6px;padding:9px 12px;line-height:1.55;margin-top:10px;color:#5c4400}
+.err{font-size:12.5px;background:var(--bad-soft);border:1px solid #f5c2c0;border-left:3px solid var(--bad);border-radius:6px;padding:9px 12px;line-height:1.55;margin-top:10px;color:#7a1d18}
+.badge{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:50px;background:#F1F5F9;color:#475569;vertical-align:middle}
+.badge.ok{background:var(--ok-soft);color:var(--ok)}.badge.warn{background:var(--warn-soft);color:var(--warn)}.badge.bad{background:var(--bad-soft);color:var(--bad)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 12px}
+.conf{font-size:10px;color:var(--muted);margin-left:4px}.conf.low{color:var(--bad);font-weight:700}
+table.t{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}.t th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--line);background:#f7f8fb}.t td{padding:6px 8px;border-bottom:1px solid #eef1f6;vertical-align:middle}.t td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}.t tr.tot td{font-weight:700;background:var(--acc-soft)}
+.mono{font-family:ui-monospace,Menlo,monospace;font-size:12px}
+.card{border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-top:10px;background:#fff}
+.card h4{margin:0 0 6px;font-size:13.5px}
+.empty{padding:36px 20px;text-align:center;color:var(--muted);font-size:13px;line-height:1.6}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid #cfe3d7;border-top-color:var(--acc);border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px}@keyframes sp{to{transform:rotate(360deg)}}
+.cite{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:8px;font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:999}.toast.show{opacity:1}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.grid3{grid-template-columns:1fr}.wrap{padding:14px}}
+</style>
+</head>
+<body data-nav-title="Баримтын зураг → бичилт">
+<div class="wrap">
+  <div class="head"><div><h1>Баримтын зураг → журналын бичилт</h1><p>И-баримт, НӨАТ-ын падаан, нэхэмжлэхийн зургийг уншуулахад борлуулагч, ТТД, ДДТД, «Төлөх дүн», «НӨАТ» задарч, компанийн НӨАТ-ын горимоор журналын бичилтийн <b>санал</b> гарна. Нягтлан батлахаас өмнө юу ч бичигдэхгүй — санал «Санхүүгийн програм → Импорт → Баримтын зураг» хэсэгт очиж, тэнд батлагдана.</p></div>
+    <div><a class="btn" href="businessbi_journal.html">Санхүүгийн програм →</a></div></div>
+  <div class="layout">
+    <div class="panel">
+      <div class="step">Алхам 1</div><h2>Зураг оруулах</h2>
+      <div class="drop" id="drop" onclick="document.getElementById('file').click()"><b>Зураг сонгох эсвэл чирж оруулах</b>JPG, PNG, WEBP · утасны камераар шууд авч болно</div>
+      <input type="file" id="file" accept="image/*" capture="environment" hidden>
+      <div class="prev" id="prev"><img id="prevImg" alt="Баримт"></div>
+      <div class="f"><label>Тайлбар (заавал биш) — юу худалдан авсан</label><input id="hint" placeholder="ж: Оффисын хангамж, шатахуун" maxlength="300"></div>
+      <label class="toggle"><input type="checkbox" id="coVat"> Манай компани <b>НӨАТ суутган төлөгч</b> (НӨАТ-ыг авлагад тусад нь бүртгэнэ)</label>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn p" id="runBtn" disabled>Уншуулах</button><span id="ticket" style="font-size:12px;color:var(--muted);align-self:center"></span></div>
+      <div class="note">Үнэ: <b>24 цагийн эрх 5,000₮</b> (WIRE.mn) — хугацаанд хэдэн ч баримт. Зураг хөтөч дээр 1600px болж жижигрээд илгээгдэнэ; баримт дээрх «батлах», «зааврыг үл тоо» мэтийн бичвэрийг систем үл тоож, нягтлангийн хяналтад оруулна.</div>
+      <div id="taxWarn"></div>
+    </div>
+    <div class="panel" id="resPanel">
+      <div class="step">Алхам 2</div><h2>Уншсан өгөгдөл, бичилтийн санал</h2>
+      <div id="res"><div class="empty"><b style="color:var(--ink)">Зураг уншуулаагүй байна</b><br>Зүүн талд зураг оруулаад «Уншуулах» дарна уу.</div></div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const $=id=>document.getElementById(id);
+const fmt=n=>Math.round(n||0).toLocaleString('en-US');
+const r2=n=>Math.round((+n||0)*100)/100;
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2800); }
+const INBOX_KEY='bbi_receipt_inbox', CFG_KEY='bbi_receipt_cfg';
+let FILE=null, RES=null, SELLER=null;
+
+/* Журналын дансны төлөвлөгөө, тохиргоо — ижил хөтчийн localStorage-оос (байхгүй бол стандарт жагсаалт) */
+const ACC_FALLBACK=[['700101','Цалингийн зардал'],['700105','Түрээсийн зардал'],['700110','Шатахуун, тээврийн зардал'],['700115','Бичиг хэрэг, хангамжийн зардал'],['700120','Харилцаа холбооны зардал'],['700125','Цахилгаан, дулаан, усны зардал'],['730901','Бусад зардал'],['750101','Банкны шимтгэл, хүүгийн зардал'],['150101','Бараа материал'],['200101','Үндсэн хөрөнгө']];
+function journalDB(){ try{ const co=JSON.parse(localStorage.getItem('bbi_companies_v1')||'null'); const key=(co&&co.current&&co.current!=='default')?'bbi_gl_v1::'+co.current:'bbi_gl_v1'; return JSON.parse(localStorage.getItem(key)||'null'); }catch(e){ return null; } }
+function accounts(){ const db=journalDB(); const accs=((db&&db.accounts)||[]).filter(a=>/^(1[45]|20|7[0-9])/.test(String(a.code))).map(a=>[String(a.code),a.name]); return accs.length?accs:ACC_FALLBACK; }
+function jSettings(){ const db=journalDB(); return (db&&db.settings)||{}; }
+/* Данс санал болгох — борлуулагчийн нэр, мөрүүдийн түлхүүр үгээр (загвар биш, код) */
+const KW=[[/шатахуун|бензин|дизель|petrol|АИ-9|станц|нефт/i,'700110'],[/түрээс|rent/i,'700105'],[/интернэт|холбоо|мобиком|юнител|скайтел|жимобайл|unitel|mobicom/i,'700120'],[/цахилгаан|дулаан|ус |усны|УСУГ|ЦДС|эрчим/i,'700125'],[/бичиг|канц|хангамж|принтер|хор|цаас/i,'700115'],[/банк|шимтгэл|хураамж/i,'750101'],[/бараа|материал|бөөн/i,'150101']];
+function suggestAcc(r){ const text=[r.seller_name,(r.lines||[]).map(l=>l.name).join(' '),$('hint').value].join(' '); const accs=accounts(); for(const [re,code] of KW){ if(re.test(text)&&accs.some(a=>a[0]===code)) return code; } return accs.some(a=>a[0]==='730901')?'730901':accs[0][0]; }
+
+/* Файл сонголт, урьдчилан харах */
+$('file').onchange=e=>setFile(e.target.files[0]);
+const drop=$('drop'); ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('over'); })); ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.remove('over'); })); drop.addEventListener('drop',e=>{ const f=e.dataTransfer.files[0]; if(f) setFile(f); });
+function setFile(f){ if(!f||!/^image\//.test(f.type)){ toast('Зураг файл сонгоно уу'); return; } FILE=f; const url=URL.createObjectURL(f); $('prevImg').src=url; $('prev').style.display='block'; $('runBtn').disabled=false; $('drop').innerHTML='<b>'+esc(f.name)+'</b>'+Math.round(f.size/1024)+' KB · өөр зураг сонгохоор дарна'; }
+try{ const cfg=JSON.parse(localStorage.getItem(CFG_KEY)||'{}'); $('coVat').checked=!!cfg.coVat; }catch(e){}
+$('coVat').onchange=()=>{ try{ localStorage.setItem(CFG_KEY, JSON.stringify({coVat:$('coVat').checked})); }catch(e){} if(RES) renderResult(); };
+$('taxWarn').innerHTML=BBITax.banner(new Date());
+
+/* Уншуулах — нэвтрэлт (gate) + 24 цагийн эрх (pay) + функц дуудлага */
+async function runExtract(){
+  if(!FILE) return;
+  const btn=$('runBtn'); btn.disabled=true; btn.innerHTML='<span class="spin"></span> Уншиж байна…';
+  $('res').innerHTML='<div class="empty"><span class="spin"></span> Зургийг жижигрүүлж, уншуулж байна — 10–20 секунд</div>';
+  try{
+    const out=await BBIReceipt.extract(FILE,{hint:$('hint').value.trim(), onProgress:st=>{ btn.innerHTML='<span class="spin"></span> '+({resize:'Жижигрүүлж байна…',upload:'Илгээж байна…',extract:'Уншиж байна…'}[st]||'Ажиллаж байна…'); }});
+    if(!out||!out.ok){ throw new Error((out&&out.error)||'Уншиж чадсангүй'); }
+    RES=out; SELLER=null; renderResult();
+    if(RES.receipt.seller_tin||RES.receipt.seller_reg) checkSeller();
+  }catch(e){ console.error(e); $('res').innerHTML='<div class="err"><b>Уншиж чадсангүй.</b> '+esc(e.message||e)+'<br>Зураг тод, бүтэн (дээд, доод хэсэг нь орсон) байх ёстой. Дахин оролдоно уу.</div>'; }
+  btn.disabled=false; btn.textContent='Уншуулах';
+}
+$('runBtn').onclick=BBIGate.protect(BBIPay.require({tool:'receipt', meta:()=>({file:FILE&&FILE.name})}, runExtract), {tool:'Баримтын зураг → бичилт', action:'extract'});
+function refreshTicket(){ try{ const t=BBIPay.ticketInfo('receipt'); $('ticket').textContent=t?('Эрх хүчинтэй: '+t.leftText):'Эрх авна (5,000₮ / 24 цаг)'; }catch(e){} }
+refreshTicket(); setInterval(refreshTicket,30000);
+
+/* Борлуулагчийг ebarimt бүртгэлээс шалгах (НӨАТ төлөгч эсэх — НӨАТ хасах шийдвэрт нөлөөлнө) */
+async function checkSeller(){
+  const r=RES.receipt; const el=$('sellerSt'); if(el) el.innerHTML='<span class="spin"></span>';
+  try{ SELLER=await BBIEbarimt.lookup(r.seller_tin?{tin:r.seller_tin}:{reg:r.seller_reg}); }catch(e){ SELLER={found:false,error:'network'}; }
+  renderResult();
+}
+
+/* НӨАТ-ын шийдвэр — КОД гаргана, загвар зөвхөн санал болгосон (Nyabo-ийн зарчим) */
+function vatDecision(r){
+  const coVat=$('coVat').checked; const vat=r2(r.vat_amount||0), total=r2(r.total||0);
+  if(!coVat) return {deduct:false, why:'Компани НӨАТ суутган төлөгч биш — НӨАТ өртөгт шингэнэ'};
+  if(!(vat>0)) return {deduct:false, why:'Баримт дээр НӨАТ хэвлэгдээгүй — хасахгүй'};
+  if(SELLER&&SELLER.found&&SELLER.vatPayer===false) return {deduct:false, warn:true, why:'Борлуулагч ebarimt бүртгэлд НӨАТ төлөгч биш — НӨАТ-ыг хасах эрхгүй, өртөгт шингээв (НӨАТ-ын хууль 14)'};
+  if(r.vat_check&&r.vat_check.ok===false) return {deduct:true, warn:true, why:'НӨАТ = Төлөх дүн × 10/110 тэнцэхгүй (зөрүү '+fmt(r.vat_check.diff)+'₮) — нягтлан шалгана'};
+  return {deduct:true, why:'НӨАТ-ыг худалдан авалтын НӨАТ-ын авлагад (121001) тусад нь бүртгэнэ — НӨАТ-ын хууль 14.1'};
+}
+function buildEntry(r, expAcc){
+  const s=jSettings(); const total=r2(r.total||0), vat=r2(r.vat_amount||0); const d=vatDecision(r);
+  const net=d.deduct? r2(total-vat) : total;
+  const credit= r.payment_type==='cash' ? '100101' : (s.accPayable||'310101');
+  const creditName= r.payment_type==='cash' ? 'Касс' : 'Дансны өглөг';
+  const lines=[{dt:expAcc, kt:credit, amt:net, kind:'net'}];
+  if(d.deduct && vat>0) lines.push({dt:s.accVatIn||'121001', kt:credit, amt:vat, kind:'vat'});
+  return {lines, net, vat:d.deduct?vat:0, total, credit, creditName, decision:d};
+}
+function conf(r,k){ const c=(r.confidence||{})[k]; if(c==null) return ''; return '<span class="conf'+(c<0.7?' low':'')+'" title="Итгэлийн түвшин">'+Math.round(c*100)+'%</span>'; }
+function renderResult(){
+  const r=RES.receipt; const accs=accounts(); const expAcc=($('expAcc')&&$('expAcc').value)||suggestAcc(r);
+  const E=buildEntry(r, expAcc);
+  const seller= SELLER? (SELLER.found? '<span class="badge '+(SELLER.vatPayer?'ok':'warn')+'">'+esc(SELLER.name||'')+' · '+(SELLER.vatPayer?'НӨАТ төлөгч':'НӨАТ төлөгч биш')+'</span>' : '<span class="badge bad">ebarimt бүртгэлд олдсонгүй</span>') : '<span class="badge">шалгаагүй</span>';
+  const review=r.review_required? '<div class="warn"><b>Нягтлангийн хяналт шаардлагатай:</b> '+(r.review_reasons||[]).map(x=>({suspicious_text:'баримт дээр заавар мэт сэжигтэй бичвэр',vat_check_failed:'НӨАТ-ын тэнцэтгэл зөрсөн',vat_check_unavailable:'НӨАТ шалгах боломжгүй',total_missing:'Төлөх дүн олдсонгүй',low_confidence:'итгэлийн түвшин бага'}[x]||x)).join('; ')+'</div>':'';
+  const warns=(r.warnings||[]).length? '<div class="warn">'+r.warnings.map(esc).join('<br>')+'</div>':'';
+  $('res').innerHTML=`
+    <div class="grid3">
+      <div class="f"><label>Борлуулагч ${conf(r,'seller_name')}</label><input id="fSeller" value="${esc(r.seller_name||'')}"></div>
+      <div class="f"><label>ТТД ${conf(r,'seller_tin')}</label><input id="fTin" value="${esc(r.seller_tin||'')}"></div>
+      <div class="f"><label>РД ${conf(r,'seller_reg')}</label><input id="fReg" value="${esc(r.seller_reg||'')}"></div>
+    </div>
+    <div style="margin-top:6px;font-size:12px;">ebarimt бүртгэл: <span id="sellerSt">${seller}</span> <button class="btn sm" onclick="RES.receipt.seller_tin=$('fTin').value.trim();RES.receipt.seller_reg=$('fReg').value.trim();checkSeller()">дахин шалгах</button></div>
+    <div class="grid3">
+      <div class="f"><label>Огноо ${conf(r,'date')}</label><input id="fDate" type="date" value="${esc(r.date||'')}"></div>
+      <div class="f"><label>Төлөх дүн ₮ ${conf(r,'total')}</label><input id="fTotal" type="number" step="0.01" value="${r.total==null?'':r.total}"></div>
+      <div class="f"><label>НӨАТ ₮ ${conf(r,'vat_amount')}</label><input id="fVat" type="number" step="0.01" value="${r.vat_amount==null?'':r.vat_amount}"></div>
+    </div>
+    <div class="grid3">
+      <div class="f"><label>ДДТД (33 орон) ${conf(r,'ddtd')}</label><input id="fDdtd" class="mono" value="${esc(r.ddtd||'')}"></div>
+      <div class="f"><label>Төлбөрийн хэлбэр ${conf(r,'payment_type')}</label><select id="fPay">${['cash','card','transfer','qpay','unknown'].map(k=>`<option value="${k}" ${r.payment_type===k?'selected':''}>${({cash:'Бэлэн',card:'Карт',transfer:'Шилжүүлэг',qpay:'QPay',unknown:'Тодорхойгүй'})[k]}</option>`).join('')}</select></div>
+      <div class="f"><label>Зардлын данс (санал)</label><select id="expAcc">${accs.map(a=>`<option value="${a[0]}" ${a[0]===expAcc?'selected':''}>${a[0]} — ${esc(a[1])}</option>`).join('')}</select></div>
+    </div>
+    ${review}${warns}
+    ${(r.lines||[]).length?`<table class="t"><thead><tr><th>Мөр</th><th class="n">Тоо</th><th class="n">Нэгж үнэ</th><th class="n">Дүн</th></tr></thead><tbody>${r.lines.map(l=>`<tr><td>${esc(l.name)}</td><td class="n">${l.qty==null?'':l.qty}</td><td class="n">${l.unit_price==null?'':fmt(l.unit_price)}</td><td class="n">${l.amount==null?'':fmt(l.amount)}</td></tr>`).join('')}</tbody></table>`:''}
+    <div class="card"><h4>📒 Бичилтийн санал <span class="badge ${E.decision.warn?'warn':'ok'}">${E.decision.deduct?'НӨАТ хасна':'НӨАТ өртөгт'}</span></h4>
+      <div style="font-size:12.5px;color:var(--sub)">${esc(E.decision.why)}${r.city_tax?' · НХАТ '+fmt(r.city_tax)+'₮ өртөгт багтав':''}</div>
+      <table class="t"><thead><tr><th>Дебит</th><th>Кредит</th><th class="n">Дүн</th><th>Тайлбар</th></tr></thead><tbody>
+        ${E.lines.map(l=>`<tr><td class="mono">${l.dt}</td><td class="mono">${l.kt}</td><td class="n">${fmt(l.amt)}</td><td>${l.kind==='vat'?'Худалдан авалтын НӨАТ':'Зардал / хөрөнгө (цэвэр дүн)'}</td></tr>`).join('')}
+        <tr class="tot"><td colspan="2">Нийт — ${esc(E.creditName)} ${E.credit}</td><td class="n">${fmt(E.total)}</td><td>${r.payment_type==='cash'?'бэлэн төлсөн — кассаас':'өглөг нээлттэй — банкны хуулгаар хаагдана'}</td></tr>
+      </tbody></table>
+      <div class="cite">§ НӨАТ-ын тухай хууль 14.1 (худалдан авалтын НӨАТ-ыг хасах); НББ-ийн тухай хууль 13.7 (анхан шатны баримт: и-баримт ДДТД); Заавар 116: 70 зардал / 12 НӨАТ-ын авлага / 31 өглөг.</div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn p" onclick="sendToJournal()">📨 Журналд санал болгох</button><button class="btn" onclick="RES=null;$('res').innerHTML='<div class=empty>Татгалзав — өөр зураг уншуулж болно</div>'">Татгалзах</button></div>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:8px">Санал «Санхүүгийн програм → Импорт → Баримтын зураг» хэсэгт очно; тэнд нягтлан данс солих, батлах, татгалзах сонголттой. Батлахаас өмнө журналд юу ч бичигдэхгүй.</div>
+    </div>`;
+  ['fPay','expAcc','fTotal','fVat'].forEach(id=>{ $(id).onchange=()=>{ r.payment_type=$('fPay').value; r.total=+$('fTotal').value||0; r.vat_amount=+$('fVat').value||0; renderResult(); }; });
+}
+function sendToJournal(){
+  const r=RES.receipt; r.seller_name=$('fSeller').value.trim(); r.seller_tin=$('fTin').value.trim(); r.seller_reg=$('fReg').value.trim(); r.date=$('fDate').value; r.total=+$('fTotal').value||0; r.vat_amount=+$('fVat').value||0; r.ddtd=$('fDdtd').value.trim(); r.payment_type=$('fPay').value;
+  if(!r.date||!(r.total>0)){ toast('Огноо, төлөх дүнгээ шалгана уу'); return; }
+  const E=buildEntry(r,$('expAcc').value);
+  const item={id:'rc'+Date.now().toString(36), at:new Date().toISOString(), by:(BBIGate.getUser&&BBIGate.getUser()&&BBIGate.getUser().email)||'', model:RES.model,
+    receipt:{seller_name:r.seller_name, seller_tin:r.seller_tin, seller_reg:r.seller_reg, ddtd:r.ddtd, lottery:r.lottery||'', date:r.date, total:r.total, vat_amount:r.vat_amount, city_tax:r.city_tax||0, payment_type:r.payment_type, lines:r.lines||[], review_required:!!r.review_required, review_reasons:r.review_reasons||[], warnings:r.warnings||[], confidence:r.confidence||{}},
+    seller:SELLER&&SELLER.found?{name:SELLER.name, vatPayer:!!SELLER.vatPayer, tin:SELLER.tin}:null,
+    entry:{date:r.date, partner:r.seller_name||'', tin:r.seller_tin||'', desc:(r.seller_name||'Баримт')+(r.lines&&r.lines[0]?' — '+r.lines[0].name:'')+($('hint').value.trim()?' ('+$('hint').value.trim()+')':''), lines:E.lines.map(l=>({dt:l.dt,kt:l.kt,amt:l.amt,kind:l.kind})), vatDeducted:E.decision.deduct, why:E.decision.why, docRef:{type:'ebarimt', no:r.ddtd||(r.seller_tin+' · '+r.date)}},
+    thumb:thumb()};
+  try{ const box=JSON.parse(localStorage.getItem(INBOX_KEY)||'[]'); box.push(item); localStorage.setItem(INBOX_KEY, JSON.stringify(box)); }catch(e){ toast('Хадгалж чадсангүй: '+e.message); return; }
+  toast('Журналд санал илгээгдлээ — Импорт → Баримтын зураг хэсгээс батална');
+  $('res').innerHTML='<div class="note">✅ Санал илгээгдлээ. <a href="businessbi_journal.html#receipt">Санхүүгийн програм → Импорт → Баримтын зураг</a> хэсэгт батална.<br>Дараагийн баримтаа оруулж болно.</div>'; RES=null; FILE=null; $('prev').style.display='none'; $('runBtn').disabled=true; $('drop').innerHTML='<b>Зураг сонгох эсвэл чирж оруулах</b>JPG, PNG, WEBP';
+}
+/* Жижиг thumbnail (160px) — журналд баримтын зураг харагдана; localStorage-д бага зай эзэлнэ */
+function thumb(){ try{ const img=$('prevImg'); const c=document.createElement('canvas'); const k=Math.min(1,160/Math.max(img.naturalWidth,img.naturalHeight)); c.width=Math.round(img.naturalWidth*k); c.height=Math.round(img.naturalHeight*k); c.getContext('2d').drawImage(img,0,0,c.width,c.height); return c.toDataURL('image/jpeg',0.6); }catch(e){ return ''; } }
+</script>
+</body>
+</html>

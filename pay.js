@@ -20,7 +20,7 @@
   "use strict";
   const REGION = "asia-northeast1";
   const FUNCTIONS_SDK = "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js";
-  const PRICES = { ndsh_hhoat: { amount: 5000, label: "1 тайлан татах", validHours: 24 } };
+  const PRICES = { ndsh_hhoat: { amount: 5000, label: "1 тайлан татах", validHours: 24 }, receipt: { amount: 5000, label: "24 цагийн эрх — баримтын зураг уншуулах", validHours: 24 } };
   const POLL_MS = 3000, POLL_MAX_MS = 20 * 60 * 1000;
 
   let fns = null, loading = null;

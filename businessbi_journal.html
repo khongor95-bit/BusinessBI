@@ -469,10 +469,16 @@ tr.set-detail>td{background:var(--bg-row)!important;padding:8px 10px 12px 34px;}
           <span class="t">Цалин — НДШ тайлан</span>
           <span class="d">PDF · ажилтан бүрийн цалин, ХХОАТ автомат тооцоолол</span>
         </div>
+        <div class="imp-type-card" data-type="receipt" onclick="impSetType('receipt')">
+          <svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M8 8h8M8 12h8M8 16h5"/><circle cx="17" cy="17" r="2.5"/></svg>
+          <span class="t">Баримтын зураг <span class="badge warn" id="rcInboxCnt" style="display:none"></span></span>
+          <span class="d">receipt_scan.html-ээс ирсэн санал · нягтлан батлана</span>
+        </div>
       </div>
     </div>
     <div class="note" id="impTypeNote">Банкны хуулга: орлого, зарлагын гүйлгээ. Өглөгийн төлөлт нээлттэй падаантай автоматаар тулгагдана.</div>
     <input type="file" id="impFile" accept=".xlsx,.xls,.csv,.pdf" onchange="impLoadFile(this)">
+    <div id="rcInbox" style="display:none;margin-top:10px;"></div>
     <div class="note">Дэмжих формат: .xlsx, .xls, .csv — банкны интернэт банкнаас татсан хуулга, eBarimt-аас татсан падааны жагсаалт. Эхний мөрөнд баганын нэр байх шаардлагатай.</div>
     <div id="impSheetPick" style="display:none;" class="field"><label>Sheet сонгох</label><select id="impSheetSel" onchange="impPickSheet()"></select></div>
   </div>
@@ -1093,10 +1099,12 @@ function nav(page){
   try{ (renderers[page]||(()=>{}))(); }catch(e){ console.error(e); toast('Хуудас ачаалахад алдаа: '+e.message, true); }
   window.scrollTo(0,0);
 }
+if(location.hash==='#receipt'){ setTimeout(()=>{ nav('import'); impSetType('receipt'); },50); }
 document.getElementById('tabstrip').addEventListener('click', e=>{
   const t=e.target.closest('.rtab'); if(t) nav(t.dataset.default);
 });
 function refreshDots(){
+  rcBadge();
   const set=(id,state)=>{ const el=document.getElementById(id); if(el){ el.className='sb-dot'+(state?' '+state:''); } };
   const s=DB.settings;
   set('dot-settings', s.company? 'ok':'warn');
@@ -1501,6 +1509,7 @@ function ensurePartner(name, tin){
 /* ═══════════════ IMPORT WIZARD ═══════════════ */
 let IMP={wb:null, sheet:null, headers:[], rows:[], mapped:[], stage:1, type:'bank'};
 const IMP_NOTES={
+  receipt:'Баримтын зураг: «Баримтын зураг → бичилт» хуудаснаас (receipt_scan.html) ирсэн саналууд. Данс, дүнг шалгаад «Батлах» дарахад л журналд бичигдэнэ (ДДТД баримтын лавлагаатай, батлагдсан төлөвтэй). Татгалзсан санал устана.',
   ndsh:'НДШ-ийн сарын тайлангийн PDF-ээс ажилтан бүрийн цалинг уншина. ХХОАТ болон хөнгөлөлтийг систем тооцоолж, цалингийн хүснэгт үүсгээд журналд нэгтгэл дүнгээр бичнэ.',
   bank:'Банкны хуулга: орлого, зарлагын гүйлгээ. Өглөгийн төлөлт нээлттэй падаантай автоматаар тулгагдана.',
   vatbuy:'Худалдан авалтын падаан бүр 3 мөр бичилт үүсгэнэ: ДТ зардал/хөрөнгө (нийт − НӨАТ), ДТ НӨАТ-ын авлага, КТ Дансны өглөг (нийт) — падааны огноогоор, аккруэл сууриар. НХАТ-тай падааны хотын татвар зардалдаа автоматаар шингэнэ.',
@@ -1513,8 +1522,51 @@ function impSetType(t){
   document.querySelectorAll('.imp-bank').forEach(el=>el.style.display= t==='bank'?'':'none');
   document.querySelectorAll('.imp-vat').forEach(el=>el.style.display= (t==='vatbuy'||t==='vatsale')?'':'none');
   document.querySelectorAll('.imp-ndsh').forEach(el=>el.style.display= t==='ndsh'?'':'none');
+  document.getElementById('impFile').style.display= t==='receipt'?'none':'';
+  document.getElementById('rcInbox').style.display= t==='receipt'?'':'none';
+  if(t==='receipt') renderReceiptInbox();
   if(IMP.headers.length) impFillColumnSelects();
 }
+
+/* ═══ Баримтын зураг — receipt_scan.html-ээс ирсэн саналын inbox (localStorage, нэг хөтөч) ═══ */
+const RC_KEY='bbi_receipt_inbox';
+function rcInbox(){ try{ const a=JSON.parse(localStorage.getItem(RC_KEY)||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+function rcSave(a){ try{ localStorage.setItem(RC_KEY, JSON.stringify(a)); }catch(e){} rcBadge(); }
+function rcBadge(){ const el=document.getElementById('rcInboxCnt'); if(!el) return; const n=rcInbox().length; el.style.display=n?'':'none'; el.textContent=n; }
+function renderReceiptInbox(){
+  const box=document.getElementById('rcInbox'); if(!box) return;
+  const items=rcInbox();
+  if(!items.length){ box.innerHTML='<div class="empty"><b>Санал алга</b><a href="receipt_scan.html" target="_blank" class="link">Баримтын зураг → бичилт</a> хуудсанд зураг уншуулаад «Журналд санал болгох» дарна</div>'; return; }
+  const s=DB.settings; const accOpts=DB.accounts.filter(a=>/^(1[45]|20|7[0-9])/.test(a.code)).map(a=>`<option value="${a.code}">${a.code} — ${esc(a.name)}</option>`).join('');
+  box.innerHTML=items.map(it=>{ const r=it.receipt, e=it.entry; const net=e.lines.find(l=>l.kind==='net')||{}; const vat=e.lines.find(l=>l.kind==='vat'); const dup=DB.journal.some(j=>j.docRef&&j.docRef.no&&r.ddtd&&j.docRef.no===r.ddtd); const locked=dateLocked(e.date);
+    return `<div class="card" style="margin-bottom:10px;border:1px solid var(--bdr-strong);"><div style="display:flex;gap:12px;align-items:flex-start;">${it.thumb?`<img src="${it.thumb}" style="width:80px;border-radius:4px;border:1px solid var(--bdr);">`:''}<div style="flex:1;min-width:0;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;"><b>${esc(r.seller_name||'Борлуулагч ?')}</b> <span class="mono" style="color:var(--muted)">${esc(r.seller_tin||'')}</span> ${it.seller?`<span class="badge ${it.seller.vatPayer?'ok':'warn'}">${it.seller.vatPayer?'НӨАТ төлөгч':'НӨАТ төлөгч биш'}</span>`:''} ${r.review_required?'<span class="badge warn" title="'+esc((r.review_reasons||[]).join(', '))+'">хяналт шаардлагатай</span>':''} ${dup?'<span class="badge err" title="Ижил ДДТД-тай бичилт журналд бий">давхардал?</span>':''} ${locked?'<span class="badge err">түгжигдсэн үе</span>':''}</div>
+      <div style="font-size:12px;margin:4px 0;">${esc(e.date)} · Төлөх дүн <b>${fmtZ(r.total)}</b> · НӨАТ ${fmtZ(r.vat_amount||0)} · ${({cash:'бэлэн',card:'карт',transfer:'шилжүүлэг',qpay:'QPay',unknown:'?'})[r.payment_type]||''} ${r.ddtd?'· ДДТД <span class="mono">'+esc(r.ddtd)+'</span>':''}</div>
+      <div style="font-size:11.5px;color:var(--muted);">${esc(e.why)}</div>
+      <table class="tbl" style="margin-top:6px;"><thead><tr><th>Дебит</th><th>Кредит</th><th class="num">Дүн</th></tr></thead><tbody>
+        <tr><td><select class="pill-input" id="rcAcc-${it.id}" style="min-width:220px;">${accOpts}</select></td><td class="mono">${esc(net.kt||'')} ${esc(accLabel(net.kt||''))}</td><td class="num mono">${fmtZ(net.amt||0)}</td></tr>
+        ${vat?`<tr><td class="mono">${esc(vat.dt)} ${esc(accLabel(vat.dt))}</td><td class="mono">${esc(vat.kt)}</td><td class="num mono">${fmtZ(vat.amt)}</td></tr>`:''}
+      </tbody></table>
+      <div style="display:flex;gap:8px;margin-top:8px;"><button class="btn primary sm" onclick="rcApprove('${it.id}')" ${locked?'disabled':''}>✓ Батлах — журналд бичих</button><button class="btn sm danger" onclick="rcReject('${it.id}')">Татгалзах</button><span style="font-size:11px;color:var(--muted);align-self:center;">${esc((it.at||'').slice(0,16).replace('T',' '))} ${esc(it.by||'')}</span></div>
+    </div></div></div>`; }).join('');
+  items.forEach(it=>{ const sel=document.getElementById('rcAcc-'+it.id); const net=it.entry.lines.find(l=>l.kind==='net'); if(sel&&net){ if(![...sel.options].some(o=>o.value===net.dt)) sel.insertAdjacentHTML('afterbegin',`<option value="${esc(net.dt)}">${esc(net.dt)} — (төлөвлөгөөнд алга)</option>`); sel.value=net.dt; } });
+}
+function rcReject(id){ const items=rcInbox(); const it=items.find(x=>x.id===id); if(!it) return; if(!confirm('Саналыг татгалзах уу? ('+(it.receipt.seller_name||'')+' · '+fmtZ(it.receipt.total)+')')) return; logEvent('receipt','','татгалзав — '+(it.receipt.seller_name||'')+' '+fmtZ(it.receipt.total)+(it.receipt.ddtd?' ДДТД '+it.receipt.ddtd:'')); rcSave(items.filter(x=>x.id!==id)); save(); renderReceiptInbox(); }
+function rcApprove(id){
+  const items=rcInbox(); const it=items.find(x=>x.id===id); if(!it) return;
+  const e=it.entry, r=it.receipt;
+  if(!assertDateOpen(e.date,'баримтын бичилт')) return;
+  const acc=(document.getElementById('rcAcc-'+id)||{}).value||e.lines[0].dt;
+  for(const l of e.lines){ const dt=l.kind==='net'?acc:l.dt; if(!accByCode(dt)){ toast('Бүртгэлгүй данс: '+dt, true); return; } if(!accByCode(l.kt)){ toast('Бүртгэлгүй данс: '+l.kt, true); return; } }
+  if(DB.journal.some(j=>j.docRef&&j.docRef.no&&r.ddtd&&j.docRef.no===r.ddtd) && !confirm('Ижил ДДТД-тай бичилт журналд аль хэдийн байна. Дахин бичих үү?')) return;
+  ensurePartner(e.partner, e.tin);
+  const doc=nextDocNo(), batch=nextBatch(), at=new Date().toISOString();
+  const base={doc, date:e.date, partner:e.partner, source:'vatbuy', batch, posted:true, by:who(), at, docRef:e.docRef||{type:'ebarimt', no:r.ddtd||''}, receipt:{ddtd:r.ddtd||'', total:r.total, vat:r.vat_amount||0, pay:r.payment_type, model:it.model||''}};
+  for(const l of e.lines) DB.journal.push({...base, desc:e.desc+(l.kind==='vat'?' — НӨАТ':''), dt:l.kind==='net'?acc:l.dt, kt:l.kt, amt:r2(l.amt)});
+  logEvent('receipt',doc,(r.seller_name||'')+' '+fmtZ(r.total)+(r.ddtd?' ДДТД '+r.ddtd:'')+(r.review_required?' (хяналттай батлав)':''));
+  rcSave(items.filter(x=>x.id!==id)); save(); renderReceiptInbox(); toast('Баримт №'+doc+' журналд бичигдлээ');
+}
+window.addEventListener('storage', ev=>{ if(ev.key===RC_KEY){ rcBadge(); if(IMP.type==='receipt') renderReceiptInbox(); } });
 
 function impGoStage(n){
   IMP.stage=n;

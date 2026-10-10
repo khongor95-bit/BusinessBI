@@ -40,6 +40,7 @@ const SITE_URL = defineString("SITE_URL", { default: "https://businessbi.mn" });
 // ── Үнийн жагсаалт (сервер эрх мэдэлтэй; клиент дээрх тоо зөвхөн харуулахад) ──
 const PRODUCTS = {
   ndsh_hhoat: { amount: 5000, currency: "MNT", title: "НДШ → ХХОАТ маягт (1 тайлан татах)", validHours: 24 },
+  receipt:    { amount: 5000, currency: "MNT", title: "Баримтын зураг → бичилт (24 цагийн эрх)", validHours: 24 },
 };
 const ALLOWED_ORIGINS = [/^https?:\/\/(www\.)?businessbi\.mn$/, /^https?:\/\/[a-z0-9-]+\.github\.io$/, /^http:\/\/localhost(:\d+)?$/, /^http:\/\/127\.0\.0\.1(:\d+)?$/];
 const CALL_OPTS = { cors: ALLOWED_ORIGINS, secrets: [WIRE_SECRET_KEY, WIRE_WEBHOOK_SECRET] };
