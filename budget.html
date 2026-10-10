@@ -10,6 +10,7 @@
 <meta name="theme-color" content="#0b1a33">
 <meta property="og:type" content="website"><meta property="og:site_name" content="BusinessBI.mn"><meta property="og:title" content="Бизнес төлөвлөлт — BusinessBI.mn"><meta property="og:description" content="6 алхмын төлөвлөлт, what-if хувилбар, төсвийн баримт, гүйцэтгэл, прогноз."><meta property="og:url" content="https://businessbi.mn/budget.html"><meta property="og:image" content="https://businessbi.mn/og-image.png"><meta name="twitter:card" content="summary_large_image">
 <script src="gate.js"></script>
+<script src="tax.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -180,7 +181,7 @@ const val=el=>el.classList.contains('money')?(pv(el.value)||0):el.type==='number
 const MONEY='type="text" inputmode="decimal" class="money"';
 
 /* ── Өгөгдөл ── */
-const DEF=()=>({v:2, settings:{name:'',year:String(Y+1),cit:10,recvDays:30,payDays:30,openingCash:0,director:'',preparedBy:''},
+const DEF=()=>({v:2, settings:{name:'',year:String(Y+1),cit:BBITax.get('cit.tiers',String(Y+1))[0].rate*100,recvDays:30,payDays:30,openingCash:0,director:'',preparedBy:''},
   prev:{year:String(Y),revenue:Z(),varCost:Z(),fixed:Z()},            // өмнөх жилийн сарын нийт (дүн шинжилгээ, улирал)
   lines:[],   // орлогын шугам: {id,name,unit,price,prevQty[12],growthQty,growthPrice,season,qty[12],varPct,varUnit,priceFrom}
   fixed:[],   // тогтмол зардал: {id,name,acc,amount,growth,from,months[12]|null,step:{lineId,cap,cost}|null}
@@ -233,6 +234,7 @@ function pageDash(){
   const fcProfit=F.rev.map((x,m)=>x-F.varc[m]-F.fixed[m]); const planProfit=c.rev.map((x,m)=>x-c.varc[m]-c.fixed[m]);
   return `<div class="ph"><div><h1>Самбар — ${esc(DB.settings.name||'Компани')} ${esc(DB.settings.year)}</h1><p>Төлөвлөгөө, гүйцэтгэл, прогнозын нэг дор. ${DB.approved?'<span class="chip ok">Төсөв батлагдсан '+DB.approved.at.slice(0,10)+'</span>':'<span class="chip warn">Төсөв батлагдаагүй</span>'}</p></div>
     <div class="acts"><button class="btn p" onclick="go('plan')">${ready?'Төлөвлөлт засах':'Төлөвлөлт эхлэх →'}</button><button class="btn" onclick="go('actual')">Гүйцэтгэл оруулах</button></div></div>
+    ${ready?BBITax.banner(DB.settings.year):''}
     ${!ready?`<div class="card"><div class="empty"><b style="color:var(--ink);font-size:16px">Эхлэх</b><br>«Дүн шинжилгээ»-д өмнөх жилийн тоогоо оруулаад (эсвэл алгасаад), «6 алхмын төлөвлөлт»-ээр орлого, зардал, хөрөнгө оруулалтаа асуулт-хариултаар бөглөнө. Үр дүн нь орлогын тайлан, хугарлын цэг, мөнгөн урсгал.<br><br><button class="btn p" onclick="go('plan')">6 алхмын төлөвлөлт →</button><div class="hint" style="margin-top:22px">Эсвэл бэлэн жишээгээр турших:</div>${demoPicker()}</div></div>`:`
     <div class="kpis">${[['Төлөвлөсөн орлого',fm(c.tot.rev),''],['Цэвэр ашиг (төсөв)',fm(c.tot.net),c.tot.net<0?'neg':'pos'],['Ашгийн маржин',pct(c.tot.margin),c.tot.margin<0?'neg':''],['Хугарлын цэг (орлого)',c.tot.be===Infinity?'—':fm(c.tot.be),''],['Мөнгө, жилийн эцэст',fm(c.cashBal[11]),c.cashBal[11]<0?'neg':''],[to>=0?`Прогноз ашиг (бодит ${to+1} сар + төсөв)`:'Гүйцэтгэл',to>=0?fm(sum(fcProfit)):'ороогүй',to>=0&&sum(fcProfit)<sum(planProfit)?'neg':'']].map(([k,v,cl])=>`<div class="kpi"><span>${k}</span><b class="${cl}">${v}</b></div>`).join('')}</div>
     <div class="grid2">
@@ -284,8 +286,9 @@ function pagePlan(){ return `<div class="ph"><div><h1>6 алхмын төлөв�
 function stepDone(i){ const s=DB.settings; return [null,!!(s.name&&s.year), DB.lines.length>0, DB.lines.some(l=>+l.varPct>0||+l.varUnit>0), DB.fixed.length>0, true, !!DB.approved][i]; }
 function wnav(prev,next,extra){ return `<div class="wnav"><div>${prev?`<button class="btn" onclick="WS=${prev};DB.step=WS;save();render()">← Өмнөх</button>`:''}</div><div style="display:flex;gap:8px">${extra||''}${next?`<button class="btn p" onclick="WS=${next};DB.step=WS;save();render()">Дараах →</button>`:''}</div></div>`; }
 function step1(){ const s=DB.settings; return `<div class="q"><h2>1. Ямар компанийн, аль жилийн төлөвлөгөө вэ?</h2><p class="lead">Нэр, жил, татварын хувь, авлага/өглөгийн дундаж хугацаа — мөнгөн урсгалд хэрэгтэй.</p>
-  <div class="row c3"><div class="f"><label>Компанийн нэр</label><input data-s="name" value="${esc(s.name)}"></div><div class="f"><label>Төлөвлөх жил</label><input data-s="year" value="${esc(s.year)}"></div><div class="f"><label>ААНОАТ (%)</label><input data-s="cit" type="number" value="${s.cit}"><small>Жилийн орлого 6 тэрбумаас доош 10%; 20.2.7-ийн 1% горим бол 1 гэж бич</small></div></div>
+  <div class="row c3"><div class="f"><label>Компанийн нэр</label><input data-s="name" value="${esc(s.name)}"></div><div class="f"><label>Төлөвлөх жил</label><input data-s="year" value="${esc(s.year)}"></div><div class="f"><label>ААНОАТ (%)</label><input data-s="cit" type="number" value="${s.cit}"><small>${(()=>{ try{ const t=BBITax.get("cit.tiers",s.year), st=BBITax.get("cit.simple_threshold",s.year), sr=BBITax.get("cit.simple_rate",s.year); return `Жилийн орлого ${fm(t[0].upto)}-аас доош ${t[0].rate*100}%; 20.2.7-ийн ${sr}% горим (борлуулалт ${fm(st)} хүртэл) бол ${sr} гэж бич`; }catch(e){ return esc(e.message); } })()}</small></div></div>
   <div class="row c4" style="margin-top:12px"><div class="f"><label>Авлагын дундаж хугацаа (хоног)</label><input data-s="recvDays" type="number" value="${s.recvDays}"><small>Борлуулалтын мөнгө хэдэн хоногийн дараа ордог вэ</small></div><div class="f"><label>Өглөгийн дундаж хугацаа (хоног)</label><input data-s="payDays" type="number" value="${s.payDays}"></div><div class="f"><label>Жилийн эхний мөнгө (₮)</label><input data-s="openingCash" ${MONEY} value="${fi(s.openingCash)}"></div><div class="f"><label>Боловсруулсан / Баталсан</label><input data-s="preparedBy" value="${esc(s.preparedBy)}" placeholder="нягтлан"><input data-s="director" value="${esc(s.director)}" placeholder="захирал" style="margin-top:6px"></div></div>
+  ${BBITax.banner(s.year)}
   ${sum(DB.prev.revenue)>0?`<div class="note" style="margin-top:12px">Өмнөх жил: орлого ${fm(sum(DB.prev.revenue))}, маржин ${pct((sum(DB.prev.revenue)-sum(DB.prev.varCost)-sum(DB.prev.fixed))/sum(DB.prev.revenue))}. Улирлын хэлбэр орлогын шугамд ашиглагдана.</div>`:`<div class="warn" style="margin-top:12px">Өмнөх жилийн тоо ороогүй — «Дүн шинжилгээ»-д оруулбал улирлын хэлбэр, зардлын бүтэц автоматаар гарна. Шинэ бизнес бол үргэлжлүүлнэ үү.</div>`}
   ${wnav(0,2)}</div>`; }
 function bindStep1(){ document.querySelectorAll('[data-s]').forEach(i=>i.addEventListener('change',()=>{ const k=i.dataset.s; DB.settings[k]=val(i); save(); if(k==='name'||k==='year') render(); })); }

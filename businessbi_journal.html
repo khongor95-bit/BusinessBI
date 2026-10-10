@@ -20,6 +20,7 @@
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="mn_MN">
 <meta name="twitter:card" content="summary_large_image">
+<script src="tax.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -391,6 +392,8 @@ tr.set-detail>td{background:var(--bg-row)!important;padding:8px 10px 12px 34px;}
         <div class="field"><label>ХХОАТ хөнгөлөлт (₮/сар)</label><input type="number" id="stHhoatCredit" step="1000" min="0"></div>
       </div>
       <div class="note">НӨАТ-тэй гүйлгээ импортлоход цэвэр дүн = нийт ÷ (1 + НӨАТ%). ААНОАТ нь хаалтын бичилтэд ашигтай үед автоматаар тооцогдоно.</div>
+      <h3 style="margin-top:14px;">Татварын параметр (tax.js) <button class="btn" style="font-size:11px;padding:3px 9px;margin-left:8px;" onclick="applyTaxDefaults()">Тайлант үеийн хуулийн утгаар бөглөх</button></h3>
+      <div id="taxParamsBox"></div>
       <h3 style="margin-top:14px;">Хаалтын дансууд</h3>
       <div class="grid2">
         <div class="field"><label>Орлого зардлын нэгдсэн данс</label><input id="stAccSummary"></div>
@@ -953,11 +956,11 @@ const DEFAULT_ACCOUNTS = [
 ];
 const DEFAULT_SETTINGS = {
   company:'', tin:'', from:'2026-01-01', to:'2026-12-31',
-  director:'', accountant:'', vatPct:10, citPct:10, citMode:'standard', tt02:{},
+  director:'', accountant:'', vatPct:BBITax.get('vat.rate',new Date()), citPct:10, citMode:'standard', tt02:{},
   accSummary:'920101', accTaxExp:'910101', accTaxPay:'311003',
   accProfit:'910201', accRetained:'440101', accVatIn:'121001', accVatOut:'311002',
   accPayable:'310101', accReceivable:'120100',
-  ndshEmpPct:11.5, ndshCoPct:12.5, hhoatCredit:20000, accDeprExp:'701014'
+  ndshEmpPct:BBITax.get('ndsh.employee.default',new Date()), ndshCoPct:BBITax.ndshEmployer(new Date(),1), hhoatCredit:BBITax.hhoatMonthlyCredit(0,new Date()), accDeprExp:'701014'
 };
 let DB = { settings:{...DEFAULT_SETTINGS}, accounts:[], partners:[], journal:[], rules:[], payroll:[], assets:[], seq:{doc:100000, batch:1} };
 
@@ -1097,11 +1100,31 @@ function refreshDots(){
 
 /* ═══════════════ SETTINGS ═══════════════ */
 function renderSettings(){
-  const s=DB.settings;
+  const s=DB.settings; renderTaxParams();
   const M={stCompany:'company',stTin:'tin',stFrom:'from',stTo:'to',stDirector:'director',stAccountant:'accountant',
     stVat:'vatPct',stCitMode:'citMode',stAccSummary:'accSummary',stAccTaxExp:'accTaxExp',stAccTaxPay:'accTaxPay',
     stAccProfit:'accProfit',stAccRetained:'accRetained',stAccVatIn:'accVatIn',stAccVatOut:'accVatOut',stAccPayable:'accPayable',stAccReceivable:'accReceivable',stNdshEmp:'ndshEmpPct',stNdshCo:'ndshCoPct',stHhoatCredit:'hhoatCredit'};
   for(const [id,key] of Object.entries(M)) document.getElementById(id).value=s[key];
+}
+/* Тайлант үед хүчинтэй татварын параметрууд — tax.js-ээс, эх сурвалж, ишлэлтэй */
+function renderTaxParams(){
+  const box=document.getElementById('taxParamsBox'); if(!box) return;
+  const d=DB.settings.to||DB.settings.from||new Date();
+  const keys=['vat.rate','vat.registration_threshold','cit.tiers','cit.simple_rate','cit.simple_threshold','ndsh.employee.default','ndsh.employer.default','hhoat.annual_tiers','hhoat.monthly_credit'];
+  const fmtV=p=>{ const v=p.value; if(Array.isArray(v)) return v.map(t=>(t.upto==null?'дээш':'≤ '+fmtMoney(t.upto))+' → '+(t.rate!=null?(t.rate*100)+'%':fmtMoney(t.credit)+'₮')).join('; '); if(typeof v==='object') return Object.entries(v).map(([k,x])=>k+' '+x).join(', '); return v+(p.unit||''); };
+  let rows='';
+  keys.forEach(k=>{ try{ const p=BBITax.row(k,d); rows+=`<tr><td>${esc(p.label)}</td><td class="num">${esc(fmtV(p))}</td><td style="font-size:11px;color:var(--muted)">${esc(p.citation)}<br>${esc(p.source)}</td><td>${p.verified?'<span class="badge ok">баталгаажсан</span>':'<span class="badge warn">VERIFY</span>'}</td></tr>`; }catch(e){ rows+=`<tr><td colspan="4" style="color:var(--red)">${esc(e.message)}</td></tr>`; } });
+  const simpleOpt=document.querySelector('#stCitMode option[value="simple1"]'); if(simpleOpt){ try{ simpleOpt.textContent='1% — жилийн '+fmtMoney(BBITax.get('cit.simple_threshold',d))+'₮ хүртэл борлуулалтын орлоготой (20.2.7)'; }catch(e){} }
+  box.innerHTML=BBITax.banner(d)+`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Параметр</th><th class="num">Утга (${esc(String(BBITax.iso(d)))})</th><th>Эх сурвалж, ишлэл</th><th></th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">Цалин бодогч, НДШ→ХХОАТ хөрвүүлэгч, төлөвлөлт мөн энэ файлаас уншина. Дээрх НДШ/НӨАТ-ын талбарууд компанийн тохиргоо — хоосон бол хуулийн утга хэрэглэнэ.</div>`;
+}
+function fmtMoney(n){ return Math.round(n||0).toLocaleString('en-US'); }
+function applyTaxDefaults(){
+  const d=DB.settings.to||DB.settings.from||new Date();
+  document.getElementById('stVat').value=BBITax.get('vat.rate',d);
+  document.getElementById('stNdshEmp').value=BBITax.get('ndsh.employee.default',d);
+  document.getElementById('stNdshCo').value=BBITax.ndshEmployer(d,1);
+  document.getElementById('stHhoatCredit').value=BBITax.hhoatMonthlyCredit(0,d);
+  toast('Хуулийн утгаар бөглөв — «Тохиргоо хадгалах» дарна уу');
 }
 function saveSettings(){
   const g=id=>document.getElementById(id).value.trim();
@@ -1834,31 +1857,18 @@ function impRenderSkipWarn(){
 /* ── ХХОАТ, НДШ тооцоолол — НДШ/ХХОАТ хөрвүүлэгчтэй ЯГ ИЖИЛ логик ── */
 // Даатгуулагчийн төрлийн кодоор НДШ-ийн хувь (хөрвүүлэгчээс хуулсан):
 // ердийн 11.5%, тэтгэврийн шимтгэл төлөхгүй 0.8%, тэтгэвэр тогтоолгосон ч төлдөг 9.3%
-const NDSH_RATE_BY_CODE={
-  "22011":0.8, "22031":0.8, "25022":0.8, "34011":0.8, "39012":0.8, "70011":0.8,
-  "22001":9.3, "22021":9.3, "25012":9.3, "34001":9.3, "38002":9.3, "39002":9.3, "70001":9.3
-};
-function ndshRate(code){
-  const r=NDSH_RATE_BY_CODE[String(code||'').trim()];
-  return (r===undefined)? (DB.settings.ndshEmpPct||11.5) : r;
+/* Хувь, шатлал, хөнгөлөлт — tax.js (огноотой параметр). Тайлант сар: цалингийн сар
+   (салбарын сонголт / импортын nMonth), байхгүй бол тайлант үеийн эхлэл. */
+let SAL_TAX_MONTH='';
+function payrollTaxDate(){
+  const m=SAL_TAX_MONTH||((document.getElementById('nMonth')||{}).value)||'';
+  return m? m+'-01' : (DB.settings.from||new Date().toISOString().slice(0,10));
 }
+function ndshRate(code){ return BBITax.ndshEmployee(code, payrollTaxDate(), DB.settings.ndshEmpPct||undefined); }
 // Сарын хөнгөлөлтийн шатлал — ОЗЦ (цалин − НДШ)-аар (хөрвүүлэгчтэй ижил)
-function monthlyCreditTier(ozc){
-  if(ozc<=500000)  return 20000;
-  if(ozc<=1000000) return 18000;
-  if(ozc<=1500000) return 16000;
-  if(ozc<=2000000) return 14000;
-  if(ozc<=2500000) return 12000;
-  if(ozc<=3000000) return 10000;
-  return 0;
-}
+function monthlyCreditTier(ozc){ return BBITax.hhoatMonthlyCredit(ozc, payrollTaxDate()); }
 // Шатлалт татвар (хуулийн 21.1) — хөрвүүлэгчтэй ижил
-function tierTaxJ(taxable){
-  if(taxable<=0) return 0;
-  if(taxable<=120000000) return taxable*0.10;
-  if(taxable<=180000000) return 12000000+(taxable-120000000)*0.15;
-  return 21000000+(taxable-180000000)*0.20;
-}
+function tierTaxJ(taxable){ return BBITax.hhoatMonthly(taxable, payrollTaxDate()); }
 // Ажилтны мөрийн автомат хөнгөлөлт (70 код — татвараас чөлөөлөгдсөн,
 // 40 код — давхар ажлын 7.1.6 орлого тул сарын хөнгөлөлтгүй)
 function autoCredit(e){
@@ -3300,7 +3310,7 @@ function salCurrent(){
 }
 function renderSalary(){
   const sel=document.getElementById('salMonthSel');
-  const cur=sel.value;
+  const cur=sel.value; SAL_TAX_MONTH=cur||'';
   sel.innerHTML=DB.payroll.map(p=>`<option value="${p.month}">${p.month}</option>`).join('');
   if([...sel.options].some(o=>o.value===cur)) sel.value=cur;
   else if(sel.options.length) sel.value=sel.options[sel.options.length-1].value;
@@ -3829,11 +3839,7 @@ function catOpening(cats){
   return v;
 }
 /* ААНОАТ: хуулийн 20.1 (10%, 6 тэрбумаас дээш 600 сая + 25%) эсвэл 20.2.7 (1%) */
-function citTax(base){
-  if(base<=0) return 0;
-  if(DB.settings.citMode==='simple1') return r2(base*0.01);
-  return base<=6e9 ? r2(base*0.10) : r2(6e8 + (base-6e9)*0.25);
-}
+function citTax(base){ return BBITax.cit(base, DB.settings.to||new Date(), DB.settings.citMode); }
 function citLabel(){
   return DB.settings.citMode==='simple1' ? 'ААНОАТ 1% (хуулийн 20.2.7)' : 'ААНОАТ 10%/25% (хуулийн 20.1)';
 }

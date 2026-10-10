@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <script src="gate.js"></script>
+<script src="tax.js"></script>
 <script src="pay.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="site.css">
@@ -381,6 +382,7 @@
         </div>
 
         <!-- 4. Гол дүгнэлт -->
+        <div id="taxWarn"></div>
         <div class="insights" id="insights"></div>
       </div>
   </div><!-- /dash panel -->
@@ -746,64 +748,16 @@ function typeCat(code){
 // Ердийн даатгуулагч: тэтгэврийн 8.5 + тэтгэмжийн 0.8 + ажилгүйдлийн 0.2 + ЭМД 2.0 = 11.5%
 // Тэтгэвэр тогтоолгосон, тэтгэврийн даатгалын шимтгэл ТӨЛӨХГҮЙ: зөвхөн тэтгэмжийн 0.8%
 // Тэтгэвэр тогтоолгосон, тэтгэврийн даатгалын шимтгэл ТӨЛНӨ: 8.5 + 0.8 = 9.3%
-const EMD_RATE=11.5; // default (танигдаагүй код)
-const NDSH_RATE_BY_CODE={
-  // "тэтгэврийн даатгалын шимтгэл төлөхгүй" гэсэн кодууд → 0.8%
-  "22011":0.8, "22031":0.8, "25022":0.8, "34011":0.8, "39012":0.8, "70011":0.8,
-  // "тэтгэвэр тогтоолгосон ... шимтгэл төлнө" гэсэн кодууд → 9.3%
-  // ⚠ БАТАЛГААЖУУЛАХ: НДЕГ/нягтлангаар шалгуулж баталгаажуулна уу
-  "22001":9.3, "22021":9.3, "25012":9.3, "34001":9.3, "38002":9.3, "39002":9.3, "70001":9.3
-};
-function ndshRate(code){
-  const r=NDSH_RATE_BY_CODE[String(code||'').trim()];
-  return (r===undefined)?EMD_RATE:r;
-}
-
-// 21.1 Шатлалт татвар. Цалингийн хувьд бараг үргэлж 10% (120 саяас доош).
-// 120 саяас дээш бол шатлал хэрэгжинэ. Маягт дээр "Шатлал" багана 1 байна.
-function tierTax(taxable){
-  if(taxable<=0) return 0;
-  if(taxable<=120000000) return taxable*0.10;
-  if(taxable<=180000000) return 12000000+(taxable-120000000)*0.15;
-  return 21000000+(taxable-180000000)*0.20;
-}
-// Шатлалын дугаар (etax "Шатлал" багана)
-function tierNo(taxable){
-  if(taxable<=120000000) return 1;
-  if(taxable<=180000000) return 2;
-  return 3;
-}
-// 23.1 Сард ногдох хөнгөлөлт — цалин бодогчтой адил ОЗЦ (НДШ хассан сарын
-// орлого)-оор шатлалыг ШУУД тогтооно. ×12 хувиргахгүй.
-// Эх сурвалж: 2020.01.01-нээс мөрдөх хүснэгт.
-// Д/д | ОЗЦ (НДШ 11.5% хассан сарын дүн) | Сарын хөнгөлөлт
-// 1   | 0 – 500,000           | 20,000
-// 2   | 500,001 – 1,000,000   | 18,000
-// 3   | 1,000,001 – 1,500,000 | 16,000
-// 4   | 1,500,001 – 2,000,000 | 14,000
-// 5   | 2,000,001 – 2,500,000 | 12,000
-// 6   | 2,500,001 – 3,000,000 | 10,000
-// 7   | 3,000,001+            | хөнгөлөлтгүй (0)
-function monthlyCredit(ozc){
-  if(ozc<=500000)  return 20000;
-  if(ozc<=1000000) return 18000;
-  if(ozc<=1500000) return 16000;
-  if(ozc<=2000000) return 14000;
-  if(ozc<=2500000) return 12000;
-  if(ozc<=3000000) return 10000;
-  return 0;
-}
-
-// Шатлалын тайлбар (задаргаа хуудсанд харуулах)
-function creditTierLabel(ozc){
-  if(ozc<=500000)  return '0–500,000 → 20,000₮';
-  if(ozc<=1000000) return '500,001–1,000,000 → 18,000₮';
-  if(ozc<=1500000) return '1,000,001–1,500,000 → 16,000₮';
-  if(ozc<=2000000) return '1,500,001–2,000,000 → 14,000₮';
-  if(ozc<=2500000) return '2,000,001–2,500,000 → 12,000₮';
-  if(ozc<=3000000) return '2,500,001–3,000,000 → 10,000₮';
-  return '3,000,001+ → хөнгөлөлтгүй';
-}
+/* Хувь, шатлал, хөнгөлөлт — tax.js (огноотой параметр). Тайлант жил state.year-аас. */
+function convTaxDate(){ return ((typeof state!=='undefined'&&state&&state.year)||new Date().getFullYear())+'-01-01'; }
+function EMD_RATE_OF(){ return BBITax.get('ndsh.employee.default', convTaxDate()); }
+function ndshRate(code){ return BBITax.ndshEmployee(code, convTaxDate()); }
+// 21.1 Шатлалт татвар — жилийн өссөн ТНО-оор
+function tierTax(taxable){ return BBITax.hhoatAnnual(taxable, convTaxDate()); }
+function tierNo(taxable){ return BBITax.hhoatTierNo(taxable, convTaxDate()); }
+// 23.1 Сард ногдох хөнгөлөлт — ОЗЦ (НДШ хассан сарын орлого)-оор
+function monthlyCredit(ozc){ return BBITax.hhoatMonthlyCredit(ozc, convTaxDate()); }
+function creditTierLabel(ozc){ return BBITax.hhoatCreditLabel(ozc, convTaxDate()); }
 
 // ---- Регистрээр нэгтгэх (өссөн дүн) ----
 // Улирлын бүх орсон сарын мөрүүдийг регистрээр нэгтгэж, орсон сарын тоог тоолно.
@@ -1081,6 +1035,7 @@ function fmtMln(n){
 // Гол дүгнэлтүүдийг автоматаар үүсгэх
 function drawInsights(agg, demo, mt, lastM, lastMonthCount){
   const el=$('insights'); if(!el) return;
+  const tw=$('taxWarn'); if(tw) tw.innerHTML=BBITax.banner(convTaxDate());
   const I={
     trend:`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>`,
     people:`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>`,
@@ -1762,7 +1717,7 @@ function buildExcel(){
 
     push([`ХХОАТ ТООЦООЛЛЫН ЗАДАРГАА — ${year} он (${qLabel})`]);
     push([modeNote]);
-    push([`ЭМД хувь: даатгуулагчийн кодоор (ердийн ${EMD_RATE}%, тэтгэврийн шимтгэл төлөхгүй 0.8%, төлдөг 9.3%)   |   Татвар: 120 саяас доош 10%   |   Хамрах ажилтан: ${list.length}`]);
+    push([`ЭМД хувь: даатгуулагчийн кодоор (ердийн ${EMD_RATE_OF()}%, тэтгэврийн шимтгэл төлөхгүй 0.8%, төлдөг 9.3%)   |   Татвар: 120 саяас доош 10%   |   Хамрах ажилтан: ${list.length}`]);
     push([]);
 
     list.forEach((r,idx)=>{

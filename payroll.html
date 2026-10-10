@@ -11,6 +11,7 @@
 <meta property="og:type" content="website"><meta property="og:site_name" content="BusinessBI.mn"><meta property="og:title" content="Цалин бодогч — BusinessBI.mn"><meta property="og:description" content="Цалин, НДШ, ХХОАТ, хөнгөлөлт — сар бүр автоматаар. Цалингийн хуудас, НД тайлан, ХХОАТ маягт."><meta property="og:url" content="https://businessbi.mn/payroll.html"><meta property="og:image" content="https://businessbi.mn/og-image.png"><meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="site.css">
 <script src="gate.js"></script>
+<script src="tax.js"></script>
 <script src="site.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -104,6 +105,7 @@ table.g{border-collapse:collapse;width:100%;font-size:13px;min-width:900px}
 
   <!-- Сарын цалин -->
   <div class="panel" id="p-pay">
+    <div id="taxWarn"></div>
     <div class="kpis" id="kpis"></div>
     <div class="bar"><div class="l"><button class="btn p" id="fillMonth">Үндсэн цалингаар бөглөх</button><button class="btn" id="copyPrev">Өмнөх сараас хуулах</button><button class="btn d" id="clearMonth">Сарыг цэвэрлэх</button></div>
       <div class="r"><button class="btn" id="xlsPay">⬇ Цалингийн хүснэгт (Excel)</button><button class="btn" id="xlsNd">⬇ НД тайлан (Excel)</button><button class="btn" id="xlsTax">⬇ ХХОАТ маягт (Excel)</button></div></div>
@@ -136,7 +138,7 @@ table.g{border-collapse:collapse;width:100%;font-size:13px;min-width:900px}
 <script>
 /* ═══════════════ ӨГӨГДӨЛ ═══════════════ */
 const KEY='bbi_payroll_v1';
-const DEF={settings:{name:'',tin:'',director:'',accountant:'',empRate:12.5,payDay:10}, employees:[], months:{}}; // months[YYYY-MM] = {empId:{base,add,ded,note}}
+const DEF={settings:{name:'',tin:'',director:'',accountant:'',empRate:BBITax.ndshEmployer(new Date(),1),payDay:10}, employees:[], months:{}}; // months[YYYY-MM] = {empId:{base,add,ded,note}}
 let DB=load();
 function load(){ try{ const d=JSON.parse(localStorage.getItem(KEY)||'null'); if(d&&d.settings) return {...DEF,...d, settings:{...DEF.settings,...d.settings}}; }catch(e){} return JSON.parse(JSON.stringify(DEF)); }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(DB)); }catch(e){ toast('Хадгалж чадсангүй (хөтчийн санах ой)'); } }
@@ -148,10 +150,11 @@ function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show');
 
 /* ═══════════════ ТАТВАР, ШИМТГЭЛ (хөрвүүлэгчтэй ижил логик) ═══════════════ */
 const TYPES={"01001":"Үндсэн ажилтан (гэрээт)","02001":"Иргэний гэрээгээр ажиллагч","06002":"Хүүхэд асрах чөлөөтэй","17002":"Жирэмсний/амаржсаны амралттай","22001":"Өндөр насны тэтгэвэртэй (шимтгэл төлнө)","22011":"Өндөр насны тэтгэвэртэй (шимтгэл төлөхгүй)","40001":"Давхар ажил (үндсэн ажлаас гадуур)","70001":"ХЧА тэтгэвэртэй (шимтгэл төлнө)","70011":"ХЧА тэтгэвэртэй (шимтгэл төлөхгүй)","75001":"ТУЗ-ийн гишүүн"};
-const NDSH_RATE={"22011":0.8,"22031":0.8,"25022":0.8,"34011":0.8,"39012":0.8,"70011":0.8,"22001":9.3,"22021":9.3,"25012":9.3,"34001":9.3,"38002":9.3,"39002":9.3,"70001":9.3};
-const ndshRate=code=>NDSH_RATE[String(code||'').trim()]??11.5;
-function tierTax(k){ if(k<=0) return 0; if(k<=120000000) return k*0.10; if(k<=180000000) return 12000000+(k-120000000)*0.15; return 21000000+(k-180000000)*0.20; }
-function monthlyCredit(ozc){ if(ozc<=500000) return 20000; if(ozc<=1000000) return 18000; if(ozc<=1500000) return 16000; if(ozc<=2000000) return 14000; if(ozc<=2500000) return 12000; if(ozc<=3000000) return 10000; return 0; }
+/* Хувь, шатлал, хөнгөлөлт — tax.js (огноотой параметр); тайлант сар MONTH-оор */
+const taxDate=()=>(typeof MONTH==='string'&&MONTH)?MONTH+'-01':new Date().toISOString().slice(0,10);
+const ndshRate=code=>BBITax.ndshEmployee(code, taxDate());
+const tierTax=k=>BBITax.hhoatMonthly(k, taxDate());
+const monthlyCredit=ozc=>BBITax.hhoatMonthlyCredit(ozc, taxDate());
 function calc(e, row){
   const base=+row.base||0, add=+row.add||0, ded=+row.ded||0;
   const gross=r2(base+add);
@@ -159,7 +162,7 @@ function calc(e, row){
   const exempt=code.startsWith('70'), noCredit=code.startsWith('40')||e.nonResident;
   const ndsh=r2(gross*ndshRate(code)/100);
   const taxable=r2(Math.max(0,gross-ndsh));
-  let tax=exempt?0:(e.nonResident?r2(taxable*0.20):r2(tierTax(taxable)));
+  let tax=exempt?0:(e.nonResident?r2(taxable*BBITax.get('hhoat.nonresident_rate',taxDate())/100):r2(tierTax(taxable)));
   const credit=(exempt||noCredit||tax<=0)?0:Math.min(monthlyCredit(taxable), tax);
   const taxAfter=r2(Math.max(0,tax-credit));
   const net=r2(gross-ndsh-taxAfter-ded);
@@ -215,7 +218,7 @@ $('impEmpFile').onchange=async e=>{
 /* ═══════════════ САРЫН ЦАЛИН ═══════════════ */
 function activeEmps(){ return DB.employees.filter(e=>e.active!==false); }
 function renderPay(){
-  renderMonths();
+  renderMonths(); $('taxWarn').innerHTML=BBITax.banner(taxDate());
   const t=$('payTable'); const rows=monthRows(); const list=activeEmps();
   if(!list.length){ t.innerHTML='<tr><td class="empty" colspan="14">Идэвхтэй ажилтан алга.</td></tr>'; $('kpis').innerHTML=''; $('payWarn').innerHTML=''; return; }
   const tot={gross:0,ndsh:0,taxAfter:0,ded:0,net:0,employer:0,credit:0};
