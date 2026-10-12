@@ -50,14 +50,48 @@ export function normalizeStatus(s: unknown): Norm {
   return { status: "pending", rawStatus: v };
 }
 
-/** Нэхэмжлэл + hosted checkout. amount — төгрөгөөр. */
-export async function createIntent(secretKey: string, p: { amount: number; currency?: string; description?: string; metadata: Record<string, string>; successUrl?: string; cancelUrl?: string; operators?: string[] }) {
-  const idem = p.metadata?.paymentId || crypto.randomUUID();
+export type IntentParams = { amount: number; currency?: string; description?: string; metadata: Record<string, string>; successUrl?: string; cancelUrl?: string; operators?: string[] };
+function intentBody(secretKey: string, p: IntentParams) {
   const ops = p.operators && p.operators.length ? p.operators : (secretKey.startsWith("sk_test_") ? ["sandbox"] : []);
   const body: Record<string, unknown> = { amount: Math.round(p.amount * AMOUNT_MULT), currency: p.currency ?? "MNT", description: String(p.description ?? "").slice(0, 500), metadata: p.metadata ?? {} };
   if (ops.length) body.allowed_operators = ops;
-  const intent = await wireFetch(secretKey, "POST", "/payment_intents", body, "pi-" + idem);
+  return body;
+}
+/** Зөвхөн PaymentIntent (hosted session-гүй) — inline QR урсгалд */
+export async function createPaymentIntent(secretKey: string, p: IntentParams, idem?: string) {
+  const intent = await wireFetch(secretKey, "POST", "/payment_intents", intentBody(secretKey, p), "pi-" + (idem ?? p.metadata?.paymentId ?? crypto.randomUUID()));
   if (!intent?.id) throw new WireError("WIRE: payment_intent хариунд id алга", 502, null, intent);
+  return intent;
+}
+
+/* next_action (confirm-ийн дараа) — баримтжуулаагүй, 2026-10-12 live дээр бодитоор шалгасан бүтэц:
+     { type:"qr", qr:{ text:"0002010102…", image_url:"data:image/png;base64,…",
+                       deeplinks:[{name:"Khan bank", description:"Хаан банк", logo:"https://…png", link:"khanbank://q?qPay_QRcode=…"}, …] } } */
+export type QrAction = { text: string; image: string | null; deeplinks: { name: string; description: string; logo: string; link: string }[] };
+export function parseNextAction(na: any): QrAction | null {
+  const qr = na?.qr ?? (na?.type === "qr" ? na : null);
+  const text = qr?.text ?? qr?.qr_text ?? qr?.data ?? null;
+  if (!text) return null;
+  const image = qr?.image_url ?? qr?.image ?? qr?.qr_image ?? null;
+  const links = Array.isArray(qr?.deeplinks) ? qr.deeplinks : (Array.isArray(qr?.urls) ? qr.urls : []);
+  const deeplinks = links.filter((d: any) => d?.link).map((d: any) => ({ name: String(d.name ?? ""), description: String(d.description ?? ""), logo: String(d.logo ?? ""), link: String(d.link) })).slice(0, 40);
+  return { text: String(text), image: image ? String(image) : null, deeplinks };
+}
+/** Intent-ийг оператор руу илгээж (confirm) QR/deeplink авна. operator өгөхгүй бол эхний зөвшөөрөгдсөн оператор. */
+export async function confirmIntent(secretKey: string, intentId: string, operator?: string, idem?: string) {
+  const body: Record<string, unknown> = {};
+  if (operator) body.operator = operator;
+  const pi = await wireFetch(secretKey, "POST", `/payment_intents/${encodeURIComponent(intentId)}/confirm`, body, "cf-" + (idem ?? intentId));
+  return { status: normalizeStatus(pi?.status).status, rawStatus: String(pi?.status ?? ""), operator: pi?.selected_operator ?? null, qr: parseNextAction(pi?.next_action), expiresAt: pi?.expires_at ?? null, raw: pi };
+}
+export async function cancelIntent(secretKey: string, intentId: string) {
+  return wireFetch(secretKey, "POST", `/payment_intents/${encodeURIComponent(intentId)}/cancel`, {}, "cx-" + intentId);
+}
+
+/** Нэхэмжлэл + hosted checkout (pay.wire.mn). amount — төгрөгөөр. */
+export async function createIntent(secretKey: string, p: IntentParams, idemKey?: string) {
+  const idem = idemKey || p.metadata?.paymentId || crypto.randomUUID();
+  const intent = await createPaymentIntent(secretKey, p, idem);
   const sess: Record<string, string> = { payment_intent: intent.id };
   if (p.successUrl) sess.success_url = p.successUrl;
   if (p.cancelUrl) sess.cancel_url = p.cancelUrl;

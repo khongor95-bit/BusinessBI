@@ -32,7 +32,7 @@
 
 | Функц | Зам | Нэвтрэлт | Үүрэг |
 |---|---|---|---|
-| `payments` | `POST /functions/v1/payments/create` | хэрэглэгч | нэхэмжлэл + WIRE checkout URL (эсвэл mock хуудас) |
+| `payments` | `POST /functions/v1/payments/create` | хэрэглэгч | нэхэмжлэл → **inline QR** (`qr:{text,image,deeplinks}` — хуудсан дээрээ, шинэ цонхгүй); болохгүй бол WIRE hosted checkout URL; mock горимд mock хуудас |
 | | `POST /functions/v1/payments/check` | хэрэглэгч | төлөв; pending бол WIRE-ээс лавлана; `consume:true` → татсан тоо +1 |
 | | `POST /functions/v1/payments/webhook` | WIRE гарын үсэг | `payment_intent.succeeded` → `payments.status='paid'`; `endpoint.verification` → 200 |
 | | `POST /functions/v1/payments/mock` | линкийн sig | `wire_mode=mock` үеийн тест төлбөрийн JSON API; хуудас нь сайт дээр `mock_checkout.html` (edge gateway HTML-ийг text/plain + CSP sandbox болгодог тул функц HTML буцаахгүй) |
@@ -43,6 +43,15 @@
 Протокол (бүгд): `{data:{…}}` → `200 {result:{…}}` эсвэл `4xx {error:{status, message}}`. Клиент: `mp.js` → `BBIMP.callFn(name, data)`;
 `pay.js`, `ebarimt.js`, `receipt.js` үүнийг ашиглана. `mp.js` нь хуучин `gate.js`-тэй нийцтэй `BBIGate` API-г (protect/logActivity/getUser) Supabase дээр өгдөг тул
 хэрэгслийн хуудсууд `<script src="mp.js">` + `<body data-auth="supabase">`.
+
+### WIRE-ийн бодит зан төлөв (docs-оос зөрсөн, 2026-10-12 live дээр тулгасан)
+- **Дүн бүхэл төгрөгөөр.** docs.wire.mn «50000 = 500.00₮» гэж бичсэн ч `amount:500000` нь pay.wire.mn дээр **500,000₮** гэж гарсан.
+  `wire.ts` → `AMOUNT_MULT = 1`. Хэзээ ч 100 болгохгүй.
+- **Inline QR**: `POST /payment_intents` → `POST /payment_intents/{id}/confirm` ({} эсвэл {operator}) → `next_action.qr = {text, image_url (data:png), deeplinks:[{name,description,logo,link}]}`
+  (23 банкны апп, бүгд `…://q?qPay_QRcode=…` — WIRE дотроо QPay reseller). Intent TTL ~15 мин. `check` нь `GET /payment_intents/{id}` → `succeeded`.
+  pay.wire.mn-ийг iframe-д оруулж болохгүй (`frame-ancestors 'none'`), тиймээс QR-ийг `pay.js` modal дотор өөрсдөө зурна.
+  Унтраах бол `app_settings.wire_inline='0'` → hosted checkout (шинэ цонх) руу буцна.
+- Үйлчилж буй оператор: `GET /operator_connections` → `qpay` (mode: reseller).
 
 ## Хүснэгт (`migrations/20261010_payments.sql`)
 `payments` (хэрэглэгч өөрийнхийг уншина, бичих зөвхөн service role), `payment_events` (webhook аудит, id = WIRE event id → давхардал),

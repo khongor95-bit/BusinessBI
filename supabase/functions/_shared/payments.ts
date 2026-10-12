@@ -15,16 +15,23 @@ export type Payment = {
   provider_intent_id: string | null; provider_session_id: string | null; provider_status: string | null;
   checkout_url: string | null; meta: Record<string, unknown>; created_at: string; paid_at: string | null;
   paid_via: string | null; expires_at: string | null; downloads: number; last_download_at: string | null;
+  provider_raw?: Record<string, any> | null;   // {intent, session?, confirm?, qr?:{text,image,deeplinks}}
 };
 
 const ms = (iso: string | null) => (iso ? new Date(iso).getTime() : 0);
 
-/** Клиентэд буцаах хэлбэр (pay.js-ийн хүлээдэг талбарууд) */
+/** Клиентэд буцаах хэлбэр (pay.js-ийн хүлээдэг талбарууд).
+    qr — inline төлбөрийн QR (pending үед л): {text, image, deeplinks[]}; intentExpiresAt — WIRE intent-ийн хугацаа (ms) */
 export function publicView(p: Payment) {
   const paid = p.status === "paid" && ms(p.expires_at) > Date.now();
+  const raw = p.provider_raw ?? {};
+  const intentExp = Number(raw?.confirm?.expires_at ?? raw?.intent?.expires_at ?? 0) * 1000;
+  const pending = p.status === "pending";
   return {
     paymentId: p.id, status: p.status, paid, amount: p.amount, currency: p.currency, tool: p.tool,
-    checkoutUrl: p.status === "pending" ? (p.checkout_url ?? null) : null,
+    checkoutUrl: pending ? (p.checkout_url ?? null) : null,
+    qr: pending && raw?.qr?.text ? raw.qr : null,
+    intentExpiresAt: pending && intentExp ? intentExp : null,
     paidAt: ms(p.paid_at) || null, expiresAt: ms(p.expires_at) || null, downloads: p.downloads ?? 0, provider: p.provider,
   };
 }

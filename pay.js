@@ -11,8 +11,10 @@
 
    Урсгал:
      1. localStorage-д хүчинтэй тасалбар (24 цаг) байвал → сервер дээр баталгаажуулж → шууд cb()
-     2. Үгүй бол төлбөрийн modal → payments/create → WIRE checkout-ийг ШИНЭ ЦОНХОНД нээнэ
-        (хуудсыг солихгүй — хэрэглэгчийн PDF-ээс уншсан өгөгдөл санах ойд байдаг тул)
+     2. Үгүй бол төлбөрийн modal → payments/create:
+        а) qr ирвэл (WIRE inline) — QR + банкны аппын товчнуудыг ЭНЭ modal дотор харуулна (шинэ цонхгүй;
+           хуудсыг солихгүй — хэрэглэгчийн PDF-ээс уншсан өгөгдөл санах ойд байдаг тул)
+        б) checkoutUrl ирвэл (hosted fallback / mock) — шинэ цонхонд нээнэ, нээгдэхгүй бол линк
      3. 3 сек тутам payments/check-ээр шалгана; pay_done.html-ээс postMessage ирвэл шууд шалгана
      4. Төлөгдмөгц тасалбар хадгалж, modal хааж, cb() ажиллуулна
    ============================================================ */
@@ -81,6 +83,21 @@
       @keyframes bbipay-r{to{transform:rotate(360deg)}}
       .bbipay-f{padding:12px 28px;background:#f7f9f8;border-top:1px solid #eef1ef;font-size:11.5px;color:#6b7670;line-height:1.5}
       .bbipay-sec{margin-top:10px;font-size:12px;text-align:center}.bbipay-sec button{background:none;border:none;color:#6b7670;text-decoration:underline;cursor:pointer;font-size:12px}
+      .bbipay-qr{display:none;text-align:center}
+      .bbipay-qr.show{display:block}
+      .bbipay-qr .amt{font-size:28px;font-weight:800;color:#1a4d38;letter-spacing:-.5px;margin:2px 0 4px}
+      .bbipay-qr .hint{font-size:12.5px;color:#6b7670;margin-bottom:10px}
+      .bbipay-qr .img{display:inline-block;padding:8px;border:1px solid #e3e7e4;border-radius:14px;background:#fff}
+      .bbipay-qr .img img,.bbipay-qr .img canvas{display:block;width:200px;height:200px}
+      .bbipay-qr .timer{font-size:11.5px;color:#6b7670;margin-top:8px}
+      .bbipay-banks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px;max-height:230px;overflow:auto;padding:2px}
+      .bbipay-banks a{display:flex;align-items:center;gap:8px;padding:9px 10px;min-width:0;border:1px solid #e3e7e4;border-radius:10px;font-size:12.5px;color:#1a2b25;text-decoration:none;background:#fff;text-align:left}
+      .bbipay-banks a:hover{border-color:#216a4c;background:#f3f8f5}
+      .bbipay-banks img{width:24px;height:24px;border-radius:6px;object-fit:cover;flex:none}
+      .bbipay-banks span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .bbipay-or{font-size:11.5px;color:#6b7670;margin:12px 0 0}
+      .bbipay-mobile .bbipay-qr .img img{width:150px;height:150px}
+      .bbipay-toggle{margin-top:8px;font-size:12px}.bbipay-toggle button{background:none;border:none;color:#216a4c;text-decoration:underline;cursor:pointer;font-size:12px}
     `;
     document.head.appendChild(st);
     modal = document.createElement("div");
@@ -91,7 +108,16 @@
       <div class="bbipay-b">
         <div class="bbipay-price"><b id="bbipayAmt"></b><span id="bbipayPer"></span></div>
         <ul class="bbipay-list" id="bbipayList"></ul>
-        <button class="bbipay-btn" id="bbipayGo"><span class="bbipay-wire">WIRE</span> WIRE.mn-ээр төлөх →</button>
+        <button class="bbipay-btn" id="bbipayGo"><span class="bbipay-wire">WIRE</span> Банкны аппаар төлөх →</button>
+        <div class="bbipay-qr" id="bbipayQr">
+          <div class="amt" id="bbipayQrAmt"></div>
+          <div class="hint" id="bbipayQrHint">Банкны аппаараа QR-ийг уншуулна уу</div>
+          <div class="img" id="bbipayQrBox"><img id="bbipayQrImg" alt="Төлбөрийн QR"></div>
+          <div class="timer" id="bbipayQrTimer"></div>
+          <div class="bbipay-or" id="bbipayOr">эсвэл банкны аппаа сонгоно уу</div>
+          <div class="bbipay-banks" id="bbipayBanks"></div>
+          <div class="bbipay-toggle" id="bbipayQrToggle"></div>
+        </div>
         <div class="bbipay-st" id="bbipaySt"></div>
         <div class="bbipay-sec" id="bbipayAlt" style="display:none"><button id="bbipayRecheck">Төлбөр хийсэн — дахин шалгах</button></div>
       </div>
@@ -108,9 +134,61 @@
   }
   function $(id) { return modal.querySelector("#" + id); }
   function setStatus(html, cls) { const el = $("bbipaySt"); el.className = "bbipay-st" + (cls ? " " + cls : ""); el.innerHTML = html; }
+  const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const isMobile = () => (window.matchMedia && matchMedia("(pointer:coarse)").matches) || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  // ── Inline QR (WIRE next_action.qr) — шинэ цонхгүй, хуудсан дээрээ ───────────
+  let qrTimer = null;
+  function hideQr() {
+    if (qrTimer) { clearInterval(qrTimer); qrTimer = null; }
+    $("bbipayQr").classList.remove("show");
+    modal.classList.remove("bbipay-mobile");
+    [".bbipay-price", ".bbipay-list", "#bbipayGo"].forEach(s => { const e = modal.querySelector(s); if (e) e.style.display = ""; });
+  }
+  function showQr(r) {
+    const qr = r.qr, mobile = isMobile();
+    [".bbipay-price", ".bbipay-list", "#bbipayGo"].forEach(s => { const e = modal.querySelector(s); if (e) e.style.display = "none"; });
+    modal.classList.toggle("bbipay-mobile", mobile);
+    $("bbipayQrAmt").textContent = fmtMNT(r.amount);
+    const img = $("bbipayQrImg");
+    if (qr.image) img.src = qr.image;
+    else { // image ирээгүй бол текстийг нь өөрөө QR болгоно (qrcode lib байвал), үгүй бол зөвхөн банкны аппууд
+      img.removeAttribute("src"); $("bbipayQrBox").style.display = "none";
+    }
+    const banks = $("bbipayBanks");
+    banks.innerHTML = (qr.deeplinks || []).map(d => `<a href="${esc(d.link)}" rel="noopener"><img src="${esc(d.logo)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'"><span>${esc(d.name)}</span></a>`).join("");
+    const hasBanks = !!(qr.deeplinks && qr.deeplinks.length);
+    // Утсан дээр: банкны аппын товчнууд гол нь (deeplink тухайн төхөөрөмж дээрээ л нээгдэнэ), QR-ийг хураана.
+    // Компьютер дээр: QR гол нь; deeplink ажиллахгүй тул банкны жагсаалтыг нуун.
+    const tog = $("bbipayQrToggle");
+    if (mobile && hasBanks) {
+      $("bbipayQrHint").textContent = "Банкны аппаа сонгоод төлбөрөө баталгаажуулна уу";
+      $("bbipayQrBox").style.display = "none"; $("bbipayOr").style.display = "none"; banks.style.display = "";
+      tog.innerHTML = '<button type="button">Өөр утсаар уншуулах бол QR харуулах</button>';
+      tog.querySelector("button").onclick = () => { const b = $("bbipayQrBox"); const on = b.style.display === "none"; b.style.display = on ? "" : "none"; tog.querySelector("button").textContent = on ? "QR нуух" : "Өөр утсаар уншуулах бол QR харуулах"; };
+    } else {
+      $("bbipayQrHint").textContent = "Утсан дээрх банкны аппаараа QR-ийг уншуулна уу";
+      $("bbipayOr").style.display = "none"; banks.style.display = "none"; tog.innerHTML = "";
+    }
+    $("bbipayQr").classList.add("show");
+    // Хугацаа (WIRE intent ~15 мин)
+    if (qrTimer) clearInterval(qrTimer);
+    const exp = r.intentExpiresAt || 0, tEl = $("bbipayQrTimer");
+    const tick = () => {
+      if (!exp) { tEl.textContent = ""; return; }
+      const left = exp - Date.now();
+      if (left <= 0) { clearInterval(qrTimer); qrTimer = null; tEl.textContent = "QR-ийн хугацаа дууслаа."; stopPoll();
+        setStatus('<button type="button" class="bbipay-btn" id="bbipayRenew" style="margin-top:4px">Шинэ QR авах</button>', "");
+        $("bbipayRenew").onclick = () => { hideQr(); setStatus(""); startPayment(); }; return; }
+      tEl.textContent = "QR хүчинтэй: " + Math.floor(left / 60000) + ":" + String(Math.floor((left % 60000) / 1000)).padStart(2, "0");
+    };
+    tick(); qrTimer = setInterval(tick, 1000);
+  }
+
   function open(req) {
     buildModal();
     current = { tool: req.tool, meta: req.meta || {}, onPaid: req.onPaid, paymentId: null, checkoutUrl: null, win: null };
+    hideQr();
     const pr = PRICES[req.tool] || { amount: 0, label: "", validHours: 24 };
     $("bbipayTitle").textContent = req.title || "Тайлан татах";
     $("bbipayDesc").textContent = req.desc || "";
@@ -132,6 +210,7 @@
     modal.classList.remove("show");
     document.body.style.overflow = "";
     stopPoll();
+    if (qrTimer) { clearInterval(qrTimer); qrTimer = null; }
   }
   function stopPoll() { if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; } }
 
@@ -140,24 +219,28 @@
     const btn = $("bbipayGo");
     btn.disabled = true;
     setStatus('<span class="bbipay-spin"></span>Нэхэмжлэл үүсгэж байна…');
-    // Popup-ийг хэрэглэгчийн click-ийн дотор нээнэ (блоклогдохоос сэргийлж) — дараа нь URL онооно
-    let win = null;
-    try { win = window.open("about:blank", "bbipay_checkout", "popup=yes,width=520,height=760"); } catch (_) {}
     try {
       const r = await call("createPayment", { tool: current.tool, meta: current.meta });
       current.paymentId = r.paymentId; current.checkoutUrl = r.checkoutUrl;
       if (r.paid) { await onPaid(r); return; }
-      if (!r.checkoutUrl) throw new Error("checkout URL ирсэнгүй");
-      if (win && !win.closed) { win.location.href = r.checkoutUrl; current.win = win; }
-      else { win = window.open(r.checkoutUrl, "bbipay_checkout"); current.win = win; }
-      const link = `<a href="${r.checkoutUrl}" target="bbipay_checkout" rel="noopener">энд дарж</a>`;
-      setStatus(`<span class="bbipay-spin"></span>Төлбөрийн цонх нээгдлээ — тэнд төлбөрөө хийнэ үү. Энэ хуудсыг хаахгүй. ` +
-                (current.win ? `Цонх харагдахгүй бол ${link} нээнэ үү.` : `Цонх нээгдсэнгүй (popup хориглосон байж магадгүй) — ${link} нээнэ үү.`));
+      if (r.qr && r.qr.text) {
+        // Inline QR — энэ modal дотор, шинэ цонхгүй
+        showQr(r);
+        setStatus('<span class="bbipay-spin"></span>Төлбөр хүлээж байна… Төлсний дараа автоматаар үргэлжилнэ.');
+      } else {
+        if (!r.checkoutUrl) throw new Error("checkout URL ирсэнгүй");
+        // Hosted checkout (fallback) — popup click-ийн дараа нээгдэж байгаа тул хориглогдож болно → линк үзүүлнэ
+        let win = null;
+        try { win = window.open(r.checkoutUrl, "bbipay_checkout", "popup=yes,width=520,height=760"); } catch (_) {}
+        current.win = win;
+        const link = `<a href="${r.checkoutUrl}" target="bbipay_checkout" rel="noopener">энд дарж</a>`;
+        setStatus(`<span class="bbipay-spin"></span>Төлбөрийн цонх нээгдлээ — тэнд төлбөрөө хийнэ үү. Энэ хуудсыг хаахгүй. ` +
+                  (win ? `Цонх харагдахгүй бол ${link} нээнэ үү.` : `Цонх нээгдсэнгүй (popup хориглосон байж магадгүй) — ${link} нээнэ үү.`));
+      }
       $("bbipayAlt").style.display = "block";
       pollStart = Date.now();
       schedulePoll();
     } catch (e) {
-      if (win && !win.closed) { try { win.close(); } catch (_) {} }
       console.error(e);
       const msg = (e && e.message) || "алдаа";
       const code = (e && e.code) || "";
@@ -180,7 +263,7 @@
     try {
       const r = await call("checkPayment", { paymentId: current.paymentId });
       if (r.paid) { await onPaid(r); return; }
-      if (r.status === "failed") { setStatus("Төлбөр цуцлагдсан/амжилтгүй. Дахин оролдоно уу.", "err"); $("bbipayGo").disabled = false; stopPoll(); return; }
+      if (r.status === "failed") { hideQr(); setStatus("Төлбөр цуцлагдсан/амжилтгүй. Дахин оролдоно уу.", "err"); $("bbipayGo").disabled = false; stopPoll(); return; }
       if (manual) setStatus('<span class="bbipay-spin"></span>Төлбөр хараахан бүртгэгдээгүй — банкны аппаа шалгаад хэдэн секундын дараа дахин үзнэ үү.');
     } catch (e) { console.warn("poll", e); }
     if (modal.classList.contains("show")) schedulePoll();

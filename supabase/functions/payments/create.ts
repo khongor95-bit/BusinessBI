@@ -1,9 +1,10 @@
-/* create-payment — {tool, meta:{…}} → {paymentId, checkoutUrl, amount, reused, …}
-   Нэвтэрсэн хэрэглэгчид нэхэмжлэл үүсгэж WIRE checkout URL (эсвэл mock хуудас) буцаана.
-   8 минутын дотор үүссэн төлөгдөөгүй нэхэмжлэл байвал түүнийг дахин ашиглана. */
+/* create-payment — {tool, meta:{…}} → {paymentId, qr?, checkoutUrl?, amount, reused, …}
+   Нэвтэрсэн хэрэглэгчид нэхэмжлэл үүсгэнэ. WIRE горимд эхлээд inline QR (qr:{text,image,deeplinks} — хуудсан
+   дээрээ харуулна), болохгүй бол hosted checkout URL (pay.wire.mn, шинэ цонх); mock горимд mock хуудас.
+   8 минутын дотор үүссэн төлөгдөөгүй нэхэмжлэл байвал түүнийг дахин ашиглана (QR-ийг нь дахин өгнө). */
 import { admin, callable, getSetting, HttpsError } from "../_shared/http.ts";
 import { PRODUCTS, REUSE_PENDING_MS, publicView, mockSig, wireMode, useWire, type Payment } from "../_shared/payments.ts";
-import { createIntent, WireError } from "../_shared/wire.ts";
+import { cancelIntent, confirmIntent, createIntent, createPaymentIntent, WireError } from "../_shared/wire.ts";
 
 export const handler = callable(async (data, { user }) => {
   const tool = String(data.tool ?? "");
@@ -36,12 +37,30 @@ export const handler = callable(async (data, { user }) => {
     const key = Deno.env.get("WIRE_SECRET_KEY") ?? "";
     if (!key) throw new HttpsError("failed-precondition", "WIRE_SECRET_KEY тохируулаагүй (Supabase → Edge Functions → Secrets).");
     if (mode === "live" && !key.startsWith("sk_live_")) throw new HttpsError("failed-precondition", "Live горимд sk_live_ түлхүүр хэрэгтэй.");
-    try {
-      const ops = (await getSetting("wire_operators", "")).split(",").map((s) => s.trim()).filter(Boolean);
-      const intent = await createIntent(key, {
-        amount: product.amount, currency: product.currency, description: `BusinessBI — ${product.title}`,
-        metadata: { paymentId: id, uid, tool }, successUrl, cancelUrl, operators: mode === "test" ? ["sandbox"] : ops,
-      });
+    const ops = (await getSetting("wire_operators", "")).split(",").map((s) => s.trim()).filter(Boolean);
+    const params = {
+      amount: product.amount, currency: product.currency, description: `BusinessBI — ${product.title}`,
+      metadata: { paymentId: id, uid, tool }, successUrl, cancelUrl, operators: mode === "test" ? ["sandbox"] : ops,
+    };
+    // 1) Inline QR (хуудас солихгүй, шинэ цонхгүй): intent → confirm → next_action.qr {text,image,deeplinks}
+    //    wire_inline='0' бол алгасна. Амжилтгүй бол 2) hosted checkout (pay.wire.mn) руу унана.
+    let inlineOk = false;
+    if ((await getSetting("wire_inline", "1")) !== "0") {
+      try {
+        const intent = await createPaymentIntent(key, params, id);
+        const cf = await confirmIntent(key, intent.id, params.operators[0], id);
+        if (cf.qr && cf.status !== "failed") {
+          row.provider_intent_id = String(intent.id); row.provider_status = cf.rawStatus;
+          row.provider_raw = { intent, confirm: { status: cf.rawStatus, operator: cf.operator, expires_at: cf.expiresAt }, qr: cf.qr };
+          inlineOk = true;
+        } else {
+          console.warn("WIRE inline: confirm хариунд qr алга → hosted", cf.rawStatus, JSON.stringify(cf.raw?.next_action ?? null).slice(0, 300));
+          cancelIntent(key, intent.id).catch(() => {});
+        }
+      } catch (e) { console.warn("WIRE inline failed → hosted", (e as Error).message, JSON.stringify((e as WireError).body ?? null).slice(0, 300)); }
+    }
+    if (!inlineOk) try {
+      const intent = await createIntent(key, params, id + "-h");
       row.provider_intent_id = intent.intentId; row.provider_session_id = intent.sessionId;
       row.checkout_url = intent.checkoutUrl; row.provider_raw = intent.raw;
     } catch (e) {

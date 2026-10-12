@@ -8,7 +8,7 @@ const assertRejects = async (fn: () => Promise<unknown>, cls: any, msgIncludes?:
   try { await fn(); } catch (e) { threw = true; nodeAssert.ok(e instanceof cls, "wrong error class"); if (msgIncludes) nodeAssert.ok(String((e as Error).message).includes(msgIncludes), "message: " + (e as Error).message); }
   nodeAssert.ok(threw, "did not reject");
 };
-import { createIntent, getIntentStatus, normalizeStatus, parseWebhookEvent, verifyWebhookSignature, WireError } from "./wire.ts";
+import { createIntent, getIntentStatus, normalizeStatus, parseWebhookEvent, verifyWebhookSignature, WireError, confirmIntent, parseNextAction } from "./wire.ts";
 
 const secret = "whsec_test_123";
 const enc = new TextEncoder();
@@ -89,4 +89,31 @@ Deno.test("createIntent: 2 алхам, бүхэл төгрөг (×100 ХИЙХГ
     globalThis.fetch = (async () => new Response(JSON.stringify({ code: "connector_required" }), { status: 400 })) as typeof fetch;
     await assertRejects(() => createIntent("sk_live_abc", { amount: 5000, metadata: { paymentId: "P4" } }), WireError, "connector_required");
   } finally { globalThis.fetch = realFetch; }
+});
+Deno.test("confirmIntent → next_action.qr (text/image/deeplinks), parseNextAction хувилбарууд", async () => {
+  const na = { type: "qr", qr: { text: "000201…QPP", image_url: "data:image/png;base64,AAA", deeplinks: [
+    { name: "Khan bank", description: "Хаан банк", logo: "https://qpay.mn/q/logo/khanbank.png", link: "khanbank://q?qPay_QRcode=000201" },
+    { name: "bad", logo: "", link: "" } ] } };
+  const realFetch = globalThis.fetch;
+  const calls: any[] = [];
+  globalThis.fetch = (async (url: string, opts: any) => {
+    calls.push({ url, body: opts.body ? JSON.parse(opts.body) : null, headers: opts.headers });
+    return new Response(JSON.stringify({ id: "pi_7", status: "requires_action", selected_operator: "qpay", next_action: na, expires_at: 1791776763 }), { status: 200 });
+  }) as typeof fetch;
+  try {
+    const r = await confirmIntent("sk_live_x", "pi_7", undefined, "P7");
+    assertEquals(calls[0].url, "https://api.wire.mn/v1/payment_intents/pi_7/confirm");
+    assertEquals(calls[0].body, {});
+    assertEquals(calls[0].headers["Idempotency-Key"], "cf-P7");
+    assertEquals([r.status, r.rawStatus, r.operator, r.expiresAt], ["pending", "requires_action", "qpay", 1791776763]);
+    assertEquals(r.qr!.text, "000201…QPP"); assertEquals(r.qr!.image, "data:image/png;base64,AAA");
+    assertEquals(r.qr!.deeplinks.length, 1, "link-гүй deeplink хасагдана"); assertEquals(r.qr!.deeplinks[0].name, "Khan bank");
+    calls.length = 0;
+    await confirmIntent("sk_live_x", "pi_7", "qpay");
+    assertEquals(calls[0].body, { operator: "qpay" });
+  } finally { globalThis.fetch = realFetch; }
+  assertEquals(parseNextAction(null), null);
+  assertEquals(parseNextAction({ type: "redirect", url: "https://x" }), null);
+  assertEquals(parseNextAction({ qr: { text: "T" } })!.deeplinks, []);
+  assertEquals(parseNextAction({ type: "qr", text: "T2", image: "I" })!.image, "I");
 });
