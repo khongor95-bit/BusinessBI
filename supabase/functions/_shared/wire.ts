@@ -5,7 +5,8 @@
      Base URL      https://api.wire.mn/v1
      Auth          Authorization: Bearer sk_test_… | sk_live_…
      Idempotency   бүх POST-д "Idempotency-Key" толгой ЗААВАЛ
-     Дүн           бага нэгжээр: 50000 = 500.00₮  (⇒ 5,000₮ = 500000)
+     Дүн           БҮХЭЛ ТӨГРӨГӨӨР. docs.wire.mn "50000 = 500.00₮" гэж бичсэн ч pay.wire.mn дээр
+                   amount:500000 → "500,000₮" гэж гарсан (2026-10-12 бодитоор тулгасан) ⇒ ×100 ХИЙХГҮЙ.
      1) POST /payment_intents {amount,currency:"MNT",description,allowed_operators,metadata}
           → {id:"pi_…",status:"requires_payment_method",…}
      2) POST /checkout/sessions {payment_intent, success_url, cancel_url} → {id:"cs_…", url}
@@ -18,7 +19,7 @@
      Тест          sk_test_ + allowed_operators:["sandbox"]; дүн 42 → amount_too_small, 42424 → timeout
    ============================================================ */
 const BASE_URL = Deno.env.get("WIRE_BASE_URL") ?? "https://api.wire.mn/v1";
-const AMOUNT_MULT = 100;
+const AMOUNT_MULT = 1;   // 1 = бүхэл төгрөг (pay.wire.mn-ээр баталгаажсан). 100 тавибал 5,000₮ → 500,000₮ болно!
 const SIG_HEADER = "wirepayment-signature";
 const TOLERANCE_SEC = 300;
 

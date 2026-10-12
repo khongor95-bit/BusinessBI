@@ -18,7 +18,7 @@ async function sign(ts: number, body: Uint8Array<ArrayBuffer>): Promise<string> 
   return [...new Uint8Array(await crypto.subtle.sign("HMAC", key, d))].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 const bodyObj = { id: "evt_1", object: "event", type: "payment_intent.succeeded", livemode: false, created: 1717000000,
-  data: { id: "pi_1", object: "payment_intent", amount: 500000, currency: "MNT", status: "succeeded", metadata: { paymentId: "abc", uid: "u1", tool: "ndsh_hhoat" } } };
+  data: { id: "pi_1", object: "payment_intent", amount: 5000, currency: "MNT", status: "succeeded", metadata: { paymentId: "abc", uid: "u1", tool: "ndsh_hhoat" } } };
 const body = enc.encode(JSON.stringify(bodyObj)) as Uint8Array<ArrayBuffer>;
 const H = (v: string) => new Headers({ "WirePayment-Signature": v });
 
@@ -56,7 +56,7 @@ Deno.test("normalize status", () => {
   assertEquals(normalizeStatus("succeeded").status, "paid");
   assertEquals(normalizeStatus("canceled").status, "failed");
 });
-Deno.test("createIntent: 2 алхам, бага нэгж, Idempotency-Key", async () => {
+Deno.test("createIntent: 2 алхам, бүхэл төгрөг (×100 ХИЙХГҮЙ), Idempotency-Key", async () => {
   const calls: { url: string; method: string; headers: Record<string, string>; body: any }[] = [];
   const realFetch = globalThis.fetch;
   globalThis.fetch = (async (url: string, opts: any) => {
@@ -72,7 +72,7 @@ Deno.test("createIntent: 2 алхам, бага нэгж, Idempotency-Key", asyn
     assertEquals([r.intentId, r.checkoutUrl, r.sessionId, r.status], ["pi_9", "https://pay.wire.mn/c/tok", "cs_9", "pending"]);
     assertEquals(calls.length, 2);
     assertEquals(calls[0].url, "https://api.wire.mn/v1/payment_intents");
-    assertEquals(calls[0].body.amount, 500000);
+    assertEquals(calls[0].body.amount, 5000, "5,000₮ → amount:5000 (pay.wire.mn дээр 500000 нь 500,000₮ гэж гарсан)");
     assertEquals(calls[0].body.allowed_operators, ["sandbox"]);
     assertEquals(calls[0].body.metadata.paymentId, "P1");
     assertEquals(calls[0].headers["Idempotency-Key"], "pi-P1");
