@@ -759,6 +759,19 @@ function tierNo(taxable){ return BBITax.hhoatTierNo(taxable, convTaxDate()); }
 function monthlyCredit(ozc){ return BBITax.hhoatMonthlyCredit(ozc, convTaxDate()); }
 function creditTierLabel(ozc){ return BBITax.hhoatCreditLabel(ozc, convTaxDate()); }
 
+// ---- НД сангаас тэтгэмж авч буй даатгуулагчийн төрөл ----
+// Эдгээр кодтой сард НДШ тайлангийн "цалин" багана нь ажил олгогчийн олгосон
+// хөдөлмөрийн хөлс БИШ — НД сангаас олгох тэтгэмж/шимтгэлийн суурь. НД сангаас
+// олгосон тэтгэвэр, тэтгэмж нь ХХОАТ-аас чөлөөлөгдөх орлого тул тухайн сарыг
+// 7.1.1 орлого, ХХОАТ, 23.1 хөнгөлөлтөд ОРУУЛАХГҮЙ.
+//  17002, 38002, 41002 — жирэмсний болон амаржсаны амралт
+//  06002, 06012, 41012 — хүүхэд асрах чөлөө
+//  21002, 39002, 39012, 42002 — 1 сараас дээш хугацаагаар ХЧТА (тэтгэмж)
+// Анхаар: 68001 (хүүхэд асрах чөлөөтэй ч хөдөлмөрийн хөлс авсан) ба 14001/34xxx
+// (сул зогсолтын олговор — ажил олгогч төлдөг) нь татвартай тул энд ороогүй.
+const BENEFIT_TYPES=new Set(['17002','38002','41002','06002','06012','41012','21002','39002','39012','42002']);
+function isBenefitType(code){ return BENEFIT_TYPES.has(String(code||'').trim()); }
+
 // ---- Регистрээр нэгтгэх (өссөн дүн) ----
 // Улирлын бүх орсон сарын мөрүүдийг регистрээр нэгтгэж, орсон сарын тоог тоолно.
 // Сар бүрийн орлогыг тусд нь хадгална — хөнгөлөлтийг сар бүрийн шатлалаар тооцоход хэрэгтэй.
@@ -781,7 +794,11 @@ function aggregateByRegister(){
       a.salary+=r.salary; a.totalNdsh+=r.totalNdsh;
       a.employer+=r.employer; a.employee+=r.employee;
       a.months.add(m);
-      a.monthly.push({month:m, salary:r.salary, employee:r.employee});
+      const ben=isBenefitType(r.type);
+      a.monthly.push({month:m, salary:r.salary, employee:r.employee, type:r.type, benefit:ben});
+      // Ажилтны үндсэн төрөл — тэтгэмжийн бус (ажилласан) сарын кодыг давуу авна.
+      // Ж: 7-р сард 01001, 8-9-р сард 17002 бол төрөл = 01001.
+      if(!ben && isBenefitType(a.type)) a.type=r.type;
       if(r.nameSource==='db'){a.lastName=r.lastName;a.firstName=r.firstName;a.nameSource='db';}
     });
   });
@@ -818,11 +835,17 @@ function computeEtaxRow(r, useAnnual){
   //         бусад орлогод эдлүүлнэ).
   const noCredit=code.startsWith('40');
   const rate=ndshRate(r.type);               // fallback хувь (кодоор)
-  const G=r.salary;                          // 7.1.1 нийт орлого (өссөн)
+  // Тэтгэмжийн сарууд (жирэмсний амралт г.м.) — НД сангийн тэтгэмж, татваргүй.
+  // Зөвхөн ажилласан (тэтгэмжийн бус) сарын орлого 7.1.1-д орно.
+  const workMonths=r.monthly.filter(mo=>!mo.benefit);
+  const benefitMonths=r.monthly.filter(mo=>mo.benefit);
+  const benefitAmt=Math.round(benefitMonths.reduce((s,mo)=>s+mo.salary,0)*100)/100;
+  const G=Math.round(workMonths.reduce((s,mo)=>s+mo.salary,0)*100)/100; // 7.1.1 нийт орлого (өссөн)
+  const empWork=workMonths.reduce((s,mo)=>s+mo.employee,0);
   // ЭМД, НДШ дүн — НД тайлангаас уншсан ДААТГУУЛАГЧИЙН БОДИТ шимтгэлийг ашиглана.
   // Тайлангаас гараагүй (0/хоосон) үед л хувиар бодно.
-  const I=(r.employee>0) ? Math.round(r.employee*100)/100
-                         : Math.round(G*rate/100*100)/100;
+  const I=(empWork>0) ? Math.round(empWork*100)/100
+                      : Math.round(G*rate/100*100)/100;
   const K=Math.round((G-I)*100)/100;          // татвар ногдуулах орлого (ОЗЦ нийт)
   const P=exempt ? 0 : Math.round(tierTax(K)*100)/100; // ногдуулсан татвар (70 код → чөлөөлөх)
   const tier=tierNo(K);
@@ -831,7 +854,9 @@ function computeEtaxRow(r, useAnnual){
   // 70 (татваргүй) ба 40 (7.1.6 орлого) кодтой бол хөнгөлөлт 0.
   let S=0;
   const creditList=[];
-  r.monthly.forEach(mo=>{
+  // Тэтгэмжийн сард хөнгөлөлт ОЛГОХГҮЙ — ОЗЦ=0 гэж бодвол хамгийн өндөр (20,000₮)
+  // хөнгөлөлт гарч, ажилласан сарын татварыг буруу бууруулдаг байсан.
+  workMonths.forEach(mo=>{
     if(exempt||noCredit){ creditList.push(0); return; }
     // тухайн сарын НДШ хассан дүн — тайлангийн бодит шимтгэлээр, байхгүй бол хувиар
     const ozc=(mo.employee>0) ? mo.salary - mo.employee
@@ -844,7 +869,9 @@ function computeEtaxRow(r, useAnnual){
   const W=Math.round((T)*100)/100;            // нийт суутгуулсан (7.1.6, шууд бус энд 0)
   // R багана: сард ногдох хөнгөлөлтийн КОД (дундаж биш — ижил бол дүн, өөр бол 999)
   const rCode=monthlyCreditCode(creditList);
-  return {G,I,K,P,tier,S,T,W,rCode,creditList,months:r.monthCount,net:G-I-T,exempt,noCredit};
+  // Q багана — орлого хүлээн авсан (ажилласан) сарын тоо; тэтгэмжийн сар орохгүй.
+  return {G,I,K,P,tier,S,T,W,rCode,creditList,months:workMonths.length,net:G-I-T,exempt,noCredit,
+          benefitAmt, benefitMonths:benefitMonths.map(mo=>mo.month)};
 }
 
 // Жилийн хөнгөлөлт хэрэглэх эсэх — бүх 12 сар орсон үед (жилийн эцсийн тайлан)
@@ -989,7 +1016,8 @@ function refreshSummary(){
     const ex=list.filter(r=>String(r.type||'').startsWith('70'));
     const nc=list.filter(r=>String(r.type||'').startsWith('40'));
     const fo=list.filter(r=>r.foreign);
-    if(!ex.length && !nc.length && !fo.length){ el.style.display='none'; el.innerHTML=''; return; }
+    const bn=list.filter(r=>r.monthly.some(mo=>mo.benefit));
+    if(!ex.length && !nc.length && !fo.length && !bn.length){ el.style.display='none'; el.innerHTML=''; return; }
     const nm=r=>((r.lastName||'')+' '+(r.firstName||'')).trim()||r.reg||'?';
     let html='';
     if(fo.length){
@@ -999,6 +1027,9 @@ function refreshSummary(){
         +`<b>Оршин суугч бус</b> ажилтны орлогод ХХОАТ хуулиар 20%, хөнгөлөлтгүй ногдуулдаг тул тэр тохиолдолд маягтад гараар засна уу. Нас, хүйс регистрээс гардаггүй тул «Тодорхойгүй» гарна.`
         +(noid.length?`<br><b>⚠ ${noid.length} ажилтны дугаар танигдсангүй</b> — ТТД модалд нэрээр нь ТТД-г гараар оруулна уу.`:'')
         +`</div>`;
+    }
+    if(bn.length){
+      html+=`<div style="${html?'margin-top:6px':''}"><b>ℹ Тэтгэмжтэй ${bn.length} ажилтан</b> — жирэмсний/амаржсаны амралт, хүүхэд асрах чөлөө эсвэл ХЧТА-ын кодтой сарыг НД сангийн тэтгэмж гэж үзэж ХХОАТ, хөнгөлөлтөд <b>оруулаагүй</b>; зөвхөн ажилласан сарын цалинд татвар бодлоо: ${bn.map(r=>nm(r)+' ('+r.monthly.filter(mo=>mo.benefit).map(mo=>mo.month).join(',')+'-р сар)').join(', ')}</div>`;
     }
     if(ex.length){
       html+=`<div><b>⚠ 70 кодтой ${ex.length} ажилтан</b> — ХЧА тэтгэвэр тогтоолгосон тул ХХОАТ-аас <b>чөлөөлж</b> тооцлоо (хуулийн 22.1.2). ЭХМК-ын дүгнэлт, ХБ үнэмлэхтэй эсэхийг заавал шалгана уу: ${ex.map(nm).join(', ')}</div>`;
@@ -1596,9 +1627,15 @@ function buildExcel(){
   // тухайн хүнд хөдөлмөрийн хөлс олгоогүй (жирэмсний/амаржсаны амралт, чөлөө г.м.)
   // → татвар ногдох орлого байхгүй тул татварын маягтад оруулахгүй.
   // Анхаар: энэ шүүлт ЗӨВХӨН Excel-д үйлчилнэ. Dashboard бүх ажилтныг хэвээр харуулна.
-  const excludedList=agg.list.filter(r=>(r.employee||0)<=0);
-  const list=agg.list.filter(r=>(r.employee||0)>0);
+  // Мөн: бүх сар нь тэтгэмжийн код (17002 жирэмсний амралт г.м.) бол татвар ногдох
+  // орлогогүй тул хасна. Хэсэгчлэн тэтгэмжтэй бол зөвхөн ажилласан сар нь маягтад орно.
   const useAnnual=useAnnualCredit(monthsFilled);
+  const taxableOf=r=>{
+    const empWork=r.monthly.filter(mo=>!mo.benefit).reduce((s,mo)=>s+mo.employee,0);
+    return empWork>0 && computeEtaxRow(r, useAnnual).G>0;
+  };
+  const excludedList=agg.list.filter(r=>!taxableOf(r));
+  const list=agg.list.filter(taxableOf);
   if(list.length===0){
     toast('Суутгал төлсөн ажилтан алга — Excel үүсгэх боломжгүй');
     return;
@@ -1632,7 +1669,7 @@ function buildExcel(){
       ttdOf(r.reg)||r.reg,         // A: Татвар төлөгчийн дугаар — толиос 12 оронт ТТД; байхгүй бол регистрээр (etax дээр гараар солино)
       r.lastName,                  // B: Овог
       r.firstName,                 // C: Нэр
-      r.salary,                    // D: 7.1.1 цалин
+      c.G,                         // D: 7.1.1 цалин (тэтгэмжийн сар ороогүй)
       0,                           // E: 7.1.2-7
       0,                           // F: 7.1.6
       c.G,                         // G: Нийт (1+2+3)
@@ -1664,7 +1701,7 @@ function buildExcel(){
     [`ХХОАТ суутгалын маягт — ${year} он (өссөн дүн)`],
     [company?`Байгууллага: ${company}`:''],
     [`Хамрах сар: ${qLabel} | Нэгтгэсэн ажилтан: ${list.length} | Хөнгөлөлт: ${modeLabel} | etax маягттай тулгасан`],
-    [excludedList.length?`Анхаар: суутгасан НДШ 0 байсан ${excludedList.length} ажилтныг (мөнгө аваагүй — жирэмсний амралт г.м.) татвараас хассан. Доорх "Хассан" хуудаснаас үзнэ үү.`:''],
+    [excludedList.length?`Анхаар: татвар ногдох орлогогүй ${excludedList.length} ажилтныг (жирэмсний амралт, чөлөө г.м.) маягтаас хассан. Доорх "Хассан" хуудаснаас үзнэ үү.`:(list.some(r=>r.monthly.some(mo=>mo.benefit))?'Анхаар: зарим ажилтны жирэмсний/хүүхэд асрах/ХЧТА тэтгэмжийн сарыг (НД сангаас, ХХОАТ-гүй) орлогоос хассан.':'')],
     [],
     ['№','Овог','Нэр','Регистр','Мэргэжил','Төрөл','Нас','Хүйс','Орсон сар','Нийт орлого (G)','ЭМД дүн (I)','Татвар ногдох (K)','Шатлал','Ногдуулсан татвар (P)','Хөнгөлөлт нийт (S)','Суутгах татвар (T)','Гарт олгох цэвэр']
   ];
@@ -1691,9 +1728,9 @@ function buildExcel(){
   if(excludedList.length){
     const s3=[
       [`ХХОАТ-аас хассан ажилтнууд — ${year} он`],
-      ['Шалтгаан: улирлын турш ажилтнаас суутгасан НДШ 0 байсан = хөдөлмөрийн хөлс олгоогүй (жирэмсний/амаржсаны амралт, чөлөө г.м.) тул татвар ногдох орлогогүй.'],
+      ['Шалтгаан: хөдөлмөрийн хөлс олгоогүй — бүх сар нь НД сангийн тэтгэмжийн код (жирэмсний/амаржсаны амралт, хүүхэд асрах чөлөө, ХЧТА) эсвэл суутгасан НДШ 0. НД сангийн тэтгэмж ХХОАТ-аас чөлөөлөгдөнө.'],
       [],
-      ['№','Овог','Нэр','Регистр','Мэргэжил','Төрөл','Орсон сар','Нийт орлого (G)','Суутгасан НДШ']
+      ['№','Овог','Нэр','Регистр','Мэргэжил','Төрөл','Орсон сар','Тайлан дахь дүн','Суутгасан НДШ']
     ];
     excludedList.forEach((r,i)=>{
       s3.push([i+1, r.lastName, r.firstName, r.reg, occName(r.occ), typeCat(r.type), r.months.length, r.salary, r.employee]);
@@ -1735,6 +1772,11 @@ function buildExcel(){
       // --- Хүснэгт 1: сар бүрийн орлого ба хөнгөлөлт (ОЗЦ суурьтай) ---
       push(['Сар', 'Тухайн сарын орлого', 'НДШ хассан (ОЗЦ)', 'Сарын хөнгөлөлт']);
       r.monthly.slice().sort((a,b)=>a.month-b.month).forEach(mo=>{
+        if(mo.benefit){
+          const ri=push([`${mo.month}-р сар`, mo.salary, `${mo.type} — ${typeCat(mo.type)}: НД сангийн тэтгэмж, ХХОАТ-гүй`, 0]);
+          markMoney(ri, [1,3]);
+          return;
+        }
         const ozc=Math.round(((mo.employee>0) ? mo.salary - mo.employee
                                               : mo.salary - mo.salary*ndshRate(r.type)/100)*100)/100;
         const credit=monthlyCredit(ozc);
@@ -1747,7 +1789,7 @@ function buildExcel(){
       // --- Хүснэгт 2: тооцооллын алхам ---
       push(['Тооцооллын алхам', 'Томьёо', 'Дүн (₮)']);
       let ri;
-      ri=push(['1. Нийт орлого (G)', 'сар бүрийн орлогын нийлбэр', c.G]);              markMoney(ri,[2]);
+      ri=push(['1. Нийт орлого (G)', c.benefitMonths.length?`ажилласан сарын орлогын нийлбэр (тэтгэмжийн ${c.benefitMonths.join(', ')}-р сар хасагдсан)`:'сар бүрийн орлогын нийлбэр', c.G]); markMoney(ri,[2]);
       ri=push(['2. ЭМД, НДШ дүн (I)', (r.employee>0)?'НД тайлангийн даатгуулагчийн бодит шимтгэл':`G × ${ndshRate(r.type)}% (fallback)`, c.I]); markMoney(ri,[2]);
       ri=push(['3. Татвар ногдох орлого (K)', 'G − I', c.K]);                           markMoney(ri,[2]);
       ri=push(['4. Шатлалт татвар (P)', c.exempt?'70 код — ХБ орлого, ХХОАТ-аас чөлөөлөх (22.1.2, ХБ үнэмлэх шалгах)':`шатлал ${c.tier}: ТНО × 10%`, c.P]); markMoney(ri,[2]);
