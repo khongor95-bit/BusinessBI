@@ -22,6 +22,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="site.css">
 <script src="mp.js"></script>
+<script src="ebarimt.js"></script>
 <script src="site.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -79,6 +80,7 @@
 .field textarea{min-height:90px;resize:vertical}
 .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--bbi-green)}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.eb-status{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:10px;font-size:10.5px;font-weight:600;line-height:1.5;vertical-align:middle;white-space:nowrap}.eb-status:empty{display:none}.eb-status.vat{background:#dcfce7;color:#166534}.eb-status.novat{background:#fef3c7;color:#92400e}.eb-status.none{background:#f3f4f6;color:#6b7280}.eb-status.wait{color:#9ca3af;font-weight:500}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{font-size:13px;border:1.5px solid var(--bbi-line);border-radius:50px;padding:6px 12px;cursor:pointer;user-select:none}
 .chip.on{background:var(--bbi-green);color:#fff;border-color:var(--bbi-green)}
@@ -204,7 +206,7 @@
       const em=user.email||'', nm=(user.user_metadata&&(user.user_metadata.full_name||user.user_metadata.name))||'';
       open(`<div class="mhead"><div><h2>${a?'Хүсэлт — '+esc(a.name):'Нээлттэй хүсэлт — сүлжээний нягтлангуудад'}</h2><div class="acc-loc">${a?'Нягтлан хүсэлтийг тань үзээд гэрээний санал илгээнэ.':'Батлагдсан бүх нягтлан хүсэлтийг үзэж, санал илгээх боломжтой. Та тохирохыг нь сонгож гэрээ байгуулна.'}</div></div></div>
         <div class="mbody"><div id="rErr"></div>
-          <div class="row2"><div class="field"><label>Компанийн нэр *</label><input id="rCompany" placeholder="ж: Монгол Экүэстрэн ХХК"></div><div class="field"><label>Регистр / ТТД</label><input id="rReg" placeholder="ж: 6123456"></div></div>
+          <div class="row2"><div class="field"><label>Регистр / ТТД <span id="rRegSt" class="eb-status"></span></label><input id="rReg" placeholder="ж: 6123456" inputmode="numeric" title="ebarimt.mn-ээс компанийн нэрийг автоматаар татна"></div><div class="field"><label>Компанийн нэр *</label><input id="rCompany" placeholder="ж: Монгол Экүэстрэн ХХК"></div></div>
           <div class="row2"><div class="field"><label>Холбоо барих хүн *</label><input id="rName" value="${esc(nm)}"></div><div class="field"><label>Утас *</label><input id="rPhone" inputmode="tel" placeholder="8800-0000"></div></div>
           <div class="field"><label>И-мэйл</label><input id="rEmail" type="email" value="${esc(em)}"></div>
           <div class="field"><label>Хэрэгтэй үйлчилгээ *</label><div class="chips" id="rSvc">${SERVICES.map(s=>`<span class="chip">${esc(s)}</span>`).join('')}</div></div>
@@ -215,6 +217,8 @@
           <p style="font-size:12px;color:var(--bbi-muted);margin-top:10px">Хүсэлт илгээснээр <a href="terms.html" style="color:var(--bbi-green)">үйлчилгээний нөхцөл</a>-ийг зөвшөөрч байна. Хүсэлтийн төлөвийг <a href="my.html" style="color:var(--bbi-green)">Миний самбар</a>-аас харна.</p>
         </div>`);
       $('rCancel').onclick=close;
+      // Регистр бичмэгц ebarimt.mn-ээс компанийн нэр автоматаар (ebarimt.js → Supabase прокси, 30 хоног кэш)
+      if(window.BBIEbarimt){ const st=$('rRegSt'); BBIEbarimt.attach($('rReg'),{name:$('rCompany'),onResult:r=>{ const b=BBIEbarimt.badge(r); st.textContent=b.text; st.className='eb-status '+b.cls; }}); }
       $('rSvc').onclick=e=>{ if(e.target.classList.contains('chip')) e.target.classList.toggle('on'); };
       $('rSend').onclick=async()=>{
         const v=id=>$(id).value.trim();

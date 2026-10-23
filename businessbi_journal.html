@@ -367,6 +367,11 @@ tr.set-detail>td{background:var(--bg-row)!important;padding:8px 10px 12px 34px;}
   <div class="page-head"><h1>Тохиргоо</h1><p>Компанийн мэдээлэл, тайлант үе, татварын хувь, хаалтын бичилтэд ашиглах дансны кодууд.</p></div>
   <div class="grid2">
     <div class="card"><h3>Компани, тайлант үе</h3>
+      <div class="field"><label>Компанийн регистр <span id="stRegSt" style="margin-left:6px;"></span></label>
+        <div style="display:flex;gap:6px;">
+          <input id="stReg" class="mono" placeholder="6720919" inputmode="numeric" maxlength="20" title="ebarimt.mn-ээс компанийн нэр, ТТД автоматаар татна" style="flex:1;min-width:0;">
+          <button class="btn" type="button" onclick="settingsRegCheck()" title="ebarimt.mn-ээс нэр, ТТД татах">Шалгах</button>
+        </div></div>
       <div class="field"><label>Компанийн нэр</label><input id="stCompany" placeholder="Жишээ ХХК"></div>
       <div class="field"><label>Татвар төлөгчийн дугаар (ТТД)</label><input id="stTin" placeholder="0000000"></div>
       <div class="grid2">
@@ -805,8 +810,15 @@ tr.set-detail>td{background:var(--bg-row)!important;padding:8px 10px 12px 34px;}
   <div class="note">Компани бүрийн дата бүрэн тусдаа — журнал, данс, харилцагч, цалин, хөрөнгө. Нэвтэрсэн үед компани бүр cloud-д тусдаа хадгалагдана.</div>
   <div id="subInfo"></div>
   <div class="tbl-wrap"><table class="tbl" id="companyTable"></table></div>
-  <div style="display:flex;gap:8px;margin-top:12px;">
-    <input class="pill-input" id="newCompanyName" placeholder="Шинэ компанийн нэр" style="flex:1;">
+  <div style="display:flex;gap:8px;margin-top:12px;align-items:flex-start;flex-wrap:wrap;">
+    <div style="flex:0 0 170px;">
+      <div style="display:flex;gap:4px;">
+        <input class="pill-input mono" id="newCompanyReg" placeholder="Регистр / ТТД" inputmode="numeric" maxlength="20" title="ebarimt.mn-ээс нэр, ТТД автоматаар татна" style="padding:6px 8px;">
+        <button class="btn" onclick="newCompanyCheck()" title="ebarimt.mn-ээс шалгах" style="padding:4px 8px;">Шалгах</button>
+      </div>
+      <div id="newCompanyRegSt" style="font-size:10.5px;margin-top:3px;min-height:13px;color:var(--txt-muted);"></div>
+    </div>
+    <input class="pill-input" id="newCompanyName" placeholder="Шинэ компанийн нэр" style="flex:1;min-width:160px;padding:6px 8px;">
     <button class="btn primary" onclick="addCompany()">Нэмэх</button>
   </div>
   <div style="display:flex;gap:8px;margin-top:10px;">
@@ -997,7 +1009,7 @@ const DEFAULT_ACCOUNTS = [
   ['910101','Орлогын татварын зардал','91'],['920101','Орлого зардлын нэгдсэн данс','92'],
 ];
 const DEFAULT_SETTINGS = {
-  company:'', tin:'', from:'2026-01-01', to:'2026-12-31',
+  company:'', reg:'', tin:'', from:'2026-01-01', to:'2026-12-31',
   director:'', accountant:'', vatPct:BBITax.get('vat.rate',new Date()), citPct:10, citMode:'standard', tt02:{},
   accSummary:'920101', accTaxExp:'910101', accTaxPay:'311003',
   accProfit:'910201', accRetained:'440101', accVatIn:'121001', accVatOut:'311002',
@@ -1139,11 +1151,31 @@ function refreshDots(){
 /* ═══════════════ SETTINGS ═══════════════ */
 function renderSettings(){
   const s=DB.settings; renderTaxParams();
-  const M={stCompany:'company',stTin:'tin',stFrom:'from',stTo:'to',stDirector:'director',stAccountant:'accountant',
+  const M={stCompany:'company',stReg:'reg',stTin:'tin',stFrom:'from',stTo:'to',stDirector:'director',stAccountant:'accountant',
     stVat:'vatPct',stCitMode:'citMode',stAccSummary:'accSummary',stAccTaxExp:'accTaxExp',stAccTaxPay:'accTaxPay',
     stAccProfit:'accProfit',stAccRetained:'accRetained',stAccVatIn:'accVatIn',stAccVatOut:'accVatOut',stAccPayable:'accPayable',stAccReceivable:'accReceivable',stNdshEmp:'ndshEmpPct',stNdshCo:'ndshCoPct',stHhoatCredit:'hhoatCredit'};
-  for(const [id,key] of Object.entries(M)) document.getElementById(id).value=s[key];
+  for(const [id,key] of Object.entries(M)) document.getElementById(id).value=s[key]==null?'':s[key];
   document.getElementById('stStrict').checked=strictMode();
+  initSettingsLookup();
+}
+/* Тохиргоо: регистр → ebarimt.mn-ээс нэр, ТТД (нэрийг зөвхөн хоосон/өмнө автоматаар бөглөсөн үед дарж бичнэ) */
+let ST_ATTACH=null, ST_EB=null;
+function initSettingsLookup(){
+  if(ST_ATTACH||!window.BBIEbarimt) return;
+  const regEl=document.getElementById('stReg'), nameEl=document.getElementById('stCompany'), tinEl=document.getElementById('stTin'), st=document.getElementById('stRegSt');
+  if(!regEl||!nameEl) return;
+  ST_ATTACH=BBIEbarimt.attach(regEl,{name:nameEl,onResult:r=>{
+    ST_EB=(r&&r.found)?r:null;
+    st.innerHTML=ebStatusHTML(r);
+    if(r&&r.found&&r.tin&&(!tinEl.value.trim()||tinEl.dataset.bbiAutofill===tinEl.value.trim())){ tinEl.value=r.tin; tinEl.dataset.bbiAutofill=r.tin; }
+  }});
+}
+function settingsRegCheck(){
+  initSettingsLookup();
+  const v=document.getElementById('stReg').value.trim();
+  if(!v){ toast('Компанийн регистр оруулна уу', true); return; }
+  if(!ST_ATTACH){ toast('ebarimt.js ачаалагдаагүй', true); return; }
+  ST_ATTACH.refresh(true);
 }
 /* Тайлант үед хүчинтэй татварын параметрууд — tax.js-ээс, эх сурвалж, ишлэлтэй */
 function renderTaxParams(){
@@ -1168,7 +1200,8 @@ function applyTaxDefaults(){
 function saveSettings(){
   const g=id=>document.getElementById(id).value.trim();
   const s=DB.settings;
-  s.company=g('stCompany'); s.tin=g('stTin'); s.from=g('stFrom')||s.from; s.to=g('stTo')||s.to;
+  s.company=g('stCompany'); s.reg=g('stReg').replace(/\s+/g,''); s.tin=g('stTin'); s.from=g('stFrom')||s.from; s.to=g('stTo')||s.to;
+  if(ST_EB&&ST_EB.reg===BBIEbarimt.normalize({reg:s.reg}).reg) s.ebarimt={name:ST_EB.name, vatPayer:!!ST_EB.vatPayer, at:new Date().toISOString()};
   s.director=g('stDirector'); s.accountant=g('stAccountant');
   s.vatPct=parseFloat(g('stVat'))||0; s.citMode=g('stCitMode')||'standard';
   s.accSummary=g('stAccSummary'); s.accTaxExp=g('stAccTaxExp'); s.accTaxPay=g('stAccTaxPay');
@@ -5006,6 +5039,7 @@ function updateCompanyUI(){
   if(el) el.textContent=co? co.name : CO.current;
 }
 function openCompanyModal(){
+  initNewCompanyLookup();
   const si=document.getElementById('subInfo');
   if(si){
     if(!CLOUD.user||!CLOUD.enabled()) si.innerHTML='';
@@ -5038,14 +5072,44 @@ function switchCompany(id){
   toast(((CO.list.find(c=>c.id===id)||{}).name||'')+' — нээгдлээ');
   if(CLOUD.user) CLOUD.pull().catch(e=>{ console.error(e); CLOUD.setSync('err'); });
 }
+/* Компани нэмэх: регистр бичмэгц ebarimt.mn-ээс нэр, ТТД автоматаар татна (ebarimt.js → Supabase прокси) */
+let NEWCO_EB=null;   // сүүлийн ebarimt хариу {tin,reg,name,vatPayer,found}
+let NEWCO_ATTACH=null;
+function ebStatusHTML(r){
+  if(!r) return '';
+  const b=BBIEbarimt.badge(r);
+  const cls=r.pending?'info':(r.found?(r.vatPayer?'ok':'warn'):'err');
+  return '<span class="badge '+cls+'">'+esc(b.text)+'</span>'+(r.found&&r.tin?' <span class="mono">ТТД '+esc(r.tin)+'</span>':'');
+}
+function initNewCompanyLookup(){
+  if(NEWCO_ATTACH||!window.BBIEbarimt) return;
+  const regEl=document.getElementById('newCompanyReg'), nameEl=document.getElementById('newCompanyName'), st=document.getElementById('newCompanyRegSt');
+  if(!regEl||!nameEl) return;
+  NEWCO_ATTACH=BBIEbarimt.attach(regEl,{name:nameEl,onResult:r=>{ NEWCO_EB=(r&&r.found)?r:null; st.innerHTML=ebStatusHTML(r); }});
+}
+function newCompanyCheck(){
+  initNewCompanyLookup();
+  const v=document.getElementById('newCompanyReg').value.trim();
+  if(!v){ toast('Регистр эсвэл ТТД оруулна уу', true); return; }
+  if(!NEWCO_ATTACH){ toast('ebarimt.js ачаалагдаагүй', true); return; }
+  NEWCO_ATTACH.refresh(true);
+}
 function addCompany(){
   const name=document.getElementById('newCompanyName').value.trim();
-  if(!name){ toast('Компанийн нэрээ бичнэ үү', true); return; }
+  const reg=document.getElementById('newCompanyReg').value.replace(/\s+/g,'');
+  if(!name){ toast(reg?'Нэр татагдсангүй — компанийн нэрээ бичнэ үү':'Компанийн нэрээ бичнэ үү', true); return; }
+  const eb=(NEWCO_EB&&NEWCO_EB.reg===BBIEbarimt.normalize({reg}).reg)?NEWCO_EB:null;
+  const tin=eb?(eb.tin||''):(/^\d{7,}$/.test(reg)?reg:'');
   const id='c'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
-  CO.list.push({id, name}); saveCO();
+  CO.list.push({id, name, reg, tin}); saveCO();
   document.getElementById('newCompanyName').value='';
+  document.getElementById('newCompanyReg').value='';
+  document.getElementById('newCompanyRegSt').innerHTML='';
+  NEWCO_EB=null;
   switchCompany(id);
-  DB.settings.company=name; save();
+  DB.settings.company=name; DB.settings.reg=reg; if(tin) DB.settings.tin=tin;
+  if(eb) DB.settings.ebarimt={name:eb.name, vatPayer:!!eb.vatPayer, at:new Date().toISOString()};
+  save();
   renderAll();
 }
 function renameCompany(id){

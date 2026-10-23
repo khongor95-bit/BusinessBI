@@ -37,6 +37,15 @@ body{background:var(--bg);color:var(--ink);min-height:100vh;display:flex;align-i
 .field label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
 .field input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit}
 .field input:focus{outline:2px solid var(--teal);border-color:transparent}
+.field label .hint{float:right;font-weight:400;color:var(--muted);font-size:12px}
+.reg-row{display:flex;gap:8px}
+.reg-row input{flex:1;min-width:0;letter-spacing:.04em}
+.btn-check{flex:none;background:var(--teal);color:#fff;border:none;padding:0 16px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .2s;white-space:nowrap}
+.btn-check:hover{background:#0a443f}
+.btn-check:disabled{opacity:.6;cursor:default}
+.reg-status{font-size:12.5px;margin-top:6px;min-height:16px;display:flex;align-items:center;gap:6px;color:var(--muted)}
+.reg-status:empty{display:none}
+.reg-status.ok{color:#15803d}.reg-status.warn{color:#b45309}.reg-status.err{color:var(--red)}.reg-status.wait{color:var(--muted)}
 .btn{width:100%;background:var(--teal);color:#fff;border:none;padding:13px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .2s}
 .btn:hover{background:#0a443f}
 .btn:disabled{opacity:.6;cursor:default}
@@ -77,9 +86,28 @@ body{background:var(--bg);color:var(--ink);min-height:100vh;display:flex;align-i
       <button class="tab" id="tabSignup">Бүртгүүлэх</button>
     </div>
     <div class="msg" id="msg"></div>
+    <!-- Бүртгүүлэх үед: компанийн регистр → ebarimt.mn-ээс нэр автоматаар -->
+    <div class="signup-only" id="companyFields" style="display:none">
+      <div class="field">
+        <label>Компанийн регистр <span class="hint">7 оронтой · заавал биш</span></label>
+        <div class="reg-row">
+          <input type="text" id="companyReg" placeholder="6720919" inputmode="numeric" autocomplete="organization" maxlength="20">
+          <button type="button" class="btn-check" id="regCheckBtn">Шалгах</button>
+        </div>
+        <div class="reg-status" id="regStatus"></div>
+      </div>
+      <div class="field">
+        <label>Байгууллагын нэр</label>
+        <input type="text" id="companyName" placeholder="Жишээ ХХК" autocomplete="organization">
+      </div>
+    </div>
     <div class="field" id="nameField" style="display:none">
       <label>Нэр</label>
-      <input type="text" id="name" placeholder="Таны нэр">
+      <input type="text" id="name" placeholder="Таны нэр" autocomplete="name">
+    </div>
+    <div class="field signup-only" id="phoneField" style="display:none">
+      <label>Утас <span class="hint">заавал биш</span></label>
+      <input type="tel" id="phone" placeholder="9911XXXX" inputmode="tel" autocomplete="tel">
     </div>
     <div class="field">
       <label>Имэйл</label>
@@ -118,6 +146,7 @@ body{background:var(--bg);color:var(--ink);min-height:100vh;display:flex;align-i
   <div class="back"><a href="index.html">← Нүүр хуудас руу буцах</a></div>
 </div>
 
+<script src="ebarimt.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
@@ -188,26 +217,74 @@ function setMode(m) {
   $('tabLogin').classList.toggle('active', m === 'login');
   $('tabSignup').classList.toggle('active', m === 'signup');
   $('nameField').style.display   = m === 'signup' ? 'block' : 'none';
+  $('companyFields').style.display = m === 'signup' ? 'block' : 'none';
+  $('phoneField').style.display  = m === 'signup' ? 'block' : 'none';
   $('forgotWrap').style.display  = m === 'login'  ? 'block' : 'none';
   $('submitBtn').textContent     = m === 'login'  ? 'Нэвтрэх' : 'Бүртгүүлэх';
   $('subtitle').textContent      = m === 'login'  ? 'Бүртгэлдээ нэвтэрнэ үү' : 'Шинэ бүртгэл үүсгэх';
+  $('password').autocomplete     = m === 'login'  ? 'current-password' : 'new-password';
   clearMsg();
 }
 $('tabLogin').onclick  = () => setMode('login');
 $('tabSignup').onclick = () => setMode('signup');
+if (params.get('mode') === 'signup') setMode('signup');
+
+// ─── Компанийн регистр → ebarimt.mn-ээс нэр татах (ebarimt.js, Supabase прокси) ─
+// Регистр бичиж дуусмагц (700мс) автоматаар шалгана; «Шалгах» товч дахин шалгана.
+let COMPANY = null;   // {tin, reg, name, vatPayer, found}
+const regStatus = $('regStatus');
+function setRegStatus(text, cls) { regStatus.textContent = text; regStatus.className = 'reg-status ' + (cls || ''); }
+function onRegResult(r) {
+  COMPANY = (r && r.found) ? r : null;
+  if (!r)                     { setRegStatus('', ''); return; }
+  if (r.pending)              { setRegStatus('Шалгаж байна…', 'wait'); return; }
+  if (r.error === 'upstream') { setRegStatus('ebarimt.mn-тэй холбогдсонгүй — нэрээ гараар бичнэ үү.', 'warn'); return; }
+  if (r.error === 'network')  { setRegStatus('Шалгаж чадсангүй — нэрээ гараар бичнэ үү.', 'warn'); return; }
+  if (!r.found)               { setRegStatus('Энэ регистрээр бүртгэл олдсонгүй — нэрээ гараар бичнэ үү.', 'err'); return; }
+  setRegStatus('✓ Компанийн нэрийг татлаа' + (r.vatPayer ? ' (НӨАТ төлөгч)' : '') + '. Шалгаад үргэлжлүүлнэ үү.', 'ok');
+}
+const regLookup = window.BBIEbarimt
+  ? BBIEbarimt.attach($('companyReg'), { name: $('companyName'), onResult: onRegResult })
+  : null;
+$('regCheckBtn').onclick = () => {
+  const v = $('companyReg').value.replace(/\s+/g, '');
+  if (!v)              { setRegStatus('Регистрээ оруулна уу.', 'err'); $('companyReg').focus(); return; }
+  if (v.length < 5)    { setRegStatus('Регистр дутуу байна (компанийнх 7 оронтой).', 'err'); return; }
+  if (!regLookup)      { setRegStatus('Шалгах модуль ачаалагдаагүй — нэрээ гараар бичнэ үү.', 'warn'); return; }
+  regLookup.refresh(true);
+};
+$('companyReg').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('regCheckBtn').click(); } });
 
 // ─── Хэрэглэгчийн профайлыг Firestore-д хадгалах ───────────────────────────
-async function saveUser(user, extraName) {
+// extra: {name, phone, company:{reg,tin,name,vatPayer,verified}} — зөвхөн бөглөсөн талбаруудыг бичнэ
+async function saveUser(user, extra) {
+  const x = extra || {};
+  const data = {
+    name:      x.name || user.displayName || '',
+    email:     user.email,
+    createdAt: serverTimestamp(),
+    plan:      'free'   // төлбөр төлсний дараа 'pro' болгоно
+  };
+  if (x.phone)   data.phone   = x.phone;
+  if (x.company) data.company = x.company;
   try {
-    await setDoc(doc(db, 'users', user.uid), {
-      name:      extraName || user.displayName || '',
-      email:     user.email,
-      createdAt: serverTimestamp(),
-      plan:      'free'   // төлбөр төлсний дараа 'pro' болгоно
-    }, { merge: true });
+    await setDoc(doc(db, 'users', user.uid), data, { merge: true });
   } catch(e) {
     console.warn('Профайл хадгалахад алдаа:', e);
   }
+}
+// Бүртгүүлэх формын компанийн мэдээлэл → users.company
+function companyFromForm() {
+  const reg  = $('companyReg').value.replace(/\s+/g, '');
+  const name = $('companyName').value.trim();
+  if (!reg && !name) return null;
+  const c = { reg, name, verified: false };
+  if (COMPANY && COMPANY.reg === reg) {           // ebarimt.mn-ээс баталгаажсан
+    c.tin = COMPANY.tin || ''; c.vatPayer = !!COMPANY.vatPayer;
+    c.verified = (name === (COMPANY.name || '').trim());   // нэрийг гараар өөрчилсөн бол verified=false
+    c.ebarimtName = COMPANY.name || '';
+  }
+  return c;
 }
 
 // ─── Имэйл / Нууц үгээр нэвтрэх ────────────────────────────────────────────
@@ -215,17 +292,21 @@ $('submitBtn').onclick = async () => {
   const email = $('email').value.trim();
   const pass  = $('password').value;
   const name  = $('name').value.trim();
+  const phone = $('phone').value.replace(/[^\d+]/g, '');
 
   if (!email || !pass) { showMsg('Имэйл болон нууц үгээ оруулна уу.', 'err'); return; }
   if (mode === 'signup' && pass.length < 6) { showMsg('Нууц үг доод тал нь 6 тэмдэгт байх ёстой.', 'err'); return; }
   if (mode === 'signup' && !name) { showMsg('Нэрээ оруулна уу.', 'err'); return; }
+  if (mode === 'signup' && $('companyReg').value.trim() && !$('companyName').value.trim()) {
+    showMsg('Байгууллагын нэрээ оруулна уу («Шалгах» дарвал ebarimt.mn-ээс татна).', 'err'); return;
+  }
 
   $('submitBtn').disabled = true;
   try {
     if (mode === 'signup') {
       const cred = await createUserWithEmailAndPassword(auth, email, pass);
       await updateProfile(cred.user, { displayName: name });
-      await saveUser(cred.user, name);
+      await saveUser(cred.user, { name, phone, company: companyFromForm() });
       showMsg('Амжилттай бүртгүүллээ!', 'ok');
     } else {
       await signInWithEmailAndPassword(auth, email, pass);
@@ -264,7 +345,7 @@ $('forgotLink').onclick = async () => {
 };
 
 // ─── Enter товч ─────────────────────────────────────────────────────────────
-['email', 'password', 'name'].forEach(id => {
+['email', 'password', 'name', 'phone', 'companyName'].forEach(id => {
   $(id).addEventListener('keydown', e => { if (e.key === 'Enter') $('submitBtn').click(); });
 });
 

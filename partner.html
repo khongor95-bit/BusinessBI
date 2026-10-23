@@ -8,6 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="stylesheet" href="site.css">
 <script src="mp.js"></script>
+<script src="ebarimt.js"></script>
 <script src="site.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -41,6 +42,7 @@
 .field input,.field select,.field textarea{width:100%;padding:11px 13px;border:1.5px solid var(--bbi-line);border-radius:10px;font:inherit;font-size:14px}
 .field textarea{min-height:80px;resize:vertical}
 .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--bbi-green)}
+.eb-status{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:10px;font-size:10.5px;font-weight:600;line-height:1.5;vertical-align:middle;white-space:nowrap}.eb-status:empty{display:none}.eb-status.vat{background:#dcfce7;color:#166534}.eb-status.novat{background:#fef3c7;color:#92400e}.eb-status.none{background:#f3f4f6;color:#6b7280}.eb-status.wait{color:#9ca3af;font-weight:500}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}.chip{font-size:13px;border:1.5px solid var(--bbi-line);border-radius:50px;padding:6px 12px;cursor:pointer;user-select:none}
 .chip.on{background:var(--bbi-green);color:#fff;border-color:var(--bbi-green)}
@@ -135,7 +137,7 @@
   function openOffer(r){
     const d=new Date(); const start=d.toISOString().slice(0,10);
     open(`<h2>Гэрээний санал</h2><div class="sub">${r?'Хүсэлт: '+esc(r.company_name)+' — '+esc(r.contact_name):'Шинэ харилцагч — компанийн төлөөлөгчийн имэйлээр гэрээ очно'}</div><div id="oErr"></div>
-      <div class="row2"><div class="field"><label>Компанийн нэр *</label><input id="oCompany" value="${esc(r?r.company_name:'')}"></div><div class="field"><label>Регистр / ТТД</label><input id="oReg" value="${esc(r?r.company_reg||'':'')}"></div></div>
+      <div class="row2"><div class="field"><label>Регистр / ТТД <span id="oRegSt" class="eb-status"></span></label><input id="oReg" value="${esc(r?r.company_reg||'':'')}" inputmode="numeric" title="ebarimt.mn-ээс компанийн нэрийг автоматаар татна"></div><div class="field"><label>Компанийн нэр *</label><input id="oCompany" value="${esc(r?r.company_name:'')}"></div></div>
       <div class="row3"><div class="field"><label>Төлөөлөгчийн нэр</label><input id="oName" value="${esc(r?r.contact_name:'')}"></div><div class="field"><label>Утас</label><input id="oPhone" value="${esc(r?r.contact_phone:'')}"></div><div class="field"><label>Имэйл ${r?'':'*'}</label><input id="oEmail" type="email" value="${esc(r?r.contact_email||'':'')}" placeholder="гарын үсэг зурах хүний имэйл"></div></div>
       <div class="field"><label>Үйлчилгээ *</label><div class="chips" id="oSvc">${SERVICES.map(s=>`<span class="chip ${r&&(r.services||[]).includes(s)?'on':''}">${esc(s)}</span>`).join('')}</div></div>
       <div class="row3"><div class="field"><label>Сарын төлбөр (₮) *</label><input id="oFee" type="number" min="0" step="10000" value="${r&&r.budget?r.budget:(acc.price_from||'')}"></div><div class="field"><label>НӨАТ</label><select id="oVat"><option value="0">Ороогүй</option><option value="1">Орсон</option></select></div><div class="field"><label>Төлөх өдөр (сар бүрийн)</label><input id="oPay" type="number" min="1" max="28" value="10"></div></div>
@@ -144,6 +146,8 @@
       <div class="field"><label>Таны гарын үсэг (бүтэн нэр) *</label><input id="oSig" value="${esc(acc.name)}"><div style="font-size:12px;color:var(--bbi-muted);margin-top:4px">Санал илгээхдээ та гэрээнд гарын үсгээ зурна; компани зурмагц хүчинтэй болно.</div></div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px"><button class="bbi-btn" id="oSend">Гарын үсэг зурж санал илгээх</button><button class="bbi-btn ghost" id="oCancel">Болих</button></div>`);
     $('oCancel').onclick=close;
+    // Регистр бичмэгц ebarimt.mn-ээс компанийн нэр автоматаар (хоосон үед л бөглөнө — хүсэлтээс ирсэн нэрийг дарж бичихгүй)
+    if(window.BBIEbarimt){ const st=$('oRegSt'); BBIEbarimt.attach($('oReg'),{name:$('oCompany'),onResult:r=>{ const b=BBIEbarimt.badge(r); st.textContent=b.text; st.className='eb-status '+b.cls; }}); }
     $('oSvc').onclick=e=>{ if(e.target.classList.contains('chip')) e.target.classList.toggle('on'); };
     $('oSend').onclick=async()=>{
       const v=id=>$(id).value.trim(); const err=$('oErr'); err.innerHTML='';

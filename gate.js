@@ -81,7 +81,7 @@
       "display:none;position:fixed;inset:0;z-index:99999;background:rgba(17,17,17,.55);" +
       "backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:16px";
     o.innerHTML =
-      '<div style="position:relative;width:100%;max-width:460px;height:640px;max-height:92vh">' +
+      '<div style="position:relative;width:100%;max-width:460px;height:780px;max-height:92vh">' +
         '<button id="bbiGateClose" aria-label="Хаах" style="position:absolute;top:-14px;right:-14px;' +
         'z-index:2;width:38px;height:38px;border-radius:50%;border:none;background:#fff;' +
         'box-shadow:0 4px 16px rgba(0,0,0,.2);cursor:pointer;font-size:20px;line-height:1;color:#111">×</button>' +

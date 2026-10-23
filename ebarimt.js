@@ -126,7 +126,8 @@
     regEl.addEventListener("input", later);
     regEl.addEventListener("change", now);
     regEl.addEventListener("blur", now);
-    return { refresh: now };
+    // refresh(true) — «Шалгах» товчноос: өмнө нь алдаатай/олдоогүй байсан ч дахин шалгана
+    return { refresh: (force) => { clearTimeout(timer); if (force) last = ""; fire(regEl.value); } };
   }
 
   window.BBIEbarimt = { lookup, attach, badge, endpoint, normalize: norm };
