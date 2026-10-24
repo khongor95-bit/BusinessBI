@@ -341,6 +341,7 @@ tr.set-detail>td{background:var(--bg-row)!important;padding:8px 10px 12px 34px;}
     <button class="tb-ico" title="Нөөц хадгалах (JSON)" onclick="downloadBackup()"><svg viewBox="0 0 16 16"><path d="M2.5 2.5h7.5l3 3v8h-10.5z"/><path d="M5 2.5v3h5v-3"/><rect x="5" y="9" width="6" height="4.5"/></svg></button>
     <button class="tb-ico" title="Хэвлэх" onclick="window.print()"><svg viewBox="0 0 16 16"><path d="M4.5 5.5V2h7v3.5"/><rect x="2.5" y="5.5" width="11" height="5.5" rx="1"/><path d="M4.5 9.5h7V14h-7z"/></svg></button>
     <span class="tb-sep"></span>
+    <a href="dashboard.html" class="tb-link" title="Дашбоард — орлого, зардал, ашиг, авлага-өглөг, тайлангийн хуанли">Дашбоард</a>
     <a href="partner.html" class="tb-link" title="Нягтлангийн самбар — хүсэлт, гэрээ, харилцагчид">Самбар</a>
     <a href="index.html" class="tb-link primary" title="BusinessBI.mn вэб сайт руу буцах">Вэб сайт →</a>
   </div>
@@ -1118,6 +1119,8 @@ function nav(page){
   window.scrollTo(0,0);
 }
 if(location.hash==='#receipt'){ setTimeout(()=>{ nav('import'); impSetType('receipt'); },50); }
+/* dashboard.html-ээс шууд хуудас руу: #page=reports | tax | salary | journal | import | settle | settings … */
+{ const m=/^#page=([a-z]+)$/.exec(location.hash||''); if(m && PAGES.includes(m[1])){ const pg=m[1]; setTimeout(()=>{ nav(pg); history.replaceState(null,'',location.pathname); },50); } }
 document.getElementById('tabstrip').addEventListener('click', e=>{
   const t=e.target.closest('.rtab'); if(t) nav(t.dataset.default);
 });
