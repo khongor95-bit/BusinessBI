@@ -21,7 +21,9 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="description" content="Журналаа бичихэд СТ-1–СТ-4 санхүүгийн тайлан, ТТ-02 татварын тайлан автоматаар гарна. НДШ→ХХОАТ хөрвүүлэгч, НӨАТ тулгагч, нэхэмжлэх үүсгэгч — Монголын нягтлан бодогчдод зориулсан.">
 <link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="shell.css?v=20261104">
 <script src="site.js?v=20261104" defer></script>
+<script src="shell.js?v=20261104" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -33,32 +35,6 @@ body{font-family:var(--bbi-font);background:#fff;color:var(--ink);-webkit-font-s
 @media(max-width:749px){.container{padding:0 20px}}
 a{color:inherit}
 *:focus-visible{outline:2px solid var(--bbi-green);outline-offset:3px}
-
-/* ═══ ТОЛГОЙ — other-levels.com-ийн хэмжээсээр (зөвхөн нүүр хуудас) ═══
-   topbar 48px · header 84px (12px 48px) · цэсний pill 42px / 16.54px / 0 12px */
-.bbi-topbar{height:48px;background:#1f1f1f;color:#fafafa;font-size:13px;display:flex;align-items:center;justify-content:center;padding:0 20px;position:relative;font-family:var(--bbi-font)}
-.bbi-topbar a{color:#fafafa;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bbi-topbar a:hover{text-decoration:underline}
-body.home .bbi-nav{background:#fff;border-bottom:0;backdrop-filter:none}
-body.home .bbi-nav-in{max-width:none;height:84px;padding:12px 48px;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:0}
-body.home .bbi-logo{height:60px;font-size:24px}
-body.home .bbi-menu{gap:0;justify-self:center}
-body.home .bbi-menu a{display:inline-flex;align-items:center;height:42px;padding:0 12px;border-radius:60px;font-size:16.54px;font-weight:500;color:#171717}
-body.home .bbi-menu a:first-child{background:var(--bbi-green);color:#fff;font-weight:700}
-body.home .bbi-menu a:hover{color:var(--bbi-green)}
-body.home .bbi-menu a:first-child:hover{color:#fff;background:var(--bbi-green-dark)}
-body.home .bbi-nav-right{justify-self:end;gap:6px}
-body.home .bbi-login{height:42px;padding:0 16px;font-size:15px}
-@media(min-width:961px){body.home .bbi-nav-right .bbi-cta,body.home .bbi-menu a.bbi-cta{display:none}}
-@media(max-width:960px){
-  body.home .bbi-nav-in{padding:12px 20px;display:flex}
-  body.home .bbi-menu{position:absolute;top:100%;justify-self:stretch}
-  body.home .bbi-menu{visibility:hidden;transition:transform .3s,visibility .3s}
-  body.home .bbi-menu.open{visibility:visible}
-  body.home .bbi-menu a{display:block;height:auto;padding:13px 24px;border-radius:0}
-  body.home .bbi-menu a:first-child{background:none;color:#171717;font-weight:500}
-  body.home .bbi-menu a.bbi-cta{display:block;margin:8px 24px 0;border-radius:8px;text-align:center;background:var(--bbi-green);color:#fff}
-}
 
 /* Ерөнхий товч (доод хэсгүүд) */
 .cta-row{margin-top:28px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
@@ -268,85 +244,8 @@ body.home .bbi-login{height:42px;padding:0 16px;font-size:15px}
   .net-box{padding:48px 16px}.last{padding:44px 0 52px}
 }
 
-/* ═══ other-levels: булангийн radius (--rounded-block), толгойн гүйлгээ, popup, social bar, чат ═══ */
-:root{--rb:clamp(10px,1.053vw,20px);--ease-ol:cubic-bezier(.7,0,.2,1)}
-/* Толгой: дээд талдаа 92px (16px), гүйлгэхэд 84px (12px); доош гүйлгэхэд нуугдаж, дээш гүйлгэхэд гарна */
-body.home .bbi-nav{z-index:20;transition:transform .5s cubic-bezier(.6,0,.4,1)}
-body.home .bbi-nav-in{height:auto;padding:16px 48px;transition:padding .5s cubic-bezier(.6,0,.4,1)}
-body.home.hdr-scrolled .bbi-nav-in{padding-top:12px;padding-bottom:12px}
-body.home.hdr-hidden .bbi-nav{transform:translateY(-100%)}
-@media(max-width:960px){body.home .bbi-nav-in,body.home.hdr-scrolled .bbi-nav-in{padding:12px 20px}}
-/* Topbar-ийн зүүн талын icon-ууд (48px, 20px, 24px зай) */
-.bbi-topbar .tb-soc{position:absolute;left:48px;top:14px;display:flex;gap:24px;list-style:none;margin:0;padding:0}
-.bbi-topbar .tb-soc a{display:block;width:20px;height:20px;color:#fafafa}
-.bbi-topbar .tb-soc svg{width:20px;height:20px;display:block}
-@media(max-width:767px){.bbi-topbar .tb-soc{display:none}}
-
-/* Баруун талын хөвөгч bar — 52px, бөөрөнхий, blur 6px */
-.nl-bar{position:fixed;right:0;top:50vh;transform:translateY(-50%);z-index:30;width:52px;margin-inline:24px;padding:8px 0;display:grid;gap:12px;border-radius:9999px;background:rgba(255,255,255,.8);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 0 0 1px rgba(23,23,23,.1);font-family:var(--bbi-font)}
-.nl-bar ul{list-style:none;margin:0;padding:4px 0 0;display:flex;flex-direction:column;align-items:center;gap:2px}
-.nl-bar li{width:40px;height:40px}
-.nl-bar li a{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#171717}
-.nl-bar li svg{width:20px;height:20px;display:block}
-.nl-bar__btn{writing-mode:vertical-rl;display:flex;align-items:center;justify-content:center;margin:0 8px;padding:16px 0;border:0;border-radius:9999px;background:rgba(23,23,23,.045);color:#171717;font:400 10px/16px var(--bbi-font);letter-spacing:.5px;text-transform:uppercase;cursor:pointer;min-height:92px}
-.nl-bar__btn:hover span{animation:nlBeat .6s ease infinite}
-@keyframes nlBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-@media(max-width:767px){.nl-bar{display:none}}
-
-/* Зүүн доод чат товч — 50×50, radius 19.69px */
-.chat-fab{position:fixed;left:20px;bottom:80px;z-index:60;width:50px;height:50px;border-radius:19.69px;background:rgba(0,0,0,.7);color:#fff;display:flex;align-items:center;justify-content:center;text-decoration:none;box-shadow:rgba(0,0,0,.05) 0 2px 2px -1px,rgba(0,0,0,.05) 0 3px 4px -1.5px,rgba(0,0,0,.05) 0 4px 8px -2px,rgba(0,0,0,.05) 0 5px 16px -2.5px,rgba(0,0,0,.08) 0 0 0 1px;transition:transform .2s}
-.chat-fab:hover{transform:scale(1.06)}
-.chat-fab svg{width:24px;height:24px}
-
-/* Мэдээллийн товхимол popup — 480px, зүүн доод буланд 34px зайтай, scale .8→1 */
-.nl-modal{position:fixed;inset:0;z-index:35;pointer-events:none;font-family:var(--bbi-font);color:#171717}
-.nl-modal[open]{pointer-events:auto}
-.nl-overlay{position:fixed;inset:0;background:rgba(23,23,23,.7);opacity:0;visibility:hidden;transition:opacity .8s var(--ease-ol),visibility .8s var(--ease-ol)}
-.nl-modal[active] .nl-overlay{opacity:1;visibility:visible}
-.nl-inner{position:absolute;left:0;bottom:0;z-index:10;width:auto;margin:34px;background:#fff;border-radius:var(--rb);overflow:hidden;opacity:0;transform:scale(.8);transition:transform .6s var(--ease-ol),opacity .6s var(--ease-ol)}
-.nl-modal[active] .nl-inner{opacity:1;transform:scale(1)}
-.nl-head,.nl-content{opacity:0;visibility:hidden;transition:opacity .5s cubic-bezier(.3,1,.3,1) .35s,visibility .5s cubic-bezier(.3,1,.3,1) .35s}
-.nl-modal[active] .nl-head,.nl-modal[active] .nl-content{opacity:1;visibility:visible}
-.nl-head{position:absolute;top:0;right:0;z-index:1;padding:16px}
-.nl-close{width:48px;height:48px;border-radius:9999px;border:1px solid rgba(23,23,23,.1);background:none;backdrop-filter:blur(12px);color:#171717;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
-.nl-close svg{width:20px;height:20px;transition:transform .5s cubic-bezier(.3,1,.3,1)}
-.nl-close:hover svg{transform:rotate(90deg)}
-.nl-content{max-width:480px}
-.nl-scroll{padding:32px 48px;max-width:min(480px,calc(100vw - 68px))}
-.nl-content h3{margin:0;font-size:clamp(18px,15.555px + .4444vw,24px);font-weight:700;line-height:1;letter-spacing:-.03em}
-.nl-form{margin-top:32px;max-width:448px}
-.nl-field{position:relative}
-.nl-field input{display:block;width:100%;height:62px;padding:16px 26px 0;border:0;border-radius:6px;background:rgba(23,23,23,.045);color:#171717;font:400 16px/1.6 var(--bbi-font);outline:none;transition:background-color .5s cubic-bezier(.3,1,.3,1)}
-.nl-field input:focus{background:rgba(23,23,23,.115)}
-.nl-field input::placeholder{color:transparent}
-.nl-field label{position:absolute;top:0;left:1px;height:62px;margin-left:26px;display:flex;align-items:center;font-size:16px;line-height:1.6;opacity:.6;pointer-events:none;transform-origin:left center;transition:all .5s cubic-bezier(.3,1,.3,1)}
-.nl-field input:focus~label,.nl-field input:not(:placeholder-shown)~label{transform:translateY(-10px) scale(.7)}
-.nl-submit{position:absolute;top:50%;right:16px;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:9999px;background:#171717;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
-.nl-submit svg{width:16px;height:16px}
-.nl-submit:disabled{opacity:.5}
-.nl-text{margin:20px 0 0;font-size:14px;line-height:1.6}
-.nl-msg{margin:10px 0 0;font-size:13px;line-height:1.5;display:none}
-.nl-msg.ok{display:block;color:var(--bbi-green)}
-.nl-msg.err{display:block;color:#c0492b}
-.nl-soc{margin:20px 0 0;padding:0;list-style:none;display:flex;gap:24px}
-.nl-soc a{display:block;width:20px;height:20px;color:#171717}
-.nl-soc svg{width:20px;height:20px;display:block}
-@media(max-width:639px){
-  .nl-overlay{background:rgba(23,23,23,.7)}
-  .nl-inner{left:0;right:0;bottom:0;margin:0;width:100%;max-height:calc(100% - 60px);border-radius:20px 20px 0 0;opacity:1;transform:translate3d(0,100%,0)}
-  .nl-modal[active] .nl-inner{transform:translateZ(0)}
-  .nl-head{top:4px;right:4px;padding:0}
-  .nl-close{border:0;backdrop-filter:none}
-  .nl-inner::before{content:"";position:absolute;top:10px;left:50%;transform:translateX(-50%);width:48px;height:4px;border-radius:9999px;background:rgba(23,23,23,.1)}
-  .nl-head,.nl-content{transition-delay:0s}
-  .nl-scroll{padding:44px 20px 32px;max-width:none}
-  .nl-content{max-width:none}
-}
-@media (prefers-reduced-motion:reduce){.nl-inner{transform:none!important;transition:opacity .3s}}
-
-/* ═══ other-levels: алтан өнгө (нүүр хуудсанд ногооныг орлоно) ═══ */
+/* ═══ Нүүр хуудасны алтан өнгө (hero) ═══ */
 body.home{--bbi-green:#c9a24d;--bbi-green-dark:#b08a3a;--bbi-green-bright:#c9a470;--bbi-green-soft:#faf3e4;--ol-gold:#c9a470;--ol-gold-l:#f0d4ac}
-body.home .bbi-logo b{color:#c9a24d}
 body.home .search .go{background:var(--ol-gold);color:#171717}
 body.home .search input:focus{outline:3px solid rgba(201,164,112,.35);border-color:var(--ol-gold)}
 body.home .btn.outline{border-color:var(--ol-gold);color:var(--ol-gold-l)}
@@ -357,77 +256,6 @@ body.home .new:hover{border-color:var(--ol-gold);color:#fff}
 body.home .btn.green{background:var(--ol-gold);color:#171717}
 body.home .btn.green:hover{background:#b8925f}
 body.home .sugg .tag{background:#faf3e4;color:#8a6420}
-body.home .bbi-footer{background:#171717}
-body.home .bbi-footer .bbi-logo b{color:var(--ol-gold)}
-body.home .bbi-login:hover{border-color:#171717;color:#171717}
-
-/* ═══ Толгой: дээд талын бөөрөнхий булан (22.72px), гүйлгэхэд/цэс нээгдэхэд 0 ═══ */
-body.home .bbi-nav{background:#1f1f1f}
-body.home .bbi-nav-in{position:relative;z-index:2}
-body.home .bbi-nav-in::before{content:"";position:absolute;inset:0;z-index:-1;background:#fff;border-radius:calc(var(--rb)*1.5) calc(var(--rb)*1.5) 0 0;transition:border-radius .5s cubic-bezier(.6,0,.4,1)}
-body.home.hdr-scrolled .bbi-nav-in::before,body.home.mega-open .bbi-nav-in::before{border-radius:0}
-body.home.hdr-scrolled .bbi-nav{background:transparent}
-
-/* Цэсний pill: hover үед хар хуулбар доороос гулсаж гарна */
-@media(min-width:961px){
-  body.home .bbi-menu a{position:relative;overflow:hidden;padding:0 12px}
-  body.home .bbi-menu a .t{display:inline-block;transition:transform .5s cubic-bezier(.3,1,.3,1),opacity .5s cubic-bezier(.3,1,.3,1)}
-  body.home .bbi-menu a .dup{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border-radius:60px;background:#171717;color:#fff;font-weight:inherit;transform:translateY(100%) scale(.6);transition:transform .5s cubic-bezier(.3,1,.3,1)}
-  body.home .bbi-menu a:hover .dup,body.home .bbi-menu a.mega-on .dup{transform:none}
-  body.home .bbi-menu a:hover .t,body.home .bbi-menu a.mega-on .t{opacity:0;transform:translateY(-10%) scale(.6)}
-  body.home .bbi-menu a:hover{color:#171717}
-}
-
-/* ═══ Mega menu (Хэрэгслүүд) — толгойн доороос бууж ирнэ ═══ */
-.mega{position:absolute;top:0;left:0;right:0;z-index:1;overflow:hidden;pointer-events:none;border-radius:0 0 calc(var(--rb)*1.5) calc(var(--rb)*1.5);font-family:var(--bbi-font);color:#171717}
-.mega-c{background:#fff;padding-top:92px;border-radius:0 0 calc(var(--rb)*1.5) calc(var(--rb)*1.5);transform:translateY(-100%);visibility:hidden;transition:transform .7s cubic-bezier(.7,0,.3,1),visibility .7s,padding .5s cubic-bezier(.6,0,.4,1)}
-body.hdr-scrolled .mega-c{padding-top:84px}
-body.mega-open .mega{pointer-events:auto}
-body.mega-open .mega-c{transform:none;visibility:visible}
-.mega-l{display:flex;gap:max(16px,1.263vw);padding:12px 48px 56px}
-.mega-tabs{flex:0 0 auto;width:min(230px,25vw);display:flex;flex-direction:column;gap:32px}
-.mega-tabs .lbl{font-size:18px;font-weight:500;line-height:1.6;margin:0}
-.mega-nav{display:grid;gap:6px}
-.mega-nav button{display:flex;align-items:center;gap:8px;padding:0;border:0;background:none;cursor:pointer;color:#171717;font-family:inherit;text-align:left;opacity:0;transform:translateX(25%);transition:transform 2s cubic-bezier(.075,.82,.165,1) .25s,opacity 1s cubic-bezier(.19,1,.22,1)}
-.mega-nav .ic{width:42px;height:28px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;opacity:.5;transition:opacity .3s}
-.mega-nav .ic svg{width:24px;height:24px}
-.mega-nav .h{font-size:var(--ol-card-t);font-weight:700;line-height:1.25;letter-spacing:-.05em;opacity:.5;transition:opacity .3s}
-.mega-nav button.on .ic,.mega-nav button.on .h,.mega-nav button:hover .h,.mega-nav button:hover .ic{opacity:1}
-.mega-foot{position:relative;margin-top:auto;padding-top:28px}
-.mega-foot::before{content:"";position:absolute;left:0;right:0;top:28px;height:1px;background:#171717;transform:scaleX(0);transform-origin:left center;transition:transform 1s cubic-bezier(.215,.61,.355,1) .5s}
-.mega-foot a{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:20px 0 16px;text-decoration:none;color:#171717;font-size:18.54px;font-weight:700;line-height:1;letter-spacing:-.025em}
-.mega-foot svg,.mega-all svg{width:20px;height:20px;transition:transform .5s cubic-bezier(.3,1,.3,1)}
-.mega-foot a:hover svg,.mega-all:hover svg{transform:translateX(4px)}
-.mega-r{flex:1;min-width:0;opacity:0;transform:translateX(25%);transition:transform 1.5s cubic-bezier(.075,.82,.165,1) .25s,opacity .9s cubic-bezier(.19,1,.22,1)}
-.mega-panel{display:none;gap:32px}
-.mega-panel.on{display:grid}
-.mega-head{display:flex;align-items:center;justify-content:space-between;gap:16px}
-.mega-head p{margin:0;font-size:14px;line-height:1;text-transform:uppercase;color:rgba(23,23,23,.6)}
-.mega-all{display:inline-flex;align-items:center;gap:16px;text-decoration:none;color:#171717;font-size:18.54px;font-weight:700;letter-spacing:-.025em;line-height:1}
-.mega-all small{font-size:16px;font-weight:500;letter-spacing:-.025em}
-.mega-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:max(16px,1.263vw)}
-.mega-grid .pc .m{aspect-ratio:260/143}
-.mega-grid .pc .pr{line-height:1.25}
-body.mega-open .mega-nav button,body.mega-open .mega-r{opacity:1;transform:none}
-body.mega-open .mega-r{transition-delay:.3s}
-body.mega-open .mega-nav button:nth-child(1){transition-delay:.5s}
-body.mega-open .mega-nav button:nth-child(2){transition-delay:.6s}
-body.mega-open .mega-nav button:nth-child(3){transition-delay:.7s}
-body.mega-open .mega-nav button:nth-child(4){transition-delay:.8s}
-body.mega-open .mega-foot::before{transform:scaleX(1)}
-.mega-ov{position:fixed;inset:0;z-index:-1;background:linear-gradient(to top,rgba(23,23,23,.1) 40%,rgba(23,23,23,.5) 80%);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .8s cubic-bezier(.7,0,.2,1),visibility .8s}
-body.mega-open .mega-ov{opacity:1;visibility:visible;transition-delay:.1s}
-body.mega-open .nl-bar{z-index:15}
-@media(max-width:960px){.mega,.mega-ov{display:none}}
-
-/* ═══ Хуудас солигдох шилжилт (other-levels page-transition) ═══ */
-.pt{position:fixed;inset:0;z-index:9999;background:#171717;pointer-events:none;opacity:1;transition:opacity .6s cubic-bezier(.7,0,.2,1),visibility .6s;animation:ptOut .6s cubic-bezier(.7,0,.2,1) 1.5s forwards}
-.pt svg{position:absolute;right:48px;bottom:48px;width:32px;height:32px;color:#fff;animation:ptSpin 1s linear infinite}
-.pt.done{opacity:0;visibility:hidden;animation:none}
-.pt.go{opacity:1;visibility:visible;animation:none;pointer-events:auto}
-@keyframes ptOut{to{opacity:0;visibility:hidden}}
-@keyframes ptSpin{to{transform:rotate(360deg)}}
-@media (prefers-reduced-motion:reduce){.pt{display:none}}
 
 /* ═══ Гарчгийн үгс доороос гарч ирэх (split-words) ═══ */
 .sw .w{display:inline-flex;overflow:hidden;padding:.15em .05em;margin:-.15em -.05em;vertical-align:top}
@@ -439,9 +267,8 @@ body.mega-open .nl-bar{z-index:15}
 @media (prefers-reduced-motion:reduce){.sw .wi{transform:none;transition:none}.hl svg path{stroke-dashoffset:0}}
 </style>
 </head>
-<body class="home">
+<body class="home ol">
 <div class="pt" id="pt" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9"/></svg></div>
-<div class="bbi-topbar"><ul class="tb-soc"><li><a href="mailto:hello@businessbi.mn" aria-label="И-мэйл"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></a></li><li><a href="tel:+97699112233" aria-label="Утас"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></a></li><li><a href="contact.html" aria-label="Холбоо барих"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></a></li></ul><a href="ndsh_hhoat_converter.html">ШИНЭ: ХХОАТ маягтын ТТД регистрээр автоматаар →</a></div>
 
 <!-- ═══════════ HERO ═══════════ -->
 <section class="finder" aria-label="Эхлэл">
@@ -653,90 +480,6 @@ body.mega-open .nl-bar{z-index:15}
 })();
 </script>
 
-<!-- ═══════════ Хөвөгч элементүүд (other-levels загвар) ═══════════ -->
-<div class="nl-bar" aria-label="Холбоо">
-  <ul>
-    <li><a href="mailto:hello@businessbi.mn" title="И-мэйл"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg><span class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">И-мэйл</span></a></li>
-    <li><a href="tel:+97699112233" title="Утас"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg><span class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Утас</span></a></li>
-    <li><a href="contact.html" title="Холбоо барих"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Холбоо барих</span></a></li>
-  </ul>
-  <button type="button" class="nl-bar__btn" data-nl-open aria-controls="nlModal"><span>Бүртгэл</span></button>
-</div>
-
-<a class="chat-fab" href="contact.html" aria-label="Бидэнтэй чатлах"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10a4 4 0 0 1 4 4v6a4 4 0 0 1-4 4h-4l-4 3v-3H7a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4z"/></svg></a>
-
-<div class="nl-modal" id="nlModal" role="dialog" aria-modal="false" aria-labelledby="nlTitle">
-  <div class="nl-overlay" data-nl-close></div>
-  <div class="nl-inner">
-    <div class="nl-head"><button type="button" class="nl-close" data-nl-close aria-label="Хаах"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
-    <div class="nl-content"><div class="nl-scroll">
-      <h3 id="nlTitle">BusinessBI мэдээлэлд бүртгүүлэх</h3>
-      <form class="nl-form" id="nlForm" novalidate>
-        <div class="nl-field">
-          <input id="nlEmail" type="email" name="email" placeholder="И-мэйл хаягаа оруулна уу" autocomplete="email" required>
-          <label for="nlEmail">И-мэйл хаягаа оруулна уу</label>
-          <button type="submit" class="nl-submit" aria-label="Бүртгүүлэх"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
-        </div>
-        <p class="nl-msg" id="nlMsg" role="status"></p>
-      </form>
-      <p class="nl-text">Шинэ хэрэгсэл, татварын өөрчлөлт, зөвлөгөөг и-мэйлээр аваарай. Хүссэн үедээ цуцалж болно.</p>
-      <ul class="nl-soc">
-        <li><a href="mailto:hello@businessbi.mn" aria-label="И-мэйл"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></a></li>
-        <li><a href="tel:+97699112233" aria-label="Утас"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></a></li>
-        <li><a href="contact.html" aria-label="Холбоо барих"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></a></li>
-      </ul>
-    </div></div>
-  </div>
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js" defer></script>
-<script>
-/* ═══ Толгой: гүйлгэхэд жижгэрч, доош гүйлгэхэд нуугдана (other-levels header-sticky) ═══ */
-(function(){
-  const b=document.body; let last=scrollY;
-  addEventListener('scroll',()=>{
-    const y=scrollY, tb=48;
-    b.classList.toggle('hdr-scrolled', y>tb);
-    if(y>tb+92 && y>last+2) b.classList.add('hdr-hidden');
-    else if(y<last-2 || y<=tb) b.classList.remove('hdr-hidden');
-    last=y;
-  },{passive:true});
-})();
-
-/* ═══ Мэдээллийн popup — 20 сек дараа, 7 хоногт нэг удаа ═══ */
-(function(){
-  const m=document.getElementById('nlModal'); if(!m) return;
-  const KEY='bbi_nl_seen', DELAY=20000, EXPIRY=7*864e5;
-  const seen=()=>{ try{ return Date.now()-(+localStorage.getItem(KEY)||0) < EXPIRY; }catch(e){ return false; } };
-  const mark=()=>{ try{ localStorage.setItem(KEY, Date.now()); }catch(e){} };
-  function open(){ m.setAttribute('open',''); requestAnimationFrame(()=>requestAnimationFrame(()=>m.setAttribute('active',''))); mark(); }
-  function close(){ m.removeAttribute('active'); setTimeout(()=>{ if(!m.hasAttribute('active')) m.removeAttribute('open'); },800); }
-  if(!seen()) setTimeout(()=>{ if(!seen()) open(); }, DELAY);
-  document.querySelectorAll('[data-nl-open]').forEach(x=>x.addEventListener('click',e=>{e.preventDefault();open();}));
-  m.querySelectorAll('[data-nl-close]').forEach(x=>x.addEventListener('click',close));
-  addEventListener('keydown',e=>{ if(e.key==='Escape' && m.hasAttribute('active')) close(); });
-
-  const form=document.getElementById('nlForm'), inp=document.getElementById('nlEmail'), msg=document.getElementById('nlMsg'), btn=form.querySelector('.nl-submit');
-  const show=(t,ok)=>{ msg.textContent=t; msg.className='nl-msg '+(ok?'ok':'err'); };
-  form.addEventListener('submit', async e=>{
-    e.preventDefault();
-    const email=inp.value.trim();
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || email.length>120){ show('И-мэйл хаягаа зөв оруулна уу.', false); inp.focus(); return; }
-    btn.disabled=true;
-    try{
-      if(!window.firebase) throw new Error('firebase');
-      if(!firebase.apps.length) firebase.initializeApp({apiKey:"AIzaSyAXslBVU1__Ibhk3P7TEeJRS2oi-8fi6Jc",authDomain:"businessbi.firebaseapp.com",projectId:"businessbi",storageBucket:"businessbi.firebasestorage.app",messagingSenderId:"84765528435",appId:"1:84765528435:web:edf7066e6399dbc76af506"});
-      await firebase.firestore().collection('leads').add({name:'', phone:'', email, topic:'newsletter', topicText:'Мэдээллийн бүртгэл', message:'', page:location.href, ua:navigator.userAgent.slice(0,160), status:'new', createdAt: firebase.firestore.FieldValue.serverTimestamp()});
-      form.reset(); show('Баярлалаа! Бүртгэл амжилттай боллоо.', true);
-      try{ localStorage.setItem(KEY, Date.now()+365*864e5); }catch(_){}
-      setTimeout(close, 2200);
-    }catch(err){
-      console.warn('newsletter', err); show('Одоогоор бүртгэж чадсангүй. Дахин оролдоно уу.', false);
-    }finally{ btn.disabled=false; }
-  });
-})();
-</script>
 
 <script>
 /* ═══ Ангиллын slider сум + картууд гарч ирэх хөдөлгөөн ═══ */
@@ -758,25 +501,6 @@ body.mega-open .nl-bar{z-index:15}
 })();
 </script>
 <script>
-/* ═══ Хуудас солигдох шилжилт ═══ */
-(function(){
-  const pt=document.getElementById('pt'); if(!pt) return;
-  const hide=()=>{ pt.classList.remove('go'); pt.classList.add('done'); };
-  const go=()=>{ requestAnimationFrame(hide); setTimeout(hide,120); };
-  if(document.readyState!=='loading') go(); else document.addEventListener('DOMContentLoaded',go);
-  addEventListener('pageshow',e=>{ if(e.persisted) hide(); });
-  document.addEventListener('click',e=>{
-    const a=e.target.closest&&e.target.closest('a[href]'); if(!a) return;
-    if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||a.target==='_blank'||a.hasAttribute('download')) return;
-    const u=new URL(a.href,location.href);
-    if(u.origin!==location.origin||!/^https?:$/.test(u.protocol)) return;
-    if(u.pathname===location.pathname&&u.hash) return;
-    if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    e.preventDefault(); pt.classList.remove('done'); pt.classList.add('go');
-    setTimeout(()=>{ location.href=u.href; },450);
-  });
-})();
-
 /* ═══ Гарчгийн үгсийг хувааж, дэлгэцэнд орохоор доороос гаргана ═══ */
 (function(){
   const sel='.finder h1, .intro h2, #tool-list h2, #products h2, .net-box h2, .how h2, .last h2';
@@ -799,69 +523,6 @@ body.mega-open .nl-bar{z-index:15}
   els.forEach(el=>io.observe(el));
 })();
 
-/* ═══ Толгой цэс: pill hover эффект + Хэрэгслүүд mega menu ═══ */
-(function(){
-  const ARR='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
-  const IC={
-    tools:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v16"/></svg>',
-    apps:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
-    auto:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4h16v12H4z"/><path d="M8 20h8M12 16v4M8 9l2 2 4-4"/></svg>',
-    net:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M14 20c0-2.5 1.5-4.5 4-4.5s3 1.5 3 3"/></svg>'
-  };
-  const card=(h,img,t,p)=>`<a class="pc" href="${h}"><div class="m"><img src="img/${img}" alt="" loading="lazy"><div class="qa"><span>Үзэх</span></div></div><div class="ct"><span class="t">${t}</span><span class="pr">${p}</span></div></a>`;
-  const TABS=[
-    {k:'tools',n:'Хэрэгсэл',all:['tools.html','Бүх хэрэгсэл',9],items:[
-      card('ndsh_hhoat_converter.html','tool-ndsh.jpg','НДШ / ХХОАТ хөрвүүлэгч','5,000₮ / тайлан'),
-      card('noat_matcher.html','tool-noat.jpg','НӨАТ тулгагч','Үнэгүй'),
-      card('invoice_generator.html','tool-invoice.jpg','Нэхэмжлэх үүсгэгч','Үнэгүй'),
-      card('financial_dashboard.html','tool-financial.jpg','Санхүүгийн шинжилгээ','Үнэгүй')]},
-    {k:'apps',n:'Програм',all:['pricing.html','Бүх програм',4],items:[
-      card('businessbi_journal.html','finance.jpg','Санхүүгийн програм','14 хоног үнэгүй'),
-      card('payroll.html','salary.jpg','Цалин бодогч','Beta · үнэгүй'),
-      card('budget.html','budget.jpg','Бизнес төлөвлөлт','Beta · үнэгүй'),
-      card('dashboard.html?demo=1','powerbi-dashboard.png','Дашбоард','Үнэгүй')]},
-    {k:'auto',n:'Автомат',all:['tools.html','Бүх хэрэгсэл',9],items:[
-      card('receipt_scan.html','accounting.png','Баримт уншуулагч','Үнэгүй'),
-      card('businessbi_journal.html#page=reports','excel-dashboard.png','СТ-1–4 тайлан','14 хоног үнэгүй'),
-      card('noat_matcher.html','tool-noat.jpg','eBarimt тулгалт','Үнэгүй'),
-      card('ndsh_hhoat_converter.html','tool-ndsh.jpg','ТТД автоматаар','5,000₮ / тайлан')]},
-    {k:'net',n:'Сүлжээ',all:['accountants.html','Бүх нягтлан',''],items:[
-      card('accountants.html','training.png','Нягтлан хайх','Үнэгүй'),
-      card('accountant_signup.html','accounting.png','Сүлжээнд элсэх','Үнэгүй'),
-      card('pricing.html','finance.jpg','Үнэ, багц','Харах'),
-      card('contact.html','excel-dashboard.png','Холбоо барих','1 ажлын өдөрт')]}
-  ];
-  function init(){
-    const nav=document.querySelector('.bbi-nav'), menu=document.getElementById('bbiMenu'); if(!nav||!menu||nav.dataset.home) return !!(nav&&menu);
-    nav.dataset.home='1';
-    // Санхүүгийн програмыг эхэнд (алтан pill), Хэрэгслүүд хоёрт (mega)
-    const links=[...menu.querySelectorAll(':scope > a:not(.bbi-cta)')];
-    const fin=links.find(a=>/businessbi_journal/.test(a.getAttribute('href'))), tools=links.find(a=>/tools\.html/.test(a.getAttribute('href')));
-    if(fin) menu.insertBefore(fin, menu.firstChild);
-    menu.querySelectorAll(':scope > a:not(.bbi-cta)').forEach(a=>{ if(a.querySelector('.t')) return; const t=a.textContent; a.innerHTML=`<span class="t">${t}</span><span class="dup" aria-hidden="true">${t}</span>`; a.classList.remove('active'); });
-    if(!tools || matchMedia('(max-width:960px)').matches && false) return true;
-    const mega=document.createElement('div'); mega.className='mega'; mega.id='mega';
-    mega.innerHTML=`<div class="mega-c"><div class="mega-l">
-      <div class="mega-tabs"><p class="lbl">Ангилал</p><div class="mega-nav">${TABS.map((t,i)=>`<button type="button" data-i="${i}" class="${i?'':'on'}"><span class="ic">${IC[t.k]}</span><span class="h">${t.n}</span></button>`).join('')}</div>
-        <div class="mega-foot"><a href="learn.html"><span>Зөвлөгөө</span>${ARR}</a></div></div>
-      <div class="mega-r">${TABS.map((t,i)=>`<div class="mega-panel ${i?'':'on'}"><div class="mega-head"><p>${t.n}</p><a class="mega-all" href="${t.all[0]}"><span>${t.all[1]} ${t.all[2]!==''?`<small>(${t.all[2]})</small>`:''}</span>${ARR}</a></div><div class="mega-grid">${t.items.join('')}</div></div>`).join('')}</div>
-    </div></div>`;
-    const ov=document.createElement('div'); ov.className='mega-ov';
-    nav.insertBefore(mega, nav.firstChild); nav.appendChild(ov);
-    const btns=[...mega.querySelectorAll('.mega-nav button')], panels=[...mega.querySelectorAll('.mega-panel')];
-    btns.forEach((b,i)=>{ const act=()=>{ btns.forEach(x=>x.classList.toggle('on',x===b)); panels.forEach((p,j)=>p.classList.toggle('on',j===i)); }; b.addEventListener('mouseenter',act); b.addEventListener('click',act); });
-    let tm=null;
-    const open=()=>{ if(matchMedia('(max-width:960px)').matches) return; clearTimeout(tm); document.body.classList.add('mega-open'); tools.classList.add('mega-on'); };
-    const close=()=>{ clearTimeout(tm); tm=setTimeout(()=>{ document.body.classList.remove('mega-open'); tools.classList.remove('mega-on'); },180); };
-    [tools,mega].forEach(el=>{ el.addEventListener('mouseenter',open); el.addEventListener('mouseleave',close); });
-    menu.querySelectorAll(':scope > a').forEach(a=>{ if(a!==tools) a.addEventListener('mouseenter',()=>{ clearTimeout(tm); document.body.classList.remove('mega-open'); tools.classList.remove('mega-on'); }); });
-    ov.addEventListener('mouseenter',close);
-    addEventListener('keydown',e=>{ if(e.key==='Escape'){ document.body.classList.remove('mega-open'); tools.classList.remove('mega-on'); } });
-    return true;
-  }
-  const tryInit=(n)=>{ if(init()) return; if(n<40) setTimeout(()=>tryInit(n+1),50); };
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>tryInit(0)); else tryInit(0);
-})();
 </script>
 </body>
 </html>
