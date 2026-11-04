@@ -19,9 +19,19 @@
     { id: 'inventory', name: 'Агуулахын бүртгэл', price: 19000, cat: 'Үйл ажиллагаа', short: 'Бараа, орлого зарлагын хөдөлгөөн, үлдэгдэл, үнэлгээ, дахин захиалах анхааруулга.', sheets: ['Бараа', 'Хөдөлгөөн', 'Үлдэгдэл'] },
     { id: 'sales', name: 'Борлуулалтын дашбоард', price: 29000, cat: 'Дашбоард', short: 'Өгөгдлөө хуулаад л KPI, сар, салбар, бүтээгдэхүүн, борлуулагчаар график.', sheets: ['Дашбоард', 'Өгөгдөл'] },
     { id: 'feasibility', name: 'ТЭЗҮ — 5 жилийн санхүүгийн загвар', price: 49000, cat: 'Бизнес төлөвлөгөө', short: 'Хөрөнгө оруулалт, зээл, орлого зардлын төсөөлөл, NPV, IRR, өгөөжийн хугацаа, хугарлын цэг.', sheets: ['Таамаглал', 'Төсөөлөл', 'Мөнгөн урсгал', 'Зээл', 'Үр ашиг'] },
-    { id: 'aging', name: 'Авлагын насжилт', price: 19000, cat: 'НББ', short: 'Нэхэмжлэх бүрийн хугацаа хэтрэлт, харилцагчаар 0–30 / 31–60 / 61–90 / 90+ хоног.', sheets: ['Нэхэмжлэх', 'Насжилт', 'Тохиргоо'] }
+    { id: 'aging', name: 'Авлагын насжилт', price: 19000, cat: 'НББ', short: 'Нэхэмжлэх бүрийн хугацаа хэтрэлт, харилцагчаар 0–30 / 31–60 / 61–90 / 90+ хоног.', sheets: ['Нэхэмжлэх', 'Насжилт', 'Тохиргоо'] },
+    { id: 'loan', name: 'Зээлийн тооцоолуур', price: 15000, cat: 'Санхүү', short: 'Тэнцүү нийт / тэнцүү үндсэн төлбөрийн хуваарь, нийт хүү, шимтгэл орсон бодит хүү, хоёр аргын харьцуулалт.', sheets: ['Тооцоолуур', 'Хуваарь', 'Харьцуулалт'] },
+    { id: 'homebudget', name: 'Өрхийн төсөв', price: 15000, cat: 'Хувийн санхүү', short: 'Сар бүрийн орлого, зарлагыг ангиллаар — төсөв ба бодит, хадгаламжийн хувь, график.', sheets: ['Тойм', 'Гүйлгээ', 'Ангилал'] },
+    { id: 'attendance', name: 'Ирц, цагийн бүртгэл', price: 19000, cat: 'Цалин, ХН', short: 'Сарын ирцийн хүснэгт: ажилласан өдөр, цаг, илүү цаг, чөлөө, өвчтэй, тасалсан — цалинд шууд.', sheets: ['Ирц', 'Тохиргоо'] },
+    { id: 'cashbook', name: 'Касс, харилцахын дэвтэр', price: 19000, cat: 'НББ', short: 'Касс, олон банкны дансны гүйлгээ, мөр бүрийн үлдэгдэл, хугацааны тайлан, ангиллаар зарлага.', sheets: ['Тайлан', 'Гүйлгээ', 'Тохиргоо'] },
+    { id: 'costing', name: 'Өртөг ба үнэ тогтоох', price: 19000, cat: 'Үйл ажиллагаа', short: 'Түүхий эд, орц (жор), нэгжийн өртөг, зорилтот ашгаар санал болгох үнэ, бодит маржин.', sheets: ['Бүтээгдэхүүн', 'Орц', 'Түүхий эд'] },
+    { id: 'crm', name: 'Борлуулалтын CRM', price: 19000, cat: 'Борлуулалт', short: 'Харилцагч, боломж, үе шат, магадлал, жигнэсэн таамаг, хугацаа хэтэрсэн алхам, самбар.', sheets: ['Самбар', 'Боломж', 'Харилцагч', 'Тохиргоо'] },
+    { id: 'gantt', name: 'Төслийн төлөвлөгөө (Gantt)', price: 19000, cat: 'Үйл ажиллагаа', short: 'Ажил, хариуцагч, хугацаа, гүйцэтгэл — 26 долоо хоногийн Gantt график автоматаар будагдана.', sheets: ['Төлөвлөгөө'] },
+    { id: 'kpi', name: 'Ажилтны KPI үнэлгээ', price: 19000, cat: 'Цалин, ХН', short: 'Жигнэсэн KPI оноо, A–D ангилал, урамшууллын дүн, хэвлэх үнэлгээний хуудас.', sheets: ['Үнэлгээ', 'Хуудас', 'Тохиргоо'] },
+    { id: 'quote', name: 'Үнийн санал, нэхэмжлэх', price: 15000, cat: 'Борлуулалт', short: 'Үнийн жагсаалтаас код сонгоод үнийн санал, нэхэмжлэх (НӨАТ-тай) — A4-т хэвлэхэд бэлэн.', sheets: ['Үнийн санал', 'Нэхэмжлэх', 'Тохиргоо'] },
+    { id: 'cit', name: 'ААНОАТ тооцоолуур', price: 25000, cat: 'Татвар', short: 'Улирлын өссөн дүнгээр ААНОАТ, 90% хөнгөлөлт, хялбаршуулсан 1%-ийн горимтой харьцуулалт.', sheets: ['Тооцоо', 'Тохиргоо'] },
   ];
-  const BUNDLE = { id: 'all', name: 'Бүх 11 загвар — багц', price: 149000 };
+  const BUNDLE = { id: 'all', name: 'Бүх 21 загвар — багц', price: 199000 };
 
   /* ═════════ 1. ЦАЛИН ═════════ */
   async function payroll(ExcelJS, JSZip, mail) {
@@ -215,18 +225,17 @@
     const SB = "'Борлуулалт'!", PB = "'Худалдан авалт'!", rr = '$5:$', e = 304;
     MONTHS.forEach((mn, i) => {
       const r = 6 + i; M.getCell('A' + r).value = mn; M.getCell('A' + r).border = box;
-      const yr = (sh) => `(YEAR(${sh}$A$5:$A$${e})=$B$3)*(MONTH(${sh}$A$5:$A$${e})=${i + 1})`;
+      const dt = (sh) => `${sh}$A$5:$A$${e},">="&DATE($B$3,${i + 1},1),${sh}$A$5:$A$${e},"<"&DATE($B$3,${i + 2},1)`;
       const set = (c, f) => { const x = M.getCell(c + r); x.value = { formula: f }; calcCell(x, MONEY); };
-      set('B', `SUMPRODUCT(${yr(SB)}*N(+${SB}$F$5:$F$${e}))`);
-      set('C', `SUMPRODUCT(${yr(SB)}*N(+${SB}$G$5:$G$${e}))`);
-      set('D', `SUMPRODUCT(${yr(PB)}*(${PB}$H$5:$H$${e}<>"Үгүй")*N(+${PB}$G$5:$G$${e}))`);
+      set('B', `SUMIFS(${SB}$F$5:$F$${e},${dt(SB)})`);
+      set('C', `SUMIFS(${SB}$G$5:$G$${e},${dt(SB)})`);
+      set('D', `SUMIFS(${PB}$G$5:$G$${e},${dt(PB)},${PB}$H$5:$H$${e},"<>Үгүй")`);
       set('E', i === 0 ? '0' : `G${r - 1}`);
       set('F', `MAX(0,C${r}-D${r}-E${r})`);
       set('G', `MAX(0,D${r}+E${r}-C${r})`);
       M.getCell('F' + r).font = { bold: true };
     });
     M.getCell('A18').value = 'Нийт'; ['B', 'C', 'D', 'F'].forEach(c => { M.getCell(c + 18).value = { formula: `SUM(${c}6:${c}17)` }; M.getCell(c + 18).numFmt = MONEY; }); totalRow(M, 18, 1, 7);
-    note(M, 'A20', 'Анхаар: НӨАТ-гүй дүн, НӨАТ баганууд хоосон мөрт "" буцаадаг тул N(+…)-ээр тоо болгож нэмдэг.', 'A20:G20');
     return done(wb, JSZip, {
       'Сарын тооцоо': [{ type: 'col', title: 'Борлуулалтын ба хасагдах НӨАТ — сараар', cats: { ref: `'Сарын тооцоо'!$A$6:$A$17`, vals: MONTHS }, series: [{ name: 'Борлуулалтын НӨАТ', ref: `'Сарын тооцоо'!$C$6:$C$17`, vals: [], color: '#c9a470' }, { name: 'Хасагдах НӨАТ', ref: `'Сарын тооцоо'!$D$6:$D$17`, vals: [], color: '#171717' }], at: { c1: 0, r1: 21, c2: 7, r2: 40 } }]
     });
@@ -561,19 +570,19 @@
     rows.sort((a, b) => a[0] - b[0]);
     rows.forEach((x, i) => { const r = 2 + i; x.forEach((v, j) => { const c = O.getRow(r).getCell(j + 1); c.value = v; if (j === 0) c.numFmt = 'yyyy-mm-dd'; if (j === 5) c.numFmt = MONEY; }); });
     O.autoFilter = 'A1:F1';
-    const E = 5001, rg = c => `'Өгөгдөл'!$${c}$2:$${c}$${E}`, Y = `(YEAR(${rg('A')})=$C$3)`;
+    const E = 5001, rg = c => `'Өгөгдөл'!$${c}$2:$${c}$${E}`, YR = `${rg('A')},">="&DATE($C$3,1,1),${rg('A')},"<"&DATE($C$3+1,1,1)`;
     title(D, 'Борлуулалтын дашбоард', '«Өгөгдөл» хуудаснаас автоматаар', 9);
     D.getCell('B3').value = 'Он:'; D.getCell('B3').font = { bold: true }; D.getCell('B3').alignment = { horizontal: 'right' }; const yc = D.getCell('C3'); yc.value = 2026; inputCell(yc); yc.font = { bold: true, size: 13 };
-    kpi(D, 5, 2, 'Нийт борлуулалт', `SUMPRODUCT(${Y}*N(+${rg('F')}))`);
-    kpi(D, 5, 5, 'Гүйлгээний тоо', `SUMPRODUCT(${Y}*(${rg('F')}<>""))`, '#,##0');
+    kpi(D, 5, 2, 'Нийт борлуулалт', `SUMIFS(${rg('F')},${YR})`);
+    kpi(D, 5, 5, 'Гүйлгээний тоо', `COUNTIFS(${YR},${rg('F')},"<>")`, '#,##0');
     kpi(D, 5, 8, 'Дундаж гүйлгээ', `IFERROR(B6/E6,0)`);
     // Сар
     header(D, 8, ['Сар', 'Борлуулалт'], 2);
-    MONTHS.forEach((m, k) => { const r = 9 + k; D.getCell('B' + r).value = m; D.getCell('B' + r).border = box; const x = D.getCell('C' + r); x.value = { formula: `SUMPRODUCT(${Y}*(MONTH(${rg('A')})=${k + 1})*N(+${rg('F')}))` }; calcCell(x, MONEY); });
+    MONTHS.forEach((m, k) => { const r = 9 + k; D.getCell('B' + r).value = m; D.getCell('B' + r).border = box; const x = D.getCell('C' + r); x.value = { formula: `SUMIFS(${rg('F')},${rg('A')},">="&DATE($C$3,${k + 1},1),${rg('A')},"<"&DATE($C$3,${k + 2},1))` }; calcCell(x, MONEY); });
     const tbl = (col, start, label, names, src) => {
       header(D, start, [label, 'Борлуулалт'], col);
       const L1 = colL(col - 1), L2 = colL(col);
-      names.forEach((n, i) => { const r = start + 1 + i; const a = D.getCell(L1 + r); a.value = n; inputCell(a); const x = D.getCell(L2 + r); x.value = { formula: `SUMPRODUCT(${Y}*(${rg(src)}=${L1}${r})*N(+${rg('F')}))` }; calcCell(x, MONEY); });
+      names.forEach((n, i) => { const r = start + 1 + i; const a = D.getCell(L1 + r); a.value = n; inputCell(a); const x = D.getCell(L2 + r); x.value = { formula: `SUMIFS(${rg('F')},${YR},${rg(src)},${L1}${r})` }; calcCell(x, MONEY); });
       return [start + 1, start + names.length];
     };
     const [b1, b2] = tbl(5, 8, 'Салбар', br, 'B');
@@ -717,8 +726,460 @@
       { type: 'bar', title: 'Харилцагч бүрийн нийт авлага', cats: { ref: `'Насжилт'!$B$5:$B$${4 + cust.length}`, vals: cust }, series: [{ name: 'Нийт', ref: `'Насжилт'!$H$5:$H$${4 + cust.length}`, vals: [] }], at: { c1: 5, r1: gt + 2, c2: 9, r2: gt + 20 } }] });
   }
 
+  /* ═════════ 12. ЗЭЭЛ ═════════ */
+  async function loan(ExcelJS, JSZip) {
+    const wb = newBook(ExcelJS, 'Зээлийн тооцоолуур');
+    guide(wb, 'Зээлийн тооцоолуур', [
+      '«Тооцоолуур» хуудсанд зээлийн дүн, жилийн хүү, хугацаа (сар), эхлэх огноо, төлбөрийн төрлөө сонгоно.',
+      '«Тэнцүү нийт төлбөр» — сар бүр ижил дүн (аннуитет). «Тэнцүү үндсэн төлбөр» — үндсэн төлбөр тогтмол, хүү буурах тул эхний саруудад их төлнө.',
+      'Нэг удаагийн шимтгэлийг (%) оруулбал шимтгэл орсон бодит жилийн хүү гарна.',
+      '«Хуваарь» хуудсанд сар бүрийн хүү, үндсэн төлбөр, үлдэгдэл; «Харьцуулалт» хуудсанд хоёр аргыг зэрэгцүүлж харуулна.'
+    ], ['Банкны бодит хуваарь нь хоногийн тоогоор (актуал/365) бодогдож бага зэрэг зөрж болно. Энэ загвар сар бүрийг 1/12 гэж тооцно.']);
+    const T = sheet(wb, 'Тооцоолуур', { widths: [3, 34, 20, 4, 30, 18], tab: C.gold });
+    const H = sheet(wb, 'Хуваарь', { freeze: 4, widths: [6, 12, 16, 14, 16, 16, 16] });
+    const Cm = sheet(wb, 'Харьцуулалт', { widths: [3, 34, 20, 20] });
+    title(T, 'Зээлийн тооцоолуур', 'Шар нүдийг бөглөнө', 6);
+    const inp = (r, l, v, fmt, list) => { T.getCell('B' + r).value = l; T.getCell('B' + r).border = box; const x = T.getCell('C' + r); x.value = v; inputCell(x, fmt); if (list) listValidation(x, list); };
+    inp(5, 'Зээлийн дүн', 120e6, MONEY); inp(6, 'Жилийн хүү', 0.168, PCT); inp(7, 'Хугацаа (сар, 360 хүртэл)', 60, '0'); inp(8, 'Эхний төлбөрийн огноо', new Date(Date.UTC(2026, 11, 15)), 'yyyy-mm-dd'); inp(9, 'Төлбөрийн төрөл', 'Тэнцүү нийт төлбөр', null, ['Тэнцүү нийт төлбөр', 'Тэнцүү үндсэн төлбөр']); inp(10, 'Нэг удаагийн шимтгэл', 0.01, PCT);
+    T.getCell('C8').value = new Date(Date.UTC(2026, 11, 15));
+    const N = 360, h0 = 5, hL = h0 + N - 1, TS = S('Тооцоолуур');
+    title(H, 'Эргэн төлөлтийн хуваарь', '', 7);
+    header(H, 4, ['№', 'Огноо', 'Эхний үлдэгдэл', 'Хүү', 'Үндсэн төлбөр', 'Нийт төлбөр', 'Эцсийн үлдэгдэл']);
+    for (let i = 0; i < N; i++) {
+      const r = h0 + i, n = i + 1, on = `${n}<=${TS}$C$7`;
+      const f = (c, fm, fmt) => { const x = H.getCell(c + r); x.value = { formula: fm }; calcCell(x, fmt); };
+      f('A', `IF(${on},${n},"")`, '0');
+      f('B', `IF(${on},EDATE(${TS}$C$8,${i}),"")`, 'yyyy-mm-dd');
+      f('C', i === 0 ? `IF(${on},${TS}$C$5,"")` : `IF(${on},G${r - 1},"")`, MONEY);
+      f('D', `IF(${on},C${r}*${TS}$C$6/12,"")`, MONEY);
+      f('E', `IF(${on},IF(${TS}$C$9="Тэнцүү нийт төлбөр",PMT(${TS}$C$6/12,${TS}$C$7,-${TS}$C$5)-D${r},${TS}$C$5/${TS}$C$7),"")`, MONEY);
+      f('F', `IF(${on},D${r}+E${r},"")`, MONEY);
+      f('G', `IF(${on},MAX(0,C${r}-E${r}),"")`, MONEY);
+    }
+    const HS = S('Хуваарь');
+    header(T, 12, ['Үр дүн', 'Дүн'], 2);
+    const res = [['Эхний сарын төлбөр', `${HS}F5`, MONEY], ['Сүүлийн сарын төлбөр', `INDEX(${HS}F5:F${hL},C7)`, MONEY], ['Нийт хүүгийн төлбөр', `SUM(${HS}D5:D${hL})`, MONEY], ['Шимтгэл', `C5*C10`, MONEY], ['Нийт төлөх дүн (шимтгэл орсон)', `SUM(${HS}F5:F${hL})+C16`, MONEY], ['Бодит жилийн хүү (шимтгэл орсон)', `IFERROR((1+RATE(C7,-PMT(C6/12,C7,-C5),C5-C16))^12-1,"")`, PCT], ['Сүүлийн төлбөрийн огноо', `EDATE(C8,C7-1)`, 'yyyy-mm-dd']];
+    res.forEach((x, i) => { const r = 13 + i; T.getCell('B' + r).value = x[0]; T.getCell('B' + r).border = box; const v = T.getCell('C' + r); v.value = { formula: x[1] }; calcCell(v, x[2]); v.font = { bold: true, size: i === 0 ? 14 : 11 }; });
+    note(T, 'B21', 'Бодит хүүг тэнцүү нийт төлбөрийн аргаар тооцсон.', 'B21:C21');
+    header(T, 23, ['Бүтэц', 'Дүн'], 2); T.getCell('B24').value = 'Үндсэн зээл'; T.getCell('C24').value = { formula: 'C5' }; T.getCell('B25').value = 'Хүү'; T.getCell('C25').value = { formula: 'C15' }; T.getCell('B26').value = 'Шимтгэл'; T.getCell('C26').value = { formula: 'C16' }; ['C24', 'C25', 'C26'].forEach(a => calcCell(T.getCell(a), MONEY));
+    title(Cm, 'Хоёр аргын харьцуулалт', 'Ижил дүн, хүү, хугацаагаар', 4);
+    header(Cm, 4, ['', 'Тэнцүү нийт төлбөр', 'Тэнцүү үндсэн төлбөр'], 2);
+    const P = `${TS}$C$5`, rr = `${TS}$C$6/12`, nn = `${TS}$C$7`;
+    const cmp = [['Эхний сарын төлбөр', `PMT(${rr},${nn},-${P})`, `${P}/${nn}+${P}*${rr}`], ['Сүүлийн сарын төлбөр', `PMT(${rr},${nn},-${P})`, `${P}/${nn}*(1+${rr})`], ['Нийт хүү', `PMT(${rr},${nn},-${P})*${nn}-${P}`, `${P}*${rr}*(${nn}+1)/2`], ['Нийт төлөх', `PMT(${rr},${nn},-${P})*${nn}`, `${P}+${P}*${rr}*(${nn}+1)/2`]];
+    cmp.forEach((x, i) => { const r = 5 + i; Cm.getCell('B' + r).value = x[0]; Cm.getCell('B' + r).border = box; ['C', 'D'].forEach((c, k) => { const v = Cm.getCell(c + r); v.value = { formula: x[1 + k] }; calcCell(v, MONEY); }); });
+    Cm.getCell('B10').value = 'Хүүгийн хэмнэлт (үндсэн төлбөрийн арга)'; Cm.getCell('C10').value = { formula: 'C7-D7' }; Cm.getCell('C10').numFmt = MONEY; Cm.getCell('C10').font = { bold: true, color: { argb: C.green } };
+    return done(wb, JSZip, { 'Тооцоолуур': [{ type: 'doughnut', title: 'Нийт төлөх дүнгийн бүтэц', cats: { ref: `'Тооцоолуур'!$B$24:$B$26`, vals: ['Үндсэн зээл', 'Хүү', 'Шимтгэл'] }, series: [{ name: 'Дүн', ref: `'Тооцоолуур'!$C$24:$C$26`, vals: [] }], at: { c1: 4, r1: 3, c2: 6, r2: 21 } }],
+      'Харьцуулалт': [{ type: 'col', title: 'Аргуудын харьцуулалт', cats: { ref: `'Харьцуулалт'!$B$5:$B$8`, vals: cmp.map(c => c[0]) }, series: [{ name: 'Тэнцүү нийт', ref: `'Харьцуулалт'!$C$5:$C$8`, vals: [], color: '#c9a470' }, { name: 'Тэнцүү үндсэн', ref: `'Харьцуулалт'!$D$5:$D$8`, vals: [], color: '#171717' }], at: { c1: 1, r1: 11, c2: 4, r2: 29 } }] });
+  }
+
+  /* ═════════ 13. ӨРХИЙН ТӨСӨВ ═════════ */
+  async function homebudget(ExcelJS, JSZip) {
+    const wb = newBook(ExcelJS, 'Өрхийн төсөв');
+    guide(wb, 'Өрхийн төсөв', [
+      '«Ангилал» хуудсанд орлого, зарлагын ангилал бүрийн сарын төсвөө бичнэ.',
+      '«Гүйлгээ» хуудсанд өдөр бүрийн орлого, зарлагаа огноо, ангилал, дүнгээр бичнэ (ангиллыг жагсаалтаас сонгоно).',
+      '«Тойм» хуудсанд сар сонгоход төсөв ба бодит зарлага, үлдэгдэл, хадгаламжийн хувь, график гарна.'
+    ]);
+    const O = sheet(wb, 'Тойм', { widths: [3, 26, 15, 15, 15, 12, 3], tab: C.gold });
+    const G = sheet(wb, 'Гүйлгээ', { freeze: 4, widths: [12, 24, 30, 14, 10] });
+    const K = sheet(wb, 'Ангилал', { widths: [26, 10, 16] });
+    const cats = [['Цалин', 'Орлого', 4.2e6], ['Нэмэлт орлого', 'Орлого', 0.6e6], ['Хүнс', 'Зарлага', 1.2e6], ['Орон сууц, ипотек', 'Зарлага', 0.95e6], ['Ашиглалт, интернэт', 'Зарлага', 0.25e6], ['Тээвэр, шатахуун', 'Зарлага', 0.35e6], ['Хүүхэд, сургууль', 'Зарлага', 0.4e6], ['Эрүүл мэнд', 'Зарлага', 0.12e6], ['Зээлийн төлбөр', 'Зарлага', 0.5e6], ['Хувцас', 'Зарлага', 0.2e6], ['Зугаа, кафе', 'Зарлага', 0.25e6], ['Бусад', 'Зарлага', 0.15e6], ['Хадгаламж', 'Хадгаламж', 0.5e6]];
+    title(K, 'Ангилал, сарын төсөв', '', 3); header(K, 4, ['Ангилал', 'Төрөл', 'Сарын төсөв']);
+    for (let i = 0; i < 25; i++) { const r = 5 + i, c = cats[i]; ['A', 'B', 'C'].forEach((col, j) => { const x = K.getCell(col + r); inputCell(x, j === 2 ? MONEY : null); if (c) x.value = c[j]; }); listValidation(K.getCell('B' + r), ['Орлого', 'Зарлага', 'Хадгаламж']); }
+    const KS = S('Ангилал'), catRef = `${KS}$A$5:$A$29`;
+    title(G, 'Гүйлгээ', 'Өдөр бүрийн орлого, зарлага', 5); header(G, 4, ['Огноо', 'Ангилал', 'Тайлбар', 'Дүн', 'Төрөл']);
+    const R = rng(9), tx = [];
+    for (let m = 6; m <= 10; m++) cats.forEach(c => { const n = c[1] === 'Зарлага' ? 3 + Math.floor(R() * 4) : 1; for (let k = 0; k < n; k++) tx.push([new Date(Date.UTC(2026, m - 1, 1 + Math.floor(R() * 27))), c[0], '', Math.round(c[2] / n * (0.75 + R() * 0.5) / 1000) * 1000]); });
+    tx.sort((a, b) => a[0] - b[0]);
+    for (let i = 0; i < 1500; i++) { const r = 5 + i, x = tx[i]; ['A', 'B', 'C', 'D'].forEach((c, j) => { const y = G.getCell(c + r); inputCell(y, j === 0 ? 'yyyy-mm-dd' : (j === 3 ? MONEY : null)); if (x) y.value = x[j] || null; }); listValidation(G.getCell('B' + r), catRef); if (i < 600) { G.getCell('E' + r).value = { formula: `IF(B${r}="","",IFERROR(VLOOKUP(B${r},${KS}$A$5:$B$29,2,FALSE),""))` }; G.getCell('E' + r).font = { size: 9, color: { argb: C.grey } }; } }
+    title(O, 'Өрхийн төсвийн тойм', '', 6);
+    O.getCell('B3').value = 'Сар (огноо):'; O.getCell('B3').font = { bold: true }; const sm = O.getCell('C3'); sm.value = new Date(Date.UTC(2026, 9, 1)); inputCell(sm, 'yyyy-mm'); sm.font = { bold: true, size: 13 };
+    header(O, 5, ['Ангилал', 'Төсөв', 'Бодит', 'Зөрүү', 'Гүйцэтгэл'], 2);
+    const GS = S('Гүйлгээ'), gr = c => `${GS}$${c}$5:$${c}$1504`;
+    for (let i = 0; i < cats.length; i++) {
+      const r = 6 + i, kr = 5 + i;
+      const f = (c, fm, fmt) => { const x = O.getCell(c + r); x.value = { formula: fm }; calcCell(x, fmt); };
+      f('B', `${KS}A${kr}`); f('C', `N(${KS}C${kr})`, MONEY);
+      f('D', `SUMIFS(${gr('D')},${gr('B')},B${r},${gr('A')},">="&DATE(YEAR($C$3),MONTH($C$3),1),${gr('A')},"<"&EDATE(DATE(YEAR($C$3),MONTH($C$3),1),1))`, MONEY);
+      f('E', `D${r}-C${r}`, MONEY); f('F', `IFERROR(D${r}/C${r},0)`, PCT);
+    }
+    const e = 5 + cats.length, s1 = e + 2;
+    const typ = t => `SUMIF(${KS}$B$5:$B$29,"${t}",`;
+    [['Нийт орлого', 'Орлого'], ['Нийт зарлага', 'Зарлага'], ['Хадгаламж', 'Хадгаламж']].forEach(([l, t], i) => { const r = s1 + i; O.getCell('B' + r).value = l; O.getCell('C' + r).value = { formula: `SUMIF(${KS}$B$5:$B$29,"${t}",${KS}$C$5:$C$29)` }; O.getCell('D' + r).value = { formula: `SUMPRODUCT((${KS}$B$5:$B$${4 + cats.length}="${t}")*D$6:D$${e})` }; ['C', 'D'].forEach(c => O.getCell(c + r).numFmt = MONEY); totalRow(O, r, 2, 6); });
+    const lr = s1 + 3; O.getCell('B' + lr).value = 'Үлдэгдэл (орлого − зарлага − хадгаламж)'; O.getCell('D' + lr).value = { formula: `D${s1}-D${s1 + 1}-D${s1 + 2}` }; O.getCell('D' + lr).numFmt = MONEY; O.getCell('D' + lr).font = { bold: true, size: 13 };
+    O.getCell('B' + (lr + 1)).value = 'Хадгаламжийн хувь'; O.getCell('D' + (lr + 1)).value = { formula: `IFERROR(D${s1 + 2}/D${s1},0)` }; O.getCell('D' + (lr + 1)).numFmt = PCT; O.getCell('D' + (lr + 1)).font = { bold: true };
+    O.addConditionalFormatting({ ref: `E6:E${e}`, rules: [{ type: 'expression', formulae: [`AND(E6>0,VLOOKUP($B6,${KS}$A$5:$B$29,2,FALSE)="Зарлага")`], style: { font: { color: { argb: C.red }, bold: true } } }] });
+    return done(wb, JSZip, { 'Тойм': [{ type: 'bar', title: 'Төсөв ба бодит — ангиллаар', cats: { ref: `'Тойм'!$B$6:$B$${e}`, vals: cats.map(c => c[0]) }, series: [{ name: 'Төсөв', ref: `'Тойм'!$C$6:$C$${e}`, vals: [], color: '#d6d3d1' }, { name: 'Бодит', ref: `'Тойм'!$D$6:$D$${e}`, vals: [], color: '#c9a470' }], at: { c1: 7, r1: 3, c2: 15, r2: 28 } }] });
+  }
+
+  /* ═════════ 14. ИРЦ ═════════ */
+  async function attendance(ExcelJS, JSZip) {
+    const wb = newBook(ExcelJS, 'Ирц, цагийн бүртгэл');
+    guide(wb, 'Ирц, цагийн бүртгэл', [
+      '«Ирц» хуудсанд он, сараа бичихэд тухайн сарын өдрүүд гарч, амралтын өдрүүд саарал болно.',
+      'Өдөр бүрт ажилласан цагийг тоогоор (ж: 8) эсвэл үсгэн кодоор бичнэ: Ч — чөлөө, Ө — өвчтэй, Т — тасалсан, А — ээлжийн амралт, Т/Б — томилолт.',
+      'Баруун талд ажилласан өдөр, нийт цаг, илүү цаг (өдрийн нормоос дээш), код тус бүрийн тоо автоматаар бодогдоно. «Ажилласан өдөр»-ийг цалингийн загварт шууд хуулна.'
+    ]);
+    const A = sheet(wb, 'Ирц', { freeze: 6, xFreeze: 2, widths: [5, 24].concat(Array(31).fill(4.2), [9, 9, 9, 6, 6, 6, 6, 6]), zoom: 85, tab: C.gold });
+    const T = sheet(wb, 'Тохиргоо', { widths: [30, 12, 40], tab: C.grey });
+    title(T, 'Тохиргоо', '', 3); T.getCell('A4').value = 'Өдрийн ажлын цагийн норм'; inputCell(T.getCell('B4')); T.getCell('B4').value = 8;
+    A.mergeCells('A1:AH1'); A.getCell('A1').value = 'Ирц, цагийн бүртгэл'; A.getCell('A1').font = { bold: true, size: 18 }; A.getRow(1).height = 30;
+    A.getCell('A3').value = 'Он:'; inputCell(A.getCell('B3')); A.getCell('B3').value = 2026; A.getCell('C3').value = 'Сар:'; A.mergeCells('C3:D3'); inputCell(A.getCell('E3')); A.getCell('E3').value = 10; A.mergeCells('E3:F3');
+    ['A3', 'C3'].forEach(a => A.getCell(a).font = { bold: true });
+    header(A, 5, ['№', 'Ажилтан']); A.mergeCells('A5:A6'); A.mergeCells('B5:B6');
+    for (let d = 1; d <= 31; d++) {
+      const c = colL(1 + d);
+      const h = A.getCell(c + 5); h.value = { formula: `IF(MONTH(DATE($B$3,$E$3,${d}))=$E$3,${d},"")` }; h.font = { bold: true, color: { argb: C.white }, size: 9 }; h.fill = fill(C.head); h.alignment = { horizontal: 'center' };
+      const w = A.getCell(c + 6); w.value = { formula: `IF(${c}5="","",MID("ДаМяЛхПүБаБяНя",(WEEKDAY(DATE($B$3,$E$3,${d}),2)-1)*2+1,2))` }; w.font = { size: 8, color: { argb: C.grey } }; w.alignment = { horizontal: 'center' };
+    }
+    const sumH = ['Ажилласан өдөр', 'Нийт цаг', 'Илүү цаг', 'Ч', 'Ө', 'Т', 'А', 'Т/Б'];
+    sumH.forEach((t, i) => { const c = A.getCell(colL(33 + i) + 5); c.value = t; c.font = { bold: true, color: { argb: C.white }, size: 9 }; c.fill = fill(C.goldD); c.alignment = { horizontal: 'center', wrapText: true }; A.mergeCells(`${colL(33 + i)}5:${colL(33 + i)}6`); });
+    A.getRow(5).height = 30;
+    const names = ['Бат-Эрдэнэ Г.', 'Сарангэрэл Т.', 'Энхжаргал Ц.', 'Мөнх-Очир Т.', 'Оюунчимэг Н.', 'Ганзориг Б.', 'Нарантуяа С.', 'Төмөрбаатар А.', 'Цолмон Х.', 'Даваадорж М.', 'Солонго А.', 'Пүрэвсүрэн Т.'];
+    const R = rng(4), r0 = 7, N = 40, last = colL(32);
+    for (let i = 0; i < N; i++) {
+      const r = r0 + i; A.getCell('A' + r).value = i < names.length ? i + 1 : null; A.getCell('A' + r).border = box;
+      const nm = A.getCell('B' + r); inputCell(nm); if (names[i]) nm.value = names[i];
+      for (let d = 1; d <= 31; d++) {
+        const c = A.getCell(colL(1 + d) + r); c.border = box; c.alignment = { horizontal: 'center' }; c.font = { size: 9 };
+        if (names[i]) { const wd = new Date(Date.UTC(2026, 9, d)).getUTCDay(); if (wd !== 0 && wd !== 6) { const x = R(); c.value = x < 0.03 ? 'Ө' : x < 0.06 ? 'Ч' : x < 0.075 ? 'Т' : (i === 4 && d >= 13 && d <= 17) ? 'А' : (x > 0.93 ? 10 : 8); } }
+      }
+      if (i < 25) {
+        const rg = `C${r}:${last}${r}`;
+        const f = (k, fm, fmt) => { const x = A.getCell(colL(33 + k) + r); x.value = { formula: `IF($B${r}="","",${fm})` }; calcCell(x, fmt || '0'); x.alignment = { horizontal: 'center' }; };
+        f(0, `COUNTIF(${rg},">0")`); f(1, `SUM(${rg})`); f(2, `SUMIF(${rg},">"&'Тохиргоо'!$B$4)-'Тохиргоо'!$B$4*COUNTIF(${rg},">"&'Тохиргоо'!$B$4)`);
+        ['Ч', 'Ө', 'Т', 'А', 'Т/Б'].forEach((k, j) => f(3 + j, `COUNTIF(${rg},"${k}")`));
+        A.getCell(colL(33) + r).font = { bold: true };
+      }
+    }
+    A.addConditionalFormatting({ ref: `C5:${last}${r0 + N - 1}`, rules: [{ type: 'expression', formulae: [`AND(C$5<>"",WEEKDAY(DATE($B$3,$E$3,C$5),2)>5)`], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFE5E7EB' } } } }, { type: 'containsText', operator: 'containsText', text: 'Т', style: { font: { color: { argb: C.red }, bold: true } } }, { type: 'expression', formulae: ['OR(C5="Ө",C5="Ч",C5="А")'], style: { font: { color: { argb: 'FFB45309' }, bold: true } } }] });
+    note(A, 'B' + (r0 + N + 1), 'Код: тоо = ажилласан цаг · Ч чөлөө · Ө өвчтэй · Т тасалсан · А ээлжийн амралт · Т/Б томилолт', `B${r0 + N + 1}:Z${r0 + N + 1}`);
+    return done(wb, JSZip, { 'Ирц': [{ type: 'bar', title: 'Ажилласан өдөр — ажилтнаар', cats: { ref: `'Ирц'!$B$${r0}:$B$${r0 + names.length - 1}`, vals: names }, series: [{ name: 'Өдөр', ref: `'Ирц'!$AG$${r0}:$AG$${r0 + names.length - 1}`, vals: [] }], at: { c1: 1, r1: r0 + N + 3, c2: 20, r2: r0 + N + 24 } }] });
+  }
+
+  /* ═════════ 15. КАСС, ХАРИЛЦАХЫН ДЭВТЭР ═════════ */
+  async function cashbook(ExcelJS, JSZip) {
+    const wb = newBook(ExcelJS, 'Касс, харилцахын дэвтэр');
+    guide(wb, 'Касс, харилцахын дэвтэр', [
+      '«Тохиргоо» хуудсанд касс, банкны данс бүрийн нэр, эхний үлдэгдэл, мөн орлого зарлагын ангиллаа бичнэ.',
+      '«Гүйлгээ» хуудсанд гүйлгээ бүрийг огноо, данс, харилцагч, утга, ангилал, орлого эсвэл зарлагаар бичнэ. Данс тус бүрийн үлдэгдэл мөр бүрт автоматаар гарна.',
+      '«Тайлан» хуудсанд данс тус бүрийн эхний, орлого, зарлага, эцсийн үлдэгдэл, ангиллаар нэгтгэл гарна.'
+    ]);
+    const Rp = sheet(wb, 'Тайлан', { widths: [3, 28, 16, 16, 16, 16], tab: C.gold });
+    const G = sheet(wb, 'Гүйлгээ', { freeze: 4, widths: [12, 10, 20, 24, 30, 20, 14, 14, 15] });
+    const T = sheet(wb, 'Тохиргоо', { widths: [26, 16, 4, 26], tab: C.grey });
+    title(T, 'Тохиргоо', '', 4); header(T, 4, ['Данс', 'Эхний үлдэгдэл']); header(T, 4, ['Ангилал'], 4);
+    const acc = [['Касс', 2.5e6], ['Хаан банк', 38e6], ['Голомт банк', 12e6], ['ХХБ', 5e6]];
+    const cat = ['Борлуулалтын орлого', 'Авлага цуглуулалт', 'Зээл', 'Бусад орлого', 'Бараа худалдан авалт', 'Цалин', 'Татвар, НДШ', 'Түрээс', 'Ашиглалт', 'Тээвэр', 'Маркетинг', 'Банкны шимтгэл', 'Шилжүүлэг (данс хооронд)', 'Бусад зардал'];
+    for (let i = 0; i < 10; i++) { const r = 5 + i, a = acc[i]; inputCell(T.getCell('A' + r)); inputCell(T.getCell('B' + r), MONEY); if (a) { T.getCell('A' + r).value = a[0]; T.getCell('B' + r).value = a[1]; } }
+    for (let i = 0; i < 25; i++) { const r = 5 + i; inputCell(T.getCell('D' + r)); if (cat[i]) T.getCell('D' + r).value = cat[i]; }
+    const TS = S('Тохиргоо');
+    title(G, 'Гүйлгээний дэвтэр', '', 9); header(G, 4, ['Огноо', 'Баримт №', 'Данс', 'Харилцагч', 'Гүйлгээний утга', 'Ангилал', 'Орлого', 'Зарлага', 'Дансны үлдэгдэл']);
+    const R = rng(13), tx = [], who = ['Номин Холдинг', 'Говь ХК', 'Таваг Трейд', 'Юнител', 'Ажилтнууд', 'НДЕГ', 'Оффис Плаза', 'Петровис'];
+    for (let i = 0; i < 90; i++) { const inc = R() < 0.35, a = acc[R() < 0.15 ? 0 : 1 + Math.floor(R() * 3)][0]; const c = inc ? cat[Math.floor(R() * 2)] : cat[4 + Math.floor(R() * 8)]; tx.push([new Date(Date.UTC(2026, 8, 1) + Math.floor(R() * 60) * 864e5), (inc ? 'КО-' : 'КЗ-') + (100 + i), a, who[Math.floor(R() * who.length)], c, c, inc ? Math.round((1 + R() * 9) * 1e6 / 1e4) * 1e4 : null, inc ? null : Math.round((0.1 + R() * 3) * 1e6 / 1e4) * 1e4]); }
+    tx.sort((a, b) => a[0] - b[0]);
+    const g0 = 5, NG = 1000, gL = g0 + NG - 1;
+    for (let i = 0; i < NG; i++) {
+      const r = g0 + i, x = tx[i];
+      ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].forEach((c, j) => { const y = G.getCell(c + r); inputCell(y, j === 0 ? 'yyyy-mm-dd' : (j >= 6 ? MONEY : null)); if (x && x[j] != null) y.value = x[j]; });
+      listValidation(G.getCell('C' + r), `${TS}$A$5:$A$14`); listValidation(G.getCell('F' + r), `${TS}$D$5:$D$29`);
+      if (i < 500) { G.getCell('I' + r).value = { formula: `IF(C${r}="","",IFERROR(VLOOKUP(C${r},${TS}$A$5:$B$14,2,FALSE),0)+SUMIF($C$${g0}:C${r},C${r},$G$${g0}:G${r})-SUMIF($C$${g0}:C${r},C${r},$H$${g0}:H${r}))` }; calcCell(G.getCell('I' + r), MONEY); }
+    }
+    G.addConditionalFormatting({ ref: `I${g0}:I${g0 + 499}`, rules: [{ type: 'expression', formulae: [`AND(I${g0}<>"",I${g0}<0)`], style: { font: { color: { argb: C.red }, bold: true } } }] });
+    title(Rp, 'Мөнгөн хөрөнгийн тайлан', '', 6);
+    Rp.getCell('B3').value = 'Хугацаа:'; Rp.getCell('B3').font = { bold: true }; inputCell(Rp.getCell('C3'), 'yyyy-mm-dd'); Rp.getCell('C3').value = new Date(Date.UTC(2026, 8, 1)); inputCell(Rp.getCell('D3'), 'yyyy-mm-dd'); Rp.getCell('D3').value = new Date(Date.UTC(2026, 9, 31));
+    header(Rp, 5, ['Данс', 'Эхний үлдэгдэл', 'Орлого', 'Зарлага', 'Эцсийн үлдэгдэл'], 2);
+    const gr = c => `'Гүйлгээ'!$${c}$${g0}:$${c}$${gL}`;
+    for (let i = 0; i < 10; i++) { const r = 6 + i, tr = 5 + i;
+      const f = (c, fm) => { const x = Rp.getCell(c + r); x.value = { formula: `IF(${TS}$A$${tr}="","",${fm})` }; calcCell(x, c === 'B' ? null : MONEY); };
+      f('B', `${TS}A${tr}`);
+      f('C', `N(${TS}B${tr})+SUMIFS(${gr('G')},${gr('C')},B${r},${gr('A')},"<"&$C$3)-SUMIFS(${gr('H')},${gr('C')},B${r},${gr('A')},"<"&$C$3)`);
+      f('D', `SUMIFS(${gr('G')},${gr('C')},B${r},${gr('A')},">="&$C$3,${gr('A')},"<="&$D$3)`);
+      f('E', `SUMIFS(${gr('H')},${gr('C')},B${r},${gr('A')},">="&$C$3,${gr('A')},"<="&$D$3)`);
+      f('F', `C${r}+D${r}-E${r}`); }
+    Rp.getCell('B16').value = 'НИЙТ'; ['C', 'D', 'E', 'F'].forEach(c => { Rp.getCell(c + 16).value = { formula: `SUM(${c}6:${c}15)` }; Rp.getCell(c + 16).numFmt = MONEY; }); totalRow(Rp, 16, 2, 6);
+    header(Rp, 18, ['Ангилал', 'Орлого', 'Зарлага'], 2);
+    for (let i = 0; i < cat.length; i++) { const r = 19 + i; Rp.getCell('B' + r).value = { formula: `${TS}D${5 + i}` }; Rp.getCell('B' + r).border = box; ['C', 'D'].forEach((c, k) => { const x = Rp.getCell(c + r); x.value = { formula: `SUMIFS(${gr(k ? 'H' : 'G')},${gr('F')},$B${r},${gr('A')},">="&$C$3,${gr('A')},"<="&$D$3)` }; calcCell(x, MONEY); }); }
+    const ce = 18 + cat.length;
+    return done(wb, JSZip, { 'Тайлан': [{ type: 'bar', title: 'Зарлага — ангиллаар', cats: { ref: `'Тайлан'!$B$19:$B$${ce}`, vals: cat }, series: [{ name: 'Зарлага', ref: `'Тайлан'!$D$19:$D$${ce}`, vals: [] }], at: { c1: 6, r1: 3, c2: 13, r2: 30 } }] });
+  }
+
+  /* ═════════ 16. ӨРТӨГ, ҮНЭ ТОГТООХ ═════════ */
+  async function costing(ExcelJS, JSZip) {
+    const wb = newBook(ExcelJS, 'Өртөг ба үнэ тогтоох');
+    guide(wb, 'Өртөг ба үнэ тогтоох', [
+      '«Түүхий эд» хуудсанд материал бүрийн худалдан авах үнэ, багцын хэмжээг бичнэ — нэгжийн үнэ автоматаар бодогдоно.',
+      '«Орц» хуудсанд бүтээгдэхүүн бүрт ямар түүхий эд хэдий хэмжээгээр орохыг мөр мөрөөр бичнэ (жор, норм).',
+      '«Бүтээгдэхүүн» хуудсанд савлагаа, ажиллах хүч, шууд бус зардал, зорилтот ашгийн хувиа оруулахад нэгжийн өртөг, санал болгох үнэ (НӨАТ-тай), одоогийн үнийн бодит маржин гарна.'
+    ], ['Ресторан, кафе, нарийн боов, үйлдвэрлэл, гар урлалд тохиромжтой. Түүхий эдийн үнэ өсөхөд «Түүхий эд» хуудсанд л засахад бүх бүтээгдэхүүний өртөг шинэчлэгдэнэ.']);
+    const P = sheet(wb, 'Бүтээгдэхүүн', { freeze: 4, xFreeze: 1, widths: [24, 13, 11, 11, 11, 13, 10, 13, 13, 13, 11, 11], tab: C.gold });
+    const Rc = sheet(wb, 'Орц', { freeze: 4, widths: [24, 26, 10, 8, 12, 13] });
+    const M = sheet(wb, 'Түүхий эд', { freeze: 4, widths: [26, 8, 14, 12, 14] });
+    const mats = [['Кофе үр', 'гр', 85000, 1000], ['Сүү', 'мл', 4200, 1000], ['Элсэн чихэр', 'гр', 3800, 1000], ['Шоколад соус', 'мл', 32000, 1000], ['Гурил', 'гр', 52000, 25000], ['Өндөг', 'ш', 6500, 10], ['Цөцгийн тос', 'гр', 18500, 500], ['Тахианы мах', 'гр', 16000, 1000], ['Талх (сэндвич)', 'ш', 4800, 8], ['Бяслаг', 'гр', 26000, 1000], ['Ногоо (салат)', 'гр', 9000, 1000], ['Цаасан аяга', 'ш', 18000, 100]];
+    title(M, 'Түүхий эд, материал', '', 5); header(M, 4, ['Нэр', 'Нэгж', 'Худалдан авах үнэ', 'Багцын хэмжээ', 'Нэгжийн үнэ']);
+    for (let i = 0; i < 100; i++) { const r = 5 + i, x = mats[i]; ['A', 'B', 'C', 'D'].forEach((c, j) => { const y = M.getCell(c + r); inputCell(y, j >= 2 ? MONEY : null); if (x) y.value = x[j]; }); M.getCell('E' + r).value = { formula: `IF(OR(C${r}="",N(D${r})=0),"",C${r}/D${r})` }; calcCell(M.getCell('E' + r), '#,##0.00'); }
+    const MS = S('Түүхий эд');
+    const prods = [['Латте', [['Кофе үр', 18], ['Сүү', 220], ['Элсэн чихэр', 8], ['Цаасан аяга', 1]], 300, 900, 7500], ['Американо', [['Кофе үр', 18], ['Цаасан аяга', 1]], 200, 700, 6000], ['Мока', [['Кофе үр', 18], ['Сүү', 180], ['Шоколад соус', 25], ['Цаасан аяга', 1]], 300, 900, 8500], ['Круассан', [['Гурил', 60], ['Цөцгийн тос', 30], ['Өндөг', 0.3], ['Элсэн чихэр', 8]], 150, 1200, 6500], ['Тахиатай сэндвич', [['Талх (сэндвич)', 1], ['Тахианы мах', 90], ['Бяслаг', 25], ['Ногоо (салат)', 30]], 250, 1500, 12500], ['Цезарь салат', [['Тахианы мах', 120], ['Ногоо (салат)', 150], ['Бяслаг', 20], ['Талх (сэндвич)', 0.3]], 400, 1800, 14500]];
+    title(Rc, 'Орц (жор, норм)', 'Бүтээгдэхүүн бүрийн нэг нэгжид орох түүхий эд', 6); header(Rc, 4, ['Бүтээгдэхүүн', 'Түүхий эд', 'Хэмжээ', 'Нэгж', 'Нэгжийн үнэ', 'Өртөг']);
+    const lines = []; prods.forEach(p => p[1].forEach(l => lines.push([p[0], l[0], l[1]])));
+    const PS = S('Бүтээгдэхүүн');
+    for (let i = 0; i < 400; i++) { const r = 5 + i, x = lines[i]; ['A', 'B', 'C'].forEach((c, j) => { const y = Rc.getCell(c + r); inputCell(y, j === 2 ? '#,##0.###' : null); if (x) y.value = x[j]; }); listValidation(Rc.getCell('A' + r), `${PS}$A$5:$A$104`); listValidation(Rc.getCell('B' + r), `${MS}$A$5:$A$104`);
+      if (i < 200) { Rc.getCell('D' + r).value = { formula: `IF(B${r}="","",IFERROR(INDEX(${MS}$B$5:$B$104,MATCH(B${r},${MS}$A$5:$A$104,0)),"?"))` }; Rc.getCell('E' + r).value = { formula: `IF(B${r}="","",IFERROR(INDEX(${MS}$E$5:$E$104,MATCH(B${r},${MS}$A$5:$A$104,0)),0))` }; Rc.getCell('F' + r).value = { formula: `IF(B${r}="","",N(C${r})*E${r})` }; calcCell(Rc.getCell('D' + r)); calcCell(Rc.getCell('E' + r), '#,##0.00'); calcCell(Rc.getCell('F' + r), MONEY); } }
+    const RS = S('Орц');
+    title(P, 'Бүтээгдэхүүний өртөг, үнэ', '', 12);
+    P.getCell('A3').value = 'Зорилтот ашгийн хувь (анхдагч):'; P.getCell('A3').font = { bold: true }; inputCell(P.getCell('C3'), PCT); P.getCell('C3').value = 0.65; P.getCell('E3').value = 'НӨАТ:'; P.getCell('E3').font = { bold: true }; inputCell(P.getCell('F3'), PCT); P.getCell('F3').value = 0.10;
+    header(P, 4, ['Бүтээгдэхүүн', 'Түүхий эд', 'Савлагаа', 'Ажиллах хүч', 'Шууд бус', 'Нэгжийн өртөг', 'Зорилтот ашиг %', 'Санал болгох үнэ', 'НӨАТ-тай үнэ', 'Одоогийн үнэ (НӨАТ-тай)', 'Бодит маржин', 'Өртгийн хувь']);
+    for (let i = 0; i < 100; i++) { const r = 5 + i, x = prods[i];
+      inputCell(P.getCell('A' + r)); if (x) P.getCell('A' + r).value = x[0];
+      [['C', x && x[2]], ['D', x && Math.round(x[3] * 0.6)], ['E', x && Math.round(x[3] * 0.4)], ['G', null], ['J', x && x[4]]].forEach(([c, v]) => { const y = P.getCell(c + r); inputCell(y, c === 'G' ? PCT : MONEY); if (v) y.value = v; });
+      const f = (c, fm, fmt) => { const y = P.getCell(c + r); y.value = { formula: fm }; calcCell(y, fmt); };
+      f('B', `IF(A${r}="","",SUMIF(${RS}$A$5:$A$404,A${r},${RS}$F$5:$F$404))`, MONEY);
+      f('F', `IF(A${r}="","",B${r}+N(C${r})+N(D${r})+N(E${r}))`, MONEY);
+      f('H', `IF(A${r}="","",ROUND(F${r}/(1-IF(G${r}="",$C$3,G${r})),-1))`, MONEY);
+      f('I', `IF(A${r}="","",ROUND(H${r}*(1+$F$3),-2))`, MONEY);
+      f('K', `IF(OR(A${r}="",N(J${r})=0),"",1-F${r}/(J${r}/(1+$F$3)))`, PCT);
+      f('L', `IF(OR(A${r}="",N(J${r})=0),"",F${r}/(J${r}/(1+$F$3)))`, PCT);
+      P.getCell('I' + r).font = { bold: true }; }
+    P.addConditionalFormatting({ ref: 'K5:K104', rules: [{ type: 'expression', formulae: ['AND(K5<>"",K5<0.5)'], style: { font: { color: { argb: C.red }, bold: true } } }, { type: 'expression', formulae: ['AND(K5<>"",K5>=0.65)'], style: { font: { color: { argb: C.green }, bold: true } } }] });
+    const pl = 4 + prods.length;
+    return done(wb, JSZip, { 'Бүтээгдэхүүн': [{ type: 'bar', title: 'Нэгжийн өртөг ба одоогийн үнэ (НӨАТ-гүй харьцуулахад НӨАТ-тай)', cats: { ref: `'Бүтээгдэхүүн'!$A$5:$A$${pl}`, vals: prods.map(p => p[0]) }, series: [{ name: 'Нэгжийн өртөг', ref: `'Бүтээгдэхүүн'!$F$5:$F$${pl}`, vals: [], color: '#171717' }, { name: 'Одоогийн үнэ', ref: `'Бүтээгдэхүүн'!$J$5:$J$${pl}`, vals: [], color: '#c9a470' }], at: { c1: 0, r1: pl + 2, c2: 8, r2: pl + 24 } }] });
+  }
+
+  /* ═════════ 17. CRM ═════════ */
+  async function crm(ExcelJS, JSZip) {
+    const wb = newBook(ExcelJS, 'Борлуулалтын CRM');
+    guide(wb, 'Борлуулалтын CRM', [
+      '«Харилцагч» хуудсанд харилцагч бүрийн холбоо барих мэдээлэл, эх сурвалж, хариуцагчийг бичнэ.',
+      '«Боломж» хуудсанд борлуулалтын боломж бүрийн дүн, үе шат, хүлээгдэж буй хаах огноо, дараагийн алхмыг бичнэ. Үе шатаас магадлал, жигнэсэн дүн автоматаар гарна.',
+      'Дараагийн алхмын огноо өнгөрсөн бол улаанаар тодорно. «Самбар» хуудсанд үе шат, хариуцагч, сараар нэгтгэл, хөрвүүлэлтийн хувь гарна.'
+    ]);
+    const D = sheet(wb, 'Самбар', { widths: [3, 26, 12, 16, 16, 3, 20, 16, 16], tab: C.gold });
+    const O = sheet(wb, 'Боломж', { freeze: 4, xFreeze: 1, widths: [26, 24, 16, 14, 20, 9, 14, 13, 30, 13] });
+    const Cu = sheet(wb, 'Харилцагч', { freeze: 4, widths: [24, 22, 14, 24, 16, 16] });
+    const T = sheet(wb, 'Тохиргоо', { widths: [24, 12, 4, 20], tab: C.grey });
+    const ST = [['Шинэ', 0.1], ['Холбогдсон', 0.25], ['Санал илгээсэн', 0.5], ['Хэлэлцээр', 0.75], ['Амжилттай', 1], ['Алдсан', 0]];
+    const OWN = ['Анар', 'Билгүүн', 'Номин', 'Тэмүүлэн'];
+    title(T, 'Тохиргоо', '', 4); header(T, 4, ['Үе шат', 'Магадлал']); header(T, 4, ['Хариуцагч'], 4);
+    ST.forEach((s, i) => { T.getCell('A' + (5 + i)).value = s[0]; T.getCell('B' + (5 + i)).value = s[1]; inputCell(T.getCell('A' + (5 + i))); inputCell(T.getCell('B' + (5 + i)), '0%'); });
+    for (let i = 0; i < 10; i++) { inputCell(T.getCell('D' + (5 + i))); if (OWN[i]) T.getCell('D' + (5 + i)).value = OWN[i]; }
+    const TS = S('Тохиргоо');
+    const R = rng(17), comp = ['Номин Холдинг', 'Говь ХК', 'Мон Лаа', 'Тэсо', 'Хүнс Трейд', 'Эрдэнэт Сервис', 'Сүү ХК', 'Таван Богд', 'Монос', 'Юнител', 'Шунхлай', 'Петровис'];
+    title(Cu, 'Харилцагчид', '', 6); header(Cu, 4, ['Компани', 'Холбоо барих хүн', 'Утас', 'И-мэйл', 'Эх сурвалж', 'Хариуцагч']);
+    for (let i = 0; i < 300; i++) { const r = 5 + i; ['A', 'B', 'C', 'D', 'E', 'F'].forEach(c => inputCell(Cu.getCell(c + r))); listValidation(Cu.getCell('E' + r), ['Facebook', 'Танил', 'Вэб сайт', 'Утас', 'Үзэсгэлэн', 'Бусад']); listValidation(Cu.getCell('F' + r), `${TS}$D$5:$D$14`);
+      if (comp[i]) { Cu.getCell('A' + r).value = comp[i]; Cu.getCell('B' + r).value = ['Б. Болд', 'Д. Сараа', 'Г. Тэмүүжин', 'Э. Номин'][i % 4]; Cu.getCell('C' + r).value = '99' + String(100000 + Math.floor(R() * 899999)); Cu.getCell('D' + r).value = 'info' + (i + 1) + '@example.mn'; Cu.getCell('E' + r).value = ['Facebook', 'Танил', 'Вэб сайт', 'Утас'][i % 4]; Cu.getCell('F' + r).value = OWN[i % 4]; } }
+    title(O, 'Борлуулалтын боломж', '', 10); header(O, 4, ['Боломж', 'Харилцагч', 'Хариуцагч', 'Дүн', 'Үе шат', 'Магадлал', 'Жигнэсэн дүн', 'Хаах огноо', 'Дараагийн алхам', 'Огноо']);
+    const deals = ['Санхүүгийн програм нэвтрүүлэх', 'Жилийн аудит', 'Цалингийн систем', 'Дашбоард', 'НББ аутсорсинг', 'Татварын зөвлөгөө', 'Сургалт', 'Нөөцийн систем'];
+    for (let i = 0; i < 500; i++) { const r = 5 + i;
+      ['A', 'B', 'C', 'D', 'E', 'H', 'I', 'J'].forEach(c => inputCell(O.getCell(c + r), c === 'D' ? MONEY : ('HJ'.includes(c) ? 'yyyy-mm-dd' : null)));
+      listValidation(O.getCell('B' + r), `'Харилцагч'!$A$5:$A$304`); listValidation(O.getCell('C' + r), `${TS}$D$5:$D$14`); listValidation(O.getCell('E' + r), `${TS}$A$5:$A$10`);
+      if (i < 36) { const st = ST[Math.min(5, Math.floor(Math.pow(R(), 0.8) * 6))][0]; O.getCell('A' + r).value = deals[i % deals.length]; O.getCell('B' + r).value = comp[i % comp.length]; O.getCell('C' + r).value = OWN[i % 4]; O.getCell('D' + r).value = Math.round((2 + R() * 40) * 1e6 / 1e5) * 1e5; O.getCell('E' + r).value = st; O.getCell('H' + r).value = new Date(Date.UTC(2026, 9 + Math.floor(R() * 3), 1 + Math.floor(R() * 27))); O.getCell('I' + r).value = st === 'Амжилттай' || st === 'Алдсан' ? '' : ['Уулзалт товлох', 'Санал илгээх', 'Гэрээний төсөл', 'Утсаар холбогдох'][i % 4]; O.getCell('J' + r).value = st === 'Амжилттай' || st === 'Алдсан' ? null : new Date(Date.UTC(2026, 10, 1 + Math.floor(R() * 20))); }
+      if (i < 300) { O.getCell('F' + r).value = { formula: `IF(E${r}="","",IFERROR(VLOOKUP(E${r},${TS}$A$5:$B$10,2,FALSE),0))` }; calcCell(O.getCell('F' + r), '0%'); O.getCell('G' + r).value = { formula: `IF(E${r}="","",N(D${r})*F${r})` }; calcCell(O.getCell('G' + r), MONEY); } }
+    O.addConditionalFormatting({ ref: 'J5:J304', rules: [{ type: 'expression', formulae: ['AND(J5<>"",J5<TODAY(),$E5<>"Амжилттай",$E5<>"Алдсан")'], style: { font: { color: { argb: C.red }, bold: true }, fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFFDECEC' } } } }] });
+    O.addConditionalFormatting({ ref: 'E5:E304', rules: [{ type: 'cellIs', operator: 'equal', formulae: ['"Амжилттай"'], style: { font: { color: { argb: C.green }, bold: true } } }, { type: 'cellIs', operator: 'equal', formulae: ['"Алдсан"'], style: { font: { color: { argb: C.grey } } } }] });
+    const ob = c => `'Боломж'!$${c}$5:$${c}$504`;
+    title(D, 'Борлуулалтын самбар', '', 9);
+    kpi(D, 3, 2, 'Нээлттэй боломжийн дүн', `SUMPRODUCT((${ob('E')}<>"")*(${ob('E')}<>"Амжилттай")*(${ob('E')}<>"Алдсан"),${ob('D')})`);
+    kpi(D, 3, 4, 'Жигнэсэн таамаг', `SUMIFS(${ob('G')},${ob('E')},"<>Амжилттай",${ob('E')},"<>Алдсан")`);
+    kpi(D, 3, 7, 'Хөрвүүлэлтийн хувь', `IFERROR(COUNTIF(${ob('E')},"Амжилттай")/(COUNTIF(${ob('E')},"Амжилттай")+COUNTIF(${ob('E')},"Алдсан")),0)`, PCT);
+    header(D, 7, ['Үе шат', 'Тоо', 'Дүн', 'Жигнэсэн'], 2);
+    ST.forEach((s, i) => { const r = 8 + i; D.getCell('B' + r).value = { formula: `${TS}A${5 + i}` }; D.getCell('B' + r).border = box; [['C', `COUNTIF(${ob('E')},B${r})`, '0'], ['D', `SUMIF(${ob('E')},B${r},${ob('D')})`, MONEY], ['E', `SUMIF(${ob('E')},B${r},${ob('G')})`, MONEY]].forEach(([c, f, fm]) => { const x = D.getCell(c + r); x.value = { formula: f }; calcCell(x, fm); }); });
+    header(D, 7, ['Хариуцагч', 'Амжилттай', 'Нээлттэй'], 7);
+    for (let i = 0; i < 6; i++) { const r = 8 + i; D.getCell('G' + r).value = { formula: `IF(${TS}D${5 + i}="","",${TS}D${5 + i})` }; D.getCell('G' + r).border = box; [['H', `IF(G${r}="","",SUMIFS(${ob('D')},${ob('C')},G${r},${ob('E')},"Амжилттай"))`], ['I', `IF(G${r}="","",SUMIFS(${ob('D')},${ob('C')},G${r},${ob('E')},"<>Амжилттай",${ob('E')},"<>Алдсан"))`]].forEach(([c, f]) => { const x = D.getCell(c + r); x.value = { formula: f }; calcCell(x, MONEY); }); }
+    D.getCell('B15').value = 'Хугацаа хэтэрсэн алхам:'; D.getCell('C15').value = { formula: `COUNTIFS(${ob('J')},"<"&TODAY(),${ob('E')},"<>Амжилттай",${ob('E')},"<>Алдсан")` }; D.getCell('C15').font = { bold: true, color: { argb: C.red } };
+    return done(wb, JSZip, { 'Самбар': [{ type: 'bar', title: 'Үе шат бүрийн дүн', cats: { ref: `'Самбар'!$B$8:$B$13`, vals: ST.map(s => s[0]) }, series: [{ name: 'Дүн', ref: `'Самбар'!$D$8:$D$13`, vals: [] }], at: { c1: 1, r1: 16, c2: 5, r2: 34 } },
+      { type: 'col', title: 'Хариуцагчаар', cats: { ref: `'Самбар'!$G$8:$G$11`, vals: OWN }, series: [{ name: 'Амжилттай', ref: `'Самбар'!$H$8:$H$11`, vals: [], color: '#c9a470' }, { name: 'Нээлттэй', ref: `'Самбар'!$I$8:$I$11`, vals: [], color: '#171717' }], at: { c1: 5, r1: 16, c2: 9, r2: 34 } }] });
+  }
+
+  /* ═════════ 18. GANTT ═════════ */
+  async function gantt(ExcelJS, JSZip) {
+    const wb = newBook(ExcelJS, 'Төслийн төлөвлөгөө (Gantt)');
+    guide(wb, 'Төслийн төлөвлөгөө (Gantt)', [
+      '«Төлөвлөгөө» хуудсанд төслийн эхлэх огноо, тайлангийн огноог бичнэ.',
+      'Ажил бүрийн нэр, хариуцагч, эхлэх, дуусах огноо, гүйцэтгэлийн хувийг бичихэд Gantt график (7 хоногоор, 26 долоо хоног) автоматаар будагдана: алтан — төлөвлөсөн хугацаа, хар — гүйцэтгэсэн хэсэг.',
+      'Төлөв (Эхлээгүй / Явагдаж буй / Хоцорсон / Дууссан) тайлангийн огноотой харьцуулж автоматаар гарна. Улаан босоо шугам — тайлангийн огноо.'
+    ]);
+    const G = sheet(wb, 'Төлөвлөгөө', { freeze: 6, xFreeze: 8, widths: [5, 30, 14, 11, 11, 7, 9, 13].concat(Array(26).fill(3.6)), zoom: 90, tab: C.gold });
+    G.mergeCells('A1:H1'); G.getCell('A1').value = 'Төслийн төлөвлөгөө'; G.getCell('A1').font = { bold: true, size: 18 }; G.getRow(1).height = 30;
+    G.getCell('A2').value = 'Төсөл:'; G.mergeCells('B2:D2'); inputCell(G.getCell('B2')); G.getCell('B2').value = 'BusinessBI нэвтрүүлэлт — Жишээ ХХК';
+    G.getCell('A3').value = 'Эхлэх:'; inputCell(G.getCell('B3'), 'yyyy-mm-dd'); G.getCell('B3').value = new Date(Date.UTC(2026, 10, 2));
+    G.getCell('C3').value = 'Тайлангийн огноо:'; G.getCell('C3').alignment = { horizontal: 'right' }; G.mergeCells('C3:D3'); inputCell(G.getCell('E3'), 'yyyy-mm-dd'); G.getCell('E3').value = new Date(Date.UTC(2026, 11, 7));
+    ['A2', 'A3', 'C3'].forEach(a => G.getCell(a).font = { bold: true });
+    header(G, 5, ['№', 'Ажил', 'Хариуцагч', 'Эхлэх', 'Дуусах', 'Хоног', 'Гүйцэтгэл', 'Төлөв']);
+    for (let w = 0; w < 26; w++) { const c = colL(8 + w); const h = G.getCell(c + 5); h.value = { formula: `$B$3-WEEKDAY($B$3,3)+${w * 7}` }; h.numFmt = 'mm/dd'; h.font = { size: 7, color: { argb: C.white } }; h.fill = fill(C.head); h.alignment = { textRotation: 90, horizontal: 'center' }; }
+    G.getRow(5).height = 42; G.getRow(6).height = 4;
+    const tasks = [['Шинжилгээ, шаардлага тодорхойлох', 'Хонгор', 0, 9, 1], ['Дансны жагсаалт, тохиргоо', 'Нягтлан', 7, 6, 1], ['Эхний үлдэгдэл шилжүүлэх', 'Нягтлан', 12, 10, 1], ['Харилцагч, бараа импорт', 'Оператор', 14, 12, 0.8], ['Банкны хуулга холбох', 'Хонгор', 21, 9, 0.6], ['Цалингийн модуль', 'ХН', 25, 14, 0.4], ['Дашбоард тохируулах', 'Хонгор', 35, 10, 0.1], ['Хэрэглэгчийн сургалт', 'Хонгор', 42, 5, 0], ['Зэрэгцээ ажиллагаа (1 сар)', 'Нягтлан', 45, 30, 0], ['Хүлээлгэн өгөх', 'Захирал', 76, 3, 0]];
+    const r0 = 7, N = 60, base = Date.UTC(2026, 10, 2);
+    for (let i = 0; i < N; i++) { const r = r0 + i, t = tasks[i];
+      G.getCell('A' + r).value = { formula: `IF(B${r}="","",ROW()-${r0 - 1})` }; calcCell(G.getCell('A' + r));
+      ['B', 'C', 'D', 'E', 'G'].forEach(c => inputCell(G.getCell(c + r), 'DE'.includes(c) ? 'yyyy-mm-dd' : (c === 'G' ? '0%' : null)));
+      if (t) { G.getCell('B' + r).value = t[0]; G.getCell('C' + r).value = t[1]; G.getCell('D' + r).value = new Date(base + t[2] * 864e5); G.getCell('E' + r).value = new Date(base + (t[2] + t[3] - 1) * 864e5); G.getCell('G' + r).value = t[4]; }
+      G.getCell('F' + r).value = { formula: `IF(OR(D${r}="",E${r}=""),"",E${r}-D${r}+1)` }; calcCell(G.getCell('F' + r), '0');
+      G.getCell('H' + r).value = { formula: `IF(B${r}="","",IF(N(G${r})>=1,"Дууссан",IF($E$3<D${r},"Эхлээгүй",IF(D${r}+(E${r}-D${r}+1)*N(G${r})<$E$3-0.5,IF($E$3>E${r},"Хоцорсон","Хоцорч буй"),"Явагдаж буй"))))` }; calcCell(G.getCell('H' + r));
+      for (let w = 0; w < 26; w++) G.getCell(colL(8 + w) + r).border = { left: { style: 'hair', color: { argb: 'FFEEEEEE' } }, bottom: { style: 'hair', color: { argb: 'FFEEEEEE' } } };
+    }
+    const rL = r0 + N - 1, gr = `I${r0}:AH${rL}`;
+    G.addConditionalFormatting({ ref: gr, rules: [
+      { type: 'expression', priority: 1, formulae: [`AND($D${r0}<>"",I$5<=$D${r0}+($E${r0}-$D${r0}+1)*N($G${r0})-1,I$5+6>=$D${r0})`], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FF171717' } } } },
+      { type: 'expression', priority: 2, formulae: [`AND($D${r0}<>"",I$5<=$E${r0},I$5+6>=$D${r0})`], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFC9A470' } } } },
+      { type: 'expression', priority: 3, formulae: [`AND($E$3>=I$5,$E$3<I$5+7)`], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFFDE2E2' } } } }] });
+    G.addConditionalFormatting({ ref: `H${r0}:H${rL}`, rules: [{ type: 'containsText', operator: 'containsText', text: 'Хоцор', style: { font: { color: { argb: C.red }, bold: true } } }, { type: 'cellIs', operator: 'equal', formulae: ['"Дууссан"'], style: { font: { color: { argb: C.green }, bold: true } } }] });
+    G.getCell('B' + (rL + 2)).value = 'Нийт гүйцэтгэл (хоногоор жигнэсэн):'; G.getCell('B' + (rL + 2)).font = { bold: true };
+    G.getCell('G' + (rL + 2)).value = { formula: `IFERROR(SUMPRODUCT(F${r0}:F${rL},G${r0}:G${rL})/SUM(F${r0}:F${rL}),0)` };
+    return done(wb, JSZip, {});
+  }
+
+  /* ═════════ 19. KPI ═════════ */
+  async function kpiTpl(ExcelJS, JSZip) {
+    const wb = newBook(ExcelJS, 'Ажилтны KPI үнэлгээ');
+    guide(wb, 'Ажилтны KPI үнэлгээ', [
+      '«Тохиргоо» хуудсанд KPI шалгуур, жин (нийт 100%), үнэлгээний ангилал, урамшууллын хувийг тохируулна.',
+      '«Үнэлгээ» хуудсанд ажилтан бүрийн шалгуур тус бүрийн оноог (1–5) бичнэ. Жигнэсэн нийт оноо (100-аар), ангилал (A–D), урамшууллын дүн автоматаар.',
+      '«Хуудас» хуудсанд ажилтны дугаар сонгоход тухайн хүний үнэлгээний хуудас гарна — ярилцлагад хэвлэж ашиглана.'
+    ]);
+    const E = sheet(wb, 'Үнэлгээ', { freeze: 5, xFreeze: 3, widths: [5, 22, 18, 13, 11, 11, 11, 11, 11, 11, 9, 13, 13], tab: C.gold });
+    const H = sheet(wb, 'Хуудас', { widths: [3, 34, 12, 12, 30] });
+    const T = sheet(wb, 'Тохиргоо', { widths: [34, 10, 4, 12, 10, 12], tab: C.grey });
+    const KP = [['Борлуулалт / ажлын төлөвлөгөөний биелэлт', 0.35], ['Ажлын чанар, алдаагүй байдал', 0.2], ['Харилцагчийн сэтгэл ханамж', 0.15], ['Ирц, цагийн хуваарь', 0.1], ['Багийн ажил, хамтын ажиллагаа', 0.1], ['Санаачилга, сайжруулалт', 0.1]];
+    title(T, 'Тохиргоо', 'KPI жин нийлбэр 100% байх ёстой', 6); header(T, 4, ['KPI шалгуур', 'Жин']); header(T, 4, ['Оноо ≥', 'Ангилал', 'Урамшуулал'], 4);
+    KP.forEach((k, i) => { const r = 5 + i; T.getCell('A' + r).value = k[0]; inputCell(T.getCell('A' + r)); T.getCell('B' + r).value = k[1]; inputCell(T.getCell('B' + r), '0%'); });
+    T.getCell('A11').value = 'Нийт жин'; T.getCell('B11').value = { formula: 'SUM(B5:B10)' }; T.getCell('B11').numFmt = '0%'; totalRow(T, 11, 1, 2);
+    T.addConditionalFormatting({ ref: 'B11', rules: [{ type: 'expression', formulae: ['ROUND(B11,4)<>1'], style: { font: { color: { argb: C.red }, bold: true } } }] });
+    [[0, 'D', 0], [60, 'C', 0.05], [75, 'B', 0.10], [90, 'A', 0.20]].forEach((g, i) => { const r = 5 + i; T.getCell('D' + r).value = g[0]; inputCell(T.getCell('D' + r)); T.getCell('E' + r).value = g[1]; inputCell(T.getCell('E' + r)); T.getCell('F' + r).value = g[2]; inputCell(T.getCell('F' + r), '0%'); });
+    const TS = S('Тохиргоо');
+    E.mergeCells('A1:M1'); E.getCell('A1').value = 'Ажилтны KPI үнэлгээ'; E.getCell('A1').font = { bold: true, size: 18 }; E.getRow(1).height = 30;
+    E.getCell('A2').value = 'Үнэлгээний үе:'; E.getCell('A2').font = { bold: true }; E.mergeCells('C2:D2'); inputCell(E.getCell('C2')); E.getCell('C2').value = '2026 оны III улирал';
+    const hdr = ['№', 'Ажилтан', 'Албан тушаал', 'Үндсэн цалин'];
+    header(E, 4, hdr.concat(KP.map((_, i) => 'KPI ' + (i + 1)), ['Оноо', 'Ангилал', 'Урамшуулал']));
+    KP.forEach((k, i) => { const c = E.getCell(colL(4 + i) + 5); c.value = { formula: `${TS}A${5 + i}` }; c.font = { size: 8, color: { argb: C.grey } }; c.alignment = { wrapText: true, vertical: 'top' }; });
+    E.getRow(5).height = 48;
+    const names = [['Бат-Эрдэнэ Г.', 'Борлуулалтын менежер', 2.6e6], ['Оюунчимэг Н.', 'Борлуулагч', 1.5e6], ['Ганзориг Б.', 'Борлуулагч', 1.45e6], ['Энхжаргал Ц.', 'Нягтлан', 2.2e6], ['Нарантуяа С.', 'Агуулахын эрхлэгч', 1.7e6], ['Цолмон Х.', 'Нярав', 1.35e6], ['Даваадорж М.', 'Маркетинг', 1.9e6], ['Солонго А.', 'Оператор', 1.1e6]];
+    const R = rng(23), r0 = 6, N = 50, rL = r0 + N - 1;
+    for (let i = 0; i < N; i++) { const r = r0 + i, x = names[i];
+      E.getCell('A' + r).value = { formula: `IF(B${r}="","",ROW()-${r0 - 1})` }; calcCell(E.getCell('A' + r));
+      ['B', 'C', 'D'].forEach((c, j) => { const y = E.getCell(c + r); inputCell(y, j === 2 ? MONEY : null); if (x) y.value = x[j]; });
+      KP.forEach((_, k) => { const y = E.getCell(colL(4 + k) + r); inputCell(y, '0'); y.alignment = { horizontal: 'center' }; y.dataValidation = { type: 'whole', operator: 'between', formulae: [1, 5], showErrorMessage: true, error: '1–5' }; if (x) y.value = Math.min(5, Math.max(1, Math.round(2.6 + R() * 2.6))); });
+      const sc = `E${r}:J${r}`;
+      E.getCell('K' + r).value = { formula: `IF(COUNT(${sc})=0,"",ROUND(SUMPRODUCT(${sc},TRANSPOSE(${TS}$B$5:$B$10))/5*100,1))` };
+      E.getCell('K' + r).value = { formula: `IF(COUNT(${sc})=0,"",ROUND((E${r}*${TS}$B$5+F${r}*${TS}$B$6+G${r}*${TS}$B$7+H${r}*${TS}$B$8+I${r}*${TS}$B$9+J${r}*${TS}$B$10)/5*100,1))` }; calcCell(E.getCell('K' + r), '0.0'); E.getCell('K' + r).font = { bold: true };
+      E.getCell('L' + r).value = { formula: `IF(K${r}="","",LOOKUP(K${r},${TS}$D$5:$D$8,${TS}$E$5:$E$8))` }; calcCell(E.getCell('L' + r)); E.getCell('L' + r).alignment = { horizontal: 'center' }; E.getCell('L' + r).font = { bold: true };
+      E.getCell('M' + r).value = { formula: `IF(K${r}="","",N(D${r})*LOOKUP(K${r},${TS}$D$5:$D$8,${TS}$F$5:$F$8))` }; calcCell(E.getCell('M' + r), MONEY);
+    }
+    E.addConditionalFormatting({ ref: `L${r0}:L${rL}`, rules: [{ type: 'cellIs', operator: 'equal', formulae: ['"A"'], style: { font: { color: { argb: C.green }, bold: true }, fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFE8F5EC' } } } }, { type: 'cellIs', operator: 'equal', formulae: ['"D"'], style: { font: { color: { argb: C.red }, bold: true }, fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFFDECEC' } } } }] });
+    const tr = rL + 1; E.getCell('B' + tr).value = 'Нийт урамшуулал'; E.getCell('M' + tr).value = { formula: `SUM(M${r0}:M${rL})` }; E.getCell('M' + tr).numFmt = MONEY; E.getCell('K' + tr).value = { formula: `IFERROR(AVERAGE(K${r0}:K${rL}),0)` }; E.getCell('K' + tr).numFmt = '0.0'; totalRow(E, tr, 1, 13);
+    // Хуудас
+    H.mergeCells('B2:E2'); H.getCell('B2').value = 'АЖИЛТНЫ ГҮЙЦЭТГЭЛИЙН ҮНЭЛГЭЭ'; H.getCell('B2').font = { bold: true, size: 16 }; H.getCell('B2').alignment = { horizontal: 'center' };
+    H.mergeCells('B3:E3'); H.getCell('B3').value = { formula: `'Үнэлгээ'!C2` }; H.getCell('B3').alignment = { horizontal: 'center' }; H.getCell('B3').font = { color: { argb: C.grey } };
+    H.getCell('B5').value = 'Ажилтны №'; H.getCell('B5').font = { bold: true }; const sel = H.getCell('C5'); sel.value = 1; inputCell(sel); sel.font = { bold: true, size: 13 };
+    const ix = c => `INDEX('Үнэлгээ'!$${c}$${r0}:$${c}$${rL},$C$5)`;
+    [['Овог нэр', 'B'], ['Албан тушаал', 'C']].forEach(([l, c], i) => { H.getCell('B' + (7 + i)).value = l; H.getCell('B' + (7 + i)).font = { color: { argb: C.grey } }; H.getCell('C' + (7 + i)).value = { formula: ix(c) }; H.getCell('C' + (7 + i)).font = { bold: true }; });
+    header(H, 10, ['Шалгуур', 'Жин', 'Оноо (1–5)', 'Тайлбар'], 2);
+    KP.forEach((k, i) => { const r = 11 + i; H.getCell('B' + r).value = { formula: `${TS}A${5 + i}` }; H.getCell('B' + r).border = box; H.getCell('C' + r).value = { formula: `${TS}B${5 + i}` }; calcCell(H.getCell('C' + r), '0%'); H.getCell('D' + r).value = { formula: ix(colL(4 + i)) }; calcCell(H.getCell('D' + r), '0'); H.getCell('D' + r).alignment = { horizontal: 'center' }; H.getCell('E' + r).border = box; });
+    [['Нийт оноо (100)', 'K', '0.0'], ['Ангилал', 'L', '@'], ['Урамшуулал', 'M', MONEY]].forEach(([l, c, f], i) => { const r = 18 + i; H.getCell('B' + r).value = l; H.getCell('D' + r).value = { formula: ix(c) }; H.getCell('D' + r).numFmt = f; totalRow(H, r, 2, 5); });
+    H.getCell('B23').value = 'Ажилтны санал:'; H.getCell('B26').value = 'Ажилтан: ____________________'; H.getCell('D26').value = 'Удирдлага: ____________________';
+    H.pageSetup = { paperSize: 9, orientation: 'portrait', fitToPage: true, fitToWidth: 1, fitToHeight: 1, printArea: 'B2:E27' };
+    return done(wb, JSZip, { 'Үнэлгээ': [{ type: 'bar', title: 'Нийт оноо — ажилтнаар', cats: { ref: `'Үнэлгээ'!$B$${r0}:$B$${r0 + names.length - 1}`, vals: names.map(n => n[0]) }, series: [{ name: 'Оноо', ref: `'Үнэлгээ'!$K$${r0}:$K$${r0 + names.length - 1}`, vals: [] }], at: { c1: 14, r1: 3, c2: 22, r2: 24 } }] });
+  }
+
+  /* ═════════ 20. ҮНИЙН САНАЛ, НЭХЭМЖЛЭХ ═════════ */
+  async function quote(ExcelJS, JSZip) {
+    const wb = newBook(ExcelJS, 'Үнийн санал, нэхэмжлэх');
+    guide(wb, 'Үнийн санал, нэхэмжлэх', [
+      '«Тохиргоо» хуудсанд өөрийн байгууллагын нэр, регистр, хаяг, утас, банк, дансны дугаар, мөн бараа үйлчилгээний үнийн жагсаалтаа бичнэ.',
+      '«Үнийн санал» хуудсанд харилцагчийн мэдээлэл, барааны кодыг сонгоход нэр, нэгж, үнэ автоматаар гарна. Тоо, хөнгөлөлтөө бичнэ.',
+      '«Нэхэмжлэх» хуудас үнийн саналын мөрүүдийг автоматаар авч, төлбөрийн мэдээлэлтэй нэхэмжлэх болгоно. Хоёулаа A4-т багтаж хэвлэгдэнэ (File → Export → PDF).'
+    ]);
+    const Q = sheet(wb, 'Үнийн санал', { widths: [3, 6, 12, 32, 9, 9, 14, 9, 15, 3], tab: C.gold });
+    const I = sheet(wb, 'Нэхэмжлэх', { widths: [3, 6, 12, 32, 9, 9, 14, 9, 15, 3], tab: C.gold });
+    const T = sheet(wb, 'Тохиргоо', { widths: [24, 36, 4, 10, 30, 9, 14], tab: C.grey });
+    title(T, 'Тохиргоо', 'Байгууллага, үнийн жагсаалт', 7);
+    const CO = [['Байгууллагын нэр', 'Жишээ ХХК'], ['Регистр', '6123456'], ['Хаяг', 'Улаанбаатар, Сүхбаатар дүүрэг, 1-р хороо'], ['Утас', '7700-1234'], ['И-мэйл', 'info@example.mn'], ['Банк', 'Хаан банк'], ['Дансны дугаар', '5000 1234 56'], ['Данс эзэмшигч', 'Жишээ ХХК'], ['НӨАТ төлөгч эсэх', 'Тийм']];
+    header(T, 4, ['Үзүүлэлт', 'Утга']);
+    CO.forEach((c, i) => { const r = 5 + i; T.getCell('A' + r).value = c[0]; T.getCell('A' + r).border = box; T.getCell('B' + r).value = c[1]; inputCell(T.getCell('B' + r)); });
+    listValidation(T.getCell('B13'), ['Тийм', 'Үгүй']);
+    header(T, 4, ['Код', 'Бараа, үйлчилгээ', 'Нэгж', 'Үнэ (НӨАТ-гүй)'], 4);
+    const items = [['S01', 'Санхүүгийн программ — жилийн эрх', 'жил', 1200000], ['S02', 'Нэвтрүүлэлт, тохиргоо', 'удаа', 800000], ['S03', 'Сургалт (2 цаг)', 'удаа', 250000], ['S04', 'НББ аутсорсинг', 'сар', 450000], ['S05', 'Захиалгат дашбоард', 'ш', 900000], ['P01', 'Ноутбук', 'ш', 2900000], ['P02', 'Принтер', 'ш', 750000]];
+    for (let i = 0; i < 150; i++) { const r = 5 + i, x = items[i]; ['D', 'E', 'F', 'G'].forEach((c, j) => { const y = T.getCell(c + r); inputCell(y, j === 3 ? MONEY : null); if (x) y.value = x[j]; }); }
+    const TS = S('Тохиргоо');
+    const doc = (W, kind) => {
+      const isQ = kind === 'q';
+      W.mergeCells('B2:F2'); W.getCell('B2').value = { formula: `${TS}B5` }; W.getCell('B2').font = { bold: true, size: 15 };
+      W.mergeCells('B3:F3'); W.getCell('B3').value = { formula: `"РД: "&${TS}B6&" · "&${TS}B7` }; W.getCell('B3').font = { size: 9, color: { argb: C.grey } };
+      W.mergeCells('B4:F4'); W.getCell('B4').value = { formula: `"Утас: "&${TS}B8&" · "&${TS}B9` }; W.getCell('B4').font = { size: 9, color: { argb: C.grey } };
+      W.mergeCells('G2:I2'); W.getCell('G2').value = isQ ? 'ҮНИЙН САНАЛ' : 'НЭХЭМЖЛЭХ'; W.getCell('G2').font = { bold: true, size: 18, color: { argb: C.goldD } }; W.getCell('G2').alignment = { horizontal: 'right' };
+      const meta = isQ ? [['№', 'ҮС-2026-031'], ['Огноо', new Date(Date.UTC(2026, 10, 5))], ['Хүчинтэй', new Date(Date.UTC(2026, 10, 20))]] : [['№', 'НХ-2026-112'], ['Огноо', new Date(Date.UTC(2026, 10, 5))], ['Төлөх хугацаа', new Date(Date.UTC(2026, 10, 19))]];
+      meta.forEach((m, i) => { const r = 3 + i; W.getCell('G' + r).value = m[0]; W.getCell('G' + r).alignment = { horizontal: 'right' }; W.getCell('G' + r).font = { size: 9, color: { argb: C.grey } }; W.mergeCells(`H${r}:I${r}`); const x = W.getCell('H' + r); x.value = m[1]; inputCell(x, i ? 'yyyy-mm-dd' : null); x.alignment = { horizontal: 'right' }; });
+      W.getCell('B7').value = isQ ? 'Хэнд:' : 'Төлөгч:'; W.getCell('B7').font = { bold: true, color: { argb: C.goldD } };
+      const cust = [['Байгууллага', 'Номин Холдинг ХХК'], ['Регистр', '2012345'], ['Хаяг', 'Улаанбаатар, Хан-Уул'], ['Холбоо барих', 'Б. Болд, 9911-2233']];
+      cust.forEach((c, i) => { const r = 8 + i; W.getCell('B' + r).value = c[0]; W.mergeCells(`B${r}:C${r}`); W.getCell('B' + r).font = { size: 9, color: { argb: C.grey } }; W.mergeCells(`D${r}:F${r}`); const x = W.getCell('D' + r); if (isQ) { x.value = c[1]; inputCell(x); } else { x.value = { formula: `'Үнийн санал'!D${r}` }; } });
+      header(W, 13, ['№', 'Код', 'Бараа, үйлчилгээ', 'Нэгж', 'Тоо', 'Нэгжийн үнэ', 'Хөнг. %', 'Дүн'], 2);
+      const sample = [['S01', 1], ['S02', 1], ['S03', 3, 0.1], ['P01', 2]];
+      for (let i = 0; i < 15; i++) { const r = 14 + i;
+        W.getCell('B' + r).value = { formula: `IF(C${r}="","",${i + 1})` }; W.getCell('B' + r).border = box;
+        if (isQ) { const c = W.getCell('C' + r); inputCell(c); listValidation(c, `${TS}$D$5:$D$154`); const s = sample[i]; if (s) c.value = s[0];
+          W.getCell('D' + r).value = { formula: `IF(C${r}="","",IFERROR(VLOOKUP(C${r},${TS}$D$5:$G$154,2,FALSE),"?"))` }; W.getCell('E' + r).value = { formula: `IF(C${r}="","",IFERROR(VLOOKUP(C${r},${TS}$D$5:$G$154,3,FALSE),""))` };
+          const q = W.getCell('F' + r); inputCell(q, '#,##0.##'); if (s) q.value = s[1];
+          W.getCell('G' + r).value = { formula: `IF(C${r}="","",IFERROR(VLOOKUP(C${r},${TS}$D$5:$G$154,4,FALSE),0))` };
+          const d = W.getCell('H' + r); inputCell(d, '0%'); if (s && s[2]) d.value = s[2]; }
+        else { ['C', 'D', 'E', 'F', 'G', 'H'].forEach(c => { W.getCell(c + r).value = { formula: `IF('Үнийн санал'!${c}${r}="","",'Үнийн санал'!${c}${r})` }; }); W.getCell('H' + r).numFmt = '0%'; W.getCell('F' + r).numFmt = '#,##0.##'; }
+        ['D', 'E', 'G'].forEach(c => W.getCell(c + r).border = box); W.getCell('G' + r).numFmt = MONEY;
+        W.getCell('I' + r).value = { formula: `IF(C${r}="","",ROUND(N(F${r})*N(G${r})*(1-N(H${r})),0))` }; calcCell(W.getCell('I' + r), MONEY);
+      }
+      const t = [['Дүн', 'SUM(I14:I28)'], ['НӨАТ (10%)', `IF(${TS}$B$13="Тийм",ROUND(I29*0.1,0),0)`], ['НИЙТ', 'I29+I30']];
+      t.forEach((x, i) => { const r = 29 + i; W.mergeCells(`G${r}:H${r}`); W.getCell('G' + r).value = x[0]; W.getCell('G' + r).alignment = { horizontal: 'right' }; W.getCell('I' + r).value = { formula: x[1] }; W.getCell('I' + r).numFmt = MONEY; W.getCell('I' + r).border = box; if (i === 2) { W.getCell('G' + r).font = { bold: true }; W.getCell('I' + r).font = { bold: true, size: 13 }; W.getCell('I' + r).fill = fill(C.goldL); } });
+      if (isQ) { W.getCell('B33').value = 'Нөхцөл:'; W.getCell('B33').font = { bold: true }; W.mergeCells('C33:I34'); const n = W.getCell('C33'); n.value = 'Үнэ нь хүчинтэй хугацаанд хүчинтэй. Төлбөрийн нөхцөл: 50% урьдчилгаа, 50% хүлээлгэн өгөхөд. Хүргэлт: гэрээ байгуулснаас хойш 5 хоногт.'; inputCell(n); n.alignment = { wrapText: true, vertical: 'top' }; }
+      else { W.getCell('B33').value = 'Төлбөр хүлээн авах данс:'; W.getCell('B33').font = { bold: true }; W.mergeCells('B34:I34'); W.getCell('B34').value = { formula: `${TS}B10&" · "&${TS}B11&" · "&${TS}B12` }; W.mergeCells('B35:I35'); W.getCell('B35').value = { formula: `"Гүйлгээний утга: "&H3` }; W.getCell('B35').font = { size: 9, color: { argb: C.grey } }; }
+      W.getCell('B38').value = isQ ? 'Санал болгосон: ____________________' : 'Нягтлан бодогч: ____________________'; W.getCell('G38').value = isQ ? '' : 'Тамга'; 
+      W.pageSetup = { paperSize: 9, orientation: 'portrait', fitToPage: true, fitToWidth: 1, fitToHeight: 1, printArea: 'B2:I39', margins: { left: 0.5, right: 0.5, top: 0.6, bottom: 0.6, header: 0.2, footer: 0.2 } };
+    };
+    doc(Q, 'q'); doc(I, 'i');
+    I.getCell('H3').value = 'НХ-2026-112';
+    return done(wb, JSZip, {});
+  }
+
+  /* ═════════ 21. ААНОАТ ═════════ */
+  async function cit(ExcelJS, JSZip) {
+    const wb = newBook(ExcelJS, 'ААНОАТ тооцоолуур');
+    guide(wb, 'ААНОАТ тооцоолуур', [
+      '«Тооцоо» хуудсанд улирал бүрийн орлого, хасагдах зардал, татвараас чөлөөлөгдөх орлогыг бичнэ. Өссөн дүнгээр татвар ногдох орлого, татвар, хөнгөлөлт, улирал бүрийн төлөх дүн бодогдоно.',
+      'Жилийн борлуулалт 50 саяас бага бол хялбаршуулсан 1%-ийн горим, 1.5 тэрбумаас бага бол 90%-ийн хөнгөлөлт — хоёуланг нь автоматаар шалгаж, ердийн горимтой харьцуулна.',
+      'Хувь хэмжээ, босго «Тохиргоо» хуудсанд (2026 он). 2027 оноос босго өөрчлөгдөх төлөвтэй — тэнд засна.'
+    ], ['Энэ нь урьдчилсан тооцоо. Хасагдахгүй зардал, алдагдал шилжүүлэх хязгаар, салбарын онцгой зохицуулалт (ашигт малтмал, архи тамхи г.м. хөнгөлөлтөд хамаарахгүй) зэргийг татварын хууль, мэргэжлийн нягтлангаар баталгаажуулна уу.', 'Албан ёсны тайланг e-tax системээр илгээнэ.']);
+    const W = sheet(wb, 'Тооцоо', { widths: [3, 44, 15, 15, 15, 15, 16], tab: C.gold });
+    const T = sheet(wb, 'Тохиргоо', { widths: [46, 18, 44], tab: C.grey });
+    title(T, 'Тохиргоо — 2026', 'ААНОАТ-ын хууль (2019)', 3); header(T, 4, ['Үзүүлэлт', 'Утга', 'Эх сурвалж']);
+    const P = [['Шатлалын босго (жилийн ТНО)', 6e9, MONEY, '20.1'], ['Босго хүртэлх хувь', 0.10, PCT, '20.1'], ['Босгоос дээших хувь', 0.25, PCT, '20.1'], ['Хялбаршуулсан горимын борлуулалтын босго', 50e6, MONEY, '20.2.7 (2027-оос 400 сая — шалгана уу)'], ['Хялбаршуулсан горимын хувь (борлуулалтаас)', 0.01, PCT, '20.2.7'], ['90% хөнгөлөлтийн борлуулалтын босго', 1.5e9, MONEY, '22.1 (2027-оос 2.5 тэрбум — шалгана уу)'], ['Хөнгөлөлтийн хувь', 0.9, '0%', '22.1']];
+    P.forEach((p, i) => { const r = 5 + i; T.getCell('A' + r).value = p[0]; T.getCell('A' + r).border = box; const v = T.getCell('B' + r); v.value = p[1]; inputCell(v, p[2]); T.getCell('C' + r).value = p[3]; T.getCell('C' + r).font = { size: 9, color: { argb: C.grey } }; });
+    const TS = S('Тохиргоо');
+    title(W, 'ААНОАТ — улирлын тооцоо (өссөн дүнгээр)', '', 7);
+    W.getCell('B3').value = 'Он:'; W.getCell('B3').font = { bold: true }; inputCell(W.getCell('C3')); W.getCell('C3').value = 2026;
+    W.getCell('D3').value = 'Хялбаршуулсан горим сонгох:'; W.mergeCells('D3:E3'); W.getCell('D3').alignment = { horizontal: 'right' }; inputCell(W.getCell('F3')); W.getCell('F3').value = 'Үгүй'; listValidation(W.getCell('F3'), ['Тийм', 'Үгүй']);
+    header(W, 5, ['Үзүүлэлт (улирал бүрийн дүн)', 'I улирал', 'II улирал', 'III улирал', 'IV улирал', 'Жилийн дүн'], 2);
+    const qc = ['C', 'D', 'E', 'F'];
+    const inRows = [['Борлуулалтын орлого', [180e6, 210e6, 240e6, 260e6]], ['Бусад орлого (хүү, түрээс, ханшийн олз г.м.)', [2e6, 1.5e6, 3e6, 2.5e6]], ['Татвараас чөлөөлөгдөх орлого', [0, 0, 1e6, 0]], ['Хасагдах зардал', [150e6, 172e6, 196e6, 214e6]], ['Өмнөх оны алдагдал шилжүүлэх (хуулийн хязгаарт)', [3e6, 0, 0, 0]]];
+    inRows.forEach(([l, v], i) => { const r = 6 + i; W.getCell('B' + r).value = l; W.getCell('B' + r).border = box; qc.forEach((c, k) => { const x = W.getCell(c + r); x.value = v[k]; inputCell(x, MONEY); }); W.getCell('G' + r).value = { formula: `SUM(C${r}:F${r})` }; calcCell(W.getCell('G' + r), MONEY); });
+    let r = 12; W.getCell('B11').value = 'ЕРДИЙН ГОРИМ (өссөн дүнгээр)'; W.getCell('B11').font = { bold: true, color: { argb: C.goldD } };
+    const cum = (row, k) => `SUM($C$${row}:${qc[k]}${row})`;
+    const lines = [['Өссөн борлуулалт', k => cum(6, k)], ['Татвар ногдох орлого (өссөн)', k => `MAX(0,${cum(6, k)}+${cum(7, k)}-${cum(8, k)}-${cum(9, k)}-${cum(10, k)})`],
+      ['Татвар (шатлалаар, өссөн)', k => `MIN(${qc[k]}13,${TS}$B$5)*${TS}$B$6+MAX(0,${qc[k]}13-${TS}$B$5)*${TS}$B$7`],
+      ['90% хөнгөлөлт эрхтэй эсэх (жилийн борлуулалт)', k => `IF($G$6<=${TS}$B$10,"Тийм","Үгүй")`],
+      ['Хөнгөлөлт (өссөн)', k => `IF(${qc[k]}15="Тийм",${qc[k]}14*${TS}$B$11,0)`],
+      ['Төлөх татвар (өссөн)', k => `${qc[k]}14-${qc[k]}16`], ['Улиралд төлөх', k => k === 0 ? 'C17' : `${qc[k]}17-${qc[k - 1]}17`]];
+    lines.forEach(([l, fn], i) => { const rr = 12 + i; W.getCell('B' + rr).value = l; W.getCell('B' + rr).border = box; qc.forEach((c, k) => { const x = W.getCell(c + rr); x.value = { formula: fn(k) }; calcCell(x, i === 3 ? null : MONEY); if (i === 3) x.alignment = { horizontal: 'center' }; }); });
+    W.getCell('G18').value = { formula: 'SUM(C18:F18)' }; W.getCell('G18').numFmt = MONEY; totalRow(W, 18, 2, 7);
+    W.getCell('B20').value = 'ХЯЛБАРШУУЛСАН ГОРИМ (1%)'; W.getCell('B20').font = { bold: true, color: { argb: C.goldD } };
+    W.getCell('B21').value = 'Эрх (жилийн борлуулалт ≤ босго)'; W.getCell('C21').value = { formula: `IF($G$6<=${TS}$B$8,"Тийм","Үгүй")` }; W.getCell('C21').alignment = { horizontal: 'center' };
+    W.getCell('B22').value = 'Татвар (борлуулалт × 1%)'; qc.forEach(c => { W.getCell(c + 22).value = { formula: `IF($C$21="Тийм",${c}6*${TS}$B$9,"")` }; calcCell(W.getCell(c + 22), MONEY); }); W.getCell('G22').value = { formula: 'IF($C$21="Тийм",SUM(C22:F22),"")' }; W.getCell('G22').numFmt = MONEY;
+    W.getCell('B24').value = 'ДҮГНЭЛТ'; W.getCell('B24').font = { bold: true, color: { argb: C.goldD } };
+    W.getCell('B25').value = 'Жилийн татвар — ердийн горим'; W.getCell('G25').value = { formula: 'G18' };
+    W.getCell('B26').value = 'Жилийн татвар — хялбаршуулсан горим'; W.getCell('G26').value = { formula: 'IF(C21="Тийм",G22,"эрхгүй")' };
+    W.getCell('B27').value = 'Үр ашигтай горим'; W.getCell('G27').value = { formula: `IF(C21<>"Тийм","Ердийн горим",IF(G22<G18,"Хялбаршуулсан (1%)","Ердийн горим"))` }; W.getCell('G27').font = { bold: true, color: { argb: C.green } };
+    W.getCell('B28').value = 'Бодит татварын ачаалал (татвар / борлуулалт)'; W.getCell('G28').value = { formula: `IFERROR(IF(AND($F$3="Тийм",C21="Тийм"),G22,G18)/G6,0)` }; W.getCell('G28').numFmt = '0.00%';
+    ['G25', 'G26'].forEach(a => { W.getCell(a).numFmt = MONEY; W.getCell(a).font = { bold: true }; });
+    return done(wb, JSZip, { 'Тооцоо': [{ type: 'col', title: 'Улирал бүрийн төлөх татвар', cats: { ref: `'Тооцоо'!$C$5:$F$5`, vals: ['I', 'II', 'III', 'IV'] }, series: [{ name: 'Төлөх', ref: `'Тооцоо'!$C$18:$F$18`, vals: [] }], at: { c1: 1, r1: 30, c2: 7, r2: 48 } }] });
+  }
+
   const payslip = (E, Z) => payroll(E, Z, true);
-  const BUILD = { payroll, payslip, vat, fs, depr, cashflow, budget, inventory, sales, feasibility, aging };
+  const BUILD = { payroll, payslip, vat, fs, depr, cashflow, budget, inventory, sales, feasibility, aging, loan, homebudget, attendance, cashbook, costing, crm, gantt, kpi: kpiTpl, quote, cit };
   async function build(id, libs) { const f = BUILD[id]; if (!f) throw new Error('Загвар олдсонгүй: ' + id); return f(libs.ExcelJS, libs.JSZip); }
   function register(id, fn) { BUILD[id] = fn; }
   // ZIP-д хамт орох нэмэлт файл (url — сайтаас татна)

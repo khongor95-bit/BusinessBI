@@ -123,7 +123,7 @@ if(!document.getElementById('nlModal') && !B.dataset.noFloat) B.appendChild(frag
       card('budget.html','budget.jpg','Бизнес төлөвлөлт','Beta · үнэгүй'),
       card('financial_dashboard.html','tool-financial.jpg','Санхүүгийн шинжилгээ','Үнэгүй')]},
     {k:'auto',n:'Excel',all:['templates.html','Бүх Excel загвар',''],items:[
-      card('templates.html','tpl/payroll.jpg','Excel загварууд','19,000₮-с'),
+      card('templates.html','tpl/payroll.jpg','Excel загварууд (21)','15,000₮-с'),
       card('dashboard_maker.html','excel-dashboard.png','Дашбоард үүсгэгч','Үнэгүй харах'),
       card('custom_dashboard.html','custom-powerbi.jpg','Захиалгат дашбоард','290,000₮-с'),
       card('templates.html#feasibility','tpl/feasibility.jpg','ТЭЗҮ загвар','49,000₮')]}
