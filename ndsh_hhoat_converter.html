@@ -5,6 +5,7 @@
 <script src="mp.js"></script>
 <script src="tax.js"></script>
 <script src="pay.js"></script>
+<script src="ebarimt.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="site.css">
 <script src="site.js" defer></script>
@@ -281,10 +282,11 @@
       <h2>Татвар төлөгчийн дугаар</h2>
       <div class="ttd-status idle" id="ttdStatus">Сарын тайлан оруулмагц ажилтнуудын 12 оронт ТТД энд шалгагдана.</div>
       <div class="ttd-actions">
+        <button class="ttd-btn" id="ttdLookupBtn">🔎 Регистрээр ТТД татах (ebarimt)</button>
         <button class="ttd-btn" id="ttdImportBtn">📥 Файлаас ТТД унших</button>
         <button class="ttd-btn" id="ttdEditBtn">✏ ТТД шалгах, гараар оруулах</button>
       </div>
-      <p class="hint">Өмнө нь etax-д явуулсан ХХОАТ маягтаа (энэ хэрэгслээс гарсан Excel) оруулбал <b>овог нэрээр</b> тулгаж ТТД-г автоматаар авна. Регистр + ТТД хамт байгаа файл (толийн CSV г.м.) регистрээр тулгагдана. Оруулсан ТТД энэ хөтөчид хадгалагдаж, дараагийн улирал/жилд автоматаар бөглөгдөнө — зөвхөн шинэ ажилтных л дутна.</p>
+      <p class="hint">НДШ тайлан оруулмагц ТТД-гүй ажилтнуудын ТТД-г <b>регистрээр нь ebarimt.mn-ээс автоматаар</b> татна. Олдоогүй үлдсэнийг доорх аргаар нөхнө. Өмнө нь etax-д явуулсан ХХОАТ маягтаа (энэ хэрэгслээс гарсан Excel) оруулбал <b>овог нэрээр</b> тулгаж ТТД-г автоматаар авна. Регистр + ТТД хамт байгаа файл (толийн CSV г.м.) регистрээр тулгагдана. Оруулсан ТТД энэ хөтөчид хадгалагдаж, дараагийн улирал/жилд автоматаар бөглөгдөнө — зөвхөн шинэ ажилтных л дутна.</p>
     </div>
 
     <div class="panel" id="dlPanel">
@@ -1451,7 +1453,76 @@ function refreshTTD(){
           : 'Бүгд бүрэн ✓ Толь энэ хөтөчид хадгалагдлаа — дараагийн улиралд автоматаар бөглөгдөнө.')
       : '';
   }
+  scheduleAutoTTD();
 }
+
+// ---- Регистрээр ebarimt.mn-ээс ТТД татах ----
+// ebarimt.js (BBIEbarimt) → Supabase ebarimt-lookup → getTinInfo?regNo=<РД>.
+// Зөвхөн Монгол иргэний регистртэй (2 кирилл + 8 орон), ТТД-гүй ажилтныг шалгана.
+// Нэг нэгээр, завсартай дуудна (ebarimt блоклохоос сэргийлж). Олдсон ТТД толинд
+// хадгалагдах тул дараагийн улиралд дахин дуудахгүй.
+var ttdTried=new Set();   // энэ сессэд шалгасан (олдоогүй) регистрүүд — давтан дуудахгүй
+var ttdLookupBusy=false, ttdAutoTimer=null;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function ttdLookupCandidates(force){
+  return ttdStats().missing
+    .map(r=>({...r, key:normRegKey(r.reg)}))
+    .filter(r=>!r.foreign && REG_FULL_RE.test(r.key) && (force || !ttdTried.has(r.key)));
+}
+function scheduleAutoTTD(){
+  if(typeof ttdTried==="undefined") return;   // хуудас ачаалагдаж дуусаагүй
+  if(ttdLookupBusy || !window.BBIEbarimt) return;
+  if(!ttdLookupCandidates(false).length) return;
+  clearTimeout(ttdAutoTimer);
+  ttdAutoTimer=setTimeout(()=>lookupMissingTTD(false), 400);
+}
+async function lookupMissingTTD(force){
+  if(ttdLookupBusy) return;
+  if(!window.BBIEbarimt){ toast('ebarimt лавлагааны модуль ачаалагдсангүй — хуудсаа дахин ачаална уу'); return; }
+  const cands=ttdLookupCandidates(force);
+  if(!cands.length){
+    if(force) toast(ttdStats().missing.length
+      ? 'Регистрээр шалгах ажилтан үлдсэнгүй — гадаад иргэн/дугааргүй мөрийг гараар оруулна уу'
+      : 'Бүх ажилтан ТТД-тэй байна ✓');
+    return;
+  }
+  ttdLookupBusy=true;
+  const btn=$('ttdLookupBtn'), el=$('ttdStatus');
+  if(btn){ btn.disabled=true; btn.style.opacity='.6'; }
+  let found=0, notFound=0, failed=0, failStreak=0, stopped=false;
+  for(let i=0;i<cands.length;i++){
+    const c=cands[i];
+    el.className='ttd-status idle';
+    el.textContent=`🔎 ebarimt.mn-ээс ТТД татаж байна… ${i+1}/${cands.length} (${c.lastName||''} ${c.firstName||''})`;
+    try{
+      const r=await BBIEbarimt.lookup({reg:c.key});
+      const tin=normTTD(r && r.tin);
+      if(TTD_FULL_RE.test(tin)){
+        TTD_DB[c.key]=tin; saveTTD(); found++; failStreak=0;
+      }else if(r && r.error){
+        failed++; failStreak++;
+      }else{
+        notFound++; failStreak=0;
+        if(tin) console.warn('ebarimt ТТД формат 12 оронгүй:', c.key, tin);
+      }
+      if(!(r && r.error)) ttdTried.add(c.key);
+    }catch(e){
+      console.warn('ТТД лавлагаа', c.key, e); failed++; failStreak++;
+    }
+    if(failStreak>=3){ stopped=true; break; }   // ebarimt хүрэхгүй байна — дэмий дуудахгүй
+    if(i<cands.length-1) await sleep(300);
+  }
+  ttdLookupBusy=false;
+  if(btn){ btn.disabled=false; btn.style.opacity=''; }
+  let msg=`ebarimt: ${found} ажилтны ТТД татагдлаа ✓`;
+  if(notFound) msg+=`, ${notFound} олдсонгүй`;
+  if(failed) msg+=`, ${failed} шалгаж чадсангүй`;
+  if(stopped) msg+=' — ebarimt.mn-тэй холбогдохгүй байна, дараа «Регистрээр ТТД татах»-ыг дахин дарна уу';
+  toast(msg);
+  if(!$('ttdOverlay').classList.contains('hidden')) renderTTDTable();
+  refreshTTD();
+}
+$('ttdLookupBtn').onclick=()=>lookupMissingTTD(true);
 
 // ---- Файлаас ТТД унших ----
 // Хоёр аргаар танина (мөр бүрд):
