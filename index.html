@@ -762,7 +762,8 @@ body.mega-open .nl-bar{z-index:15}
 (function(){
   const pt=document.getElementById('pt'); if(!pt) return;
   const hide=()=>{ pt.classList.remove('go'); pt.classList.add('done'); };
-  if(document.readyState!=='loading') requestAnimationFrame(hide); else document.addEventListener('DOMContentLoaded',()=>requestAnimationFrame(hide));
+  const go=()=>{ requestAnimationFrame(hide); setTimeout(hide,120); };
+  if(document.readyState!=='loading') go(); else document.addEventListener('DOMContentLoaded',go);
   addEventListener('pageshow',e=>{ if(e.persisted) hide(); });
   document.addEventListener('click',e=>{
     const a=e.target.closest&&e.target.closest('a[href]'); if(!a) return;
