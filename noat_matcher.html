@@ -107,8 +107,15 @@
   .tol input{width:70px}
 
   /* summary cards */
-  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:18px 0}
+  @media(max-width:1000px){.kpis{grid-template-columns:repeat(3,1fr)}}
   @media(max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi.grp .n{color:#7a4fb3} .kpi.dup .n{color:#b8862f}
+  tr.grp-head td{background:#f6f1fb;font-weight:600}
+  tr.grp-head td .gn{font-family:var(--mono);color:#7a4fb3}
+  tr.grp-row td:first-child{padding-left:22px;color:var(--muted)}
+  .badge.sum{background:#f1e8fb;color:#7a4fb3}
+  tr.dup-first td{border-top:2px solid var(--line)}
   .kpi{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:13px 15px}
   .kpi .n{font-size:24px;font-weight:700;font-family:var(--mono);letter-spacing:-.5px}
   .kpi .l{font-size:11px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.4px}
@@ -217,10 +224,13 @@
   <div class="runbar">
     <div class="keys" id="keychips">
       <span class="keylabel">Тулгах түлхүүр:</span>
+      <span class="keychip on" data-k="ddtd" title="Баримтын ДДТД яг таарах — хамгийн найдвартай">ДДТД</span>
+      <span class="keychip on" data-k="pad" title="Падааны дугаар + ТТД яг таарах">Падаан №</span>
       <span class="keychip on" data-k="ttd_amt">ТТД + дүн</span>
       <span class="keychip on" data-k="ttd_noat">ТТД + НӨАТ</span>
       <span class="keychip on" data-k="date_amt">Огноо + дүн</span>
       <span class="keychip" data-k="amt_only">Зөвхөн дүн</span>
+      <span class="keychip on" data-k="sum" title="Нэг талын 2–5 мөрийн нийлбэр нөгөө талын нэг мөртэй тэнцэх (ижил харилцагч)">Нийлбэр (олон ↔ нэг)</span>
     </div>
     <button class="btn" id="runBtn" disabled>Тулгах ▸</button>
     <div class="tol">±<input type="number" id="tol" value="1" step="0.01" min="0"> ₮ зөрүү зөвшөөрнө</div>
@@ -244,6 +254,7 @@
     <summary>Хэрхэн ажилладаг вэ?</summary>
     <p>1. <b>Загвар Excel татах</b> товчоор BusinessBI загварыг татаж аваад дотоод бүртгэлээ оруулна: <code>Огноо · Харилцагч · ТТД · Дүн · НӨАТ</code>. Дүүргээд буцааж ачаалахад багана нь баталгаатай тул шууд уншина.</p>
     <p>2. <b>eBarimt падаан</b>-аа (eBarimt-аас татсанаар) тусад нь ачаална. Тулгалт нь <b>каскад</b> логикоор: эхлээд ТТД+дүн, дараа нь огноо+дүн, харилцагч+дүн-ээр тааруулна.</p>
+    <p>Тулгалтын дараалал: <b>ДДТД</b> → <b>Падаан №</b> → ТТД+дүн → ТТД+НӨАТ → огноо+дүн. Нэр дэвшигч олон бол дүнгийн зөрүү, огнооны зай хамгийн бага мөрийг сонгоно. Үлдсэн мөрүүдээс <b>нийлбэрээр</b> — ижил харилцагчийн 2–5 падааны нийлбэр нөгөө талын нэг мөртэй (± зөрүүтэй) тэнцэх тохиолдлыг олно (жишээ нь нэг нэхэмжлэлийг 3 падаанаар хуваасан).</p>
     <p>3. Үр дүн: <b>Тулгасан</b> (зөрүүтэй дүнг улаанаар), <b>Зөвхөн eBarimt-д</b> (бүртгэлд алга = бүртгэх ёстой), <b>Зөвхөн бүртгэлд</b> (eBarimt-д алга = баримт дутуу).</p>
   </details>
 </div>
@@ -359,18 +370,25 @@ const TEMPLATE_COLS=[
   {field:"total", header:"Дүн",        hint:"Нийт дүн (НӨАТ-тай)"},
   {field:"noat",  header:"НӨАТ",       hint:"Татварын дүн"},
 ];
+// Заавал биш нэмэлт баганууд (6, 7-р багана) — байвал ДДТД / падаанаар яг тулгана
+const TEMPLATE_OPT=[
+  {field:"ddtd", header:"ДДТД",       hint:"Баримтын ДДТД (заавал биш)"},
+  {field:"pad",  header:"Падаан №",   hint:"Падааны дугаар (заавал биш)"},
+];
 // Template-ийн тогтсон map: багана бүр өөрийн индекс дээр
 function templateMap(){
   const map={ddtd:null,pad:null,date:null,cname:null,ttd:null,noat:null,net:null,total:null};
   TEMPLATE_COLS.forEach((c,i)=>{ map[c.field]=i; });
+  const hs=(state.B&&state.B.headers)||[];
+  TEMPLATE_OPT.forEach(c=>{ const i=hs.findIndex(h=>norm(h).toLowerCase()===c.header.toLowerCase()); if(i>=0) map[c.field]=i; });
   return map;
 }
 // Template Excel татаж өгөх
 function downloadTemplate(){
-  const header=TEMPLATE_COLS.map(c=>c.header);
-  const example=["2025-01-31","Жишээ ХХК","1234567","1320000","120000"];
-  const ws=XLSX.utils.aoa_to_sheet([header, example, ["","","","",""]]);
-  ws["!cols"]=[{wch:14},{wch:28},{wch:14},{wch:16},{wch:14}];
+  const header=[...TEMPLATE_COLS,...TEMPLATE_OPT].map(c=>c.header);
+  const example=["2025-01-31","Жишээ ХХК","1234567","1320000","120000","",""];
+  const ws=XLSX.utils.aoa_to_sheet([header, example, ["","","","","","",""]]);
+  ws["!cols"]=[{wch:14},{wch:28},{wch:14},{wch:16},{wch:14},{wch:24},{wch:14}];
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,"Бүртгэл");
   XLSX.writeFile(wb,"BusinessBI_NOAT_zagvar.xlsx");
@@ -562,71 +580,152 @@ function buildRecords(obj){
 }
 
 function getActiveKeys(){
-  return $$(".keychip.on").map(c=>c.dataset.k);
+  return $$(".keychip.on").map(c=>c.dataset.k).filter(k=>k!=="sum");
 }
 
 function run(){
   const keys=getActiveKeys();
-  if(!keys.length){toast("Дор хаяж нэг тулгах түлхүүр сонгоно уу",true);return;}
+  const useSum=!!document.querySelector('.keychip.on[data-k="sum"]');
+  if(!keys.length && !useSum){toast("Дор хаяж нэг тулгах түлхүүр сонгоно уу",true);return;}
   const tol=parseNum($("#tol").value)||0;
   const A=buildRecords(state.A); // ebarimt
   const B=buildRecords(state.B); // internal
+  A.forEach(a=>a._side="A"); B.forEach(b=>b._side="B");
 
-  const usedB=new Set();
+  const usedA=new Set(), usedB=new Set();
   const matched=[]; // {a,b,via,delta}
-  const onlyA=[];
-
-  // build indexes over B for each key type
+  // B-ийн индекс түлхүүр бүрээр
   const idx={ddtd:new Map(),pad:new Map(),ttd_amt:new Map(),ttd_noat:new Map(),date_amt:new Map(),amt_only:new Map()};
   function add(map,k,i){ if(!k)return; if(!map.has(k))map.set(k,[]); map.get(k).push(i); }
   B.forEach((b,i)=>{
     if(b.ddtd && b.ddtd.length>=10) add(idx.ddtd, b.ddtd, i);
-    if(b.pad) add(idx.pad, b.pad, i);
+    if(b.pad) add(idx.pad, padKey(b), i);
     if(b.ttd && b.total!=null) add(idx.ttd_amt, b.ttd+"|"+roundKey(b.total), i);
     if(b.ttd && b.noat!=null && b.noat>0) add(idx.ttd_noat, b.ttd+"|"+roundKey(b.noat), i);
     if(b.date && b.total!=null) add(idx.date_amt, b.date+"|"+roundKey(b.total), i);
     if(b.total!=null) add(idx.amt_only, "|"+roundKey(b.total), i);
   });
-
-  function tryKey(a,key){
-    let cand=[];
-    if(key==="ddtd" && a.ddtd && a.ddtd.length>=10) cand=idx.ddtd.get(a.ddtd)||[];
-    else if(key==="pad" && a.pad) cand=idx.pad.get(a.pad)||[];
-    else if(key==="ttd_amt" && a.ttd && a.total!=null){
-      cand=findAmt(idx.ttd_amt, a.ttd, a.total, tol);
-    }
-    else if(key==="ttd_noat" && a.ttd && a.noat!=null && a.noat>0){
-      cand=findAmt(idx.ttd_noat, a.ttd, a.noat, tol);
-    }
-    else if(key==="date_amt" && a.date && a.total!=null){
-      cand=findAmt(idx.date_amt, a.date, a.total, tol);
-    }
-    else if(key==="amt_only" && a.total!=null){
-      cand=findAmt(idx.amt_only, "", a.total, tol);
-    }
-    for(const bi of cand){ if(!usedB.has(bi)) return bi; }
-    return -1;
+  function candidates(a,key){
+    if(key==="ddtd") return (a.ddtd && a.ddtd.length>=10) ? (idx.ddtd.get(a.ddtd)||[]) : [];
+    if(key==="pad") return a.pad ? (idx.pad.get(padKey(a))||[]) : [];
+    if(key==="ttd_amt") return (a.ttd && a.total!=null) ? findAmt(idx.ttd_amt, a.ttd, a.total, tol) : [];
+    if(key==="ttd_noat") return (a.ttd && a.noat!=null && a.noat>0) ? findAmt(idx.ttd_noat, a.ttd, a.noat, tol) : [];
+    if(key==="date_amt") return (a.date && a.total!=null) ? findAmt(idx.date_amt, a.date, a.total, tol) : [];
+    if(key==="amt_only") return (a.total!=null) ? findAmt(idx.amt_only, "", a.total, tol) : [];
+    return [];
   }
-
-  for(const a of A){
-    let found=-1,via=null;
-    for(const key of keys){
-      const bi=tryKey(a,key);
-      if(bi>=0){found=bi;via=key;break;}
+  // Хамгийн тохирох нэр дэвшигч: дүнгийн зөрүү ↓, огнооны зай ↓, нэр таарсан, мөрийн дараалал
+  function best(a,cand){
+    let bi=-1, bs=null;
+    for(const i of cand){
+      if(usedB.has(i)) continue;
+      const b=B[i];
+      const sc=[ (a.total!=null&&b.total!=null)?Math.abs(a.total-b.total):1e15,
+                 dayDist(a.date,b.date),
+                 sameName(a.cname,b.cname)?0:1,
+                 i ];
+      if(!bs || cmpArr(sc,bs)<0){ bs=sc; bi=i; }
     }
-    if(found>=0){
-      usedB.add(found);
-      const b=B[found];
-      const delta = (a.total!=null && b.total!=null) ? (a.total-b.total) : null;
-      matched.push({a,b,via,delta});
-    } else {
-      onlyA.push(a);
+    return bi;
+  }
+  // Түлхүүр бүрээр БҮХ мөрийг давтана — хүчтэй түлхүүр (ДДТД) эхэлж бүгдийг нь авна
+  for(const key of keys){
+    for(const a of A){
+      if(usedA.has(a._i)) continue;
+      const bi=best(a, candidates(a,key));
+      if(bi<0) continue;
+      usedA.add(a._i); usedB.add(bi);
+      const b=B[bi];
+      matched.push({a,b,via:key,delta:(a.total!=null&&b.total!=null)?(a.total-b.total):null});
     }
   }
+  // ---- Нийлбэрээр тулгах: нэг мөр ↔ нөгөө талын 2–5 мөрийн нийлбэр ----
+  const groups=[];
+  if(useSum){
+    const restA=A.filter(a=>!usedA.has(a._i) && a.total!=null);
+    const restB=B.filter((b,i)=>!usedB.has(i) && b.total!=null);
+    sumMatch(restA, restB, usedA, usedB, tol, groups, "A");  // нэг eBarimt = олон бүртгэл
+    sumMatch(restB.filter(b=>!usedB.has(b._i)), restA.filter(a=>!usedA.has(a._i)), usedB, usedA, tol, groups, "B"); // нэг бүртгэл = олон eBarimt
+  }
+  const onlyA=A.filter(a=>!usedA.has(a._i));
   const onlyB=B.filter((b,i)=>!usedB.has(i));
+  const dups=[...findDups(A,"eBarimt"), ...findDups(B,"Бүртгэл")];
 
-  state.result={matched,onlyA,onlyB,keys,tol};
+  state.result={matched,groups,onlyA,onlyB,dups,keys,tol};
   renderResults();
+}
+
+function padKey(o){ return (o.ttd||"")+"#"+String(o.pad).replace(/^0+/,""); }
+function cmpArr(x,y){ for(let i=0;i<x.length;i++){ if(x[i]!==y[i]) return x[i]<y[i]?-1:1; } return 0; }
+function dayNum(d){ return d?Date.parse(d+"T00:00:00Z")/864e5:null; }
+function dayDist(x,y){ const a=dayNum(x),b=dayNum(y); return (a==null||b==null)?9999:Math.abs(a-b); }
+function sameName(x,y){ const a=norm(x).toLowerCase().replace(/[^a-zа-яёөү0-9]/gi,""), b=norm(y).toLowerCase().replace(/[^a-zа-яёөү0-9]/gi,""); return !!a && a===b; }
+function partyKey(o){
+  if(o.ttd) return "t:"+o.ttd;
+  const n=norm(o.cname).toLowerCase().replace(/\b(ххк|хк|ххн|тбб|llc|ltd)\b/g,"").replace(/[^a-zа-яёөү0-9]/gi,"");
+  return n?"n:"+n:"";
+}
+/* Subset-sum: "one" талын мөр бүрт "many" талаас ижил харилцагчийн 2–5 мөрийг олно.
+   - ±62 хоногийн дотор, огноогоор хамгийн ойр 24 мөрөөс хайна (тооцоолол хурдан, худал таарал бага)
+   - Хайлтын хязгаар: 60,000 алхам / мөр
+   - Хэд хэдэн хослол таарвал: цөөн мөртэй → дүнгийн зөрүү бага → огнооны хүрээ бага */
+function sumMatch(oneList, manyList, usedOne, usedMany, tol, groups, oneSide){
+  const MAXK=5, MAXC=24, MAXSTEPS=60000;
+  const byParty=new Map();
+  for(const m of manyList){ const k=partyKey(m); if(!k) continue; if(!byParty.has(k)) byParty.set(k,[]); byParty.get(k).push(m); }
+  const ones=[...oneList].sort((x,y)=>Math.abs(y.total)-Math.abs(x.total));
+  for(const o of ones){
+    if(usedOne.has(o._i)) continue;
+    const pool0=byParty.get(partyKey(o)); if(!pool0) continue;
+    let pool=pool0.filter(m=>!usedMany.has(m._i) && m.total!=null && Math.sign(m.total)===Math.sign(o.total) && Math.abs(m.total)<=Math.abs(o.total)+tol && (dayDist(o.date,m.date)<=62 || !o.date || !m.date));
+    if(pool.length<2) continue;
+    pool.sort((x,y)=>dayDist(o.date,x.date)-dayDist(o.date,y.date));
+    pool=pool.slice(0,MAXC).sort((x,y)=>Math.abs(y.total)-Math.abs(x.total));
+    const target=Math.abs(o.total), vals=pool.map(m=>Math.abs(m.total));
+    // suffix sum — үлдсэн бүгдийг нэмсэн ч хүрэхгүй бол таслана
+    const suf=new Array(vals.length+1).fill(0); for(let i=vals.length-1;i>=0;i--) suf[i]=suf[i+1]+vals[i];
+    let bestSet=null, bestScore=null, steps=0;
+    const pick=[];
+    (function dfs(start,sum){
+      if(++steps>MAXSTEPS) return;
+      if(pick.length>=2 && Math.abs(sum-target)<=tol){
+        const ds=pick.map(i=>dayNum(pool[i].date)).filter(x=>x!=null);
+        const span=ds.length?Math.max(...ds)-Math.min(...ds):9999;
+        const sc=[pick.length, Math.abs(sum-target), span];
+        if(!bestScore || cmpArr(sc,bestScore)<0){ bestScore=sc; bestSet=pick.slice(); }
+      }
+      if(pick.length>=MAXK) return;
+      if(bestScore && pick.length+1>bestScore[0]) return;   // илүү олон мөртэйг хайхгүй
+      for(let i=start;i<vals.length;i++){
+        if(sum+vals[i]>target+tol) continue;
+        if(sum+suf[i]<target-tol) return;
+        pick.push(i); dfs(i+1,sum+vals[i]); pick.pop();
+        if(steps>MAXSTEPS) return;
+      }
+    })(0,0);
+    if(!bestSet) continue;
+    const many=bestSet.map(i=>pool[i]).sort((x,y)=>String(x.date||'').localeCompare(String(y.date||'')));
+    usedOne.add(o._i); many.forEach(m=>usedMany.add(m._i));
+    const manySum=many.reduce((t,m)=>t+m.total,0);
+    groups.push({one:o, many, oneSide, delta: oneSide==="A" ? o.total-manySum : manySum-o.total});
+  }
+}
+/* Давхардал: ДДТД → ТТД+падаан → ТТД+огноо+дүн-ээр ижил мөр нэг файлд 2+ удаа */
+function findDups(recs, label){
+  const m=new Map();
+  for(const r of recs){
+    let k="";
+    if(r.ddtd && r.ddtd.length>=10) k="d:"+r.ddtd;
+    else if(r.pad) k="p:"+padKey(r);
+    else if(r.ttd && r.date && r.total!=null) k="x:"+r.ttd+"|"+r.date+"|"+roundKey(r.total);
+    if(!k) continue;
+    if(!m.has(k)) m.set(k,[]); m.get(k).push(r);
+  }
+  const out=[]; let g=0;
+  for(const [k,arr] of m){ if(arr.length<2) continue; g++;
+    const why=k[0]==="d"?"ДДТД ижил":k[0]==="p"?"Падаан № ижил":"ТТД, огноо, дүн ижил";
+    arr.forEach((r,j)=>out.push({grp:g, side:label, why, n:arr.length, r})); }
+  return out;
 }
 
 function roundKey(n){ return Math.round(n*100)/100; }
@@ -649,7 +748,7 @@ function findAmt(map, prefix, amt, tol){
 }
 
 /* ---------- results UI ---------- */
-const KEY_LABEL={ddtd:"ДДТД",pad:"Падаан №",ttd_amt:"ТТД+дүн",ttd_noat:"ТТД+НӨАТ",date_amt:"Огноо+дүн",amt_only:"Зөвхөн дүн"};
+const KEY_LABEL={ddtd:"ДДТД",pad:"Падаан №",ttd_amt:"ТТД+дүн",ttd_noat:"ТТД+НӨАТ",date_amt:"Огноо+дүн",amt_only:"Зөвхөн дүн",sum:"Нийлбэр"};
 const KEY_BADGE={ddtd:"ddtd",pad:"pad",ttd_amt:"ttd",ttd_noat:"ttd",date_amt:"amt",amt_only:"amt"};
 
 function renderResults(){
@@ -660,12 +759,16 @@ function renderResults(){
     <div class="kpi matched"><div class="n">${r.matched.length}</div><div class="l">Тулгасан</div></div>
     <div class="kpi diff"><div class="n">${diffCount}</div><div class="l">Дүнгийн зөрүүтэй</div></div>
     <div class="kpi only_a"><div class="n">${r.onlyA.length}</div><div class="l">Зөвхөн eBarimt-д</div></div>
-    <div class="kpi only_b"><div class="n">${r.onlyB.length}</div><div class="l">Зөвхөн бүртгэлд</div></div>`;
+    <div class="kpi only_b"><div class="n">${r.onlyB.length}</div><div class="l">Зөвхөн бүртгэлд</div></div>
+    <div class="kpi grp"><div class="n">${r.groups.length}</div><div class="l">Нийлбэрээр тулгасан</div></div>
+    <div class="kpi dup"><div class="n">${new Set(r.dups.map(d=>d.side+d.grp)).size}</div><div class="l">Давхардсан</div></div>`;
   const tabs=[
     {t:"Тулгасан",n:r.matched.length},
     {t:"Дүнгийн зөрүүтэй",n:diffCount},
     {t:"Зөвхөн eBarimt-д",n:r.onlyA.length},
     {t:"Зөвхөн бүртгэлд",n:r.onlyB.length},
+    {t:"Нийлбэрээр тулгасан",n:r.groups.length},
+    {t:"Давхардал",n:r.dups.length},
   ];
   $("#tabs").innerHTML=tabs.map((x,i)=>
     `<div class="tab ${i===state.activeTab?"on":""}" data-i="${i}">${x.t}<span class="cnt">${x.n}</span></div>`).join("");
@@ -713,6 +816,27 @@ function renderTable(){
         <td class="num delta ${dz}">${m.delta==null?"":fmt(m.delta)}</td>
       </tr>`;
     }
+    html+="</tbody></table>";
+  } else if(tab===4){
+    const data=r.groups.filter(g=>rowMatch(g.one)||g.many.some(rowMatch));
+    html=`<table><thead><tr><th>Бүлэг</th><th>Тал</th><th>Огноо</th><th>Харилцагч</th><th>ТТД</th><th>Падаан №</th><th class="num">Дүн</th><th class="num">Зөрүү</th></tr></thead><tbody>`;
+    if(!data.length) html+=emptyRow(8);
+    const sideName=s=>s==="A"?"eBarimt":"Бүртгэл";
+    data.forEach((g,gi)=>{
+      const o=g.one, other=g.oneSide==="A"?"B":"A";
+      const dz=Math.abs(g.delta)<=(r.tol||0)?"zero":"";
+      html+=`<tr class="grp-head"><td><span class="gn">#${gi+1}</span> <span class="badge sum">1 ↔ ${g.many.length}</span></td><td>${sideName(g.oneSide)}</td><td>${o.date||""}</td><td class="txt">${o.cname||""}</td><td>${o.ttd||""}</td><td>${o.pad||""}</td><td class="num">${fmt(o.total)}</td><td class="num delta ${dz}">${fmt(g.delta)}</td></tr>`;
+      g.many.forEach(m=>{ html+=`<tr class="grp-row"><td>↳</td><td>${sideName(other)}</td><td>${m.date||""}</td><td class="txt">${m.cname||""}</td><td>${m.ttd||""}</td><td>${m.pad||""}</td><td class="num">${fmt(m.total)}</td><td></td></tr>`; });
+    });
+    html+="</tbody></table>";
+  } else if(tab===5){
+    const data=r.dups.filter(d=>rowMatch(d.r));
+    html=`<table><thead><tr><th>Бүлэг</th><th>Файл</th><th>Шалтгаан</th><th>Огноо</th><th>Харилцагч</th><th>ТТД</th><th>Падаан №</th><th>ДДТД</th><th class="num">Нийт дүн</th></tr></thead><tbody>`;
+    if(!data.length) html+=emptyRow(9);
+    let prev="";
+    for(const d of data){ const o=d.r, k=d.side+d.grp;
+      html+=`<tr class="${k!==prev?"dup-first":""}"><td>#${d.grp} <span style="color:var(--muted)">×${d.n}</span></td><td>${d.side}</td><td>${d.why}</td><td>${o.date||""}</td><td class="txt">${o.cname||""}</td><td>${o.ttd||""}</td><td>${o.pad||""}</td><td>${o.ddtd||""}</td><td class="num">${fmt(o.total)}</td></tr>`;
+      prev=k; }
     html+="</tbody></table>";
   } else {
     const data=(tab===2?r.onlyA:r.onlyB).filter(rowMatch);
@@ -796,6 +920,26 @@ function exportXlsx(){
   const wsB=mk(ob,obHead);
   wsB["!cols"]=[{wch:12},{wch:26},{wch:12},{wch:14},{wch:13}];
   XLSX.utils.book_append_sheet(wb,wsB,"Зөвхөн бүртгэлд");
+
+  // ===== Нийлбэрээр тулгасан (1 ↔ олон) =====
+  const sn=s=>s==="A"?"eBarimt":"Бүртгэл";
+  const gHead=["Бүлэг","Төрөл","Тал","Огноо","Харилцагч","ТТД","Падаан №","ДДТД","Дүн","Бүлгийн зөрүү"];
+  const gRows=[];
+  r.groups.forEach((g,gi)=>{
+    const o=g.one, other=g.oneSide==="A"?"B":"A";
+    gRows.push([gi+1,"1 ↔ "+g.many.length,sn(g.oneSide),o.date||"",o.cname||"",o.ttd||"",o.pad||"",o.ddtd||"",o.total,g.delta]);
+    g.many.forEach(m=>gRows.push([gi+1,"↳",sn(other),m.date||"",m.cname||"",m.ttd||"",m.pad||"",m.ddtd||"",m.total,""]));
+  });
+  const wsG=mk(gRows,gHead);
+  wsG["!cols"]=[{wch:7},{wch:9},{wch:10},{wch:12},{wch:26},{wch:12},{wch:13},{wch:22},{wch:14},{wch:13}];
+  XLSX.utils.book_append_sheet(wb,wsG,"Нийлбэрээр тулгасан");
+
+  // ===== Давхардал =====
+  const dHead=["Бүлэг","Давталт","Файл","Шалтгаан","Огноо","Харилцагч","ТТД","Падаан №","ДДТД","Нийт дүн","НӨАТ"];
+  const dRows=r.dups.map(d=>[d.grp,d.n,d.side,d.why,d.r.date||"",d.r.cname||"",d.r.ttd||"",d.r.pad||"",d.r.ddtd||"",d.r.total,d.r.noat]);
+  const wsX=mk(dRows,dHead);
+  wsX["!cols"]=[{wch:7},{wch:8},{wch:10},{wch:20},{wch:12},{wch:26},{wch:12},{wch:13},{wch:22},{wch:14},{wch:13}];
+  XLSX.utils.book_append_sheet(wb,wsX,"Давхардал");
 
   XLSX.writeFile(wb,"НӨАТ_тулгалт_"+new Date().toISOString().slice(0,10)+".xlsx");
   toast("Excel татагдлаа");
