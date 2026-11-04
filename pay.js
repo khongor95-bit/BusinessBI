@@ -20,7 +20,7 @@
    ============================================================ */
 (function () {
   "use strict";
-  const PRICES = { ndsh_hhoat: { amount: 5000, label: "1 тайлан татах", validHours: 24 }, receipt: { amount: 5000, label: "24 цагийн эрх — баримтын зураг уншуулах", validHours: 24 } };
+  const PRICES = { ndsh_hhoat: { amount: 5000, label: "1 тайлан татах", validHours: 24 }, receipt: { amount: 5000, label: "24 цагийн эрх — баримтын зураг уншуулах", validHours: 24 }, dashboard: { amount: 9900, label: "1 дашбоард Excel-ээр татах", validHours: 24 } };
   const POLL_MS = 3000, POLL_MAX_MS = 20 * 60 * 1000;
 
   // Сервер тал: Supabase Edge Function "payments" (supabase/functions/payments) — mp.js-ийн callFn-ээр дуудна

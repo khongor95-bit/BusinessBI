@@ -124,7 +124,7 @@ if(!document.getElementById('nlModal') && !B.dataset.noFloat) B.appendChild(frag
     {k:'auto',n:'Автомат',all:['tools.html','Бүх хэрэгсэл',9],items:[
       card('receipt_scan.html','accounting.png','Баримт уншуулагч','Үнэгүй'),
       card('businessbi_journal.html#page=reports','excel-dashboard.png','СТ-1–4 тайлан','14 хоног үнэгүй'),
-      card('noat_matcher.html','tool-noat.jpg','eBarimt тулгалт','Үнэгүй'),
+      card('dashboard_maker.html','excel-dashboard.png','Дашбоард үүсгэгч','Үнэгүй харах'),
       card('ndsh_hhoat_converter.html','tool-ndsh.jpg','ТТД автоматаар','5,000₮ / тайлан')]},
     {k:'net',n:'Сүлжээ',all:['accountants.html','Бүх нягтлан',''],items:[
       card('accountants.html','training.png','Нягтлан хайх','Үнэгүй'),

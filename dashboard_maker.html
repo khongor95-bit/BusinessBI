@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<script src="mp.js"></script>
+<script src="pay.js?v=20261104"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="shell.css?v=20261104c">
+<script src="site.js" defer></script>
+<script src="shell.js?v=20261104d" defer></script>
+<title>Дашбоард үүсгэгч — Excel, CSV-г график болгох · BusinessBI</title>
+<meta name="description" content="Excel эсвэл CSV файлаа оруулаад хэдхэн секундэд KPI, график, дүгнэлттэй дашбоард гаргана. Үнэгүй, файл тань компьютероос гарахгүй. Засварлах боломжтой Excel дашбоардаар татах боломжтой.">
+<link rel="canonical" href="https://businessbi.mn/dashboard_maker.html">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#0b0d1c">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BusinessBI.mn">
+<meta property="og:title" content="Дашбоард үүсгэгч — Excel, CSV-г график болгох">
+<meta property="og:description" content="Excel эсвэл CSV файлаа оруулаад хэдхэн секундэд KPI, график, дүгнэлттэй дашбоард гаргана.">
+<meta property="og:url" content="https://businessbi.mn/dashboard_maker.html">
+<meta property="og:image" content="https://businessbi.mn/og-image.png">
+<meta property="og:locale" content="mn_MN">
+<meta name="twitter:card" content="summary_large_image">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0}
+body{background:#fff;font-family:var(--bbi-font);color:#111827;-webkit-font-smoothing:antialiased;line-height:1.6}
+.oldt{--g:#c9a470;--navy:#0b0d1c;font-family:inherit;color:#111827}
+.oldt *{box-sizing:border-box}
+.oldt-hero{isolation:isolate;background:var(--navy);color:#fff;text-align:center;padding:96px 20px 150px;position:relative;overflow:hidden}
+.oldt-wall{position:absolute;inset:-18% -20%;display:flex;flex-direction:column;justify-content:center;gap:22px;transform:rotate(-8deg);z-index:-2}
+.oldt-wall__row{display:flex;gap:22px;width:max-content;animation:oldtWallL 90s linear infinite}
+.oldt-wall__row--2{animation-name:oldtWallR;animation-duration:110s}
+.oldt-wall__row--3{animation-duration:130s}
+.oldt-wall__row--4{animation-name:oldtWallR;animation-duration:120s}
+.oldt-wall__row img{width:320px;height:200px;object-fit:cover;object-position:left top;border-radius:14px;box-shadow:rgba(0,0,0,.45) 0 12px 30px;flex:0 0 auto;background:#1a1d33}
+@keyframes oldtWallL{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes oldtWallR{0%{transform:translateX(-50%)}100%{transform:translateX(0)}}
+@media (prefers-reduced-motion:reduce){.oldt-wall__row{animation:none}}
+.oldt-shade{position:absolute;inset:0;z-index:-1;background:radial-gradient(rgba(11,13,28,.72) 0%,rgba(11,13,28,.8) 55%,rgba(11,13,28,.92) 100%)}
+.oldt-hero h1{margin:0 auto 16px;font-size:clamp(32px,4.3vw,66px);line-height:1.05;letter-spacing:-.03em;font-weight:800;color:#fff;text-shadow:rgba(0,0,0,.5) 0 6px 30px;max-width:1000px}
+.oldt-hero h1 span{color:var(--g)}
+.oldt-hero p{margin:0 auto;max-width:700px;font-size:clamp(16px,1.6vw,20px);line-height:1.5;color:rgba(255,255,255,.85)}
+.oldt-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:22px}
+.oldt-badges span{font-size:13px;color:#e5e7eb;border:1px solid rgba(255,255,255,.18);padding:6px 12px;border-radius:999px;background:rgba(11,13,28,.55);backdrop-filter:blur(4px)}
+.oldt-wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+.oldt-upload{position:relative;z-index:2;margin-top:-80px;background:#fff;border-radius:22px;box-shadow:rgba(11,13,28,.45) 0 30px 80px -30px;padding:22px}
+.oldt-drop{display:block;border:2px dashed #d6c79f;border-radius:16px;padding:40px 20px;text-align:center;cursor:pointer;transition:background .2s,border-color .2s;background:#fdfbf6}
+.oldt-drop.is-over{background:#f8f1df;border-color:var(--g)}
+.oldt-drop svg{display:block;margin:0 auto;width:44px;height:44px;color:var(--g)}
+.oldt-drop h2{margin:10px 0 6px;font-size:20px;font-weight:700;color:#111827}
+.oldt-drop p{margin:0;color:#6b7280;font-size:14px}
+.oldt-drop input{display:none}
+.oldt-row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:16px}
+.oldt-btn{appearance:none;border:0;cursor:pointer;font:inherit;font-weight:700;font-size:15px;padding:13px 22px;border-radius:999px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:transform .15s,background .15s;line-height:1.4}
+.oldt-btn:hover{transform:translateY(-1px)}
+.oldt-btn--gold{background:var(--g);color:#171717}
+.oldt-btn--gold:hover{background:#d4b27f}
+.oldt-btn--dark{background:#111827;color:#fff}
+.oldt-btn--ghost{background:#fff;color:#111827;border:1px solid #d1d5db}
+.oldt-btn[disabled]{opacity:.6;cursor:wait}
+.oldt-status{min-height:22px;margin:12px 0 0;text-align:center;font-size:14px;color:#6b7280}
+.oldt-status.is-error{color:#b91c1c}
+.oldt-work{display:none;margin-top:28px}
+.oldt-work.is-on{display:block}
+.oldt-controls{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;align-items:end;margin-bottom:14px}
+.oldt-controls label{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.04em}
+.oldt-controls select{font:inherit;font-size:14px;text-transform:none;letter-spacing:0;color:#111827;padding:10px;border:1px solid #d1d5db;border-radius:10px;background:#fff;width:100%}
+.oldt-board{background:#f5f7fa;border:1px solid #e5e7eb;border-radius:22px;padding:22px;color:#374151}
+.oldt-board__head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+.oldt-title{margin:0;font-size:clamp(20px,2.2vw,28px);font-weight:800;letter-spacing:-.02em;color:#111827;outline:none;border-bottom:1px dashed transparent}
+.oldt-title:focus{border-bottom-color:var(--g)}
+.oldt-brand{font-size:12px;color:#6b7280;white-space:nowrap}
+.oldt-brand b{color:#9a7a3f}
+.oldt-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:12px}
+.oldt-kpi{background:#fff;border:1px solid #e5e7eb;box-shadow:rgba(16,24,40,.05) 0 1px 2px;border-radius:16px;padding:16px 18px;min-width:0}
+.oldt-kpi small{display:block;font-size:12px;color:#6b7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.oldt-kpi strong{display:block;margin-top:6px;font-size:clamp(20px,2.3vw,30px);font-weight:800;color:#111827;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+.oldt-kpi em{display:block;margin-top:4px;font-style:normal;font-size:13px;color:#6b7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.oldt-kpi em.up{color:#16a34a}
+.oldt-kpi em.down{color:#dc2626}
+.oldt-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.oldt-panel{background:#fff;border:1px solid #e5e7eb;box-shadow:rgba(16,24,40,.05) 0 1px 2px;border-radius:16px;padding:14px 14px 6px;min-width:0}
+.oldt-panel--wide{grid-column:1/-1}
+.oldt-panel h3{margin:2px 4px 6px;font-size:14px;font-weight:600;color:#111827}
+.oldt-chart{width:100%;height:300px}
+.oldt-insights{margin:0;padding:4px 6px 10px 22px;display:grid;gap:8px;font-size:14px;line-height:1.5;color:#4b5563}
+.oldt-insights b{color:#111827}
+.oldt-hidden{display:none!important}
+.oldt-cta{margin:40px 0;border-radius:22px;background:linear-gradient(135deg,#fdf8ec,#f6efdd);border:1px solid #ecdcb2;padding:clamp(24px,4vw,44px);display:grid;grid-template-columns:1.4fr 1fr;gap:24px;align-items:center}
+.oldt-cta h2{margin:0 0 10px;font-size:clamp(22px,2.6vw,32px);letter-spacing:-.02em;color:#111827}
+.oldt-cta p{margin:0;color:#4b5563;line-height:1.6}
+.oldt-cta .oldt-row{justify-content:flex-end;margin:0}
+.oldt-work.is-on~.oldt-cta{display:none}
+.oldt-how{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:48px 0}
+.oldt-how div{border:1px solid #e5e7eb;border-radius:16px;padding:20px}
+.oldt-how b{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--navy);color:var(--g);font-size:14px;margin-bottom:10px}
+.oldt-how h3{margin:0 0 6px;font-size:17px;color:#111827}
+.oldt-how p{margin:0;color:#6b7280;font-size:14px;line-height:1.55}
+.oldt-faq{max-width:820px;margin:0 auto 64px}
+.oldt-faq h2{text-align:center;font-size:clamp(22px,2.6vw,30px);margin:0 0 18px;color:#111827}
+.oldt-faq details{border-bottom:1px solid #e5e7eb;padding:16px 4px}
+.oldt-faq summary{cursor:pointer;font-weight:600;font-size:16px;color:#111827}
+.oldt-faq p{margin:10px 0 0;color:#4b5563;line-height:1.6}
+.oldt-next{margin:44px 0 72px;text-align:center}
+.oldt-next__h{margin:0 0 6px;font-size:clamp(22px,2.6vw,32px);letter-spacing:-.02em;color:#111827}
+.oldt-next__sub{margin:0 0 24px;color:#6b7280}
+.oldt-next__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;text-align:left;align-items:stretch}
+.oldt-opt{position:relative;display:flex;flex-direction:column;border:1px solid #e5e7eb;border-radius:20px;padding:26px 24px 22px;background:#fff}
+.oldt-opt--main{border:2px solid #c9a470;background:#fdf8ec;box-shadow:rgba(201,164,112,.7) 0 20px 50px -24px}
+.oldt-opt__tag{align-self:flex-start;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#6b7280;background:#f3f4f6;padding:5px 10px;border-radius:999px;margin-bottom:14px}
+.oldt-opt--main .oldt-opt__tag{background:#c9a470;color:#171717}
+.oldt-opt h3{margin:0 0 8px;font-size:19px;color:#111827}
+.oldt-opt p{margin:0 0 20px;color:#4b5563;font-size:14px;line-height:1.55;flex:1 1 0%}
+.oldt-opt .oldt-btn{width:100%;justify-content:center}
+.oldt-opt small{display:block;margin-top:10px;font-size:12px;color:#6b7280;text-align:center}
+.oldt-uses{margin:8px 0 56px}
+.oldt-uses h2{text-align:center;font-size:clamp(22px,2.6vw,32px);margin:0 0 8px;letter-spacing:-.02em;color:#111827}
+.oldt-uses__lead{text-align:center;color:#6b7280;margin:0 auto 22px;max-width:640px;line-height:1.55}
+.oldt-uses__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.oldt-uses__grid a{display:block;border:1px solid #e5e7eb;border-radius:16px;padding:18px 20px;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s}
+.oldt-uses__grid a:hover{border-color:#c9a470;transform:translateY(-2px)}
+.oldt-uses__grid h3{margin:0 0 6px;font-size:17px;color:#111827}
+.oldt-uses__grid p{margin:0;color:#6b7280;font-size:14px;line-height:1.55}
+.oldt-uses__more{text-align:center;margin:22px 0 0;color:#4b5563}
+.oldt-uses__more a,.oldt-faq a{color:#9a7a3f;font-weight:600}
+.oldt-paid{display:block;margin-top:8px;font-size:12px;color:#16a34a;text-align:center;font-weight:600}
+@media (max-width:899px){.oldt-uses__grid{grid-template-columns:1fr}}
+@media (max-width:989px){
+  .oldt-controls{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .oldt-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .oldt-grid{grid-template-columns:1fr}
+  .oldt-cta{grid-template-columns:1fr}
+  .oldt-next__grid{grid-template-columns:1fr}
+  .oldt-cta .oldt-row{justify-content:flex-start}
+  .oldt-how{grid-template-columns:1fr}
+}
+@media (max-width:600px){
+  .oldt-hero{padding:56px 16px 120px}
+  .oldt-wall__row img{width:200px;height:125px}
+  .oldt-wrap{padding:0 16px}
+  .oldt-upload{padding:14px}
+  .oldt-drop{padding:28px 14px}
+  .oldt-board{padding:14px;border-radius:16px}
+  .oldt-chart{height:260px}
+  .oldt-board__head{flex-direction:column;align-items:flex-start}
+}
+.oldt-toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:#171717;color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:9999;max-width:90vw}
+.oldt-toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body data-nav-title="Дашбоард үүсгэгч" data-auth="supabase" class="ol">
+<div class="pt" id="pt" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9"/></svg></div>
+
+<div class="oldt" id="oldt">
+  <section class="oldt-hero">
+    <div class="oldt-wall" aria-hidden="true" id="oldt-wall"></div>
+    <div class="oldt-shade"></div>
+    <h1>Excel файлаа <span>дашбоард</span> болго — хэдхэн секундэд</h1>
+    <p>Excel эсвэл CSV файлаа оруулахад KPI, график, товч дүгнэлттэй цэвэрхэн дашбоард шууд гарна. Бүртгэл шаардахгүй.</p>
+    <div class="oldt-badges"><span>Үнэгүй харах</span><span>.xlsx, .xls, .csv</span><span>Файл тань компьютероос гарахгүй</span></div>
+  </section>
+
+  <div class="oldt-wrap">
+    <div class="oldt-upload">
+      <label class="oldt-drop" id="oldt-drop">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+        <h2>Excel эсвэл CSV файлаа энд чирж оруулна уу</h2>
+        <p>эсвэл дарж сонгоно уу · эхний мөр нь баганын нэр байна</p>
+        <input type="file" id="oldt-file" accept=".xlsx,.xls,.xlsm,.csv">
+      </label>
+      <div class="oldt-row"><button class="oldt-btn oldt-btn--ghost" id="oldt-sample" type="button">Жишээ борлуулалтын датагаар туршиж үзэх</button></div>
+      <p class="oldt-status" id="oldt-status" role="status"></p>
+    </div>
+
+    <div class="oldt-work" id="oldt-work">
+      <div class="oldt-controls">
+        <label>Утга<select id="oldt-val"></select></label>
+        <label>Тооцоо<select id="oldt-agg"><option value="sum">Нийлбэр</option><option value="avg">Дундаж</option></select></label>
+        <label>Огноо<select id="oldt-date"></select></label>
+        <label>Бүлэглэх<select id="oldt-g1"></select></label>
+        <label>2-р бүлэг<select id="oldt-g2"></select></label>
+        <label class="oldt-hidden" id="oldt-sheet-wrap">Хуудас<select id="oldt-sheet"></select></label>
+      </div>
+
+      <div class="oldt-board" id="oldt-board">
+        <div class="oldt-board__head">
+          <h2 class="oldt-title" id="oldt-title" contenteditable="true" spellcheck="false">Борлуулалтын дашбоард</h2>
+          <span class="oldt-brand"><b>businessbi.mn</b> дээр үнэгүй бүтээв</span>
+        </div>
+        <div class="oldt-kpis" id="oldt-kpis"></div>
+        <div class="oldt-grid">
+          <div class="oldt-panel oldt-panel--wide" id="oldt-p-trend"><h3 id="oldt-h-trend"></h3><div class="oldt-chart" id="oldt-c-trend"></div></div>
+          <div class="oldt-panel" id="oldt-p-top"><h3 id="oldt-h-top"></h3><div class="oldt-chart" id="oldt-c-top"></div></div>
+          <div class="oldt-panel" id="oldt-p-share"><h3 id="oldt-h-share"></h3><div class="oldt-chart" id="oldt-c-share"></div></div>
+          <div class="oldt-panel" id="oldt-p-cat2"><h3 id="oldt-h-cat2"></h3><div class="oldt-chart" id="oldt-c-cat2"></div></div>
+          <div class="oldt-panel" id="oldt-p-ins"><h3>Товч дүгнэлт</h3><ul class="oldt-insights" id="oldt-ins"></ul></div>
+        </div>
+      </div>
+
+      <div class="oldt-next">
+        <h2 class="oldt-next__h">Дараа нь юу хийх вэ?</h2>
+        <p class="oldt-next__sub">Өөрт тохирох хувилбараа сонгоно уу.</p>
+        <div class="oldt-next__grid">
+          <div class="oldt-opt">
+            <span class="oldt-opt__tag">Үнэгүй</span>
+            <h3>Өөр файл туршиж үзэх</h3>
+            <p>Өөр Excel эсвэл CSV файл оруулж шинэ дашбоардыг хэдхэн секундэд гаргана.</p>
+            <button class="oldt-btn oldt-btn--ghost" id="oldt-new" type="button">Өөр файл оруулах</button>
+          </div>
+          <div class="oldt-opt oldt-opt--main">
+            <span class="oldt-opt__tag">Хамгийн их сонгогддог</span>
+            <h3>Энэ дашбоардыг Excel-ээр авах</h3>
+            <p>Яг ийм KPI, график, өнгө, дүгнэлттэй, засварлах боломжтой Excel файл. Томьёо нь таны өгөгдөлтэй холбогдсон тул тоо өөрчлөхөд дашбоард шинэчлэгдэнэ.</p>
+            <button class="oldt-btn oldt-btn--gold" id="oldt-buy" type="button">Excel-ээр татах · 9,900 ₮</button>
+            <small>Файлыг таны хөтөч дотор үүсгэнэ — өгөгдөл тань хаашаа ч илгээгдэхгүй.</small>
+            <span class="oldt-paid oldt-hidden" id="oldt-paid"></span>
+          </div>
+          <div class="oldt-opt">
+            <span class="oldt-opt__tag">Бид хийж өгнө</span>
+            <h3>Манай баг бүтээж өгье</h3>
+            <p>Таны бодит өгөгдөл дээр өөрөө шинэчлэгддэг бүрэн интерактив Excel, Google Sheets эсвэл Power BI дашбоард.</p>
+            <a class="oldt-btn oldt-btn--dark" href="contact.html?topic=dashboard">Захиалгат дашбоард →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="oldt-cta">
+      <div>
+        <h2>Илүү гүнзгий дашбоард хэрэгтэй юу?</h2>
+        <p>Олон эх сурвалжийг нэгтгэсэн, шүүлтүүр, өдөр бүр шинэчлэгддэг дашбоардыг манай баг таны бизнест тохируулан хийж өгнө.</p>
+      </div>
+      <div class="oldt-row">
+        <a class="oldt-btn oldt-btn--dark" href="contact.html?topic=dashboard">Захиалгат дашбоард авах</a>
+        <a class="oldt-btn oldt-btn--ghost" href="tools.html">Бусад хэрэгсэл</a>
+      </div>
+    </div>
+
+    <div class="oldt-how">
+      <div><b>1</b><h3>Файлаа оруул</h3><p>Excel (.xlsx, .xls) эсвэл CSV файлаа чирж оруулна. Эхний мөрөнд баганын нэрс байхад л болно.</p></div>
+      <div><b>2</b><h3>Багануудаа сонго</h3><p>Утга, огноо, бүлгийн баганыг бид автоматаар таньж сонгоно. Хүсвэл дээрх сонголтоор сольж болно.</p></div>
+      <div><b>3</b><h3>Дашбоардаа ав</h3><p>KPI, сар бүрийн чиг хандлага, шилдэг бүлгүүд, хувь хэмжээ, дүгнэлт шууд гарна. Excel-ээр нь татаж авч болно.</p></div>
+    </div>
+
+    <div class="oldt-uses">
+      <h2>Юунд ашиглах вэ</h2>
+      <p class="oldt-uses__lead">Мөр, баганатай ямар ч хүснэгтийг дашбоард болгоно. Хамгийн түгээмэл хэрэглээ:</p>
+      <div class="oldt-uses__grid">
+        <a href="#oldt"><h3>Борлуулалтын тайлан</h3><p>Сар бүрийн борлуулалт, шилдэг бүтээгдэхүүн, бүс, суваг.</p></a>
+        <a href="financial_dashboard.html"><h3>Санхүүгийн тайлан</h3><p>Орлого, зардал, ашгийг ангиллаар нь харьцуулж харах.</p></a>
+        <a href="budget.html"><h3>Төсөв ба зардал</h3><p>Хэлтэс, зардлын төрлөөр хаана хамгийн их зарцуулж байгааг олох.</p></a>
+        <a href="payroll.html"><h3>Цалин, хүний нөөц</h3><p>Хэлтэс, албан тушаалаар цалин, ажилтны тоог харах.</p></a>
+        <a href="noat_matcher.html"><h3>НӨАТ, падаан</h3><p>eBarimt-аас татсан падааныг харилцагч, сараар нь нэгтгэх.</p></a>
+        <a href="#oldt"><h3>Агуулах, нөөц</h3><p>Барааны үлдэгдэл, хөдөлгөөнийг ангилал, агуулахаар харах.</p></a>
+      </div>
+      <p class="oldt-uses__more">Бэлэн загвар хэрэгтэй юу? <a href="tools.html">Бүх хэрэгслийг үзэх →</a></p>
+    </div>
+
+    <div class="oldt-faq">
+      <h2>Түгээмэл асуулт</h2>
+      <details><summary>Үнэхээр үнэгүй юу?</summary><p>Тийм. Файлаа оруулж дашбоардаа харах, сонголтоо солих нь бүрэн үнэгүй, бүртгэл шаардахгүй. Зөвхөн засварлах боломжтой Excel файлаар татахад 9,900₮ төлнө. Төлснөөс хойш 24 цагийн дотор дахин татах үнэгүй.</p></details>
+      <details><summary>Миний өгөгдөл хаашаа илгээгдэх вэ?</summary><p>Хаашаа ч илгээгдэхгүй. Файлыг таны хөтөч дотор уншиж, дашбоард болон Excel файлыг мөн хөтөч дотор үүсгэнэ. Манай серверт зөвхөн төлбөрийн мэдээлэл очно.</p></details>
+      <details><summary>Ямар файл дэмждэг вэ?</summary><p>.xlsx, .xls, .xlsm болон .csv файл. Олон хуудастай бол хуудсаа сонгох цонх гарна. Эхний мөр нь баганын нэр, доор нь мөр бүр нэг бичлэг байхад хамгийн сайн ажиллана.</p></details>
+      <details><summary>Excel файлд юу орох вэ?</summary><p>Дашбоард хуудас (KPI, 4 график, дүгнэлт), тооцооны хуудас, таны өгөгдлийн хуудас. KPI болон хүснэгтүүд нь томьёогоор өгөгдөлтэй холбогдсон тул тоо засахад автоматаар шинэчлэгдэнэ. Графикууд нь Excel-ийн жинхэнэ график тул өнгө, хэлбэрийг нь өөрөө өөрчилж болно.</p></details>
+      <details><summary>Огнооны баганаа танихгүй байна</summary><p>Огноо нь Excel-ийн огнооны формат эсвэл 2026-01-31, 2026.01.31 гэх мэт бичигдсэн байх хэрэгтэй. «Огноо» сонголтоос баганаа гараар сонгож болно.</p></details>
+      <details><summary>Өөрийн бизнест тохирсон дашбоард хийлгэж болох уу?</summary><p>Болно. <a href="contact.html?topic=dashboard">Холбогдоорой</a> — олон эх сурвалжтай, өдөр бүр шинэчлэгддэг Excel, Google Sheets эсвэл Power BI дашбоард хийж өгнө.</p></details>
+    </div>
+  </div>
+</div>
+<div class="oldt-toast" id="oldt-toast"></div>
+
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const PALETTE=['#c9a470','#171717','#8a6d3b','#9ca3af','#e3cfa6','#4b5563','#b45309','#d6d3d1'];
+const GOLD='#c9a470';
+const SESSION_KEY='bbi_dash_session_v1', PEND='bbi_dash_pending_dl', TTL=2*3600*1000;
+const state={sheets:[],sheet:0,headers:[],rows:[],cols:[],sel:{val:-1,agg:'sum',date:-1,g1:-1,g2:-1},fileName:'',res:null};
+const charts={};
+
+// ── hero wall ─────────────────────────────────────────
+(function wall(){
+  const imgs=['excel-dashboard.png','powerbi-dashboard.png','tool-financial.jpg','tool-noat.jpg','tool-ndsh.jpg','tool-invoice.jpg','finance.jpg','budget.jpg','salary.jpg','accounting.png','training.png'];
+  const w=$('oldt-wall'); let h='';
+  for(let r=1;r<=4;r++){
+    const seq=[]; for(let i=0;i<8;i++) seq.push(imgs[(i*3+r*2)%imgs.length]);
+    const tags=seq.concat(seq).map(s=>`<img src="img/${s}" alt="" loading="lazy">`).join('');
+    h+=`<div class="oldt-wall__row oldt-wall__row--${r}">${tags}</div>`;
+  }
+  w.innerHTML=h;
+})();
+
+function toast(t){const e=$('oldt-toast');e.textContent=t;e.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(()=>e.classList.remove('on'),3200);}
+function status(t,err){const s=$('oldt-status');s.textContent=t;s.classList.toggle('is-error',!!err);}
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+// ── formatting ────────────────────────────────────────
+function fmtN(v,dec){ if(v==null||!isFinite(v)) return '—'; return v.toLocaleString('en-US',{minimumFractionDigits:dec||0,maximumFractionDigits:dec||0}); }
+function compact(v){
+  if(v==null||!isFinite(v)) return '—';
+  const a=Math.abs(v);
+  if(a>=1e9) return (v/1e9).toFixed(1).replace(/\.0$/,'')+' тэрбум';
+  if(a>=1e6) return (v/1e6).toFixed(1).replace(/\.0$/,'')+' сая';
+  if(a>=1e4) return (v/1e3).toFixed(1).replace(/\.0$/,'')+' мян';
+  if(Number.isInteger(v)) return fmtN(v);
+  return fmtN(v,2);
+}
+function axisFmt(v){const a=Math.abs(v); if(a>=1e9) return (v/1e9)+'тэрб'; if(a>=1e6) return (v/1e6)+'сая'; if(a>=1e3) return (v/1e3)+'мян'; return v;}
+const pct=(v,d)=>(v==null||!isFinite(v))?'—':(v*100).toFixed(d==null?1:d)+'%';
+
+// ── parsing ───────────────────────────────────────────
+function toNum(v){
+  if(typeof v==='number') return isFinite(v)?v:NaN;
+  if(v==null) return NaN;
+  let s=String(v).trim(); if(!s) return NaN;
+  s=s.replace(/[₮$€¥\s ]/g,'').replace(/төг(рөг)?$/i,'');
+  let neg=false; if(/^\(.*\)$/.test(s)){neg=true;s=s.slice(1,-1);}
+  if(/^-?\d{1,3}(,\d{3})+(\.\d+)?$/.test(s)) s=s.replace(/,/g,'');
+  else if(/^-?\d+,\d+$/.test(s)) s=s.replace(',','.');
+  if(s.endsWith('%')){const n=parseFloat(s); return isNaN(n)?NaN:n/100;}
+  if(!/^-?\d*\.?\d+(e-?\d+)?$/i.test(s)) return NaN;
+  const n=parseFloat(s); return neg?-n:n;
+}
+function toDate(v){
+  if(v instanceof Date && !isNaN(v)) return new Date(v.getTime()+90*60e3); // SheetJS: 23:59:xx → дараагийн өдөр
+  if(v==null||typeof v==='number') return null;
+  const s=String(v).trim(); let m;
+  if((m=s.match(/^(\d{4})[-./](\d{1,2})(?:[-./](\d{1,2}))?/))){const d=new Date(+m[1],+m[2]-1,+(m[3]||1),12); return (+m[2]>=1&&+m[2]<=12)?d:null;}
+  if((m=s.match(/^(\d{1,2})[./](\d{1,2})[./](\d{4})/))){let a=+m[1],b=+m[2]; let day,mon; if(s.includes('/')&&b<=12&&a<=12){mon=a;day=b;} else if(a>12){day=a;mon=b;} else {day=a;mon=b;} if(mon>12){const t=mon;mon=day;day=t;} return new Date(+m[3],mon-1,day,12);}
+  return null;
+}
+const monthKey=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+const monthLbl=k=>k.replace('-','.');
+
+function analyse(aoa){
+  // header row = first row with ≥2 non-empty cells
+  let hr=0; for(let i=0;i<Math.min(aoa.length,30);i++){ if((aoa[i]||[]).filter(c=>c!==''&&c!=null).length>=2){hr=i;break;} }
+  const width=Math.max(...aoa.slice(hr,hr+200).map(r=>(r||[]).length),0);
+  const headers=[]; const seen={};
+  for(let c=0;c<width;c++){ let n=String((aoa[hr]||[])[c]??'').trim()||('Багана '+(c+1)); if(seen[n]){seen[n]++; n+=' ('+seen[n]+')';} else seen[n]=1; headers.push(n); }
+  const rows=aoa.slice(hr+1).filter(r=>r&&r.some(c=>c!==''&&c!=null));
+  const sample=rows.length>3000?rows.filter((_,i)=>i%Math.ceil(rows.length/3000)===0):rows;
+  const cols=headers.map((name,idx)=>{
+    let nn=0,nd=0,ne=0; const distinct=new Set();
+    for(const r of sample){ const v=r[idx]; if(v===''||v==null){continue;} ne++; if(v instanceof Date||(typeof v==='string'&&toDate(v))) nd++; else if(!isNaN(toNum(v))) nn++; if(distinct.size<=200) distinct.add(String(v instanceof Date?v.toDateString():v).trim()); }
+    let type='text';
+    if(ne&&nd/ne>=.8) type='date'; else if(ne&&nn/ne>=.8) type='num';
+    // ID-like numeric columns (жил, код) → not a value
+    const idLike=/(^|\s)(id|код|дугаар|№|регистр|ттд|жил|year|утас|phone)(\s|$)/i.test(name);
+    return {name,idx,type,distinct:distinct.size,ne,idLike};
+  });
+  return {headers,rows,cols};
+}
+function autoPick(){
+  const C=state.cols, s=state.sel;
+  const nums=C.filter(c=>c.type==='num'&&!c.idLike);
+  const pref=nums.find(c=>/борлуулалт|орлого|дүн|revenue|sales|amount|total|нийт|үнэ/i.test(c.name));
+  s.val=(pref||nums[nums.length>1?nums.length-1:0]||{idx:-1}).idx;
+  if(pref) s.val=pref.idx; else if(nums.length){ // largest sum
+    let best=null,bs=-Infinity; for(const c of nums){ let t=0; for(const r of state.rows){const n=toNum(r[c.idx]); if(!isNaN(n)) t+=Math.abs(n);} if(t>bs){bs=t;best=c;} } s.val=best.idx; }
+  const d=C.find(c=>c.type==='date'); s.date=d?d.idx:-1;
+  const cats=C.filter(c=>c.type==='text'&&c.distinct>=2&&c.distinct<=60&&c.ne>=state.rows.length*.5).sort((a,b)=>a.distinct-b.distinct);
+  const catsAny=cats.length?cats:C.filter(c=>c.type==='text'&&c.distinct>=2);
+  // prefer human-ish order: first 2 by column order among sensible ones
+  const ordered=catsAny.slice(0,4).sort((a,b)=>a.idx-b.idx);
+  s.g1=ordered[0]?ordered[0].idx:-1; s.g2=ordered[1]?ordered[1].idx:-1;
+  s.agg='sum';
+}
+function fillSelects(){
+  const C=state.cols,s=state.sel;
+  const opt=(v,t,sel)=>`<option value="${v}"${sel?' selected':''}>${esc(t)}</option>`;
+  $('oldt-val').innerHTML=opt(-1,'Мөрийн тоо',s.val===-1)+C.filter(c=>c.type==='num').map(c=>opt(c.idx,c.name,s.val===c.idx)).join('');
+  $('oldt-agg').value=s.agg;
+  $('oldt-date').innerHTML=opt(-1,'Байхгүй',s.date===-1)+C.filter(c=>c.type==='date').map(c=>opt(c.idx,c.name,s.date===c.idx)).join('');
+  const cat=C.filter(c=>c.type!=='num'||c.idLike||c.distinct<=40);
+  $('oldt-g1').innerHTML=opt(-1,'Байхгүй',s.g1===-1)+cat.map(c=>opt(c.idx,c.name,s.g1===c.idx)).join('');
+  $('oldt-g2').innerHTML=opt(-1,'Байхгүй',s.g2===-1)+cat.map(c=>opt(c.idx,c.name,s.g2===c.idx)).join('');
+  $('oldt-agg').disabled=s.val===-1;
+  const sw=$('oldt-sheet-wrap');
+  if(state.sheets.length>1){ sw.classList.remove('oldt-hidden'); $('oldt-sheet').innerHTML=state.sheets.map((n,i)=>opt(i,n.name,i===state.sheet)).join(''); } else sw.classList.add('oldt-hidden');
+}
+
+// ── compute ───────────────────────────────────────────
+function compute(){
+  const s=state.sel, R=state.rows, isCount=s.val===-1, avg=!isCount&&s.agg==='avg';
+  const valName=isCount?'Мөрийн тоо':state.headers[s.val];
+  const gName=s.g1>=0?state.headers[s.g1]:'', g2Name=s.g2>=0?state.headers[s.g2]:'';
+  const label=v=>{ if(v instanceof Date) return v.toISOString().slice(0,10); const t=String(v??'').trim(); return t||'(хоосон)'; };
+  let sum=0,cnt=0,n=R.length,mx=-Infinity;
+  const byM=new Map(),byG=new Map(),byG2=new Map();
+  const add=(map,k,v,has)=>{let o=map.get(k); if(!o){o={s:0,c:0,n:0};map.set(k,o);} o.n++; if(has){o.s+=v;o.c++;}};
+  for(const r of R){
+    let v=1,has=true; if(!isCount){ v=toNum(r[s.val]); has=!isNaN(v); if(!has) v=0; }
+    if(has){sum+=v;cnt++; if(v>mx) mx=v;}
+    if(s.date>=0){const d=toDate(r[s.date]); if(d) add(byM,monthKey(d),v,has);}
+    if(s.g1>=0) add(byG,label(r[s.g1]),v,has);
+    if(s.g2>=0) add(byG2,label(r[s.g2]),v,has);
+  }
+  const fin=o=>avg?(o.c?o.s/o.c:0):o.s;
+  const months=[...byM.entries()].sort((a,b)=>a[0]<b[0]?-1:1).map(([k,o])=>({k,v:fin(o)}));
+  const groups=[...byG.entries()].map(([k,o])=>({k,v:fin(o)})).sort((a,b)=>b.v-a.v);
+  const groups2=[...byG2.entries()].map(([k,o])=>({k,v:fin(o)})).sort((a,b)=>b.v-a.v);
+  const total=avg?(cnt?sum/cnt:0):sum;
+  const gTot=groups.reduce((a,b)=>a+b.v,0);
+  return {isCount,avg,valName,gName,g2Name,total,sum,cnt,n,perRow:cnt?sum/cnt:0,months,groups,groups2,gTot,max:mx};
+}
+
+function aggWord(res){ return res.isCount?'Мөрийн тоо':(res.avg?'Дундаж '+res.valName.toLowerCase():'Нийт '+res.valName.toLowerCase()); }
+function kpis(res){
+  const K=[];
+  K.push({l:aggWord(res),v:compact(res.total),t:fmtN(res.total,res.avg?2:0),e:fmtN(res.n)+' мөр шинжилсэн',c:''});
+  const M=res.months;
+  if(M.length>=1){
+    const last=M[M.length-1], prev=M[M.length-2];
+    let e='',c='';
+    if(prev&&prev.v){const ch=last.v/prev.v-1; c=ch>=0?'up':'down'; e=(ch>=0?'▲ ':'▼ ')+pct(Math.abs(ch))+' ('+monthLbl(prev.k)+'-тэй харьц.)';}
+    K.push({l:'Сүүлийн сар ('+monthLbl(last.k)+')',v:compact(last.v),t:fmtN(last.v,res.avg?2:0),e:e||'өмнөх сар алга',c});
+  } else K.push({l:'Хамгийн их утга',v:compact(res.max),t:fmtN(res.max,2),e:'нэг мөрөнд',c:''});
+  if(res.groups.length){const g=res.groups[0]; K.push({l:'Тэргүүлэх '+res.gName.toLowerCase(),v:g.k,t:g.k,e:res.avg?compact(g.v)+' дундаж':'нийтийн '+pct(res.gTot?g.v/res.gTot:0),c:''});}
+  else K.push({l:'Мөрийн тоо',v:fmtN(res.n),t:fmtN(res.n),e:'нийт бичлэг',c:''});
+  K.push({l:'Мөр тутмын дундаж',v:fmtN(res.perRow,2),t:fmtN(res.perRow,2),e:fmtN(res.cnt)+' мөрөөр',c:''});
+  return K;
+}
+function insights(res){
+  const I=[], G=res.groups, M=res.months, w=res.gName.toLowerCase();
+  if(G.length){
+    if(res.avg) I.push(`<b>${esc(G[0].k)}</b> — хамгийн өндөр дундажтай ${esc(w)} (${compact(G[0].v)}).`);
+    else I.push(`<b>${esc(G[0].k)}</b> нь тэргүүлэх ${esc(w)} — нийтийн <b>${pct(res.gTot?G[0].v/res.gTot:0)}</b>.`);
+  }
+  if(M.length){ const b=M.reduce((a,c)=>c.v>a.v?c:a,M[0]); I.push(`Шилдэг сар: <b>${monthLbl(b.k)}</b> — <b>${compact(b.v)}</b>.`); }
+  if(M.length>=4){
+    const h=Math.floor(M.length/2), f=M.slice(0,h).reduce((a,c)=>a+c.v,0), s=M.slice(M.length-h).reduce((a,c)=>a+c.v,0);
+    if(f){const ch=s/f-1; I.push(`Хугацааны сүүлийн хагас эхний хагасаас <b>${pct(Math.abs(ch))}</b> ${ch>=0?'өссөн':'буурсан'}.`);}
+  }
+  if(G.length>3&&!res.avg){ const t3=G.slice(0,3).reduce((a,c)=>a+c.v,0); I.push(`Эхний 3 ${esc(w)} нийтийн <b>${pct(res.gTot?t3/res.gTot:0)}</b>-ийг бүрдүүлж байна (нийт ${G.length}-аас).`); }
+  if(G.length>1){ const l=G[G.length-1]; I.push(`Хамгийн бага ${esc(w)}: <b>${esc(l.k)}</b> (${compact(l.v)}).`); }
+  if(!I.length) I.push('Бүлэглэх эсвэл огнооны багана сонговол дэлгэрэнгүй дүгнэлт гарна.');
+  return I;
+}
+
+// ── render ────────────────────────────────────────────
+const AX={color:'#6b7280',fontSize:12};
+function chart(id){ const el=$(id); if(!charts[id]) charts[id]=echarts.init(el,null,{renderer:'canvas'}); return charts[id]; }
+function render(){
+  const res=state.res=compute();
+  $('oldt-kpis').innerHTML=kpis(res).map(k=>`<div class="oldt-kpi"><small>${esc(k.l)}</small><strong title="${esc(k.t)}">${esc(k.v)}</strong><em class="${k.c}">${esc(k.e)}</em></div>`).join('');
+  $('oldt-ins').innerHTML=insights(res).map(t=>`<li>${t}</li>`).join('');
+  const vn=res.isCount?'Мөрийн тоо':(res.avg?'Дундаж '+res.valName.toLowerCase():res.valName);
+  const tip={trigger:'axis',valueFormatter:v=>fmtN(v,res.avg?2:0)};
+  // trend
+  const pT=$('oldt-p-trend');
+  if(res.months.length){
+    pT.classList.remove('oldt-hidden'); $('oldt-h-trend').textContent=vn+' — сараар';
+    chart('oldt-c-trend').setOption({color:[GOLD],grid:{left:8,right:28,top:16,bottom:8,containLabel:true},tooltip:tip,
+      xAxis:{type:'category',data:res.months.map(m=>monthLbl(m.k)),axisLabel:AX,axisLine:{lineStyle:{color:'#e5e7eb'}},axisTick:{show:false}},
+      yAxis:{type:'value',axisLabel:{...AX,formatter:axisFmt},splitLine:{lineStyle:{color:'#eef0f3'}}},
+      series:[{type:'line',data:res.months.map(m=>+m.v.toFixed(2)),symbol:'emptyCircle',symbolSize:6,lineStyle:{width:3},
+        areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(201,164,112,.28)'},{offset:1,color:'rgba(201,164,112,0)'}])}}]},true);
+  } else pT.classList.add('oldt-hidden');
+  // top5
+  const pTop=$('oldt-p-top'), pSh=$('oldt-p-share');
+  if(res.groups.length){
+    pTop.classList.remove('oldt-hidden'); pSh.classList.remove('oldt-hidden');
+    const top=res.groups.slice(0,5).reverse();
+    $('oldt-h-top').textContent='Шилдэг 5 '+res.gName.toLowerCase()+' — '+vn.toLowerCase();
+    chart('oldt-c-top').setOption({grid:{left:8,right:40,top:8,bottom:8,containLabel:true},tooltip:{...tip,axisPointer:{type:'shadow'}},
+      xAxis:{type:'value',axisLabel:{...AX,formatter:axisFmt},splitLine:{lineStyle:{color:'#eef0f3'}}},
+      yAxis:{type:'category',data:top.map(g=>g.k),axisLabel:{color:'#374151',fontSize:12,width:110,overflow:'truncate'},axisLine:{show:false},axisTick:{show:false}},
+      series:[{type:'bar',data:top.map(g=>+g.v.toFixed(2)),barMaxWidth:22,itemStyle:{color:GOLD,borderRadius:[0,6,6,0]},label:{show:true,position:'right',color:'#374151',formatter:p=>compact(p.value)}}]},true);
+    $('oldt-h-share').textContent=res.gName+'-ийн эзлэх хувь';
+    const sh=shareData(res.groups);
+    chart('oldt-c-share').setOption({color:PALETTE,tooltip:{trigger:'item',valueFormatter:v=>fmtN(v,res.avg?2:0)},
+      legend:{bottom:0,type:'scroll',textStyle:{color:'#374151'},itemWidth:10,itemHeight:10,icon:'circle'},
+      series:[{type:'pie',radius:['48%','74%'],center:['50%','45%'],data:sh.map(g=>({name:g.k,value:+g.v.toFixed(2)})),
+        itemStyle:{borderColor:'#fff',borderWidth:3,borderRadius:6},label:{color:'#374151',formatter:'{d}%'}}]},true);
+  } else { pTop.classList.add('oldt-hidden'); pSh.classList.add('oldt-hidden'); }
+  // cat2
+  const pC2=$('oldt-p-cat2');
+  if(res.groups2.length){
+    pC2.classList.remove('oldt-hidden'); const g2=res.groups2.slice(0,10);
+    $('oldt-h-cat2').textContent=vn+' — '+res.g2Name.toLowerCase()+'-аар';
+    chart('oldt-c-cat2').setOption({grid:{left:8,right:8,top:24,bottom:8,containLabel:true},tooltip:{...tip,axisPointer:{type:'shadow'}},
+      xAxis:{type:'category',data:g2.map(g=>g.k),axisLabel:{color:'#374151',fontSize:12,interval:0,width:90,overflow:'truncate'},axisLine:{lineStyle:{color:'#e5e7eb'}},axisTick:{show:false}},
+      yAxis:{type:'value',axisLabel:{...AX,formatter:axisFmt},splitLine:{lineStyle:{color:'#eef0f3'}}},
+      series:[{type:'bar',data:g2.map(g=>+g.v.toFixed(2)),barMaxWidth:34,itemStyle:{color:'#171717',borderRadius:[6,6,0,0]},label:{show:true,position:'top',color:'#374151',formatter:p=>compact(p.value)}}]},true);
+  } else pC2.classList.add('oldt-hidden');
+  // insights panel spans full row when it would be alone
+  const vis=['oldt-p-top','oldt-p-share','oldt-p-cat2'].filter(id=>!$(id).classList.contains('oldt-hidden')).length;
+  $('oldt-p-ins').classList.toggle('oldt-panel--wide',vis%2===0);
+  Object.values(charts).forEach(c=>c.resize());
+  saveSession();
+}
+function shareData(groups){ if(groups.length<=7) return groups; const top=groups.slice(0,6); const rest=groups.slice(6).reduce((a,c)=>a+c.v,0); return top.concat([{k:'Бусад',v:rest}]); }
+addEventListener('resize',()=>Object.values(charts).forEach(c=>c.resize()));
+
+// ── load ──────────────────────────────────────────────
+function useSheet(i){
+  state.sheet=i; const a=analyse(state.sheets[i].aoa);
+  state.headers=a.headers; state.rows=a.rows; state.cols=a.cols;
+  if(!state.rows.length){ status('Энэ хуудсанд өгөгдөл алга. Өөр хуудас сонгоно уу.',true); return false; }
+  autoPick(); fillSelects(); return true;
+}
+function showWork(scroll){
+  $('oldt-work').classList.add('is-on');
+  render();
+  if(scroll) setTimeout(()=>{ const y=$('oldt-work').getBoundingClientRect().top+scrollY-110; scrollTo({top:y,behavior:'smooth'}); },60);
+}
+function loadWorkbook(wb,name){
+  state.fileName=name;
+  state.sheets=wb.SheetNames.map(n=>({name:n,aoa:XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:true,defval:''})})).filter(s=>s.aoa.length);
+  if(!state.sheets.length){ status('Файлд өгөгдөл олдсонгүй.',true); return; }
+  // most rows sheet first
+  let bi=0; state.sheets.forEach((s,i)=>{ if(s.aoa.length>state.sheets[bi].aoa.length) bi=i; });
+  if(!useSheet(bi)) return;
+  const t=name.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').trim();
+  $('oldt-title').textContent=t?(t.charAt(0).toUpperCase()+t.slice(1)+' — дашбоард'):'Миний дашбоард';
+  status(`Бэлэн: ${fmtN(state.rows.length)} мөр, ${state.headers.length} багана олдлоо. Доорх сонголтоор баганаа сольж болно.`);
+  showWork(true);
+}
+function readFile(f){
+  if(!f) return;
+  if(f.size>40*1024*1024){ status('Файл хэт том байна (40MB хүртэл).',true); return; }
+  status('Файлыг уншиж байна…');
+  const rd=new FileReader();
+  rd.onload=e=>{ try{ const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true}); loadWorkbook(wb,f.name); }catch(err){ console.error(err); status('Файлыг уншиж чадсангүй. .xlsx, .xls эсвэл .csv файл эсэхийг шалгана уу.',true); } };
+  rd.readAsArrayBuffer(f);
+}
+const drop=$('oldt-drop');
+$('oldt-file').addEventListener('change',e=>{ readFile(e.target.files[0]); e.target.value=''; });
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('is-over');}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('is-over');}));
+drop.addEventListener('drop',e=>readFile(e.dataTransfer.files[0]));
+$('oldt-new').onclick=()=>{ scrollTo({top:$('oldt-drop').getBoundingClientRect().top+scrollY-140,behavior:'smooth'}); setTimeout(()=>$('oldt-file').click(),350); };
+
+// sample data — seeded
+function sample(){
+  let seed=20261104; const rnd=()=>(seed=(seed*1664525+1013904223)%4294967296)/4294967296;
+  const reg=[['Улаанбаатар',1.6],['Дархан',1.05],['Эрдэнэт',1.0],['Чойбалсан',.8],['Ховд',.7]];
+  const prod=[['Ундаа',900],['Жүүс',1400],['Сүү',1900],['Талх',1200],['Кофе',5200],['Цай',2600]];
+  const ch=[['Дэлгүүр',.55],['Онлайн',.27],['Бөөний',.18]];
+  const pick=a=>{let t=a.reduce((s,x)=>s+x[1],0)*rnd(); for(const x of a){t-=x[1]; if(t<=0) return x;} return a[a.length-1];};
+  const aoa=[];
+  const start=new Date(2025,0,1,12), days=638;
+  for(let i=0;i<1914;i++){
+    const d=new Date(start.getTime()+Math.floor(rnd()*days)*864e5);
+    const r=pick(reg), p=prod[Math.floor(rnd()*prod.length)], c=pick(ch);
+    const season=1+.25*Math.sin((d.getMonth()+d.getFullYear()*12)/1.9)+(d.getFullYear()-2025)*.12;
+    const q=Math.max(1,Math.round((rnd()*1.6+.4)*r[1]*season*(c[0]==='Бөөний'?3:1)));
+    const rev=Math.round(q*p[1]*(.9+rnd()*.2)/10)*10;
+    aoa.push([d,r[0],p[0],c[0],q,rev,Math.round(rev*(.55+rnd()*.15)/10)*10]);
+  }
+  aoa.sort((a,b)=>a[0]-b[0]);
+  return [['Огноо','Бүс','Бүтээгдэхүүн','Суваг','Тоо ширхэг','Борлуулалт','Өртөг']].concat(aoa);
+}
+$('oldt-sample').onclick=()=>{
+  state.sheets=[{name:'Борлуулалт',aoa:sample()}]; state.fileName='Жишээ борлуулалт.xlsx';
+  useSheet(0); $('oldt-title').textContent='Борлуулалтын дашбоард';
+  status(`Бэлэн: ${fmtN(state.rows.length)} мөр, ${state.headers.length} багана олдлоо. Доорх сонголтоор баганаа сольж болно.`);
+  showWork(true);
+};
+const onSel=()=>{ const s=state.sel; s.val=+$('oldt-val').value; s.agg=$('oldt-agg').value; s.date=+$('oldt-date').value; s.g1=+$('oldt-g1').value; s.g2=+$('oldt-g2').value; $('oldt-agg').disabled=s.val===-1; render(); };
+['oldt-val','oldt-agg','oldt-date','oldt-g1','oldt-g2'].forEach(id=>$(id).addEventListener('change',onSel));
+$('oldt-sheet').addEventListener('change',e=>{ if(useSheet(+e.target.value)) render(); });
+$('oldt-title').addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault();e.target.blur();} });
+$('oldt-title').addEventListener('blur',saveSession);
+
+// ── session (login хийх үед өгөгдөл алдагдахгүй) ─────
+function ser(v){ return v instanceof Date?{$d:v.getTime()}:v; }
+function des(v){ return (v&&typeof v==='object'&&'$d' in v)?new Date(v.$d):v; }
+function saveSession(){
+  try{
+    if(!state.sheets.length) return;
+    const sh=state.sheets[state.sheet];
+    const body=JSON.stringify({t:Date.now(),name:state.fileName,title:$('oldt-title').textContent,sel:state.sel,sheet:{name:sh.name,aoa:sh.aoa.map(r=>r.map(ser))}});
+    if(body.length>4.5e6){ localStorage.removeItem(SESSION_KEY); return; }
+    localStorage.setItem(SESSION_KEY,body);
+  }catch(e){}
+}
+function restore(){
+  try{
+    const raw=localStorage.getItem(SESSION_KEY); if(!raw) return false;
+    const o=JSON.parse(raw); if(!o||Date.now()-o.t>TTL){ localStorage.removeItem(SESSION_KEY); return false; }
+    state.sheets=[{name:o.sheet.name,aoa:o.sheet.aoa.map(r=>r.map(des))}]; state.fileName=o.name;
+    useSheet(0); Object.assign(state.sel,o.sel); fillSelects(); $('oldt-title').textContent=o.title||'Миний дашбоард';
+    status(`Өмнө оруулсан файл сэргээгдлээ: ${fmtN(state.rows.length)} мөр.`);
+    showWork(false); return true;
+  }catch(e){ return false; }
+}
+
+// ── Excel dashboard (ExcelJS + native charts via JSZip) ──
+function loadScript(src){ return new Promise((ok,no)=>{ const s=document.createElement('script'); s.src=src; s.onload=ok; s.onerror=()=>no(new Error('load '+src)); document.head.appendChild(s); }); }
+async function ensureLibs(){
+  if(!window.ExcelJS) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js');
+  if(!window.JSZip) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+}
+const X=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const colL=n=>{let s='';n++;while(n>0){const m=(n-1)%26;s=String.fromCharCode(65+m)+s;n=Math.floor((n-1)/26);}return s;};
+const hex=c=>c.replace('#','').toUpperCase();
+function txPr(sz,color,bold){ return `<c:txPr><a:bodyPr/><a:lstStyle/><a:p><a:pPr><a:defRPr sz="${sz}"${bold?' b="1"':''}><a:solidFill><a:srgbClr val="${color}"/></a:solidFill><a:latin typeface="Calibri"/></a:defRPr></a:pPr><a:endParaRPr lang="mn-MN"/></a:p></c:txPr>`; }
+function cache(ref,vals,num){
+  const pts=vals.map((v,i)=>`<c:pt idx="${i}"><c:v>${X(num?(+v||0):v)}</c:v></c:pt>`).join('');
+  return num?`<c:numRef><c:f>${X(ref)}</c:f><c:numCache><c:formatCode>General</c:formatCode><c:ptCount val="${vals.length}"/>${pts}</c:numCache></c:numRef>`
+            :`<c:strRef><c:f>${X(ref)}</c:f><c:strCache><c:ptCount val="${vals.length}"/>${pts}</c:strCache></c:strRef>`;
+}
+function dLbls(pos,fmt){ return `<c:dLbls><c:numFmt formatCode="${fmt==='pct'?'0.0%':'#,##0'}" sourceLinked="0"/><c:spPr><a:noFill/><a:ln><a:noFill/></a:ln></c:spPr>${txPr(900,'374151')}${pos?`<c:dLblPos val="${pos}"/>`:''}<c:showLegendKey val="0"/><c:showVal val="${fmt==='pct'?0:1}"/><c:showCatName val="0"/><c:showSerName val="0"/><c:showPercent val="${fmt==='pct'?1:0}"/><c:showBubbleSize val="0"/>${fmt==='pct'?'<c:showLeaderLines val="1"/>':''}</c:dLbls>`; }
+function axes(catPos,valPos,reverse){
+  return `<c:catAx><c:axId val="5001"/><c:scaling><c:orientation val="${reverse?'maxMin':'minMax'}"/></c:scaling><c:delete val="0"/><c:axPos val="${catPos}"/><c:numFmt formatCode="General" sourceLinked="0"/><c:majorTickMark val="none"/><c:minorTickMark val="none"/><c:tickLblPos val="nextTo"/><c:spPr><a:ln w="9525"><a:solidFill><a:srgbClr val="E5E7EB"/></a:solidFill></a:ln></c:spPr>${txPr(900,'374151')}<c:crossAx val="5002"/><c:crosses val="autoZero"/><c:auto val="1"/><c:lblAlgn val="ctr"/><c:lblOffset val="100"/><c:noMultiLvlLbl val="0"/></c:catAx>`+
+         `<c:valAx><c:axId val="5002"/><c:scaling><c:orientation val="minMax"/></c:scaling><c:delete val="0"/><c:axPos val="${valPos}"/><c:majorGridlines><c:spPr><a:ln w="9525"><a:solidFill><a:srgbClr val="EEF0F3"/></a:solidFill></a:ln></c:spPr></c:majorGridlines><c:numFmt formatCode="#,##0" sourceLinked="0"/><c:majorTickMark val="none"/><c:minorTickMark val="none"/><c:tickLblPos val="nextTo"/><c:spPr><a:ln><a:noFill/></a:ln></c:spPr>${txPr(900,'6B7280')}<c:crossAx val="5001"/><c:crosses val="${reverse?'max':'autoZero'}"/><c:crossBetween val="between"/></c:valAx>`;
+}
+function chartXml(o){
+  const title=`<c:title><c:tx><c:rich><a:bodyPr/><a:lstStyle/><a:p><a:pPr><a:defRPr sz="1200" b="1"/></a:pPr><a:r><a:rPr lang="mn-MN" sz="1200" b="1"><a:solidFill><a:srgbClr val="111827"/></a:solidFill><a:latin typeface="Calibri"/></a:rPr><a:t>${X(o.title)}</a:t></a:r></a:p></c:rich></c:tx><c:overlay val="0"/></c:title><c:autoTitleDeleted val="0"/>`;
+  const cat=`<c:cat>${cache(o.catRef,o.cats,false)}</c:cat>`, val=`<c:val>${cache(o.valRef,o.vals,true)}</c:val>`;
+  const tx=`<c:tx><c:v>${X(o.name)}</c:v></c:tx>`;
+  const fill=c=>`<a:solidFill><a:srgbClr val="${hex(c)}"/></a:solidFill>`;
+  let plot='', legend='';
+  if(o.type==='line'){
+    plot=`<c:lineChart><c:grouping val="standard"/><c:varyColors val="0"/><c:ser><c:idx val="0"/><c:order val="0"/>${tx}<c:spPr><a:ln w="34925" cap="rnd">${fill(o.color)}<a:round/></a:ln></c:spPr><c:marker><c:symbol val="circle"/><c:size val="6"/><c:spPr><a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill><a:ln w="19050">${fill(o.color)}</a:ln></c:spPr></c:marker>${cat}${val}<c:smooth val="0"/></c:ser><c:marker val="1"/><c:axId val="5001"/><c:axId val="5002"/></c:lineChart>`+axes('b','l');
+  } else if(o.type==='bar'||o.type==='col'){
+    const h=o.type==='bar';
+    plot=`<c:barChart><c:barDir val="${h?'bar':'col'}"/><c:grouping val="clustered"/><c:varyColors val="0"/><c:ser><c:idx val="0"/><c:order val="0"/>${tx}<c:spPr>${fill(o.color)}<a:ln><a:noFill/></a:ln></c:spPr><c:invertIfNegative val="0"/>${dLbls('outEnd')}${cat}${val}</c:ser><c:gapWidth val="${h?80:60}"/><c:axId val="5001"/><c:axId val="5002"/></c:barChart>`+axes(h?'l':'b',h?'b':'l',h);
+  } else {
+    const dpt=o.vals.map((_,i)=>`<c:dPt><c:idx val="${i}"/><c:bubble3D val="0"/><c:spPr>${fill(PALETTE[i%PALETTE.length])}<a:ln w="28575"><a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill></a:ln></c:spPr></c:dPt>`).join('');
+    plot=`<c:doughnutChart><c:varyColors val="1"/><c:ser><c:idx val="0"/><c:order val="0"/>${tx}${dpt}${dLbls('', 'pct')}${cat}${val}</c:ser><c:firstSliceAng val="0"/><c:holeSize val="55"/></c:doughnutChart>`;
+    legend=`<c:legend><c:legendPos val="r"/><c:overlay val="0"/>${txPr(900,'374151')}</c:legend>`;
+  }
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><c:roundedCorners val="0"/><c:chart>${title}<c:plotArea><c:layout/>${plot}<c:spPr><a:noFill/><a:ln><a:noFill/></a:ln></c:spPr></c:plotArea>${legend}<c:plotVisOnly val="1"/><c:dispBlanksAs val="gap"/></c:chart><c:spPr><a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill><a:ln w="9525"><a:solidFill><a:srgbClr val="E5E7EB"/></a:solidFill></a:ln></c:spPr><c:txPr><a:bodyPr/><a:lstStyle/><a:p><a:pPr><a:defRPr><a:latin typeface="Calibri"/></a:defRPr></a:pPr><a:endParaRPr lang="mn-MN"/></a:p></c:txPr></c:chartSpace>`;
+}
+function anchor(i,a){
+  return `<xdr:twoCellAnchor editAs="oneCell"><xdr:from><xdr:col>${a.c1}</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>${a.r1}</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from><xdr:to><xdr:col>${a.c2}</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>${a.r2}</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to><xdr:graphicFrame macro=""><xdr:nvGraphicFramePr><xdr:cNvPr id="${i+2}" name="Chart ${i+1}"/><xdr:cNvGraphicFramePr/></xdr:nvGraphicFramePr><xdr:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/></xdr:xfrm><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/chart"><c:chart xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="rIdC${i+1}"/></a:graphicData></a:graphic></xdr:graphicFrame><xdr:clientData/></xdr:twoCellAnchor>`;
+}
+async function injectCharts(buf,list){
+  const zip=await JSZip.loadAsync(buf);
+  const sheetPath='xl/worksheets/sheet1.xml', relPath='xl/worksheets/_rels/sheet1.xml.rels';
+  let sx=await zip.file(sheetPath).async('string');
+  const m=sx.match(/<(legacyDrawing|legacyDrawingHF|picture|oleObjects|controls|webPublishItems|tableParts|extLst)\b/);
+  const tag='<drawing r:id="rIdDash1"/>';
+  sx=m?sx.replace(m[0],tag+m[0]):sx.replace('</worksheet>',tag+'</worksheet>');
+  if(!/xmlns:r=/.test(sx.slice(0,600))) sx=sx.replace('<worksheet ','<worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" ');
+  zip.file(sheetPath,sx);
+  const relEntry='<Relationship Id="rIdDash1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawingDash1.xml"/>';
+  const ex=zip.file(relPath);
+  if(ex){ zip.file(relPath,(await ex.async('string')).replace('</Relationships>',relEntry+'</Relationships>')); }
+  else zip.file(relPath,`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${relEntry}</Relationships>`);
+  zip.file('xl/drawings/drawingDash1.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">${list.map((c,i)=>anchor(i,c.at)).join('')}</xdr:wsDr>`);
+  zip.file('xl/drawings/_rels/drawingDash1.xml.rels',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${list.map((c,i)=>`<Relationship Id="rIdC${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart" Target="../charts/chartDash${i+1}.xml"/>`).join('')}</Relationships>`);
+  list.forEach((c,i)=>zip.file(`xl/charts/chartDash${i+1}.xml`,chartXml(c)));
+  let ct=await zip.file('[Content_Types].xml').async('string');
+  ct=ct.replace('</Types>','<Override PartName="/xl/drawings/drawingDash1.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>'+list.map((c,i)=>`<Override PartName="/xl/charts/chartDash${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>`).join('')+'</Types>');
+  zip.file('[Content_Types].xml',ct);
+  return zip.generateAsync({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',compression:'DEFLATE'});
+}
+
+async function buildExcel(){
+  const btn=$('oldt-buy'); const btnLbl=btn.textContent; btn.disabled=true; btn.textContent='Excel бэлдэж байна…';
+  try{
+    await ensureLibs();
+    const res=state.res||compute(), s=state.sel, title=$('oldt-title').textContent.trim()||'Дашбоард';
+    const wb=new ExcelJS.Workbook(); wb.creator='BusinessBI.mn'; wb.created=new Date();
+    const D=wb.addWorksheet('Дашбоард',{views:[{showGridLines:false,zoomScale:90}],properties:{tabColor:{argb:'FFC9A470'}}});
+    const T=wb.addWorksheet('Тооцоо',{views:[{showGridLines:false}]});
+    const R=wb.addWorksheet('Өгөгдөл',{views:[{state:'frozen',ySplit:1}]});
+    const BG={type:'pattern',pattern:'solid',fgColor:{argb:'FFF5F7FA'}}, WH={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFFFFF'}};
+    const INK='FF111827', GREY='FF6B7280', LINE={style:'thin',color:{argb:'FFE5E7EB'}};
+    const dec=res.avg?'#,##0.00':'#,##0';
+
+    // ── Өгөгдөл ──
+    const hdr=state.headers.slice(); const useM=s.date>=0&&res.months.length; const VCOL=hdr.length, MCOL=hdr.length+1;
+    hdr.push(res.isCount?'Тоо (1)':'Утга: '+res.valName); if(useM) hdr.push('Сар');
+    R.addRow(hdr);
+    R.getRow(1).eachCell(c=>{c.font={bold:true,color:{argb:'FFFFFFFF'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF171717'}};});
+    const g1Text=s.g1>=0, g2Text=s.g2>=0;
+    const lbl=v=>{ if(v instanceof Date) return v.toISOString().slice(0,10); const t=String(v??'').trim(); return t||'(хоосон)'; };
+    for(const r of state.rows){
+      const out=state.headers.map((_,i)=>{ let v=r[i]; if(v===''||v==null) return null; if(v instanceof Date) return new Date(v.getTime()); if(i===s.g1||i===s.g2) return lbl(v); return v; });
+      if(g1Text&&out[s.g1]==null) out[s.g1]='(хоосон)'; if(g2Text&&out[s.g2]==null) out[s.g2]='(хоосон)';
+      let v=1; if(!res.isCount){ v=toNum(r[s.val]); if(isNaN(v)) v=null; }
+      out.push(v);
+      if(useM){ const d=toDate(r[s.date]); out.push(d?monthLbl(monthKey(d)):null); }
+      R.addRow(out);
+    }
+    state.headers.forEach((h,i)=>{ const col=R.getColumn(i+1); col.width=Math.min(30,Math.max(10,String(h).length+4)); if(i===s.date) col.numFmt='yyyy-mm-dd'; });
+    R.getColumn(VCOL+1).width=16; R.getColumn(VCOL+1).numFmt=dec==='#,##0'?'#,##0.##':dec; if(useM) R.getColumn(MCOL+1).width=10;
+    R.autoFilter={from:{row:1,column:1},to:{row:1,column:hdr.length}};
+    const last=state.rows.length+1, rng=c=>`'Өгөгдөл'!$${colL(c)}$2:$${colL(c)}$${last}`;
+    const VR=rng(VCOL);
+    const aggF=(critCol,cell)=>res.isCount?`COUNTIFS(${rng(critCol)},${cell})`:(res.avg?`IFERROR(AVERAGEIFS(${VR},${rng(critCol)},${cell}),0)`:`SUMIFS(${VR},${rng(critCol)},${cell})`);
+
+    // ── Тооцоо ──
+    T.getColumn(1).width=14; T.getColumn(2).width=16; T.getColumn(3).width=3; T.getColumn(4).width=24; T.getColumn(5).width=16; T.getColumn(6).width=10; T.getColumn(7).width=3; T.getColumn(8).width=24; T.getColumn(9).width=16; T.getColumn(10).width=3; T.getColumn(11).width=24; T.getColumn(12).width=16;
+    T.getCell('A1').value='Тооцооны хүснэгтүүд'; T.getCell('A1').font={bold:true,size:14,color:{argb:INK}};
+    T.getCell('A2').value='Бүх дүн «Өгөгдөл» хуудаснаас томьёогоор бодогдоно. Өгөгдлөө засахад автоматаар шинэчлэгдэнэ.'; T.getCell('A2').font={italic:true,color:{argb:GREY},size:9};
+    const head=(cells)=>cells.forEach(([a,t])=>{const c=T.getCell(a);c.value=t;c.font={bold:true,color:{argb:'FFFFFFFF'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF171717'}};c.alignment={vertical:'middle'};});
+    const vName=res.isCount?'Мөрийн тоо':(res.avg?'Дундаж':'Дүн');
+    const charts=[]; let mFirst=4,mLast=3, gFirst=4,gLast=3, g2First=4,g2Last=3, shFirst=4, shLast=3;
+    if(useM){
+      head([['A3','Сар'],['B3',vName]]);
+      res.months.forEach((m,i)=>{ const r=4+i; T.getCell('A'+r).value=monthLbl(m.k); T.getCell('B'+r).value={formula:aggF(MCOL,'A'+r),result:+m.v.toFixed(4)}; T.getCell('B'+r).numFmt=dec; });
+      mLast=3+res.months.length;
+    }
+    if(res.groups.length){
+      head([['D3',res.gName],['E3',vName],['F3','Хувь']]);
+      res.groups.forEach((g,i)=>{ const r=4+i; T.getCell('D'+r).value=g.k; T.getCell('E'+r).value={formula:aggF(s.g1,'D'+r),result:+g.v.toFixed(4)}; T.getCell('E'+r).numFmt=dec; T.getCell('F'+r).value={formula:`IFERROR(E${r}/SUM($E$4:$E$${3+res.groups.length}),0)`,result:res.gTot?g.v/res.gTot:0}; T.getCell('F'+r).numFmt='0.0%'; });
+      gLast=3+res.groups.length;
+      // share table (top 6 + Бусад)
+      const sh=shareData(res.groups);
+      head([['K3',res.gName+' (хувь)'],['L3',vName]]);
+      sh.forEach((g,i)=>{ const r=4+i; T.getCell('K'+r).value=g.k; if(g.k==='Бусад'&&res.groups.length>7){ T.getCell('L'+r).value={formula:`SUM($E$4:$E$${gLast})-SUM(L4:L${r-1})`,result:+g.v.toFixed(4)}; } else T.getCell('L'+r).value={formula:`E${4+i}`,result:+g.v.toFixed(4)}; T.getCell('L'+r).numFmt=dec; });
+      shLast=3+sh.length;
+    }
+    if(res.groups2.length){
+      head([['H3',res.g2Name],['I3',vName]]);
+      res.groups2.forEach((g,i)=>{ const r=4+i; T.getCell('H'+r).value=g.k; T.getCell('I'+r).value={formula:aggF(s.g2,'H'+r),result:+g.v.toFixed(4)}; T.getCell('I'+r).numFmt=dec; });
+      g2Last=3+res.groups2.length;
+    }
+
+    // ── Дашбоард ──
+    for(let c=1;c<=14;c++) D.getColumn(c).width=c===1||c===14?2.5:12.5;
+    for(let r=1;r<=66;r++){ const row=D.getRow(r); for(let c=1;c<=14;c++) row.getCell(c).fill=BG; }
+    D.getRow(2).height=34;
+    D.mergeCells('B2:M2'); D.getCell('B2').value=title; D.getCell('B2').font={bold:true,size:22,color:{argb:INK}}; D.getCell('B2').alignment={vertical:'middle'};
+    D.mergeCells('B3:M3'); D.getCell('B3').value=`${state.fileName||''} · ${fmtN(res.n)} мөр · ${new Date().toISOString().slice(0,10)} · businessbi.mn`; D.getCell('B3').font={size:9,color:{argb:GREY}};
+    // KPI cards: B-D, E-G, H-J, K-M ; rows 5-7
+    const K=kpis(res);
+    const kF=[];
+    kF[0]=res.isCount?`COUNTA(${VR})`:(res.avg?`AVERAGE(${VR})`:`SUM(${VR})`);
+    kF[1]=useM?`'Тооцоо'!B${mLast}`:`MAX(${VR})`;
+    kF[2]=res.groups.length?`INDEX('Тооцоо'!$D$4:$D$${gLast},MATCH(MAX('Тооцоо'!$E$4:$E$${gLast}),'Тооцоо'!$E$4:$E$${gLast},0))`:`COUNTA(${VR})`;
+    kF[3]=`IFERROR(SUM(${VR})/COUNT(${VR}),0)`;
+    const kRes=[res.total, useM?res.months[res.months.length-1].v:res.max, res.groups.length?res.groups[0].k:res.n, res.perRow];
+    const sub=[];
+    sub[0]={f:`TEXT(COUNTA(${VR}),"#,##0")&" мөр шинжилсэн"`,r:K[0].e};
+    sub[1]=useM&&res.months.length>1?{f:`IFERROR(IF('Тооцоо'!B${mLast}>='Тооцоо'!B${mLast-1},"▲ ","▼ ")&TEXT(ABS('Тооцоо'!B${mLast}/'Тооцоо'!B${mLast-1}-1),"0.0%")&" (өмнөх сартай харьц.)","")`,r:K[1].e}:{v:K[1].e};
+    sub[2]=res.groups.length&&!res.avg?{f:`"нийтийн "&TEXT(MAX('Тооцоо'!$E$4:$E$${gLast})/SUM('Тооцоо'!$E$4:$E$${gLast}),"0.0%")`,r:K[2].e}:{v:K[2].e};
+    sub[3]={f:`TEXT(COUNT(${VR}),"#,##0")&" мөрөөр"`,r:K[3].e};
+    [['B','D'],['E','G'],['H','J'],['K','M']].forEach(([a,b],i)=>{
+      for(let r=5;r<=7;r++){ D.mergeCells(`${a}${r}:${b}${r}`); const c=D.getCell(a+r); c.fill=WH; c.border={left:LINE,right:LINE,top:r===5?LINE:undefined,bottom:r===7?LINE:undefined};
+        // right border needs to be on last col of merge
+        D.getCell(b+r).border={right:LINE,top:r===5?LINE:undefined,bottom:r===7?LINE:undefined}; }
+      D.getCell(a+5).value=K[i].l; D.getCell(a+5).font={size:9,color:{argb:GREY}}; D.getCell(a+5).alignment={indent:1,vertical:'bottom'};
+      D.getCell(a+6).value={formula:kF[i],result:kRes[i]}; D.getCell(a+6).font={bold:true,size:20,color:{argb:INK}}; D.getCell(a+6).alignment={indent:1,horizontal:'left'};
+      D.getCell(a+6).numFmt=(i===2&&res.groups.length)?'@':(i===3?'#,##0.00':dec);
+      const sb=sub[i]; D.getCell(a+7).value=sb.f?{formula:sb.f,result:sb.r}:sb.v;
+      D.getCell(a+7).font={size:9,color:{argb:K[i].c==='up'?'FF16A34A':K[i].c==='down'?'FFDC2626':GREY}}; D.getCell(a+7).alignment={indent:1,vertical:'top'};
+    });
+    D.getRow(5).height=20; D.getRow(6).height=32; D.getRow(7).height=20;
+    const vn=res.isCount?'Мөрийн тоо':(res.avg?'Дундаж '+res.valName.toLowerCase():res.valName);
+    let row=8; // 0-based anchor rows
+    if(useM){ charts.push({type:'line',title:vn+' — сараар',name:vn,color:GOLD,catRef:`'Тооцоо'!$A$4:$A$${mLast}`,valRef:`'Тооцоо'!$B$4:$B$${mLast}`,cats:res.months.map(m=>monthLbl(m.k)),vals:res.months.map(m=>m.v),at:{c1:1,c2:13,r1:row,r2:row+17}}); row+=18; }
+    const half=[];
+    if(res.groups.length){
+      const n5=Math.min(5,res.groups.length);
+      half.push({type:'bar',title:'Шилдэг '+n5+' '+res.gName.toLowerCase(),name:vn,color:GOLD,catRef:`'Тооцоо'!$D$4:$D$${3+n5}`,valRef:`'Тооцоо'!$E$4:$E$${3+n5}`,cats:res.groups.slice(0,n5).map(g=>g.k),vals:res.groups.slice(0,n5).map(g=>g.v)});
+      const sh=shareData(res.groups);
+      half.push({type:'doughnut',title:res.gName+'-ийн эзлэх хувь',name:vn,catRef:`'Тооцоо'!$K$4:$K$${shLast}`,valRef:`'Тооцоо'!$L$4:$L$${shLast}`,cats:sh.map(g=>g.k),vals:sh.map(g=>g.v)});
+    }
+    if(res.groups2.length){ const n=Math.min(10,res.groups2.length); half.push({type:'col',title:vn+' — '+res.g2Name.toLowerCase()+'-аар',name:vn,color:'#171717',catRef:`'Тооцоо'!$H$4:$H$${3+n}`,valRef:`'Тооцоо'!$I$4:$I$${3+n}`,cats:res.groups2.slice(0,n).map(g=>g.k),vals:res.groups2.slice(0,n).map(g=>g.v)}); }
+    half.forEach((c,i)=>{ const left=i%2===0; c.at={c1:left?1:7,c2:left?7:13,r1:row,r2:row+16}; charts.push(c); if(!left) row+=17; });
+    // insights block
+    const insLeft=half.length%2===1; const ic1=insLeft?'H':'B', ic2='M'; const ir=insLeft?row:(half.length%2===0?row:row);
+    const insR=insLeft?ir:row; if(!insLeft&&half.length%2===0){}
+    const ins=insights(res).map(t=>t.replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"'));
+    const r0=insR+1; // 1-based
+    D.mergeCells(`${ic1}${r0}:${ic2}${r0}`); D.getCell(ic1+r0).value='Товч дүгнэлт'; D.getCell(ic1+r0).font={bold:true,size:12,color:{argb:INK}};
+    ins.forEach((t,i)=>{ const r=r0+1+i; D.mergeCells(`${ic1}${r}:${ic2}${r}`); const c=D.getCell(ic1+r); c.value='•  '+t; c.font={size:10,color:{argb:'FF4B5563'}}; c.alignment={wrapText:true,vertical:'top'}; D.getRow(r).height=30; });
+    for(let r=r0;r<=r0+ins.length;r++){ const cs=ic1.charCodeAt(0)-64, ce=13; for(let c=cs;c<=ce;c++) D.getRow(r).getCell(c).fill=WH; }
+    D.pageSetup={orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0,margins:{left:.4,right:.4,top:.5,bottom:.5,header:.2,footer:.2}};
+
+    const buf=await wb.xlsx.writeBuffer();
+    const blob=await injectCharts(buf,charts);
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+    a.download=(title.replace(/[\\/:*?"<>|]+/g,' ').trim()||'Дашбоард')+'.xlsx';
+    document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);
+    try{ localStorage.removeItem(PEND); }catch(e){}
+    toast('Excel дашбоард татагдлаа ✓');
+  }catch(e){ console.error(e); toast('Excel үүсгэж чадсангүй: '+(e.message||e)); }
+  finally{ btn.disabled=false; btn.textContent=btnLbl; refreshPaid(); }
+}
+window.__bbiDashBuild=buildExcel; // тест/админд
+
+// ── paid download ────────────────────────────────────
+const gateProtect=(fn,meta)=>(window.BBIGate&&BBIGate.protect)?BBIGate.protect(fn,meta):fn;
+const payProtect=(opts,fn)=>(window.BBIPay&&BBIPay.require)?BBIPay.require(opts,fn):()=>toast('Төлбөрийн модуль ачаалагдсангүй — хуудсыг businessbi.mn-ээс нээнэ үү');
+const buyHandler=gateProtect(payProtect({
+  tool:'dashboard',
+  title:'Excel дашбоард татах',
+  desc:'Таны дашбоардыг засварлах боломжтой Excel файлаар — KPI, 4 график, дүгнэлт, томьёотой.',
+  bullets:['Excel-ийн жинхэнэ график — өнгө, хэлбэрийг нь өөрчилж болно','Томьёо нь өгөгдөлтэй холбоотой — тоо засахад шинэчлэгдэнэ','Төлснөөс хойш 24 цагийн дотор дахин татах үнэгүй'],
+  meta:()=>({rows:state.rows.length,title:$('oldt-title').textContent.trim().slice(0,80)})
+},()=>buildExcel()),{tool:'Дашбоард үүсгэгч',action:'download'});
+$('oldt-buy').addEventListener('click',()=>{
+  if(!state.rows.length){ toast('Эхлээд файлаа оруулна уу'); return; }
+  try{ if(!(window.BBIGate&&BBIGate.isLoggedIn&&BBIGate.isLoggedIn())){ saveSession(); localStorage.setItem(PEND,String(Date.now())); } }catch(e){}
+  buyHandler();
+});
+function refreshPaid(){
+  const el=$('oldt-paid'); const t=(window.BBIPay&&BBIPay.ticketInfo)?BBIPay.ticketInfo('dashboard'):null;
+  if(t){ el.textContent='Төлсөн — '+t.leftText+' дахин татах үнэгүй'; el.classList.remove('oldt-hidden'); } else el.classList.add('oldt-hidden');
+}
+refreshPaid(); setInterval(refreshPaid,60000);
+
+// restore + resume pending download after login
+if(restore()){
+  try{ const p=+localStorage.getItem(PEND); if(p&&Date.now()-p<TTL&&window.BBIGate&&BBIGate.onReady){ BBIGate.onReady(u=>{ if(!u) return; try{localStorage.removeItem(PEND);}catch(e){} setTimeout(()=>$('oldt-buy').click(),500); }); } }catch(e){}
+}
+})();
+</script>
+</body>
+</html>

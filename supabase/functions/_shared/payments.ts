@@ -6,6 +6,7 @@ import { admin, getSetting } from "./http.ts";
 export const PRODUCTS: Record<string, { amount: number; currency: string; title: string; validHours: number }> = {
   ndsh_hhoat: { amount: 5000, currency: "MNT", title: "НДШ → ХХОАТ маягт (1 тайлан татах)", validHours: 24 },
   receipt:    { amount: 5000, currency: "MNT", title: "Баримтын зураг → бичилт (24 цагийн эрх)", validHours: 24 },
+  dashboard:  { amount: 9900, currency: "MNT", title: "Дашбоард үүсгэгч — Excel дашбоард татах", validHours: 24 },
 };
 export const REUSE_PENDING_MS = 8 * 60 * 1000;   // WIRE intent 10 мин TTL
 
