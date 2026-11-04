@@ -130,24 +130,98 @@ body.home .bbi-login{height:42px;padding:0 16px;font-size:15px}
   .btn.white,.btn.outline{min-height:52px!important}
 }
 
-/* ═══ Категори карт (хар бүхээг, зурагтай) ═══ */
+/* ═══ other-levels: хэсгийн толгой, ангиллын slider, бүтээгдэхүүний карт ═══
+   Хэмжээ 375px → 1440px хооронд шугаман өсөлттэй (other-levels-ийн fluid томьёо):
+   h2 24 → 36.37 · карт гарчиг 20 → 24.96 · бүтээгдэхүүний нэр 16 → 18.54 · зай 12 → 18.19 */
+:root{
+  --ol-h2:clamp(24px,19.64px + 1.1615vw,48px);
+  --ol-card-t:clamp(20px,7.946px + 1.1818vw,30px);
+  --ol-prod-t:clamp(16px,15.106px + .2385vw,20px);
+  --ol-p:clamp(14px,13.553px + .1192vw,16px);
+  --ol-gap:max(12px,1.263vw);
+  --ol-pad-s:max(16px,1.263vw);
+  --ol-pad-l:max(16px,2.105vw);
+  --ol-card-r:30px;
+}
 .sec{padding:28px 0 12px}
 .sec-head{text-align:center;max-width:896px;margin:0 auto 37px}
 .kicker{font-size:16px;font-weight:500;line-height:1;color:#171717;margin-bottom:16px}
-.sec h2{font-size:clamp(24px,2.526vw,36.37px);font-weight:700;letter-spacing:-.03em;line-height:1}
+.sec h2{font-size:var(--ol-h2);font-weight:700;letter-spacing:-.03em;line-height:1}
 .sec h2 em{font-style:normal;color:var(--bbi-green)}
 .sec .sub{margin-top:24px;color:#171717;font-size:16px;line-height:1.6}
-.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.cat{display:block;text-decoration:none;color:inherit;background:#fff;border-radius:0;overflow:visible;transition:.25s}
-.cat:hover .shot{box-shadow:0 24px 50px -24px rgba(0,0,0,.35)}
-.cat .shot{position:relative;aspect-ratio:436/328;background:#fafafa;border-radius:var(--rb);overflow:hidden;transition:box-shadow .25s}
-.cat .shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:left top;transition:transform .5s ease}
-.cat:hover .shot img{transform:scale(1.04)}
-.cat .shot .n{position:absolute;top:12px;left:12px;font-size:11px;font-weight:700;letter-spacing:.06em;padding:5px 10px;border-radius:999px;background:rgba(11,13,28,.75);color:#fff;backdrop-filter:blur(4px)}
-.cat .shot .n.free{background:var(--bbi-green-bright)}
-.cat .shot .n.paid{background:#c9a470;color:#171717}
-.cat h3{text-align:center;font-size:18.54px;font-weight:500;line-height:1.25;padding:18px 16px 6px}
-.cat p{text-align:center;font-size:15.27px;color:#171717;opacity:.7;padding:0 18px 18px;line-height:1.5}
+
+/* Танилцуулга — 2 багана (60% / 40%, 60px зай) */
+.intro{padding:28px 0 12px}
+.intro .container{display:grid;grid-template-columns:60% 40%;gap:60px;align-items:start;grid-template-columns:calc((100% - 60px)*.6) calc((100% - 60px)*.4)}
+.intro .ttl{display:grid;gap:16px;padding-right:60px;text-align:center}
+.intro .ttl .kicker{margin:0}
+.intro h2{font-size:var(--ol-h2);font-weight:700;line-height:1;letter-spacing:-.03em;color:#171717}
+.hl{position:relative;display:inline-block;font-style:normal;z-index:0}
+.hl svg{position:absolute;left:0;bottom:-.1em;width:100%;height:.6em;z-index:-1;overflow:visible}
+.hl svg path{fill:none;stroke:#f3c98b;stroke-width:9;stroke-linecap:round;stroke-linejoin:round}
+.intro .txt{font-size:var(--ol-p);line-height:1.6;color:#171717}
+.intro .txt a{color:#171717;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+
+/* Ангиллын slider — 4 карт харагдана, 5 дахь нь гарч ирнэ */
+.coll{padding:20px 0 24px;position:relative}
+.coll-track{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 3*var(--ol-gap))/4);gap:var(--ol-gap);overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 48px;padding:0 48px;scrollbar-width:none;box-sizing:border-box}
+.coll-track::-webkit-scrollbar{display:none}
+.mcard{scroll-snap-align:start;display:flex;flex-direction:column;background:#fafafa;border-radius:var(--ol-card-r);text-decoration:none;color:#171717}
+.mcard .m{position:relative;aspect-ratio:2688/1476;overflow:hidden;border-radius:var(--rb) var(--rb) 0 0;background:#fafafa}
+.mcard .m img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:left top;transition:transform .5s cubic-bezier(.3,1,.3,1)}
+.mcard:hover .m img{transform:scale(1.05)}
+.mcard .c{padding:var(--ol-pad-s) var(--ol-pad-l) var(--ol-pad-l);text-align:center;display:flex;justify-content:center;align-items:center;flex:1}
+.mcard .c span{font-size:var(--ol-card-t);font-weight:700;line-height:1.25;letter-spacing:-.05em;background:linear-gradient(currentColor,currentColor) 0 100%/0 1.5px no-repeat;transition:background-size .5s cubic-bezier(.3,1,.3,1)}
+.mcard:hover .c span{background-size:100% 1.5px}
+.coll-nav{position:absolute;top:0;left:0;right:0;pointer-events:none}
+.coll-btn{position:absolute;width:56px;height:56px;border-radius:9999px;border:0;background:#171717;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;pointer-events:auto;transition:opacity .3s,transform .3s}
+.coll-btn svg{width:20px;height:20px}
+.coll-btn.prev{left:78px}.coll-btn.next{right:78px}
+.coll-btn[hidden]{display:flex;opacity:0;pointer-events:none;transform:scale(.8)}
+@media(max-width:749px){
+  .intro .container{grid-template-columns:1fr;gap:32px}
+  .intro .ttl{padding-right:0}
+  .intro{padding:20px 0 12px}
+  .coll-track{grid-auto-columns:135px;gap:12px;padding:0 20px;scroll-padding:0 20px}
+  .mcard .c{padding:16px}
+  .coll-nav{display:none}
+}
+
+/* Бүтээгдэхүүний карт — 436×328 зураг, hover үед хар pill товч */
+#tool-list,#products{padding:20px 0 8px}
+.sec-top{display:flex;justify-content:space-between;align-items:flex-end;gap:32px;margin:0 0 calc(var(--ol-h2))}
+.sec-top .kicker{margin-bottom:16px}
+.sec-top h2{text-align:left}
+.sec-top .sub{margin-top:24px;max-width:896px;font-size:16px;line-height:1.6;color:#171717}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--ol-gap)}
+.pc{display:flex;flex-direction:column;text-decoration:none;color:#171717;border-radius:var(--ol-card-r)}
+.pc .m{position:relative;aspect-ratio:436/328;overflow:hidden;border-radius:var(--rb);background:#fafafa}
+.pgrid.wide .pc .m{aspect-ratio:436/245}
+.pc .m img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:left top;transition:transform .5s cubic-bezier(.3,1,.3,1)}
+.pc:hover .m img{transform:scale(1.05)}
+.pc .qa{position:absolute;left:0;right:0;bottom:20px;display:flex;justify-content:center;transform:translateY(8px);opacity:0;transition:opacity .4s cubic-bezier(.3,1,.3,1),transform .4s cubic-bezier(.3,1,.3,1)}
+.pc:hover .qa{opacity:1;transform:none}
+.pc .qa span{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:12.12px 22px;border-radius:60px;background:#171717;color:#fff;font-size:15.27px;font-weight:500;line-height:1}
+.pc .badge{position:absolute;top:12px;left:12px;font-size:11px;font-weight:700;letter-spacing:.06em;padding:5px 10px;border-radius:999px;background:rgba(11,13,28,.75);color:#fff}
+.pc .badge.free{background:var(--bbi-green-bright)}
+.pc .badge.paid{background:#c9a470;color:#171717}
+.pc .ct{padding:var(--ol-pad-s) 0 var(--ol-pad-l);text-align:center;display:grid;gap:8px}
+.pc .t{font-size:var(--ol-prod-t);font-weight:500;line-height:1.25;justify-self:center;background:linear-gradient(currentColor,currentColor) 0 100%/0 1px no-repeat;transition:background-size .5s cubic-bezier(.3,1,.3,1)}
+.pc:hover .t{background-size:100% 1px}
+.pc .pr{font-size:15.27px;line-height:1;color:#171717}
+.pc .pr s{opacity:.55;margin-right:6px}
+@media(max-width:749px){
+  .sec-top{display:block;margin-bottom:24px}
+  .pgrid{display:grid;grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:135px;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 20px;margin:0 -20px;padding:0 20px;scrollbar-width:none}
+  .pgrid::-webkit-scrollbar{display:none}
+  .pc{scroll-snap-align:start}
+  .pc .ct{padding:16px 0}
+  .pc .qa{display:none}
+}
+/* Гарч ирэх хөдөлгөөн: 50px доороос, тунгалаг → тод */
+.rv{opacity:0;transform:translateY(50px);transition:opacity 1s cubic-bezier(.19,1,.22,1),transform 2s cubic-bezier(.075,.82,.165,1)}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}}
 
 /* ═══ Outline marquee ═══ */
 .marq{overflow:hidden;padding:0 0 16px;background:#fff}
@@ -156,20 +230,6 @@ body.home .bbi-login{height:42px;padding:0 16px;font-size:15px}
 .marq span.dot{-webkit-text-stroke:0;color:#171717;font-size:22px;align-self:center}
 @keyframes marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @media (prefers-reduced-motion:reduce){.marq-track{animation:none}}
-
-/* ═══ Бүтээгдэхүүн — хэвтээ карт ═══ */
-.pro{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.pcard{display:flex;flex-direction:column;background:#fafafa;border:0;border-radius:var(--rb);overflow:hidden;text-decoration:none;color:inherit;transition:.25s}
-.pcard:hover{transform:translateY(-4px);box-shadow:0 24px 50px -24px rgba(0,0,0,.3)}
-.pthumb{aspect-ratio:436/245;position:relative;overflow:hidden;background:#eef0f3}
-.pthumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:left top}
-.pinfo{padding:18px 20px 20px;display:flex;flex-direction:column;gap:6px;flex:1}
-.pcat{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--bbi-gold)}
-.pinfo h3{font-size:18.54px;font-weight:600;letter-spacing:-.01em}
-.pinfo p{font-size:14px;color:#6b7076;line-height:1.55}
-.pfoot{margin-top:auto;padding-top:14px;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:600}
-.pfoot .go{color:var(--bbi-green)}
-.pfoot .st{color:#6b7076;font-weight:500;font-size:13px}
 
 /* ═══ Сүлжээ — ногоон дарк бүс (Other Levels-ийн сургалтын бүс шиг) ═══ */
 .net{padding:0}
@@ -201,9 +261,10 @@ body.home .bbi-login{height:42px;padding:0 16px;font-size:15px}
 .last h2{font-size:clamp(24px,2.526vw,36.37px);font-weight:700;line-height:1;letter-spacing:-.03em}
 .last p{margin:16px auto 0;max-width:56ch;color:#171717;font-size:16px}
 
-@media(max-width:1000px){.cat-grid,.pro,.steps-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:1000px){.steps-grid{grid-template-columns:1fr 1fr}}
+@media(min-width:750px) and (max-width:1000px){.pgrid{grid-template-columns:1fr 1fr}}
 @media(max-width:640px){
-  .cat-grid,.pro,.steps-grid{grid-template-columns:1fr}
+  .steps-grid{grid-template-columns:1fr}
   .net-box{padding:48px 16px}.last{padding:44px 0 52px}
 }
 
@@ -340,39 +401,44 @@ body.home.hdr-hidden .bbi-nav{transform:translateY(-100%)}
   </div>
 </section>
 
-<!-- ═══════════ КАТЕГОРИ ═══════════ -->
-<section class="sec" id="tools">
+<!-- ═══════════ ТАНИЛЦУУЛГА ═══════════ -->
+<section class="intro" id="tools">
   <div class="container">
-    <div class="sec-head">
-      <div class="kicker">BusinessBI-д тавтай морил</div>
-      <h2>Нягтлан бодогч, жижиг бизнест зориулсан <em>санхүүгийн хэрэгслүүд</em></h2>
-      <p class="sub">Файлаа оруулаад л үр дүнгээ ав. Боловсруулалт таны хөтөч дотор хийгдэнэ — ажилтны, харилцагчийн өгөгдөл серверт илгээгдэхгүй.</p>
+    <div class="ttl">
+      <p class="kicker">BusinessBI-д тавтай морил</p>
+      <h2><em class="hl">Нягтлан бодогчдод<svg viewBox="0 0 400 24" preserveAspectRatio="none" aria-hidden="true"><path d="M4 16 C 60 6, 110 22, 170 12 S 280 4, 330 14 S 385 18, 396 9"/></svg></em> зориулсан санхүүгийн хэрэгслүүд</h2>
     </div>
-    <div class="cat-grid">
-      <a class="cat" href="ndsh_hhoat_converter.html">
-        <div class="shot"><span class="n paid">5,000₮ / тайлан</span><img src="img/tool-ndsh.jpg" alt="НДШ тайлан хөрвүүлэгч" loading="lazy"></div>
-        <h3>НДШ / ХХОАТ хөрвүүлэгч</h3><p>НДШ-ийн PDF тайланг etax-д бэлэн ХХОАТ маягт болгоно. Урьдчилан харах үнэгүй.</p>
-      </a>
-      <a class="cat" href="noat_matcher.html">
-        <div class="shot"><span class="n free">Үнэгүй</span><img src="img/tool-noat.jpg" alt="НӨАТ тулгагч" loading="lazy"></div>
-        <h3>НӨАТ тулгагч</h3><p>eBarimt падааныг дотоод бүртгэлтэй тулгаж, зөрүүг шууд илрүүлнэ.</p>
-      </a>
-      <a class="cat" href="invoice_generator.html">
-        <div class="shot"><span class="n free">Үнэгүй</span><img src="img/tool-invoice.jpg" alt="Нэхэмжлэх үүсгэгч" loading="lazy"></div>
-        <h3>Нэхэмжлэх үүсгэгч</h3><p>НӨАТ-тэй мэргэжлийн нэхэмжлэхийг минутын дотор үүсгэж PDF-ээр татна.</p>
-      </a>
-      <a class="cat" href="financial_dashboard.html">
-        <div class="shot"><span class="n free">Үнэгүй</span><img src="img/tool-financial.jpg" alt="Санхүүгийн шинжилгээ" loading="lazy"></div>
-        <h3>Санхүүгийн шинжилгээ</h3><p>E-balance тайлангаас харьцаа, чиг хандлагын шинжилгээг автоматаар гаргана.</p>
-      </a>
-      <a class="cat" href="receipt_scan.html">
-        <div class="shot"><span class="n free">Үнэгүй</span><img src="img/accounting.png" alt="Баримт уншуулагч" loading="lazy"></div>
-        <h3>Баримт уншуулагч</h3><p>Баримтын зургаа оруулахад гүйлгээг таньж журналд бэлэн бичилт болгоно.</p>
-      </a>
-      <a class="cat" href="dashboard.html?demo=1">
-        <div class="shot"><span class="n free">Шинэ</span><img src="img/finance.jpg" alt="Дашбоард" loading="lazy"></div>
-        <h3>Дашбоард</h3><p>Орлого, зардал, ашиг, авлага-өглөг, тайлангийн хуанли — журналаас бодит цагт.</p>
-      </a>
+    <p class="txt"><strong>BusinessBI</strong> — Монголын нягтлан бодогчдод зориулсан <a href="businessbi_journal.html">санхүүгийн програм</a> ба автоматжуулалтын хэрэгслүүд. Файлаа оруулаад л үр дүнгээ авна: боловсруулалт таны хөтөч дотор хийгдэж, ажилтны болон харилцагчийн өгөгдөл серверт илгээгдэхгүй.</p>
+  </div>
+</section>
+
+<!-- ═══════════ АНГИЛАЛ (slider) ═══════════ -->
+<section class="coll" aria-label="Ангилал">
+  <div class="coll-track" id="collTrack">
+    <a class="mcard rv" href="businessbi_journal.html"><div class="m"><img src="img/finance.jpg" alt="" loading="lazy"></div><div class="c"><span>Санхүүгийн програм</span></div></a>
+    <a class="mcard rv" href="payroll.html"><div class="m"><img src="img/salary.jpg" alt="" loading="lazy"></div><div class="c"><span>Цалин бодогч</span></div></a>
+    <a class="mcard rv" href="ndsh_hhoat_converter.html"><div class="m"><img src="img/tool-ndsh.jpg" alt="" loading="lazy"></div><div class="c"><span>НДШ → ХХОАТ хөрвүүлэгч</span></div></a>
+    <a class="mcard rv" href="noat_matcher.html"><div class="m"><img src="img/tool-noat.jpg" alt="" loading="lazy"></div><div class="c"><span>НӨАТ тулгагч</span></div></a>
+    <a class="mcard rv" href="budget.html"><div class="m"><img src="img/budget.jpg" alt="" loading="lazy"></div><div class="c"><span>Бизнес төлөвлөлт</span></div></a>
+    <a class="mcard rv" href="dashboard.html?demo=1"><div class="m"><img src="img/powerbi-dashboard.png" alt="" loading="lazy"></div><div class="c"><span>Дашбоард</span></div></a>
+  </div>
+  <div class="coll-nav" id="collNav">
+    <button class="coll-btn prev" id="collPrev" aria-label="Өмнөх" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <button class="coll-btn next" id="collNext" aria-label="Дараах"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+  </div>
+</section>
+
+<!-- ═══════════ ХЭРЭГСЛҮҮД (бүтээгдэхүүний карт) ═══════════ -->
+<section class="sec" id="tool-list">
+  <div class="container">
+    <div class="sec-top"><div><p class="kicker">Үнэгүй, хурдан хэрэгслүүд</p><h2>Өдөр тутмын ажлаа хурдасга</h2></div></div>
+    <div class="pgrid">
+      <a class="pc rv" href="ndsh_hhoat_converter.html"><div class="m"><img src="img/tool-ndsh.jpg" alt="НДШ / ХХОАТ хөрвүүлэгч" loading="lazy"><div class="qa"><span>Нээх</span></div></div><div class="ct"><span class="t">НДШ / ХХОАТ хөрвүүлэгч</span><span class="pr">5,000₮ / тайлан</span></div></a>
+      <a class="pc rv" href="noat_matcher.html"><div class="m"><img src="img/tool-noat.jpg" alt="НӨАТ тулгагч" loading="lazy"><div class="qa"><span>Нээх</span></div></div><div class="ct"><span class="t">НӨАТ тулгагч</span><span class="pr">Үнэгүй</span></div></a>
+      <a class="pc rv" href="invoice_generator.html"><div class="m"><img src="img/tool-invoice.jpg" alt="Нэхэмжлэх үүсгэгч" loading="lazy"><div class="qa"><span>Нээх</span></div></div><div class="ct"><span class="t">Нэхэмжлэх үүсгэгч</span><span class="pr">Үнэгүй</span></div></a>
+      <a class="pc rv" href="financial_dashboard.html"><div class="m"><img src="img/tool-financial.jpg" alt="Санхүүгийн шинжилгээ" loading="lazy"><div class="qa"><span>Нээх</span></div></div><div class="ct"><span class="t">Санхүүгийн шинжилгээ</span><span class="pr">Үнэгүй</span></div></a>
+      <a class="pc rv" href="receipt_scan.html"><div class="m"><img src="img/accounting.png" alt="Баримт уншуулагч" loading="lazy"><div class="qa"><span>Нээх</span></div></div><div class="ct"><span class="t">Баримт уншуулагч</span><span class="pr">Үнэгүй</span></div></a>
+      <a class="pc rv" href="dashboard.html?demo=1"><div class="m"><img src="img/finance.jpg" alt="Дашбоард" loading="lazy"><div class="qa"><span>Нээх</span></div></div><div class="ct"><span class="t">Дашбоард</span><span class="pr">Үнэгүй</span></div></a>
     </div>
   </div>
 </section>
@@ -388,39 +454,11 @@ body.home.hdr-hidden .bbi-nav{transform:translateY(-100%)}
 <!-- ═══════════ БҮТЭЭГДЭХҮҮН ═══════════ -->
 <section class="sec" id="products">
   <div class="container">
-    <div class="sec-head">
-      <div class="kicker">Бүтээгдэхүүн</div>
-      <h2>Санхүүгийн програм, цалин, <em>төлөвлөлт</em></h2>
-      <p class="sub">Гурвуулаа нэг бүртгэлтэй. Санхүүгийн програм 14 хоног үнэгүй; цалин, төсөв beta хугацаанд үнэгүй.</p>
-    </div>
-    <div class="pro">
-      <a class="pcard" href="businessbi_journal.html">
-        <div class="pthumb"><img src="img/finance.jpg" alt="Санхүүгийн програм" loading="lazy"></div>
-        <div class="pinfo">
-          <div class="pcat">Санхүү · Татвар</div>
-          <h3>Санхүүгийн програм</h3>
-          <p>Ерөнхий журнал, СТ-1–СТ-4, ТТ-02, тодруулга, хаалтын бичилт, олон компани, cloud хадгалалт.</p>
-          <div class="pfoot"><span class="st">14 хоног үнэгүй</span><span class="go">Турших →</span></div>
-        </div>
-      </a>
-      <a class="pcard" href="payroll.html">
-        <div class="pthumb"><img src="img/salary.jpg" alt="Цалин бодогч" loading="lazy"></div>
-        <div class="pinfo">
-          <div class="pcat">Цалин</div>
-          <h3>Цалин бодогч</h3>
-          <p>Цалин, НДШ, ХХОАТ, хөнгөлөлтийг сар бүр автоматаар; цалингийн хуудас, НД тайлан, ХХОАТ маягтын Excel.</p>
-          <div class="pfoot"><span class="st">Beta · үнэгүй</span><span class="go">Нээх →</span></div>
-        </div>
-      </a>
-      <a class="pcard" href="budget.html">
-        <div class="pthumb"><img src="img/budget.jpg" alt="Бизнес төлөвлөлт" loading="lazy"></div>
-        <div class="pinfo">
-          <div class="pcat">Төлөвлөлт · Төсөв</div>
-          <h3>Бизнес төлөвлөлт</h3>
-          <p>Өмнөх жилийн шинжилгээ → 6 алхмын асуулт → орлогын тайлан, хугарлын цэг, мөнгөн урсгал, what-if хувилбар.</p>
-          <div class="pfoot"><span class="st">Beta · үнэгүй</span><span class="go">Нээх →</span></div>
-        </div>
-      </a>
+    <div class="sec-top"><div><h2>Санхүүгийн програм, цалин, төлөвлөлт</h2><p class="sub">Гурвуулаа нэг бүртгэлтэй. Санхүүгийн програм 14 хоног үнэгүй; цалин, төсөв beta хугацаанд үнэгүй.</p></div></div>
+    <div class="pgrid wide">
+      <a class="pc rv" href="businessbi_journal.html"><div class="m"><img src="img/finance.jpg" alt="Санхүүгийн програм" loading="lazy"><div class="qa"><span>Нээх</span></div></div><div class="ct"><span class="t">Санхүүгийн програм</span><span class="pr">14 хоног үнэгүй</span></div></a>
+      <a class="pc rv" href="payroll.html"><div class="m"><img src="img/salary.jpg" alt="Цалин бодогч" loading="lazy"><div class="qa"><span>Нээх</span></div></div><div class="ct"><span class="t">Цалин бодогч</span><span class="pr">Beta · үнэгүй</span></div></a>
+      <a class="pc rv" href="budget.html"><div class="m"><img src="img/budget.jpg" alt="Бизнес төлөвлөлт" loading="lazy"><div class="qa"><span>Нээх</span></div></div><div class="ct"><span class="t">Бизнес төлөвлөлт</span><span class="pr">Beta · үнэгүй</span></div></a>
     </div>
   </div>
 </section>
@@ -602,6 +640,26 @@ body.home.hdr-hidden .bbi-nav{transform:translateY(-100%)}
       console.warn('newsletter', err); show('Одоогоор бүртгэж чадсангүй. Дахин оролдоно уу.', false);
     }finally{ btn.disabled=false; }
   });
+})();
+</script>
+
+<script>
+/* ═══ Ангиллын slider сум + картууд гарч ирэх хөдөлгөөн ═══ */
+(function(){
+  const t=document.getElementById('collTrack'), pv=document.getElementById('collPrev'), nx=document.getElementById('collNext'), nav=document.getElementById('collNav');
+  if(t){
+    const card=()=>t.querySelector('.mcard');
+    const step=()=>{ const c=card(); return c? c.getBoundingClientRect().width+parseFloat(getComputedStyle(t).columnGap||0):300; };
+    const upd=()=>{ pv.hidden=t.scrollLeft<4; nx.hidden=t.scrollLeft+t.clientWidth>=t.scrollWidth-4;
+      const m=t.querySelector('.m'); if(m){ const a=m.getBoundingClientRect(), b=nav.parentElement.getBoundingClientRect(); nav.style.top=(a.top-b.top+a.height/2-28)+'px'; } };
+    pv.onclick=()=>t.scrollBy({left:-step(),behavior:'smooth'});
+    nx.onclick=()=>t.scrollBy({left:step(),behavior:'smooth'});
+    t.addEventListener('scroll',upd,{passive:true}); addEventListener('resize',upd); addEventListener('load',upd); upd();
+  }
+  const els=[...document.querySelectorAll('.rv')];
+  if(!('IntersectionObserver' in window)){ els.forEach(e=>e.classList.add('in')); return; }
+  const io=new IntersectionObserver(es=>{ es.forEach(x=>{ if(!x.isIntersecting) return; const sib=[...x.target.parentElement.children].filter(c=>c.classList.contains('rv')); x.target.style.transitionDelay=(Math.max(0,sib.indexOf(x.target))%6*0.08)+'s'; x.target.classList.add('in'); io.unobserve(x.target); }); },{rootMargin:'0px 0px -40px 0px'});
+  els.forEach(e=>io.observe(e));
 })();
 </script>
 </body>
