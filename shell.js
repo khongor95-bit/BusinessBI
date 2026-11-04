@@ -112,25 +112,25 @@ if(!document.getElementById('nlModal') && !B.dataset.noFloat) B.appendChild(frag
   const card=(h,img,t,p)=>`<a class="pc" href="${h}"><div class="m"><img src="img/${img}" alt="" loading="lazy"><div class="qa"><span>Үзэх</span></div></div><div class="ct"><span class="t">${t}</span><span class="pr">${p}</span></div></a>`;
   const TABS=[
     {k:'tools',n:'Хэрэгсэл',all:['tools.html','Бүх хэрэгсэл',9],items:[
-      card('ndsh_hhoat_converter.html','cover-ndsh.jpg','НДШ / ХХОАТ хөрвүүлэгч','5,000₮ / тайлан'),
-      card('noat_matcher.html','cover-noat.jpg','НӨАТ тулгагч','Үнэгүй'),
-      card('invoice_generator.html','cover-invoice.jpg','Нэхэмжлэх үүсгэгч','Үнэгүй'),
-      card('financial_dashboard.html','cover-financial.jpg','Санхүүгийн шинжилгээ','Үнэгүй')]},
+      card('ndsh_hhoat_converter.html','tool-ndsh.jpg','НДШ / ХХОАТ хөрвүүлэгч','5,000₮ / тайлан'),
+      card('noat_matcher.html','tool-noat.jpg','НӨАТ тулгагч','Үнэгүй'),
+      card('invoice_generator.html','tool-invoice.jpg','Нэхэмжлэх үүсгэгч','Үнэгүй'),
+      card('financial_dashboard.html','tool-financial.jpg','Санхүүгийн шинжилгээ','Үнэгүй')]},
     {k:'apps',n:'Програм',all:['pricing.html','Бүх програм',4],items:[
-      card('businessbi_journal.html','cover-finance.jpg','Санхүүгийн програм','14 хоног үнэгүй'),
-      card('payroll.html','cover-salary.jpg','Цалин бодогч','Beta · үнэгүй'),
-      card('budget.html','cover-budget.jpg','Бизнес төлөвлөлт','Beta · үнэгүй'),
-      card('dashboard.html?demo=1','cover-charts.jpg','Дашбоард','Үнэгүй')]},
+      card('businessbi_journal.html','finance.jpg','Санхүүгийн програм','14 хоног үнэгүй'),
+      card('payroll.html','salary.jpg','Цалин бодогч','Beta · үнэгүй'),
+      card('budget.html','budget.jpg','Бизнес төлөвлөлт','Beta · үнэгүй'),
+      card('dashboard.html?demo=1','powerbi-dashboard.png','Дашбоард','Үнэгүй')]},
     {k:'auto',n:'Автомат',all:['tools.html','Бүх хэрэгсэл',9],items:[
-      card('receipt_scan.html','cover-receipt.jpg','Баримт уншуулагч','Үнэгүй'),
-      card('businessbi_journal.html#page=reports','cover-ndshchart.jpg','СТ-1–4 тайлан','14 хоног үнэгүй'),
-      card('noat_matcher.html','cover-noat.jpg','eBarimt тулгалт','Үнэгүй'),
-      card('ndsh_hhoat_converter.html','cover-ndsh.jpg','ТТД автоматаар','5,000₮ / тайлан')]},
+      card('receipt_scan.html','accounting.png','Баримт уншуулагч','Үнэгүй'),
+      card('businessbi_journal.html#page=reports','excel-dashboard.png','СТ-1–4 тайлан','14 хоног үнэгүй'),
+      card('noat_matcher.html','tool-noat.jpg','eBarimt тулгалт','Үнэгүй'),
+      card('ndsh_hhoat_converter.html','tool-ndsh.jpg','ТТД автоматаар','5,000₮ / тайлан')]},
     {k:'net',n:'Сүлжээ',all:['accountants.html','Бүх нягтлан',''],items:[
-      card('accountants.html','cover-network.jpg','Нягтлан хайх','Үнэгүй'),
-      card('accountant_signup.html','cover-receipt.jpg','Сүлжээнд элсэх','Үнэгүй'),
-      card('pricing.html','cover-finance.jpg','Үнэ, багц','Харах'),
-      card('contact.html','cover-ndshchart.jpg','Холбоо барих','1 ажлын өдөрт')]}
+      card('accountants.html','training.png','Нягтлан хайх','Үнэгүй'),
+      card('accountant_signup.html','accounting.png','Сүлжээнд элсэх','Үнэгүй'),
+      card('pricing.html','finance.jpg','Үнэ, багц','Харах'),
+      card('contact.html','excel-dashboard.png','Холбоо барих','1 ажлын өдөрт')]}
   ];
   function init(){
     const nav=document.querySelector('.bbi-nav'), menu=document.getElementById('bbiMenu'); if(!nav||!menu||nav.dataset.home) return !!(nav&&menu);
