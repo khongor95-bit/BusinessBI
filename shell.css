@@ -263,3 +263,5 @@ body.ol .tool-ic:empty{display:none}
 body.ol .alert-icon{font-size:12px}
 /* Хэрэгслийн карт, panel — other-levels: 16px булан, саарал хүрээ */
 body.ol:not(.home) .card,body.ol:not(.home) .panel{border-radius:16px;border-color:#e5e7eb}
+/* Хэрэгслийн хуудсанд чат товч зүүн баганыг хаахгүй — баруун доод буланд */
+body.ol:not(.home) .chat-fab{left:auto;right:20px;bottom:20px}

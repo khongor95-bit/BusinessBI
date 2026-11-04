@@ -8,7 +8,7 @@
 <script src="ebarimt.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="site.css">
-<link rel="stylesheet" href="shell.css?v=20261104b">
+<link rel="stylesheet" href="shell.css?v=20261104c">
 <script src="site.js" defer></script>
 <script src="shell.js?v=20261104b" defer></script>
 
@@ -262,6 +262,41 @@
 .bbi-nav-links a:hover{color:#b79a63}
 .bbi-back{display:flex;align-items:center;gap:5px;color:#6b7280!important;font-weight:600!important}
 
+
+  /* ═══ Нягт layout — 1440×900 дэлгэцэнд зүүн багана бүхэлдээ багтана ═══ */
+  .wrap{margin-top:14px}
+  .layout{grid-template-columns:372px minmax(0,1fr); gap:18px}
+  .col-left{position:sticky; top:14px}
+  body.hdr-scrolled .col-left{top:98px}
+  .col-left .panel{margin-bottom:10px; padding:14px 16px}
+  .panel h2{font-size:15px; margin-bottom:10px}
+  .step-label{display:flex; align-items:center; gap:6px; margin-bottom:3px}
+  .m-grid{grid-template-columns:repeat(4,1fr); gap:6px; margin-top:4px}
+  .m-card{min-height:52px; padding:6px 4px; gap:1px; border-radius:12px!important}
+  .m-card .micon{display:none}
+  .m-card .mtitle{font-size:12.5px}
+  .m-card .mhint,.m-card .mcount{font-size:10px}
+  .m-card .mname{display:none}
+  .m-card .badge-num{display:none}
+  .m-card.done .mtitle::before{content:"✓ "; color:#a87b2c}
+  .col-left .hint{margin-top:8px; font-size:11.5px}
+  .col-left .hint{display:none}
+  .col-left #dlHint{display:block}
+  .ttd-actions{flex-direction:row; flex-wrap:wrap; gap:6px; margin-top:8px}
+  .ttd-btn{flex:1 1 auto; padding:8px 10px; font-size:12px; border-radius:999px}
+  #ttdLookupBtn{flex-basis:100%}
+  .ttd-status{padding:7px 10px; font-size:12px}
+  .dl-btn{width:100%; justify-content:center; padding:12px 18px; border-radius:999px; background:#171717}
+  .dl-btn:hover{background:#000}
+  /* Заавар — жижиг товч, дарахад зүүн баганын дээр нээгдэнэ */
+  .guide-btn{margin-left:auto; border:1px solid #e5e7eb; background:#fff; border-radius:999px; padding:3px 10px; font-size:11px; font-weight:600; letter-spacing:0; text-transform:none; color:#171717; cursor:pointer}
+  .guide-btn:hover{border-color:#171717}
+  details.bbi-guide{display:none}
+  details.bbi-guide.pop{display:block; position:absolute; z-index:40; width:min(560px,calc(100vw - 40px)); margin:6px 0 0!important; box-shadow:0 24px 60px -24px rgba(0,0,0,.35)}
+  details.bbi-guide.pop summary{display:none!important}
+  #monthPanel{position:relative}
+  @media(max-width:1100px){ .layout{grid-template-columns:1fr} .col-left{position:static} .m-grid{grid-template-columns:repeat(6,1fr)} }
+  @media(max-width:680px){ .m-grid{grid-template-columns:repeat(4,1fr)} }
 </style>
 
 </head>
@@ -274,7 +309,7 @@
   <!-- LEFT: month input + download -->
   <div class="col-left">
     <div class="panel" id="monthPanel">
-      <div class="step-label">Алхам 1 — Сарын тайлан</div>
+      <div class="step-label">Алхам 1 — Сарын тайлан <button type="button" class="guide-btn" id="guideBtn" aria-expanded="false">Заавар</button></div>
       <h2 id="monthHeading">НДШ тайлан оруулах</h2>
       <div class="m-grid" id="mGrid"></div>
       <p class="hint">Сар бүр дээр дарж тухайн сарын НДШ тайлангийн PDF-ийг оруулна уу. Оруулсан сараар улирлын тайлан автоматаар бэлдэнэ.</p>
@@ -1891,6 +1926,7 @@ function buildExcel(){
 
   const fname=`ХХОАТ_маягт_${year}_${qName}.xlsx`;
   XLSX.writeFile(wb,fname);
+  try{ localStorage.removeItem('bbi_ndsh_pending_dl'); }catch(e){}
   const missingTTD=list.filter(r=>!TTD_FULL_RE.test(ttdOf(r.reg)));
   if(missingTTD.length){
     toast(`Excel татагдлаа — анхаар: ${missingTTD.length} ажилтны ТТД дутуу тул регистрээр орсон. Алхам 2-оос нөхөж болно.`);
@@ -1901,5 +1937,56 @@ function buildExcel(){
 </script>
 
 <section class="bbi-band"><p class="k">BusinessBI санхүүгийн програм</p><h2>Журналаа бич. Тайлан нь бэлэн.</h2><p>Гүйлгээгээ бүртгэхэд СТ-1–СТ-4 санхүүгийн тайлан, татварын тайлан автоматаар — Сангийн сайдын 361-р тушаалын дагуу.</p><a href="businessbi_journal.html">14 хоног үнэгүй турших →</a></section>
+
+<script>
+/* ═══ Заавар товч — details-ийг зүүн баганын дээр popover болгож нээнэ ═══ */
+(function(){
+  const g=document.querySelector('details.bbi-guide'), b=document.getElementById('guideBtn'), mp=document.getElementById('monthPanel');
+  if(!g||!b||!mp) return;
+  mp.appendChild(g); g.open=true;
+  b.onclick=e=>{ e.stopPropagation(); const on=!g.classList.contains('pop'); g.classList.toggle('pop',on); b.setAttribute('aria-expanded',on); };
+  document.addEventListener('click',e=>{ if(g.classList.contains('pop') && !g.contains(e.target)) { g.classList.remove('pop'); b.setAttribute('aria-expanded','false'); } });
+})();
+
+/* ═══ Нэвтрэх (Google/имэйл) үед хуудас дахин ачаалагддаг тул оруулсан тайланг
+       энэ хөтөчид 2 цаг хадгалж, буцаж ирэхэд сэргээнэ. Татсны дараа устгана. ═══ */
+(function(){
+  const KEY='bbi_ndsh_session_v1', PEND='bbi_ndsh_pending_dl', TTL=2*3600e3;
+  const save=()=>{ try{
+    const months=Object.keys(state.data).filter(m=>state.data[m]&&!state.data[m].error);
+    if(!months.length){ localStorage.removeItem(KEY); return; }
+    localStorage.setItem(KEY, JSON.stringify({at:Date.now(), year:state.year, data:state.data}));
+  }catch(e){ console.warn('session save', e); } };
+  const clear=()=>{ try{ localStorage.removeItem(KEY); localStorage.removeItem(PEND); }catch(e){} };
+  window.BBINdshSession={save,clear};
+  // refreshSummary дуудагдах бүрд хадгална (сар нэмэх/устгах бүхэнд дуудагддаг)
+  const orig=window.refreshSummary;
+  if(typeof orig==='function'){ window.refreshSummary=function(){ const r=orig.apply(this,arguments); save(); return r; }; }
+  // Сэргээх
+  let restored=false;
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(raw){ const o=JSON.parse(raw);
+      if(o && Date.now()-o.at<TTL && o.data && !Object.keys(state.data).length){
+        state.year=o.year||state.year; Object.assign(state.data,o.data);
+        renderMonths(); refreshSummary(); restored=true;
+        toast('Өмнө оруулсан тайлан сэргээгдлээ ✓');
+      } else if(o && Date.now()-o.at>=TTL) localStorage.removeItem(KEY);
+    }
+  }catch(e){ console.warn('session restore', e); }
+  // Нэвтрээгүй үед «Татах» дарвал — нэвтэрч буцаж ирээд автоматаар үргэлжлүүлнэ
+  const btn=$('dlBtn'), handler=btn.onclick;
+  btn.onclick=function(ev){
+    try{ if(!(window.BBIGate&&BBIGate.isLoggedIn&&BBIGate.isLoggedIn())){ save(); localStorage.setItem(PEND, String(Date.now())); } }catch(e){}
+    return handler.call(this,ev);
+  };
+  if(restored){
+    let p=0; try{ p=+localStorage.getItem(PEND)||0; }catch(e){}
+    if(p && Date.now()-p<TTL && window.BBIGate && BBIGate.onReady){
+      BBIGate.onReady(u=>{ if(!u) return; try{ localStorage.removeItem(PEND); }catch(e){} if(!btn.disabled) setTimeout(()=>btn.click(),400); });
+    }
+  }
+})();
+</script>
 </body>
 </html>
