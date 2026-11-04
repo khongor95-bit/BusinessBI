@@ -125,7 +125,7 @@ if(!document.getElementById('nlModal') && !B.dataset.noFloat) B.appendChild(frag
       card('receipt_scan.html','accounting.png','Баримт уншуулагч','Үнэгүй'),
       card('businessbi_journal.html#page=reports','excel-dashboard.png','СТ-1–4 тайлан','14 хоног үнэгүй'),
       card('dashboard_maker.html','excel-dashboard.png','Дашбоард үүсгэгч','Үнэгүй харах'),
-      card('ndsh_hhoat_converter.html','tool-ndsh.jpg','ТТД автоматаар','5,000₮ / тайлан')]},
+      card('templates.html','tpl/payroll.jpg','Excel загварууд','19,000₮-с')]},
     {k:'net',n:'Нягтлан',all:['accountants.html','Бүх нягтлан',''],items:[
       card('accountants.html','training.png','Нягтлан хайх','Үнэгүй'),
       card('for_accountants.html','accounting.png','Нягтлан бол элсэх','Үнэгүй'),

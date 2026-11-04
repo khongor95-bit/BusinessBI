@@ -21,7 +21,7 @@
   ];
   const CONTACT = { email: "hello@businessbi.mn", phone: "+976 9911-2233", phoneHref: "tel:+97699112233" };
   const page = (location.pathname.split("/").pop() || "index.html").toLowerCase();
-  const isActive = (href) => page === href || (href === "accountants.html" && /accountant_signup|for_accountants|partner|my\.html|contract/.test(page)) || (href === "tools.html" && /converter|matcher|invoice|dashboard|payroll|budget/.test(page));
+  const isActive = (href) => page === href || (href === "accountants.html" && /accountant_signup|for_accountants|partner|my\.html|contract/.test(page)) || (href === "tools.html" && /converter|matcher|invoice|dashboard|payroll|budget|templates/.test(page));
 
   const USER_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
 
@@ -60,6 +60,7 @@
             <a href="budget.html">Бизнес төлөвлөлт</a>
             <a href="invoice_generator.html">Нэхэмжлэх үүсгэгч</a>
             <a href="financial_dashboard.html">Санхүүгийн шинжилгээ</a>
+            <a href="templates.html">Excel загварууд</a>
           </div>
           <div class="bbi-foot-col">
             <h5>Үйлчилгээ</h5>

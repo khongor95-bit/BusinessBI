@@ -7,6 +7,17 @@ export const PRODUCTS: Record<string, { amount: number; currency: string; title:
   ndsh_hhoat: { amount: 5000, currency: "MNT", title: "НДШ → ХХОАТ маягт (1 тайлан татах)", validHours: 24 },
   receipt:    { amount: 5000, currency: "MNT", title: "Баримтын зураг → бичилт (24 цагийн эрх)", validHours: 24 },
   dashboard:  { amount: 9900, currency: "MNT", title: "Дашбоард үүсгэгч — Excel дашбоард татах", validHours: 24 },
+  tpl_payroll: { amount: 29000, currency: "MNT", title: "Excel загвар — Цалин бодох загвар", validHours: 720 },
+  tpl_vat: { amount: 19000, currency: "MNT", title: "Excel загвар — НӨАТ-ын бүртгэл, тооцоо", validHours: 720 },
+  tpl_fs: { amount: 39000, currency: "MNT", title: "Excel загвар — Санхүүгийн тайлан (СТ-1, СТ-2)", validHours: 720 },
+  tpl_depr: { amount: 19000, currency: "MNT", title: "Excel загвар — Үндсэн хөрөнгийн элэгдэл", validHours: 720 },
+  tpl_cashflow: { amount: 25000, currency: "MNT", title: "Excel загвар — Мөнгөн урсгалын төлөвлөгөө", validHours: 720 },
+  tpl_budget: { amount: 25000, currency: "MNT", title: "Excel загвар — Төсөв ба гүйцэтгэл", validHours: 720 },
+  tpl_inventory: { amount: 19000, currency: "MNT", title: "Excel загвар — Агуулахын бүртгэл", validHours: 720 },
+  tpl_sales: { amount: 29000, currency: "MNT", title: "Excel загвар — Борлуулалтын дашбоард", validHours: 720 },
+  tpl_feasibility: { amount: 49000, currency: "MNT", title: "Excel загвар — ТЭЗҮ — 5 жилийн санхүүгийн загвар", validHours: 720 },
+  tpl_aging: { amount: 19000, currency: "MNT", title: "Excel загвар — Авлагын насжилт", validHours: 720 },
+  tpl_all: { amount: 129000, currency: "MNT", title: "Excel загвар — бүх 10 загварын багц", validHours: 720 },
 };
 export const REUSE_PENDING_MS = 8 * 60 * 1000;   // WIRE intent 10 мин TTL
 
