@@ -110,27 +110,23 @@ if(!document.getElementById('nlModal') && !B.dataset.noFloat) B.appendChild(frag
     net:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M14 20c0-2.5 1.5-4.5 4-4.5s3 1.5 3 3"/></svg>'
   };
   const card=(h,img,t,p)=>`<a class="pc" href="${h}"><div class="m"><img src="img/${img}" alt="" loading="lazy"><div class="qa"><span>Үзэх</span></div></div><div class="ct"><span class="t">${t}</span><span class="pr">${p}</span></div></a>`;
+  // Давхардалгүй: карт бүр зөвхөн нэг табд, зураг бүр нэг удаа. «Нягтлан олох» дээд цэсэнд тусдаа байгаа тул энд оруулахгүй.
   const TABS=[
-    {k:'tools',n:'Хэрэгсэл',all:['tools.html','Бүх хэрэгсэл',9],items:[
+    {k:'tools',n:'Хэрэгсэл',all:['tools.html','Бүх хэрэгсэл',''],items:[
       card('ndsh_hhoat_converter.html','tool-ndsh.jpg','НДШ / ХХОАТ хөрвүүлэгч','5,000₮ / тайлан'),
       card('noat_matcher.html','tool-noat.jpg','НӨАТ тулгагч','Үнэгүй'),
       card('invoice_generator.html','tool-invoice.jpg','Нэхэмжлэх үүсгэгч','Үнэгүй'),
-      card('financial_dashboard.html','tool-financial.jpg','Санхүүгийн шинжилгээ','Үнэгүй')]},
-    {k:'apps',n:'Програм',all:['pricing.html','Бүх програм',4],items:[
+      card('receipt_scan.html','accounting.png','Баримт уншуулагч','5,000₮ / 24 цаг')]},
+    {k:'apps',n:'Програм',all:['pricing.html','Үнэ, багц',''],items:[
       card('businessbi_journal.html','finance.jpg','Санхүүгийн програм','14 хоног үнэгүй'),
       card('payroll.html','salary.jpg','Цалин бодогч','Beta · үнэгүй'),
       card('budget.html','budget.jpg','Бизнес төлөвлөлт','Beta · үнэгүй'),
-      card('custom_dashboard.html','custom-powerbi.jpg','Захиалгат дашбоард','290,000₮-с')]},
-    {k:'auto',n:'Автомат',all:['tools.html','Бүх хэрэгсэл',9],items:[
-      card('receipt_scan.html','accounting.png','Баримт уншуулагч','Үнэгүй'),
-      card('businessbi_journal.html#page=reports','excel-dashboard.png','СТ-1–4 тайлан','14 хоног үнэгүй'),
+      card('financial_dashboard.html','tool-financial.jpg','Санхүүгийн шинжилгээ','Үнэгүй')]},
+    {k:'auto',n:'Excel',all:['templates.html','Бүх Excel загвар',''],items:[
+      card('templates.html','tpl/payroll.jpg','Excel загварууд','19,000₮-с'),
       card('dashboard_maker.html','excel-dashboard.png','Дашбоард үүсгэгч','Үнэгүй харах'),
-      card('templates.html','tpl/payroll.jpg','Excel загварууд','19,000₮-с')]},
-    {k:'net',n:'Нягтлан',all:['accountants.html','Бүх нягтлан',''],items:[
-      card('accountants.html','training.png','Нягтлан хайх','Үнэгүй'),
-      card('for_accountants.html','accounting.png','Нягтлан бол элсэх','Үнэгүй'),
-      card('pricing.html','finance.jpg','Үнэ, багц','Харах'),
-      card('contact.html','excel-dashboard.png','Холбоо барих','1 ажлын өдөрт')]}
+      card('custom_dashboard.html','custom-powerbi.jpg','Захиалгат дашбоард','290,000₮-с'),
+      card('templates.html#feasibility','tpl/feasibility.jpg','ТЭЗҮ загвар','49,000₮')]}
   ];
   // Урамшууллын код: ?ref=CODE → 60 хоног хадгална (pay.js төлбөрийн цонхонд автоматаар хэрэглэнэ)
   try{ const rf=new URLSearchParams(location.search).get('ref'); if(rf&&/^[A-Za-z0-9]{4,16}$/.test(rf)) localStorage.setItem('bbi_ref',JSON.stringify({code:rf.toUpperCase(),t:Date.now()})); }catch(e){}

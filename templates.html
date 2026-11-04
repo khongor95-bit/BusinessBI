@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <script src="mp.js"></script>
-<script src="pay.js?v=20261105"></script>
+<script src="pay.js?v=20261105b"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="shell.css?v=20261104c">
 <script src="site.js?v=20261105" defer></script>
-<script src="shell.js?v=20261105" defer></script>
+<script src="shell.js?v=20261105b" defer></script>
 <title>Excel загварын сан — цалин, НӨАТ, СТ, ТЭЗҮ · BusinessBI</title>
 <meta name="description" content="Монголын хууль, татварт тохирсон бэлэн Excel загварууд: цалин (НДШ, ХХОАТ), НӨАТ, санхүүгийн тайлан, элэгдэл, мөнгөн урсгал, төсөв, агуулах, ТЭЗҮ, авлагын насжилт. 19,000₮-с.">
 <link rel="canonical" href="https://businessbi.mn/templates.html">
@@ -127,8 +127,8 @@ body{background:#fff;font-family:var(--bbi-font);color:#111827;-webkit-font-smoo
   <section class="bundle" id="bundle">
     <div>
       <span class="k">Хамгийн ашигтай</span>
-      <h2>Бүх 10 загвар нэг дор</h2>
-      <p>Цалин, НӨАТ, СТ-1/2, элэгдэл, мөнгөн урсгал, төсөв, агуулах, борлуулалтын дашбоард, ТЭЗҮ, авлагын насжилт — нэг ZIP файлаар. Нягтлан, жижиг бизнест бүтэн жилийн ажилд хэрэгтэй бүх загвар.</p>
+      <h2>Бүх 11 загвар нэг дор</h2>
+      <p>Цалин, цалингийн задаргаа мэйлдэх, НӨАТ, СТ-1/2, элэгдэл, мөнгөн урсгал, төсөв, агуулах, борлуулалтын дашбоард, ТЭЗҮ, авлагын насжилт — нэг ZIP файлаар. Нягтлан, жижиг бизнест бүтэн жилийн ажилд хэрэгтэй бүх загвар.</p>
     </div>
     <div class="r">
       <div class="price" id="bPrice"></div>
@@ -158,7 +158,7 @@ body{background:#fff;font-family:var(--bbi-font);color:#111827;-webkit-font-smoo
 <div class="toast" id="toast"></div>
 
 <script src="tpl/core.js?v=20261105"></script>
-<script src="tpl/templates.js?v=20261105"></script>
+<script src="tpl/templates.js?v=20261105b"></script>
 <script>
 (function(){
   const $=id=>document.getElementById(id);
@@ -167,6 +167,7 @@ body{background:#fff;font-family:var(--bbi-font);color:#111827;-webkit-font-smoo
   const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const toast=t=>{const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(()=>e.classList.remove('on'),3400);};
   const FEAT={
+    payslip:['«Цалин бодох загвар»-ын бүх тооцоо + ажилтан бүрийн и-мэйл','Нэг товчоор ажилтан бүрт өөрийнх нь цалингийн хуудсыг PDF хавсралттай илгээнэ','Outlook эсвэл Gmail (App password) — кирилл гарчиг зөв харагдана','Тест илгээлт, илгээх эсэх сонголт, төлөв, илгээсэн цаг','ZIP: Excel файл + TsalinMail.bas макро + суулгах заавар (Windows Excel)'],
     payroll:['Үндсэн цалин, ажилласан өдрөөр бодогдсон цалин, нэмэгдэл, урамшуулал','НДШ 11.5% (дээд хязгаартай), ажил олгогчийн 12.5%','ХХОАТ — ОЗЦ-ийн шатлалаар 20,000₮–0₮ хөнгөлөлт','Ажилтан сонгоход хэвлэх цалингийн хуудас','Цалингийн зардлын бүтэц, график'],
     vat:['Борлуулалт, худалдан авалтын баримтын бүртгэл (300 мөр)','НӨАТ-тай дүнгээс НӨАТ автоматаар задарна','Хасагдах / хасагдахгүй баримт сонгох','Сар бүрийн төлөх НӨАТ, дараа сард шилжих илүү төлөлт','Сар бүрийн график'],
     fs:['Гүйлгээ балансаас СТ-1, СТ-2 автоматаар','Данс бүрийг тайлангийн мөрөнд жагсаалтаас холбоно','Баланс тэнцэж буй эсэхийг шалгана','Эргэлтийн, түргэн харьцаа, ROA, ROE, ашгийн хувь','Хөрөнгийн бүтэц, орлого зардлын график'],
@@ -197,15 +198,20 @@ body{background:#fff;font-family:var(--bbi-font);color:#111827;-webkit-font-smoo
   async function ensure(){ if(libs) return libs; if(!window.ExcelJS) await load('https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js'); if(!window.JSZip) await load('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'); return libs={ExcelJS:window.ExcelJS,JSZip:window.JSZip}; }
   const save=(blob,name)=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2500);};
   const XL='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  const clean=n=>n.replace(/[\\/:*?"<>|]+/g,' ').trim();
+  async function extras(id){ const out=[]; for(const x of ((BBITpl.EXTRAS||{})[id]||[])){ if(x.url){ const r=await fetch(x.url,{cache:'no-store'}); if(!r.ok) throw new Error(x.name+' татагдсангүй'); out.push([x.name,new Uint8Array(await r.arrayBuffer())]); } else out.push([x.name,x.text]); } return out; }
   async function downloadOne(id,btn){
     const t=L.find(x=>x.id===id); const lbl=btn&&btn.textContent; if(btn){btn.disabled=true;btn.textContent='Файл бэлдэж байна…';}
-    try{ const u=await BBITpl.build(id,await ensure()); save(new Blob([u],{type:XL}),t.name.replace(/[\\/:*?"<>|]+/g,' ')+' — BusinessBI.xlsx'); toast('Татагдлаа ✓ '+t.name); }
+    try{ const lb=await ensure(); const u=await BBITpl.build(id,lb); const ex=await extras(id);
+      if(ex.length){ const z=new lb.JSZip(); z.file(clean(t.name)+'.xlsx',u); ex.forEach(([n,d])=>z.file(n,d)); save(await z.generateAsync({type:'blob'}),clean(t.name)+' — BusinessBI.zip'); }
+      else save(new Blob([u],{type:XL}),clean(t.name)+' — BusinessBI.xlsx');
+      toast('Татагдлаа ✓ '+t.name); }
     catch(e){ console.error(e); toast('Файл үүсгэж чадсангүй: '+(e.message||e)); }
     finally{ if(btn){btn.disabled=false;btn.textContent=lbl;} refresh(); }
   }
   async function downloadAll(btn){
     const lbl=btn&&btn.textContent; if(btn){btn.disabled=true;btn.textContent='Багц бэлдэж байна…';}
-    try{ const lb=await ensure(); const zip=new lb.JSZip(); for(const t of L){ zip.file(t.name.replace(/[\\/:*?"<>|]+/g,' ')+'.xlsx',await BBITpl.build(t.id,lb)); } save(await zip.generateAsync({type:'blob'}),'BusinessBI — Excel загварын багц.zip'); toast('Бүх 10 загвар татагдлаа ✓'); }
+    try{ const lb=await ensure(); const zip=new lb.JSZip(); for(const t of L){ zip.file(clean(t.name)+'.xlsx',await BBITpl.build(t.id,lb)); for(const [n,d] of await extras(t.id)) zip.file(n,d); } save(await zip.generateAsync({type:'blob'}),'BusinessBI — Excel загварын багц.zip'); toast('Бүх '+L.length+' загвар татагдлаа ✓'); }
     catch(e){ console.error(e); toast('Багц үүсгэж чадсангүй: '+(e.message||e)); }
     finally{ if(btn){btn.disabled=false;btn.textContent=lbl;} refresh(); }
   }
@@ -218,7 +224,7 @@ body{background:#fff;font-family:var(--bbi-font);color:#111827;-webkit-font-smoo
     gate(pay({tool:'tpl_'+id,title:t.name,desc:'Excel загвар — '+t.short,bullets:(FEAT[id]||[]).slice(0,3).concat(['Худалдан авснаас хойш 30 хоног дахин татах үнэгүй']),meta:{template:id}},()=>downloadOne(id,btn)),{tool:'Excel загвар',action:'download'})();
   }
   function buyAll(btn){
-    gate(pay({tool:'tpl_all',title:B.name,desc:'Бүх 10 Excel загвар нэг ZIP файлаар.',bullets:['Цалин, НӨАТ, СТ-1/2, элэгдэл, мөнгөн урсгал','Төсөв, агуулах, борлуулалтын дашбоард, ТЭЗҮ, авлагын насжилт','30 хоног дахин татах үнэгүй — нэг нэгээр нь ч татаж болно'],meta:{template:'all'}},()=>downloadAll(btn)),{tool:'Excel загвар',action:'download'})();
+    gate(pay({tool:'tpl_all',title:B.name,desc:'Бүх '+L.length+' Excel загвар нэг ZIP файлаар.',bullets:['Цалин, задаргаа мэйлдэх, НӨАТ, СТ-1/2, элэгдэл, мөнгөн урсгал','Төсөв, агуулах, борлуулалтын дашбоард, ТЭЗҮ, авлагын насжилт','30 хоног дахин татах үнэгүй — нэг нэгээр нь ч татаж болно'],meta:{template:'all'}},()=>downloadAll(btn)),{tool:'Excel загвар',action:'download'})();
   }
   $('bBuy').onclick=()=>buyAll($('bBuy'));
   function refresh(){ const t=tick('tpl_all'); $('bPaid').textContent=t?('Төлсөн — '+t.leftText+' дахин татах үнэгүй'):''; const p=document.querySelector('.md .paid'); if(p){ const id=p.dataset.id; const tt=tick('tpl_'+id)||t; p.textContent=tt?('Төлсөн — '+tt.leftText+' дахин татах үнэгүй'):''; } }
@@ -234,7 +240,7 @@ body{background:#fff;font-family:var(--bbi-font);color:#111827;-webkit-font-smoo
         <div class="pz">${fmt(t.price)}</div>
         <h4>Юу багтсан бэ</h4><ul>${(FEAT[t.id]||[]).map(f=>`<li>${esc(f)}</li>`).join('')}</ul>
         <h4>Хуудсууд</h4><div class="tags">${['Заавар'].concat(t.sheets).map(s=>`<span>${esc(s)}</span>`).join('')}</div>
-        <div class="acts"><button class="obtn dark" id="mBuy" type="button">Худалдаж авах · ${fmt(t.price)}</button><button class="obtn ghost" id="mAll" type="button">Бүх 10 загвар — ${fmt(B.price)}</button><span class="paid" data-id="${t.id}"></span><small>Excel 2016+, Microsoft 365. Файл таны хөтөч дотор үүснэ.</small></div>
+        <div class="acts"><button class="obtn dark" id="mBuy" type="button">Худалдаж авах · ${fmt(t.price)}</button><button class="obtn ghost" id="mAll" type="button">Бүх ${L.length} загвар — ${fmt(B.price)}</button><span class="paid" data-id="${t.id}"></span><small>Excel 2016+, Microsoft 365. Файл таны хөтөч дотор үүснэ.</small></div>
       </div>`;
     mb.classList.add('on'); document.body.style.overflow='hidden';
     $('mx').onclick=close; $('mBuy').onclick=()=>buyOne(t.id,$('mBuy')); $('mAll').onclick=()=>buyAll($('mAll')); refresh();

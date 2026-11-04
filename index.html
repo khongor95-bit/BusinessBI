@@ -23,7 +23,7 @@
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="shell.css?v=20261104c">
 <script src="site.js?v=20261105" defer></script>
-<script src="shell.js?v=20261105" defer></script>
+<script src="shell.js?v=20261105b" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -164,7 +164,7 @@ a{color:inherit}
 }
 
 /* Бүтээгдэхүүний карт — 436×328 зураг, hover үед хар pill товч */
-#tool-list,#products{padding:20px 0 8px}
+#tool-list,#templates,#custom{padding:20px 0 8px}
 .sec-top{display:flex;justify-content:space-between;align-items:flex-end;gap:32px;margin:0 0 calc(var(--ol-h2))}
 .sec-top .kicker{margin-bottom:16px}
 .sec-top h2{text-align:left}
@@ -339,10 +339,9 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
   <div class="coll-track" id="collTrack">
     <a class="mcard rv" href="businessbi_journal.html"><div class="m"><img src="img/finance.jpg" alt="" loading="lazy"></div><div class="c"><span>Санхүүгийн програм</span></div></a>
     <a class="mcard rv" href="payroll.html"><div class="m"><img src="img/salary.jpg" alt="" loading="lazy"></div><div class="c"><span>Цалин бодогч</span></div></a>
-    <a class="mcard rv" href="ndsh_hhoat_converter.html"><div class="m"><img src="img/tool-ndsh.jpg" alt="" loading="lazy"></div><div class="c"><span>НДШ → ХХОАТ хөрвүүлэгч</span></div></a>
-    <a class="mcard rv" href="noat_matcher.html"><div class="m"><img src="img/tool-noat.jpg" alt="" loading="lazy"></div><div class="c"><span>НӨАТ тулгагч</span></div></a>
     <a class="mcard rv" href="budget.html"><div class="m"><img src="img/budget.jpg" alt="" loading="lazy"></div><div class="c"><span>Бизнес төлөвлөлт</span></div></a>
-    <a class="mcard rv" href="dashboard.html?demo=1"><div class="m"><img src="img/powerbi-dashboard.png" alt="" loading="lazy"></div><div class="c"><span>Дашбоард</span></div></a>
+    <a class="mcard rv" href="dashboard.html?demo=1"><div class="m"><img src="img/powerbi-dashboard.png" alt="" loading="lazy"></div><div class="c"><span>Дашбоард (demo)</span></div></a>
+    <a class="mcard rv" href="accountants.html"><div class="m"><img src="img/training.png" alt="" loading="lazy"></div><div class="c"><span>Нягтлан олох</span></div></a>
   </div>
   <div class="coll-nav" id="collNav">
     <button class="coll-btn prev" id="collPrev" aria-label="Өмнөх" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -373,22 +372,12 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
   </div>
 </div>
 
-<!-- ═══════════ БҮТЭЭГДЭХҮҮН ═══════════ -->
-<section class="sec" id="products">
-  <div class="container">
-    <div class="sec-top"><div><h2>Санхүүгийн програм, цалин, төлөвлөлт</h2><p class="sub">Гурвуулаа нэг бүртгэлтэй. Санхүүгийн програм 14 хоног үнэгүй; цалин, төсөв beta хугацаанд үнэгүй.</p></div></div>
-    <div class="pgrid wide">
-      <a class="pc rv" href="businessbi_journal.html"><div class="m"><img src="img/finance.jpg" alt="Санхүүгийн програм" loading="lazy"><div class="qa"><span>Нээх</span></div></div><div class="ct"><span class="t">Санхүүгийн програм</span><span class="pr">14 хоног үнэгүй</span></div></a>
-      <a class="pc rv" href="payroll.html"><div class="m"><img src="img/salary.jpg" alt="Цалин бодогч" loading="lazy"><div class="qa"><span>Нээх</span></div></div><div class="ct"><span class="t">Цалин бодогч</span><span class="pr">Beta · үнэгүй</span></div></a>
-      <a class="pc rv" href="budget.html"><div class="m"><img src="img/budget.jpg" alt="Бизнес төлөвлөлт" loading="lazy"><div class="qa"><span>Нээх</span></div></div><div class="ct"><span class="t">Бизнес төлөвлөлт</span><span class="pr">Beta · үнэгүй</span></div></a>
-    </div>
-  </div>
-</section>
+
 
 <!-- ═══════════ EXCEL ЗАГВАРУУД ═══════════ -->
 <section class="sec" id="templates">
   <div class="container">
-    <div class="sec-top"><div><p class="kicker">Шинэ</p><h2>Excel загварууд</h2><p class="sub">Монголын хууль, татварын хувиар бодогддог бэлэн загвар — цалин, НӨАТ, санхүүгийн тайлан, ТЭЗҮ гээд 10 төрөл.</p></div><a class="more" href="templates.html">Бүгдийг үзэх →</a></div>
+    <div class="sec-top"><div><p class="kicker">Шинэ</p><h2>Excel загварууд</h2><p class="sub">Монголын хууль, татварын хувиар бодогддог бэлэн загвар — цалин, НӨАТ, санхүүгийн тайлан, ТЭЗҮ, цалингийн задаргаа мэйлдэх гээд 11 төрөл.</p></div><a class="more" href="templates.html">Бүгдийг үзэх →</a></div>
     <div class="pgrid">
       <a class="pc rv" href="templates.html#payroll"><div class="m"><img src="img/tpl/payroll.jpg" alt="Цалин бодох загвар" loading="lazy"><div class="qa"><span>Үзэх</span></div></div><div class="ct"><span class="t">Цалин бодох загвар</span><span class="pr">29,000₮</span></div></a>
       <a class="pc rv" href="templates.html#fs"><div class="m"><img src="img/tpl/fs.jpg" alt="Санхүүгийн тайлан" loading="lazy"><div class="qa"><span>Үзэх</span></div></div><div class="ct"><span class="t">Санхүүгийн тайлан (СТ-1, СТ-2)</span><span class="pr">39,000₮</span></div></a>
@@ -527,7 +516,7 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
 <script>
 /* ═══ Гарчгийн үгсийг хувааж, дэлгэцэнд орохоор доороос гаргана ═══ */
 (function(){
-  const sel='.finder h1, .intro h2, #tool-list h2, #products h2, .net-box h2, .how h2, .last h2';
+  const sel='.finder h1, .intro h2, #tool-list h2, #templates h2, #custom h2, .net-box h2, .how h2, .last h2';
   function split(node){
     [...node.childNodes].forEach(n=>{
       if(n.nodeType===3){

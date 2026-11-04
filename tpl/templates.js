@@ -10,6 +10,7 @@
 
   const LIST = [
     { id: 'payroll', name: 'Цалин бодох загвар', price: 29000, cat: 'Цалин, ХН', short: 'НДШ, ХХОАТ, хөнгөлөлт, гарт олгох цалин, цалингийн хуудас — 2026 оны хувиар.', sheets: ['Цалин', 'Цалингийн хуудас', 'Хураангуй', 'Тохиргоо'] },
+    { id: 'payslip', name: 'Цалингийн задаргаа мэйлдэх', price: 39000, cat: 'Цалин, ХН', short: 'Цалин бодоод ажилтан бүрт цалингийн хуудсыг PDF-ээр нэг товчоор мэйлдэнэ — Outlook эсвэл Gmail.', sheets: ['Цалин', 'Цалингийн хуудас', 'Мэйл', 'Хураангуй', 'Тохиргоо'], zip: true },
     { id: 'vat', name: 'НӨАТ-ын бүртгэл, тооцоо', price: 19000, cat: 'Татвар', short: 'Борлуулалт, худалдан авалтын падаан, сар бүрийн төлөх / илүү төлсөн НӨАТ.', sheets: ['Борлуулалт', 'Худалдан авалт', 'Сарын тооцоо'] },
     { id: 'fs', name: 'Санхүүгийн тайлан (СТ-1, СТ-2)', price: 39000, cat: 'НББ', short: 'Гүйлгээ балансаас баланс, орлогын тайлан, санхүүгийн харьцаа автоматаар.', sheets: ['Гүйлгээ баланс', 'СТ-1 Баланс', 'СТ-2 Орлого', 'Харьцаа'] },
     { id: 'depr', name: 'Үндсэн хөрөнгийн элэгдэл', price: 19000, cat: 'НББ', short: 'Хөрөнгийн бүртгэл, шулуун шугамын элэгдэл, сар бүрийн хуваарь, үлдэгдэл өртөг.', sheets: ['Хөрөнгө', 'Сарын хуваарь', 'Ангиллаар', 'Тохиргоо'] },
@@ -20,12 +21,22 @@
     { id: 'feasibility', name: 'ТЭЗҮ — 5 жилийн санхүүгийн загвар', price: 49000, cat: 'Бизнес төлөвлөгөө', short: 'Хөрөнгө оруулалт, зээл, орлого зардлын төсөөлөл, NPV, IRR, өгөөжийн хугацаа, хугарлын цэг.', sheets: ['Таамаглал', 'Төсөөлөл', 'Мөнгөн урсгал', 'Зээл', 'Үр ашиг'] },
     { id: 'aging', name: 'Авлагын насжилт', price: 19000, cat: 'НББ', short: 'Нэхэмжлэх бүрийн хугацаа хэтрэлт, харилцагчаар 0–30 / 31–60 / 61–90 / 90+ хоног.', sheets: ['Нэхэмжлэх', 'Насжилт', 'Тохиргоо'] }
   ];
-  const BUNDLE = { id: 'all', name: 'Бүх 10 загвар — багц', price: 129000 };
+  const BUNDLE = { id: 'all', name: 'Бүх 11 загвар — багц', price: 149000 };
 
   /* ═════════ 1. ЦАЛИН ═════════ */
-  async function payroll(ExcelJS, JSZip) {
-    const wb = newBook(ExcelJS, 'Цалин бодох загвар');
-    guide(wb, 'Цалин бодох загвар', [
+  async function payroll(ExcelJS, JSZip, mail) {
+    const TITLE = mail ? 'Цалингийн задаргаа мэйлдэх загвар' : 'Цалин бодох загвар';
+    const wb = newBook(ExcelJS, TITLE);
+    if (mail) guide(wb, TITLE, [
+      'Энэ загвар нь «Цалин бодох загвар» дээр суурилсан: «Цалин» хуудсанд цалингаа бодож, «И-мэйл» баганад ажилтан бүрийн мэйл хаягийг бичнэ.',
+      '«Тохиргоо» хуудсын «Мэйл» хэсэгт илгээх аргаа сонгоно: Outlook (компьютер дээр Outlook суусан бол) эсвэл Gmail (Gmail-ийн App Password хэрэгтэй). Мэйлийн гарчиг, бичвэрийн загварыг тэнд засна.',
+      'Файлыг ZIP-ээс задлаад Excel-ээр нээнэ → Alt+F11 → File → Import File… → TsalinMail.bas сонгоно → хаагаад файлаа «Excel Macro-Enabled Workbook (.xlsm)» хэлбэрээр хадгална.',
+      'Alt+F8 → TsSendTest — эхний ажилтны цалингийн хуудсыг зөвхөн «Тест хаяг» руу илгээж шалгана. Зөв ирвэл TsSendAll — бүх ажилтанд тус бүрийн цалингийн хуудсыг PDF хавсралттай илгээнэ.',
+      '«Мэйл» хуудсын «Илгээх» баганад 0 бичвэл тухайн ажилтанд илгээхгүй. «Төлөв» баганад OK / алдаа, илгээсэн цаг бичигдэнэ. TsSavePdf — мэйл илгээлгүйгээр зөвхөн PDF-үүдийг хадгална.'
+    ], ['Макро зөвхөн Windows-ийн Excel дээр ажиллана (Mac Excel-д Outlook/CDO холболт өөр).',
+      'Gmail ашиглах бол Google бүртгэлдээ 2 шаттай баталгаажуулалт идэвхжүүлж «App password» үүсгэнэ — энгийн нууц үг ажиллахгүй. Нууц үгээ «Тохиргоо»-нд хадгалахгүй бол хоосон орхиход илгээх үед асууна.',
+      'Анх удаа заавал TsSendTest-ээр шалгаад дараа нь бүгдэд нь илгээнэ үү — илгээсэн мэйлийг буцаах боломжгүй.']);
+    else guide(wb, TITLE, [
       '«Тохиргоо» хуудсанд НДШ, ХХОАТ-ын хувь, хөнгөлөлтийн шатлал 2026 оны хуулиар бөглөгдсөн. Хууль өөрчлөгдвөл зөвхөн тэнд засна.',
       '«Цалин» хуудсанд сар, ажлын өдрийн нормоо оруулаад ажилтан бүрийн үндсэн цалин, ажилласан өдөр, нэмэгдэл, урамшуулал, суутгалыг шар нүдэнд бичнэ.',
       'НДШ, ХХОАТ, хөнгөлөлт, гарт олгох цалин, ажил олгогчийн НДШ автоматаар бодогдоно. Мөр нэмэх бол сүүлийн ажилтны мөрийг хуулж доор нь буулгана.',
@@ -35,8 +46,9 @@
       'НДШ ногдуулах дээд хязгаар: хөдөлмөрийн хөлсний доод хэмжээний 10 дахин. Доод хэмжээг «Тохиргоо»-нд шалгаж шинэчилнэ үү.',
       'Тэтгэвэр тогтоолгосон ажилтны НДШ-ийн хувь өөр (0.8% / 9.3%) — «НДШ %» баганад гараар солино.']);
 
-    const W = sheet(wb, 'Цалин', { freeze: 6, xFreeze: 2, widths: [5, 22, 13, 18, 14, 9, 9, 14, 12, 12, 14, 3, 13, 14, 11, 12, 13, 14, 14], zoom: 90, tab: C.gold });
+    const W = sheet(wb, 'Цалин', { freeze: 6, xFreeze: 2, widths: [5, 22, 13, 18, 14, 9, 9, 14, 12, 12, 14, 3, 13, 14, 11, 12, 13, 14, 14, 28], zoom: 90, tab: C.gold });
     const H = sheet(wb, 'Цалингийн хуудас', { widths: [3, 30, 20, 3, 30, 20] });
+    const ML = mail ? sheet(wb, 'Мэйл', { freeze: 5, widths: [5, 24, 28, 14, 40, 9, 22, 18], tab: C.gold }) : null;
     const Z = sheet(wb, 'Хураангуй', { widths: [3, 14, 14, 14, 14, 14, 14, 14, 14, 3] });
     // Тохиргоо
     const T = sheet(wb, 'Тохиргоо', { widths: [36, 16, 50], tab: C.grey });
@@ -55,7 +67,7 @@
     W.getCell('A3').value = 'Тайлант сар:'; inputCell(W.getCell('C3'), 'yyyy-mm'); W.getCell('C3').value = new Date(Date.UTC(2026, 9, 1));
     W.getCell('E3').value = 'Ажлын өдөр (норм):'; W.getCell('E3').alignment = { horizontal: 'right' }; W.mergeCells('E3:F3'); inputCell(W.getCell('G3')); W.getCell('G3').value = 22;
     ['A2', 'A3'].forEach(a => W.getCell(a).font = { bold: true });
-    header(W, 5, ['№', 'Овог нэр', 'Регистр', 'Албан тушаал', 'Үндсэн цалин', 'Ажилласан өдөр', 'НДШ %', 'Бодогдсон цалин', 'Нэмэгдэл', 'Урамшуулал', 'Нийт цалин', '', 'НДШ (ажилтан)', 'НДШ хассан орлого', 'Хөнгөлөлт', 'ХХОАТ', 'Бусад суутгал', 'Гарт олгох', 'НДШ (ажил олгогч)']);
+    header(W, 5, ['№', 'Овог нэр', 'Регистр', 'Албан тушаал', 'Үндсэн цалин', 'Ажилласан өдөр', 'НДШ %', 'Бодогдсон цалин', 'Нэмэгдэл', 'Урамшуулал', 'Нийт цалин', '', 'НДШ (ажилтан)', 'НДШ хассан орлого', 'Хөнгөлөлт', 'ХХОАТ', 'Бусад суутгал', 'Гарт олгох', 'НДШ (ажил олгогч)'].concat(mail ? ['И-мэйл'] : []));
     W.getRow(6).height = 4;
     const R = rng(77);
     const names = ['Бат-Эрдэнэ Ганболд', 'Сарангэрэл Түвшин', 'Энхжаргал Цэцэг', 'Мөнх-Очир Тэмүүлэн', 'Оюунчимэг Номин', 'Ганзориг Билгүүн', 'Нарантуяа Сүрэн', 'Төмөрбаатар Анар', 'Цолмон Хулан', 'Даваадорж Мандах', 'Солонго Ариунаа', 'Пүрэвсүрэн Тэргэл'];
@@ -76,6 +88,7 @@
       f('R', `K${r}-M${r}-P${r}-Q${r}`);
       f('S', `ROUND(MIN(K${r},${TS}$B$9)*${TS}$B$6,0)`);
       W.getCell('R' + r).font = { bold: true };
+      if (mail) { const e = W.getCell('T' + r); e.value = 'ajiltan' + (i + 1) + '@example.mn'; inputCell(e); }
     });
     const tr = rL + 1;
     W.getCell('B' + tr).value = 'НИЙТ'; ['E', 'H', 'I', 'J', 'K', 'M', 'N', 'O', 'P', 'Q', 'R', 'S'].forEach(c => { const x = W.getCell(c + tr); x.value = { formula: `SUM(${c}${r0}:${c}${rL})` }; x.numFmt = MONEY; });
@@ -86,7 +99,7 @@
     // Цалингийн хуудас
     H.mergeCells('B2:F2'); H.getCell('B2').value = 'ЦАЛИНГИЙН ХУУДАС'; H.getCell('B2').font = { bold: true, size: 18 }; H.getCell('B2').alignment = { horizontal: 'center' };
     H.mergeCells('B3:F3'); H.getCell('B3').value = { formula: `'Цалин'!C2&" · "&YEAR('Цалин'!C3)&" оны "&MONTH('Цалин'!C3)&"-р сар"` }; H.getCell('B3').alignment = { horizontal: 'center' }; H.getCell('B3').font = { color: { argb: C.grey } };
-    H.getCell('B5').value = 'Ажилтны №  (сонгоно уу) →'; H.getCell('B5').font = { bold: true };
+    H.getCell('B5').value = 'Ажилтны №'; H.getCell('B5').font = { bold: true };
     const sel = H.getCell('C5'); sel.value = 1; inputCell(sel); sel.font = { bold: true, size: 14 }; sel.alignment = { horizontal: 'center' };
     sel.dataValidation = { type: 'whole', operator: 'between', allowBlank: false, formulae: [1, N], showErrorMessage: true, error: '1–' + N + ' хооронд' };
     const ix = (col) => `INDEX('Цалин'!$${col}$${r0}:$${col}$${rL},$C$5)`;
@@ -112,7 +125,50 @@
       4: [{ type: 'doughnut', title: 'Цалингийн зардлын бүтэц', cats: { ref: `'Хураангуй'!$B$9:$B$13`, vals: comp.map(c => c[0]) }, series: [{ name: 'Дүн', ref: `'Хураангуй'!$D$9:$D$13`, vals: [] }], at: { c1: 5, r1: 7, c2: 9, r2: 22 } },
         { type: 'bar', title: 'Ажилтан тус бүрийн нийт цалин', cats: { ref: `'Цалин'!$B$${r0}:$B$${rL}`, vals: names }, series: [{ name: 'Нийт цалин', ref: `'Цалин'!$K$${r0}:$K$${rL}`, vals: [] }], at: { c1: 1, r1: 23, c2: 9, r2: 44 } }]
     };
+    if (mail) mailParts(wb, W, H, ML, T, r0, rL);
     return done(wb, JSZip, { 'Хураангуй': charts[4] });
+  }
+
+  // Мэйл хэсэг: Тохиргоо-нд мэйлийн тохиргоо, «Мэйл» хуудас, VBA-д зориулсан ASCII нэртэй range-үүд
+  function mailParts(wb, W, H, ML, T, r0, rL) {
+    const N = rL - r0 + 1;
+    H.pageSetup = { paperSize: 9, orientation: 'portrait', fitToPage: true, fitToWidth: 1, fitToHeight: 1, printArea: 'B2:F25', margins: { left: 0.5, right: 0.5, top: 0.6, bottom: 0.6, header: 0.2, footer: 0.2 } };
+    // Тохиргоо — мэйл
+    header(T, 21, ['Мэйл тохиргоо', 'Утга', 'Тайлбар']);
+    const MS = [['Илгээх арга', 'Outlook', 'Outlook эсвэл Gmail', 'BBI_Mode', ['Outlook', 'Gmail']], ['Outlook: илгээхийн өмнө харуулах (1/0)', 1, '1 бол мэйл бүр нээгдэж та өөрөө «Send» дарна; 0 бол шууд илгээнэ', 'BBI_Display'],
+      ['Gmail хаяг', '', 'ж: hr@company.mn (Google Workspace) эсвэл ...@gmail.com', 'BBI_GmailUser'], ['Gmail App password', '', 'Хоосон орхивол илгээх үед асууна (аюулгүй)', 'BBI_GmailPass'],
+      ['Илгээгчийн нэр', 'Жишээ ХХК — Нягтлан', 'Мэйлийн «From» нэр', 'BBI_FromName'], ['Тест хаяг', 'test@example.mn', 'TsSendTest зөвхөн энэ хаяг руу илгээнэ', 'BBI_TestTo'],
+      ['Гарчгийн загвар', '{COMPANY} — {MONTH}ын цалингийн задаргаа', '{NAME} {MONTH} {NET} {COMPANY} орлуулна', 'BBI_SubjectTpl'],
+      ['Бичвэрийн загвар', 'Сайн байна уу, {NAME}.\n\n{MONTH}ын цалингийн задаргааг хавсралтаар илгээж байна. Гарт олгох дүн: {NET}₮.\n\nАсуух зүйл байвал хариу бичээрэй.\n\nХүндэтгэсэн,\n{COMPANY}', 'Шинэ мөр: Alt+Enter', 'BBI_BodyTpl']];
+    MS.forEach((m, i) => { const r = 22 + i; T.getCell('A' + r).value = m[0]; T.getCell('A' + r).border = box; const v = T.getCell('B' + r); v.value = m[1]; inputCell(v); if (m[4]) listValidation(v, m[4]); T.getCell('C' + r).value = m[2]; T.getCell('C' + r).font = { size: 9, color: { argb: C.grey } }; wb.definedNames.add(`'Тохиргоо'!$B$${r}`, m[3]); });
+    T.getRow(29).height = 60; T.getCell('B29').alignment = { wrapText: true, vertical: 'top' }; T.getCell('B28').alignment = { wrapText: true };
+    T.getColumn(2).width = 40;
+    // Макронд харуулах мессежүүд (VBA-д кирилл бичихгүйн тулд энд)
+    header(T, 32, ['Макроны мессеж', 'Текст', '']);
+    const MSG = [['Батлах', 'Бүх ажилтанд цалингийн задаргаа илгээх үү? Тоо:', 'BBI_MsgConfirm'], ['Дууссан', 'Илгээсэн мэйл:', 'BBI_MsgDone'], ['Алдаатай', 'Алдаатай:', 'BBI_MsgErr'], ['Нууц үг', 'Gmail App password-оо оруулна уу:', 'BBI_MsgPass'], ['PDF хадгалсан', 'PDF хадгалсан хавтас:', 'BBI_MsgPdf'], ['Тест', 'Тест мэйл илгээгдлээ:', 'BBI_MsgTest']];
+    MSG.forEach((m, i) => { const r = 33 + i; T.getCell('A' + r).value = m[0]; T.getCell('B' + r).value = m[1]; T.getCell('B' + r).font = { size: 9 }; wb.definedNames.add(`'Тохиргоо'!$B$${r}`, m[2]); });
+    wb.definedNames.add(`'Цалингийн хуудас'!$C$5`, 'BBI_SlipSel');
+    wb.definedNames.add(`'Цалингийн хуудас'!$B$2:$F$25`, 'BBI_Slip');
+    // Мэйл хуудас
+    ML.mergeCells('A1:H1'); ML.getCell('A1').value = 'Цалингийн задаргаа мэйлдэх'; ML.getCell('A1').font = { bold: true, size: 18, color: { argb: C.ink } }; ML.getRow(1).height = 32;
+    ML.mergeCells('A2:H2'); ML.getCell('A2').value = 'Alt+F8 → TsSendTest (тест) → TsSendAll (бүгд). «Илгээх» = 0 бол алгасна.'; ML.getCell('A2').font = { size: 10, color: { argb: C.grey } };
+    ML.getCell('A3').value = 'Сар:'; ML.getCell('A3').font = { bold: true }; ML.getCell('B3').value = { formula: `YEAR('Цалин'!C3)&" оны "&MONTH('Цалин'!C3)&"-р сар"` };
+    header(ML, 5, ['№', 'Овог нэр', 'И-мэйл', 'Гарт олгох', 'Гарчиг', 'Илгээх', 'Төлөв', 'Илгээсэн']);
+    const sub = (tpl, r) => `SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(${tpl},"{NAME}",B${r}),"{MONTH}",$B$3),"{NET}",TEXT(D${r},"#,##0")),"{COMPANY}",'Цалин'!$C$2)`;
+    for (let i = 0; i < N; i++) {
+      const r = 6 + i, sr = r0 + i;
+      ML.getCell('A' + r).value = i + 1; calcCell(ML.getCell('A' + r));
+      ML.getCell('B' + r).value = { formula: `'Цалин'!B${sr}` }; calcCell(ML.getCell('B' + r));
+      ML.getCell('C' + r).value = { formula: `IF('Цалин'!T${sr}="","",'Цалин'!T${sr})` }; calcCell(ML.getCell('C' + r));
+      ML.getCell('D' + r).value = { formula: `'Цалин'!R${sr}` }; calcCell(ML.getCell('D' + r), MONEY);
+      ML.getCell('E' + r).value = { formula: sub('BBI_SubjectTpl', r) }; calcCell(ML.getCell('E' + r)); ML.getCell('E' + r).font = { size: 9, color: { argb: C.grey } };
+      const s = ML.getCell('F' + r); s.value = 1; inputCell(s, '0'); s.alignment = { horizontal: 'center' }; s.dataValidation = { type: 'whole', operator: 'between', formulae: [0, 1], showErrorMessage: true };
+      calcCell(ML.getCell('G' + r)); calcCell(ML.getCell('H' + r), 'yyyy-mm-dd hh:mm');
+      ML.getCell('I' + r).value = { formula: sub('BBI_BodyTpl', r) }; ML.getCell('I' + r).font = { size: 8, color: { argb: 'FFBBBBBB' } }; ML.getCell('I' + r).alignment = { wrapText: false, vertical: 'top' }; ML.getRow(r).height = 18;
+    }
+    ML.getColumn(9).hidden = true;
+    wb.definedNames.add(`'Мэйл'!$A$6:$I$${5 + N}`, 'BBI_MailTable');
+    ML.addConditionalFormatting({ ref: `G6:G${5 + N}`, rules: [{ type: 'beginsWith', operator: 'beginsWith', text: 'OK', style: { font: { color: { argb: C.green }, bold: true } } }, { type: 'beginsWith', operator: 'beginsWith', text: 'ERR', style: { font: { color: { argb: C.red }, bold: true } } }] });
   }
 
   // График шигтгэнэ: {хуудасны нэр: [spec]} → sheet{id}.xml (хуудсыг үүсгэсэн дарааллаар)
@@ -661,9 +717,17 @@
       { type: 'bar', title: 'Харилцагч бүрийн нийт авлага', cats: { ref: `'Насжилт'!$B$5:$B$${4 + cust.length}`, vals: cust }, series: [{ name: 'Нийт', ref: `'Насжилт'!$H$5:$H$${4 + cust.length}`, vals: [] }], at: { c1: 5, r1: gt + 2, c2: 9, r2: gt + 20 } }] });
   }
 
-  const BUILD = { payroll, vat, fs, depr, cashflow, budget, inventory, sales, feasibility, aging };
+  const payslip = (E, Z) => payroll(E, Z, true);
+  const BUILD = { payroll, payslip, vat, fs, depr, cashflow, budget, inventory, sales, feasibility, aging };
   async function build(id, libs) { const f = BUILD[id]; if (!f) throw new Error('Загвар олдсонгүй: ' + id); return f(libs.ExcelJS, libs.JSZip); }
   function register(id, fn) { BUILD[id] = fn; }
-  const api = { LIST, BUNDLE, build, register, _k: K, _done: done };
+  // ZIP-д хамт орох нэмэлт файл (url — сайтаас татна)
+  const EXTRAS = {
+    payslip: [
+      { name: 'TsalinMail.bas', url: 'tpl/TsalinMail.bas' },
+      { name: 'Унших — макро суулгах.txt', text: 'Цалингийн задаргаа мэйлдэх загвар — BusinessBI.mn\r\n\r\n1. «Цалингийн задаргаа мэйлдэх.xlsx» файлыг Excel-ээр (Windows) нээнэ.\r\n2. Alt+F11 дарж VBA цонхыг нээнэ → File → Import File… → TsalinMail.bas сонгоно.\r\n3. VBA цонхыг хаагаад File → Save As → «Excel Macro-Enabled Workbook (*.xlsm)» хэлбэрээр хадгална.\r\n4. «Тохиргоо» хуудсын «Мэйл тохиргоо» хэсгийг бөглөнө (Outlook эсвэл Gmail).\r\n5. Alt+F8 → TsSendTest → зөвхөн тест хаяг руу нэг мэйл очно. Шалгаад зөв бол Alt+F8 → TsSendAll.\r\n\r\nTsSavePdf — мэйл илгээлгүйгээр бүх ажилтны цалингийн хуудсыг PDF-ээр хадгална.\r\nGmail: Google бүртгэл → Security → 2-Step Verification → App passwords хэсгээс 16 тэмдэгттэй нууц үг үүсгэнэ.\r\nАсуулт: hello@businessbi.mn\r\n' }
+    ]
+  };
+  const api = { LIST, BUNDLE, EXTRAS, build, register, _k: K, _done: done };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.BBITpl = api;
 })(typeof self !== 'undefined' ? self : this);

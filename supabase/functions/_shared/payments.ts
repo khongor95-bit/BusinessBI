@@ -17,7 +17,8 @@ export const PRODUCTS: Record<string, { amount: number; currency: string; title:
   tpl_sales: { amount: 29000, currency: "MNT", title: "Excel загвар — Борлуулалтын дашбоард", validHours: 720 },
   tpl_feasibility: { amount: 49000, currency: "MNT", title: "Excel загвар — ТЭЗҮ — 5 жилийн санхүүгийн загвар", validHours: 720 },
   tpl_aging: { amount: 19000, currency: "MNT", title: "Excel загвар — Авлагын насжилт", validHours: 720 },
-  tpl_all: { amount: 129000, currency: "MNT", title: "Excel загвар — бүх 10 загварын багц", validHours: 720 },
+  tpl_payslip: { amount: 39000, currency: "MNT", title: "Excel загвар — Цалингийн задаргаа мэйлдэх", validHours: 720 },
+  tpl_all: { amount: 149000, currency: "MNT", title: "Excel загвар — бүх 11 загварын багц", validHours: 720 },
 };
 export const REUSE_PENDING_MS = 8 * 60 * 1000;   // WIRE intent 10 мин TTL
 
