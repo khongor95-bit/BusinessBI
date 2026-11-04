@@ -120,7 +120,7 @@ if(!document.getElementById('nlModal') && !B.dataset.noFloat) B.appendChild(frag
       card('businessbi_journal.html','finance.jpg','Санхүүгийн програм','14 хоног үнэгүй'),
       card('payroll.html','salary.jpg','Цалин бодогч','Beta · үнэгүй'),
       card('budget.html','budget.jpg','Бизнес төлөвлөлт','Beta · үнэгүй'),
-      card('dashboard.html?demo=1','powerbi-dashboard.png','Дашбоард','Үнэгүй')]},
+      card('custom_dashboard.html','custom-powerbi.jpg','Захиалгат дашбоард','290,000₮-с')]},
     {k:'auto',n:'Автомат',all:['tools.html','Бүх хэрэгсэл',9],items:[
       card('receipt_scan.html','accounting.png','Баримт уншуулагч','Үнэгүй'),
       card('businessbi_journal.html#page=reports','excel-dashboard.png','СТ-1–4 тайлан','14 хоног үнэгүй'),
