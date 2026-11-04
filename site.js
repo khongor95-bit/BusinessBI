@@ -96,7 +96,7 @@
     const tpl = document.createElement("template"); tpl.innerHTML = navHTML();
     const nav = tpl.content.firstElementChild;
     if (old.length) { old[0].replaceWith(nav); old.slice(1).forEach(o => o.remove()); }
-    else body.insertBefore(nav, body.firstChild);
+    else { const tb = body.querySelector(":scope > .bbi-topbar"); if (tb) tb.after(nav); else body.insertBefore(nav, body.firstChild); }
 
     // 2) Footer: хуучин footer байвал солино, үгүй бол төгсгөлд нэмнэ (data-no-footer бол алгасна)
     if (!body.dataset.noFooter) {

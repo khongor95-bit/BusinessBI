@@ -29,30 +29,67 @@
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--ink:#171717;--night:#0b0d1c;--night-2:#11142a}
 body{font-family:var(--bbi-font);background:#fff;color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.6}
-.container{width:92%;max-width:1200px;margin:auto}
+.container{width:100%;max-width:none;margin:0;padding:0 48px}
+@media(max-width:749px){.container{padding:0 20px}}
 a{color:inherit}
 *:focus-visible{outline:2px solid var(--bbi-green);outline-offset:3px}
 
-/* ═══ HERO — хар дэвсгэр дээр хөдөлгөөнт дашбоардын хана ═══ */
-.finder{position:relative;background:var(--night);color:#fff;overflow:hidden;min-height:620px;display:flex;align-items:center;isolation:isolate}
-.wall{position:absolute;inset:0;display:flex;flex-direction:column;gap:22px;justify-content:center;transform:rotate(-4deg) scale(1.18);z-index:0;pointer-events:none}
+/* ═══ ТОЛГОЙ — other-levels.com-ийн хэмжээсээр (зөвхөн нүүр хуудас) ═══
+   topbar 48px · header 84px (12px 48px) · цэсний pill 42px / 16.54px / 0 12px */
+.bbi-topbar{height:48px;background:#1f1f1f;color:#fafafa;font-size:13px;display:flex;align-items:center;justify-content:center;padding:0 20px;position:relative;font-family:var(--bbi-font)}
+.bbi-topbar a{color:#fafafa;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bbi-topbar a:hover{text-decoration:underline}
+body.home .bbi-nav{background:#fff;border-bottom:0;backdrop-filter:none}
+body.home .bbi-nav-in{max-width:none;height:84px;padding:12px 48px;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:0}
+body.home .bbi-logo{height:60px;font-size:24px}
+body.home .bbi-menu{gap:0;justify-self:center}
+body.home .bbi-menu a{display:inline-flex;align-items:center;height:42px;padding:0 12px;border-radius:60px;font-size:16.54px;font-weight:500;color:#171717}
+body.home .bbi-menu a:first-child{background:var(--bbi-green);color:#fff;font-weight:700}
+body.home .bbi-menu a:hover{color:var(--bbi-green)}
+body.home .bbi-menu a:first-child:hover{color:#fff;background:var(--bbi-green-dark)}
+body.home .bbi-nav-right{justify-self:end;gap:6px}
+body.home .bbi-login{height:42px;padding:0 16px;font-size:15px}
+@media(min-width:961px){body.home .bbi-nav-right .bbi-cta,body.home .bbi-menu a.bbi-cta{display:none}}
+@media(max-width:960px){
+  body.home .bbi-nav-in{padding:12px 20px;display:flex}
+  body.home .bbi-menu{position:absolute;top:100%;justify-self:stretch}
+  body.home .bbi-menu a{display:block;height:auto;padding:13px 24px;border-radius:0}
+  body.home .bbi-menu a:first-child{background:none;color:#171717;font-weight:500}
+  body.home .bbi-menu a.bbi-cta{display:block;margin:8px 24px 0;border-radius:8px;text-align:center;background:var(--bbi-green);color:#fff}
+}
+
+/* Ерөнхий товч (доод хэсгүүд) */
+.cta-row{margin-top:28px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:56px;padding:0 24px;border-radius:12px;font-weight:700;font-size:15px;text-decoration:none;transition:transform .15s,opacity .15s;border:1px solid transparent;cursor:pointer;font-family:inherit}
+.btn.green{background:var(--bbi-green);color:#fff}
+.btn.green:hover{background:var(--bbi-green-dark)}
+.btn.ghost{background:#fff;color:var(--ink);border-color:#d8dbe0}
+.btn.ghost:hover{border-color:var(--ink)}
+
+/* ═══ HERO — other-levels.com .ol-finder-ийн яг хэмжээсүүд ═══
+   1440px дээр: section 608px (96 / 88 padding) · гарчиг 61.92px нэг мөр · lead 700px/20px ·
+   хайлт 760px (input 58px) · chip 34px · товч 56px · NEW badge 39px */
+.finder{position:relative;padding:96px 20px 88px;background:var(--night);color:#fff;isolation:isolate;overflow:hidden}
+.wall{position:absolute;inset:-18% -20%;display:flex;flex-direction:column;justify-content:center;gap:22px;transform:rotate(-8deg);z-index:-2;pointer-events:none}
 .wall-row{display:flex;gap:22px;width:max-content;will-change:transform}
-.wall-row img{width:320px;height:200px;object-fit:cover;object-position:left top;border-radius:10px;background:#1a1d33;flex:none;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.wall-row img{width:320px;height:200px;object-fit:cover;object-position:left top;border-radius:14px;background:#1a1d33;flex:0 0 auto;box-shadow:rgba(0,0,0,.45) 0 12px 30px}
 .wall-row.l{animation:wallL var(--d,90s) linear infinite}
 .wall-row.r{animation:wallR var(--d,110s) linear infinite}
 @keyframes wallL{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @keyframes wallR{from{transform:translateX(-50%)}to{transform:translateX(0)}}
-.shade{position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse at 50% 45%,rgba(11,13,28,.70) 0%,rgba(11,13,28,.80) 50%,rgba(11,13,28,.93) 100%)}
-.finder-in{position:relative;z-index:2;text-align:center;padding:84px 0 72px;max-width:900px}
-.finder h1{font-size:clamp(34px,5.2vw,56px);line-height:1.06;font-weight:800;letter-spacing:-.03em;color:#fff}
-.finder .lede{margin:18px auto 0;font-size:17px;line-height:1.55;color:rgba(255,255,255,.82);max-width:58ch}
-.search{margin:30px auto 0;display:flex;gap:12px;max-width:760px}
-.search .box{flex:1;display:flex;align-items:center;gap:10px;background:#fff;border-radius:12px;height:56px;padding:0 16px;color:var(--ink);position:relative}
-.search .box svg{width:20px;height:20px;color:#8a8f9a;flex:none}
-.search input{flex:1;border:none;background:transparent;font:inherit;font-size:16px;color:var(--ink);outline:none;min-width:0}
+.shade{position:absolute;inset:0;z-index:-1;background:radial-gradient(rgba(11,13,28,.72) 0%,rgba(11,13,28,.8) 55%,rgba(11,13,28,.92) 100%)}
+.finder .finder-in{max-width:1200px;margin:0 auto;padding:0;text-align:center}
+.finder h1{margin:0 auto 16px;color:#fff;font-size:clamp(32px,4.3vw,66px);line-height:1.05;font-weight:800;letter-spacing:-.03em;text-shadow:rgba(0,0,0,.5) 0 6px 30px}
+@media(min-width:990px){.finder h1{white-space:nowrap}}
+.finder .lede{max-width:700px;margin:0 auto 30px;color:rgba(255,255,255,.85);font-size:clamp(16px,1.6vw,20px);line-height:1.5}
+.search{max-width:760px;margin:0 auto;display:grid;grid-template-columns:1fr auto;gap:10px}
+.search .box{position:relative;display:block}
+.search input{display:block;width:100%;min-height:58px;padding:0 18px;border:1px solid rgba(255,255,255,.28);border-radius:12px;background:#fff;color:#171717;font:inherit;font-size:16px;box-shadow:rgba(0,0,0,.35) 0 10px 30px;outline:none}
+.search input:focus{outline:3px solid rgba(46,139,98,.35);border-color:var(--bbi-green-bright)}
 .search input::placeholder{color:#8a8f9a}
-.search .go{flex:none;display:inline-flex;align-items:center;justify-content:center;padding:0 24px;height:56px;border-radius:12px;background:var(--bbi-green-bright);color:#fff;font-weight:700;font-size:15px;text-decoration:none;border:none;cursor:pointer;font-family:inherit;transition:background .15s}
-.search .go:hover{background:#3aa374}
+.search .go,.btn.white,.btn.outline{min-height:56px;display:inline-flex;align-items:center;justify-content:center;padding:0 24px;border-radius:12px;font-size:15px;font-weight:700;text-decoration:none;transition:transform .15s,opacity .15s;font-family:inherit;cursor:pointer}
+.search .go{border:0;background:var(--bbi-green-bright);color:#fff}
+.search .go:hover,.btn.white:hover,.btn.outline:hover{transform:translateY(-1px);opacity:.94}
 .sugg{position:absolute;left:0;right:0;top:calc(100% + 8px);background:#fff;border-radius:12px;box-shadow:0 20px 50px rgba(0,0,0,.35);text-align:left;overflow:hidden;display:none;z-index:5}
 .sugg.on{display:block}
 .sugg a{display:flex;align-items:center;gap:12px;padding:12px 16px;text-decoration:none;font-size:14px;color:var(--ink);border-top:1px solid #f0f1f3}
@@ -62,103 +99,115 @@ a{color:inherit}
 .sugg a span{color:#6b7076;font-size:13px;margin-left:auto;white-space:nowrap}
 .sugg .tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--bbi-green-soft);color:var(--bbi-green);margin-left:0;flex:none}
 .sugg .tag.paid{background:#faf3e4;color:#8a6420}
-.pills{margin:16px auto 0;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-.pills a{display:inline-flex;align-items:center;padding:8px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(11,13,28,.55);color:#fff;font-size:13px;font-weight:500;text-decoration:none;transition:.15s}
-.pills a:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.4)}
-.cta-row{margin:34px auto 0;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:52px;padding:0 24px;border-radius:12px;font-weight:700;font-size:15px;text-decoration:none;transition:.15s;border:1px solid transparent;cursor:pointer;font-family:inherit}
-.btn.white{background:#fff;color:var(--ink)}
-.btn.white:hover{background:#e9ebee}
-.btn.outline{background:rgba(11,13,28,.5);border-color:var(--bbi-green-bright);color:#9fe0c0}
-.btn.outline:hover{background:rgba(46,139,98,.2)}
-.btn.green{background:var(--bbi-green);color:#fff}
-.btn.green:hover{background:var(--bbi-green-dark)}
-.btn.ghost{background:#fff;color:var(--ink);border-color:#d8dbe0}
-.btn.ghost:hover{border-color:var(--ink)}
-.new{margin:24px auto 0;display:inline-flex;align-items:center;gap:10px;padding:8px 16px 8px 8px;border-radius:999px;background:rgba(11,13,28,.6);border:1px solid rgba(46,139,98,.55);color:#bfeeda;font-size:13.5px;text-decoration:none}
-.new i{font-style:normal;background:var(--bbi-green-bright);color:#fff;font-size:10px;font-weight:800;letter-spacing:.08em;padding:3px 8px;border-radius:999px}
-.new:hover{border-color:var(--bbi-green-bright)}
+.pills{max-width:760px;margin:16px auto 0;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.pills a{padding:8px 14px;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:rgba(11,13,28,.55);backdrop-filter:blur(4px);color:#fff;font-size:13px;line-height:normal;text-decoration:none}
+.pills a:hover{border-color:var(--bbi-green-bright);color:#bfeeda}
+.finder .cta-row{margin-top:28px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.btn.white{background:#fff;color:#171717;border:0}
+.btn.outline{border:1px solid var(--bbi-green-bright);color:#9fe0c0;background:rgba(11,13,28,.5)}
+.new{display:inline-flex;align-items:center;gap:10px;margin-top:22px;padding:8px 16px 8px 8px;border:1px solid rgba(46,139,98,.55);border-radius:999px;background:rgba(11,13,28,.6);backdrop-filter:blur(4px);color:#bfeeda;font-size:14px;font-weight:600;line-height:normal;text-decoration:none;transition:border-color .15s,color .15s}
+.new i{font-style:normal;line-height:13px;background:var(--bbi-green-bright);color:#fff;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;border-radius:999px}
+.new:hover{border-color:var(--bbi-green-bright);color:#fff}
 @media (prefers-reduced-motion:reduce){.wall-row{animation:none!important}}
+@media(max-width:749px){
+  .finder{padding:56px 16px 48px}
+  .wall-row img{width:200px;height:125px}
+  .search{grid-template-columns:1fr}
+  .search .go{width:100%}
+  .finder .cta-row{flex-direction:column}
+  .btn.white,.btn.outline{width:100%}
+}
+@media(max-width:767px){
+  .finder{padding-top:12px!important;padding-bottom:16px!important}
+  .finder h1{margin-bottom:8px!important}
+  .finder .lede{margin-bottom:10px!important}
+  .search{gap:8px!important}
+  .search input,.search .go{min-height:52px!important}
+  .pills{margin-top:8px!important;gap:6px!important}
+  .finder .cta-row{margin-top:8px!important;gap:8px!important}
+  .btn.white,.btn.outline{min-height:52px!important}
+}
 
 /* ═══ Категори карт (хар бүхээг, зурагтай) ═══ */
-.sec{padding:72px 0}
-.sec-head{text-align:center;max-width:720px;margin:0 auto 36px}
-.kicker{font-size:13px;color:#6b7076;margin-bottom:8px}
-.sec h2{font-size:clamp(24px,3vw,32px);font-weight:800;letter-spacing:-.025em;line-height:1.2}
+.sec{padding:28px 0 12px}
+.sec-head{text-align:center;max-width:896px;margin:0 auto 37px}
+.kicker{font-size:16px;font-weight:500;line-height:1;color:#171717;margin-bottom:16px}
+.sec h2{font-size:clamp(24px,2.526vw,36.37px);font-weight:700;letter-spacing:-.03em;line-height:1}
 .sec h2 em{font-style:normal;color:var(--bbi-green)}
-.sec .sub{margin-top:10px;color:#555;font-size:15.5px;line-height:1.6}
+.sec .sub{margin-top:24px;color:#171717;font-size:16px;line-height:1.6}
 .cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.cat{display:block;text-decoration:none;color:inherit;background:#f5f6f8;border-radius:16px;overflow:hidden;transition:.25s}
-.cat:hover{transform:translateY(-4px);box-shadow:0 24px 50px -24px rgba(0,0,0,.35)}
-.cat .shot{position:relative;aspect-ratio:16/9;background:var(--night-2);overflow:hidden}
+.cat{display:block;text-decoration:none;color:inherit;background:#fff;border-radius:0;overflow:visible;transition:.25s}
+.cat:hover .shot{box-shadow:0 24px 50px -24px rgba(0,0,0,.35)}
+.cat .shot{position:relative;aspect-ratio:436/328;background:#fafafa;border-radius:15.16px;overflow:hidden;transition:box-shadow .25s}
 .cat .shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:left top;transition:transform .5s ease}
 .cat:hover .shot img{transform:scale(1.04)}
 .cat .shot .n{position:absolute;top:12px;left:12px;font-size:11px;font-weight:700;letter-spacing:.06em;padding:5px 10px;border-radius:999px;background:rgba(11,13,28,.75);color:#fff;backdrop-filter:blur(4px)}
 .cat .shot .n.free{background:var(--bbi-green-bright)}
 .cat .shot .n.paid{background:#c9a470;color:#171717}
-.cat h3{text-align:center;font-size:17px;font-weight:700;padding:16px 16px 4px}
-.cat p{text-align:center;font-size:13.5px;color:#6b7076;padding:0 18px 18px;line-height:1.5}
+.cat h3{text-align:center;font-size:18.54px;font-weight:500;line-height:1.25;padding:18px 16px 6px}
+.cat p{text-align:center;font-size:15.27px;color:#171717;opacity:.7;padding:0 18px 18px;line-height:1.5}
 
 /* ═══ Outline marquee ═══ */
-.marq{overflow:hidden;padding:26px 0;border-top:1px solid #ececef;border-bottom:1px solid #ececef;background:#fff}
+.marq{overflow:hidden;padding:0 0 16px;background:#fff}
 .marq-track{display:flex;gap:56px;width:max-content;animation:marq 40s linear infinite;white-space:nowrap}
-.marq span{font-size:clamp(44px,7vw,88px);font-weight:800;letter-spacing:-.03em;line-height:1;color:transparent;-webkit-text-stroke:1.5px #171717;text-stroke:1.5px #171717}
+.marq span{font-size:clamp(56px,9.17vw,132px);font-weight:700;letter-spacing:-.04em;line-height:160px;color:transparent;-webkit-text-stroke:.01em #171717;text-stroke:.01em #171717}
 .marq span.dot{-webkit-text-stroke:0;color:#171717;font-size:22px;align-self:center}
 @keyframes marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @media (prefers-reduced-motion:reduce){.marq-track{animation:none}}
 
 /* ═══ Бүтээгдэхүүн — хэвтээ карт ═══ */
 .pro{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.pcard{display:flex;flex-direction:column;background:#fff;border:1px solid #e8e9ec;border-radius:16px;overflow:hidden;text-decoration:none;color:inherit;transition:.25s}
+.pcard{display:flex;flex-direction:column;background:#fafafa;border:0;border-radius:15.16px;overflow:hidden;text-decoration:none;color:inherit;transition:.25s}
 .pcard:hover{transform:translateY(-4px);box-shadow:0 24px 50px -24px rgba(0,0,0,.3)}
-.pthumb{aspect-ratio:16/10;position:relative;overflow:hidden;background:#eef0f3}
+.pthumb{aspect-ratio:436/245;position:relative;overflow:hidden;background:#eef0f3}
 .pthumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:left top}
 .pinfo{padding:18px 20px 20px;display:flex;flex-direction:column;gap:6px;flex:1}
 .pcat{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--bbi-gold)}
-.pinfo h3{font-size:19px;font-weight:800;letter-spacing:-.01em}
+.pinfo h3{font-size:18.54px;font-weight:600;letter-spacing:-.01em}
 .pinfo p{font-size:14px;color:#6b7076;line-height:1.55}
 .pfoot{margin-top:auto;padding-top:14px;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:600}
 .pfoot .go{color:var(--bbi-green)}
 .pfoot .st{color:#6b7076;font-weight:500;font-size:13px}
 
 /* ═══ Сүлжээ — ногоон дарк бүс (Other Levels-ийн сургалтын бүс шиг) ═══ */
-.net{padding:0 0 72px}
-.net-box{position:relative;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,#0f2a1f 0%,#1a4d38 55%,#216a4c 100%);color:#fff;padding:60px 40px;text-align:center;isolation:isolate}
+.net{padding:0}
+.net-box{position:relative;margin-top:56px;border-radius:0;overflow:hidden;background:radial-gradient(at 50% 0%,#1c7a4c 0%,#0f4f31 45%,#0a2e1e 100%);color:#fff;padding:64px 16px 60px;text-align:center;isolation:isolate}
 .net-box::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 15% 20%,rgba(143,205,177,.18),transparent 40%),radial-gradient(circle at 85% 80%,rgba(143,205,177,.14),transparent 40%);z-index:-1}
 .net-box .k{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
 .net-box .k::before{content:"";width:7px;height:7px;border-radius:50%;background:#8fcdb1}
-.net-box h2{margin-top:16px;font-size:clamp(26px,3.4vw,38px);font-weight:800;letter-spacing:-.025em;color:#fff}
-.net-box h2 em{font-style:normal;color:#8fcdb1}
-.net-box p{margin:12px auto 0;max-width:62ch;color:rgba(255,255,255,.82);font-size:15.5px;line-height:1.6}
-.net-steps{margin:26px auto 0;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;list-style:none}
-.net-steps li{padding:9px 16px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);font-size:14px;font-weight:600}
+.net-box h2{margin:16px auto 14px;max-width:820px;font-size:clamp(28px,3.06vw,44px);font-weight:800;line-height:1.15;letter-spacing:-.03em;color:#fff}
+.net-box h2 em{font-style:normal;color:#7dffb3}
+.net-box p{margin:0 auto 28px;max-width:640px;color:rgba(255,255,255,.82);font-size:17px;line-height:1.55}
+.net-steps{margin:0 auto;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;list-style:none}
+.net-steps li{padding:11px 20px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.35);font-size:15px;font-weight:600;line-height:normal}
 .net-steps li b{color:#8fcdb1;margin-right:6px}
-.net-box .cta-row{margin-top:28px}
+.net-box .cta-row{margin-top:28px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.net-box .cta-row .btn{min-height:48px;padding:14px 30px;border-radius:999px;font-size:16px;font-weight:800}
+.net-box .cta-row .btn.white{background:#7dffb3;color:#0a2e1e}
+.net-box .cta-row .btn.outline{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.35);color:#fff}
 
 /* ═══ Хэрхэн ажилладаг — 3 алхам, тоотой ═══ */
-.how{background:#f5f6f8}
+.how{background:#fff;margin-top:56px}
 .steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:8px}
-.step{background:#fff;border-radius:16px;padding:28px}
+.step{background:#fafafa;border-radius:15.16px;padding:28px}
 .step .n{font-size:40px;font-weight:800;letter-spacing:-.04em;line-height:1;color:transparent;-webkit-text-stroke:1.5px var(--bbi-green);text-stroke:1.5px var(--bbi-green)}
 .step h3{font-size:19px;font-weight:700;margin:14px 0 8px;letter-spacing:-.01em}
 .step p{color:#555;font-size:14.5px;line-height:1.6}
 
 /* ═══ Төгсгөлийн CTA ═══ */
-.last{padding:72px 0 80px;text-align:center}
-.last h2{font-size:clamp(26px,3.4vw,40px);font-weight:800;letter-spacing:-.03em}
-.last p{margin:12px auto 0;max-width:56ch;color:#555;font-size:16px}
+.last{padding:56px 0 64px;text-align:center}
+.last h2{font-size:clamp(24px,2.526vw,36.37px);font-weight:700;line-height:1;letter-spacing:-.03em}
+.last p{margin:16px auto 0;max-width:56ch;color:#171717;font-size:16px}
 
 @media(max-width:1000px){.cat-grid,.pro,.steps-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:640px){
-  .finder{min-height:560px}.finder-in{padding:64px 0 56px}
-  .search{flex-direction:column;gap:10px}.search .go{height:50px}
   .cat-grid,.pro,.steps-grid{grid-template-columns:1fr}
-  .sec{padding:52px 0}.net-box{padding:40px 22px}.last{padding:52px 0 60px}
-  .wall-row img{width:220px;height:138px}.wall{gap:14px}.wall-row{gap:14px}
+  .net-box{padding:48px 16px}.last{padding:44px 0 52px}
 }
 </style>
 </head>
-<body>
+<body class="home">
+<div class="bbi-topbar"><a href="ndsh_hhoat_converter.html">ШИНЭ: ХХОАТ маягтын ТТД регистрээр автоматаар →</a></div>
 
 <!-- ═══════════ HERO ═══════════ -->
 <section class="finder" aria-label="Эхлэл">
@@ -183,13 +232,12 @@ a{color:inherit}
   <div class="shade" aria-hidden="true"></div>
 
   <div class="container finder-in">
-    <h1>Нягтлангийн ажлыг автоматжуулах програм, хэрэгслүүд</h1>
-    <p class="lede">Ерөнхий журнал → СТ-1–СТ-4, ТТ-02 автоматаар. НДШ-ийн PDF-ийг ХХОАТ маягт болгох, eBarimt тулгах, цалин бодох, төсөв гаргах — юу хийх гэснээ бичээд хэрэгслээ ол.</p>
+    <h1>Нягтлангийн ажлыг автоматжуулна</h1>
+    <p class="lede">Журналаас СТ-1–4, ТТ-02 автоматаар. НДШ → ХХОАТ, НӨАТ тулгалт, цалин, төсөв — хийх ажлаа бичээд хэрэгслээ ол.</p>
 
     <form class="search" id="finder" role="search" autocomplete="off">
       <label class="box">
         <span class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Хэрэгсэл хайх</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
         <input id="q" type="text" placeholder="ж: НДШ тайлан, НӨАТ тулгах, цалин, нэхэмжлэх, төсөв…" aria-label="Юу хийх вэ?" aria-controls="sugg" aria-expanded="false">
         <div class="sugg" id="sugg" role="listbox"></div>
       </label>
@@ -198,12 +246,12 @@ a{color:inherit}
 
     <nav class="pills" aria-label="Түгээмэл ажлууд">
       <a href="ndsh_hhoat_converter.html">НДШ → ХХОАТ</a>
-      <a href="noat_matcher.html">НӨАТ тулгалт</a>
+      <a href="noat_matcher.html">НӨАТ</a>
       <a href="payroll.html">Цалин</a>
       <a href="invoice_generator.html">Нэхэмжлэх</a>
       <a href="budget.html">Төсөв</a>
-      <a href="businessbi_journal.html#page=reports">СТ-1–4 тайлан</a>
-      <a href="receipt_scan.html">Баримт уншуулах</a>
+      <a href="businessbi_journal.html#page=reports">СТ-1–4</a>
+      <a href="receipt_scan.html">Баримт</a>
     </nav>
 
     <div class="cta-row">
