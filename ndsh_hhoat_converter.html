@@ -1462,7 +1462,7 @@ function refreshTTD(){
 // Нэг нэгээр, завсартай дуудна (ebarimt блоклохоос сэргийлж). Олдсон ТТД толинд
 // хадгалагдах тул дараагийн улиралд дахин дуудахгүй.
 var ttdTried=new Set();   // энэ сессэд шалгасан (олдоогүй) регистрүүд — давтан дуудахгүй
-var ttdLookupBusy=false, ttdAutoTimer=null;
+var ttdLookupBusy=false, ttdAutoTimer=null, ttdAutoOff=false;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 function ttdLookupCandidates(force){
   return ttdStats().missing
@@ -1471,7 +1471,7 @@ function ttdLookupCandidates(force){
 }
 function scheduleAutoTTD(){
   if(typeof ttdTried==="undefined") return;   // хуудас ачаалагдаж дуусаагүй
-  if(ttdLookupBusy || !window.BBIEbarimt) return;
+  if(ttdLookupBusy || ttdAutoOff || !window.BBIEbarimt) return;
   if(!ttdLookupCandidates(false).length) return;
   clearTimeout(ttdAutoTimer);
   ttdAutoTimer=setTimeout(()=>lookupMissingTTD(false), 400);
@@ -1505,20 +1505,24 @@ async function lookupMissingTTD(force){
         notFound++; failStreak=0;
         if(tin) console.warn('ebarimt ТТД формат 12 оронгүй:', c.key, tin);
       }
-      if(!(r && r.error)) ttdTried.add(c.key);
+
     }catch(e){
       console.warn('ТТД лавлагаа', c.key, e); failed++; failStreak++;
     }
+    ttdTried.add(c.key);   // амжилттай/амжилтгүй аль ч тохиолдолд — автоматаар давтахгүй
     if(failStreak>=3){ stopped=true; break; }   // ebarimt хүрэхгүй байна — дэмий дуудахгүй
     if(i<cands.length-1) await sleep(300);
   }
   ttdLookupBusy=false;
   if(btn){ btn.disabled=false; btn.style.opacity=''; }
+  // Холболт амжилтгүй бол энэ сессэд автомат татахыг унтраана (дахин дахин оролдож анивчихгүй)
+  if(!force && (stopped || (failed && !found))) ttdAutoOff=true;
   let msg=`ebarimt: ${found} ажилтны ТТД татагдлаа ✓`;
   if(notFound) msg+=`, ${notFound} олдсонгүй`;
   if(failed) msg+=`, ${failed} шалгаж чадсангүй`;
   if(stopped) msg+=' — ebarimt.mn-тэй холбогдохгүй байна, дараа «Регистрээр ТТД татах»-ыг дахин дарна уу';
-  toast(msg);
+  // Автомат горимд зөвхөн олдсон үед мэдэгдэнэ; алдааг зөвхөн товч дарсан үед харуулна
+  if(force || found) toast(msg);
   if(!$('ttdOverlay').classList.contains('hidden')) renderTTDTable();
   refreshTTD();
 }
