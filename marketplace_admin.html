@@ -76,7 +76,7 @@ table.t{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}table
       <button class="tab on" data-tab="acc">Нягтлан <span class="badge" id="bAcc">0</span></button>
       <button class="tab" data-tab="leads">Хүсэлт <span class="badge" id="bLeads">0</span></button>
       <button class="tab" data-tab="revs">Үнэлгээ <span class="badge" id="bRevs">0</span></button>
-      <button class="tab" data-tab="reqs">Сүлжээний хүсэлт <span class="badge" id="bReqs">0</span></button>
+      <button class="tab" data-tab="reqs">Нээлттэй хүсэлт <span class="badge" id="bReqs">0</span></button>
       <button class="tab" data-tab="cons">Гэрээ <span class="badge" id="bCons">0</span></button>
       <button class="tab" data-tab="pay">Төлбөр · WIRE <span class="badge" id="bPay">0</span></button>
       <button class="tab" data-tab="logs">Хэрэглээ</button>
@@ -283,7 +283,7 @@ function render(){
     const ST={new:'Шинэ',offered:'Санал илгээсэн',contracted:'Гэрээ байгуулсан',declined:'Татгалзсан',closed:'Хаагдсан'};
     c.innerHTML = DATA.reqs.length ? DATA.reqs.map(q=>`
       <div class="card"><div class="head"><div><div class="title">${esc(q.company_name)} ${q.company_reg?'· '+esc(q.company_reg):''}</div>
-        <div class="sub">${q.accountant_id?'→ '+esc(q.mp_accountants?.name||'?'):'→ сүлжээнд нээлттэй'} · ${dt(q.created_at)}</div></div>
+        <div class="sub">${q.accountant_id?'→ '+esc(q.mp_accountants?.name||'?'):'→ бүх нягтланд нээлттэй'} · ${dt(q.created_at)}</div></div>
         <span class="pill ${q.status==='new'?'p-pending':'p-approved'}">${ST[q.status]||esc(q.status)}</span></div>
         <div class="meta">${(q.services||[]).join(', ')} ${q.employees?'· '+q.employees+' ажилтан':''} ${q.budget?'· төсөв '+Number(q.budget).toLocaleString()+'₮':''}<br>${esc(q.contact_name)} · ${esc(q.contact_phone)} ${q.contact_email?'· '+esc(q.contact_email):''}${q.message?'<br><i>'+esc(q.message)+'</i>':''}</div>
       </div>`).join('') : `<div class="empty">Хүсэлт алга.</div>`;

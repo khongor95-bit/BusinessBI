@@ -97,6 +97,13 @@
       .bbipay-banks span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
       .bbipay-or{font-size:11.5px;color:#6b7670;margin:12px 0 0}
       .bbipay-mobile .bbipay-qr .img img{width:150px;height:150px}
+      .bbipay-ref{margin:-4px 0 14px;font-size:12.5px;color:#6b7670}
+      .bbipay-ref>button{background:none;border:none;color:#216a4c;text-decoration:underline;cursor:pointer;font-size:12.5px;padding:0}
+      .bbipay-ref .row{display:none;gap:6px;margin-top:8px}.bbipay-ref.open .row{display:flex}
+      .bbipay-ref input{flex:1;min-width:0;padding:9px 11px;border:1.5px solid #dfe6e2;border-radius:9px;font:inherit;font-size:13px;text-transform:uppercase}
+      .bbipay-ref .row button{padding:9px 14px;border-radius:9px;border:1px solid #216a4c;background:#fff;color:#216a4c;font-weight:600;cursor:pointer}
+      .bbipay-ref .ok{color:#166534;font-weight:600}.bbipay-ref .bad{color:#b91c1c}
+      .bbipay-price s{font-size:16px;color:#9aa5a0;font-weight:600}
       .bbipay-toggle{margin-top:8px;font-size:12px}.bbipay-toggle button{background:none;border:none;color:#216a4c;text-decoration:underline;cursor:pointer;font-size:12px}
     `;
     document.head.appendChild(st);
@@ -107,6 +114,7 @@
       <div class="bbipay-h"><div class="k">Төлбөртэй үйлчилгээ</div><h3 id="bbipayTitle">Тайлан татах</h3><div class="d" id="bbipayDesc"></div></div>
       <div class="bbipay-b">
         <div class="bbipay-price"><b id="bbipayAmt"></b><span id="bbipayPer"></span></div>
+        <div class="bbipay-ref" id="bbipayRef"><button type="button" id="bbipayRefT">Урамшууллын код байна уу?</button><span id="bbipayRefSt"></span><div class="row"><input id="bbipayRefIn" maxlength="16" placeholder="ж: BOLD24" autocomplete="off"><button type="button" id="bbipayRefGo">Хэрэглэх</button></div></div>
         <ul class="bbipay-list" id="bbipayList"></ul>
         <button class="bbipay-btn" id="bbipayGo"><span class="bbipay-wire">WIRE</span> Банкны аппаар төлөх →</button>
         <div class="bbipay-qr" id="bbipayQr">
@@ -128,6 +136,9 @@
     modal.addEventListener("click", e => { if (e.target === modal) close(); });
     document.addEventListener("keydown", e => { if (e.key === "Escape" && modal.classList.contains("show")) close(); });
     modal.querySelector("#bbipayGo").onclick = startPayment;
+    modal.querySelector("#bbipayRefT").onclick = () => { modal.querySelector("#bbipayRef").classList.toggle("open"); const i = modal.querySelector("#bbipayRefIn"); if (i) i.focus(); };
+    modal.querySelector("#bbipayRefGo").onclick = () => applyRef(modal.querySelector("#bbipayRefIn").value, true);
+    modal.querySelector("#bbipayRefIn").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); applyRef(e.target.value, true); } });
     modal.querySelector("#bbipayRecheck").onclick = () => { if (current && current.paymentId) pollOnce(true); };
     window.addEventListener("message", e => { if (e.data && e.data.type === "bbi-pay-success" && current) pollOnce(true); });
     return modal;
@@ -185,9 +196,42 @@
     tick(); qrTimer = setInterval(tick, 1000);
   }
 
+  // ── Урамшууллын код (affiliate) ───────────────────────────
+  // ?ref=CODE линкээр орсон бол shell.js "bbi_ref"-д хадгална (60 хоног). Сервер кодыг дахин шалгаж хөнгөлөлт тооцно.
+  const REF_KEY = "bbi_ref", REF_TTL = 60 * 864e5;
+  function storedRef() { try { const o = JSON.parse(localStorage.getItem(REF_KEY) || "null"); if (o && o.code && Date.now() - o.t < REF_TTL) return o.code; } catch (_) {} return ""; }
+  function showPrice() {
+    const pr = PRICES[current.tool] || { amount: 0, label: "" };
+    if (current.ref && current.refPct) {
+      const disc = Math.round(pr.amount * current.refPct / 100 / 100) * 100;
+      $("bbipayAmt").innerHTML = `${fmtMNT(pr.amount - disc)} <s>${fmtMNT(pr.amount)}</s>`;
+    } else $("bbipayAmt").textContent = fmtMNT(pr.amount);
+  }
+  async function applyRef(code, manual) {
+    if (!current) return;
+    code = String(code || "").trim().toUpperCase();
+    const st = $("bbipayRefSt");
+    if (!/^[A-Z0-9]{4,16}$/.test(code)) { if (manual) st.innerHTML = ' <span class="bad">— код буруу байна</span>'; return; }
+    try {
+      await ensureMp(); const sb = await BBIMP.ready();
+      const { data, error } = await sb.rpc("referral_check", { p_code: code });
+      if (error) throw error;
+      const r = data && data[0];
+      if (!r) { current.ref = ""; current.refPct = 0; showPrice(); if (manual) st.innerHTML = ' <span class="bad">— код олдсонгүй</span>'; return; }
+      current.ref = r.code; current.refPct = r.discount_pct;
+      try { localStorage.setItem(REF_KEY, JSON.stringify({ code: r.code, t: Date.now() })); } catch (_) {}
+      $("bbipayRef").classList.remove("open");
+      $("bbipayRefT").textContent = "Код: " + r.code;
+      st.innerHTML = ` <span class="ok">— ${r.discount_pct}% хөнгөлөлт${r.owner_name ? " (" + esc(r.owner_name) + ")" : ""}</span>`;
+      showPrice();
+    } catch (e) { console.warn("referral", e); if (manual) st.innerHTML = ' <span class="bad">— шалгаж чадсангүй</span>'; }
+  }
+
   function open(req) {
     buildModal();
-    current = { tool: req.tool, meta: req.meta || {}, onPaid: req.onPaid, paymentId: null, checkoutUrl: null, win: null };
+    current = { tool: req.tool, meta: req.meta || {}, onPaid: req.onPaid, paymentId: null, checkoutUrl: null, win: null, ref: "", refPct: 0 };
+    $("bbipayRefT").textContent = "Урамшууллын код байна уу?"; $("bbipayRefSt").innerHTML = ""; $("bbipayRef").classList.remove("open"); $("bbipayRefIn").value = "";
+    const sref = storedRef(); if (sref) { $("bbipayRefIn").value = sref; applyRef(sref, false); }
     hideQr();
     const pr = PRICES[req.tool] || { amount: 0, label: "", validHours: 24 };
     $("bbipayTitle").textContent = req.title || "Тайлан татах";
@@ -220,7 +264,7 @@
     btn.disabled = true;
     setStatus('<span class="bbipay-spin"></span>Нэхэмжлэл үүсгэж байна…');
     try {
-      const r = await call("createPayment", { tool: current.tool, meta: current.meta });
+      const r = await call("createPayment", { tool: current.tool, meta: current.meta, ref: current.ref || "" });
       current.paymentId = r.paymentId; current.checkoutUrl = r.checkoutUrl;
       if (r.paid) { await onPaid(r); return; }
       if (r.qr && r.qr.text) {

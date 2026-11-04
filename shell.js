@@ -126,12 +126,14 @@ if(!document.getElementById('nlModal') && !B.dataset.noFloat) B.appendChild(frag
       card('businessbi_journal.html#page=reports','excel-dashboard.png','СТ-1–4 тайлан','14 хоног үнэгүй'),
       card('dashboard_maker.html','excel-dashboard.png','Дашбоард үүсгэгч','Үнэгүй харах'),
       card('ndsh_hhoat_converter.html','tool-ndsh.jpg','ТТД автоматаар','5,000₮ / тайлан')]},
-    {k:'net',n:'Сүлжээ',all:['accountants.html','Бүх нягтлан',''],items:[
+    {k:'net',n:'Нягтлан',all:['accountants.html','Бүх нягтлан',''],items:[
       card('accountants.html','training.png','Нягтлан хайх','Үнэгүй'),
-      card('accountant_signup.html','accounting.png','Сүлжээнд элсэх','Үнэгүй'),
+      card('for_accountants.html','accounting.png','Нягтлан бол элсэх','Үнэгүй'),
       card('pricing.html','finance.jpg','Үнэ, багц','Харах'),
       card('contact.html','excel-dashboard.png','Холбоо барих','1 ажлын өдөрт')]}
   ];
+  // Урамшууллын код: ?ref=CODE → 60 хоног хадгална (pay.js төлбөрийн цонхонд автоматаар хэрэглэнэ)
+  try{ const rf=new URLSearchParams(location.search).get('ref'); if(rf&&/^[A-Za-z0-9]{4,16}$/.test(rf)) localStorage.setItem('bbi_ref',JSON.stringify({code:rf.toUpperCase(),t:Date.now()})); }catch(e){}
   function init(){
     const nav=document.querySelector('.bbi-nav'), menu=document.getElementById('bbiMenu'); if(!nav||!menu||nav.dataset.home) return !!(nav&&menu);
     nav.dataset.home='1';

@@ -16,17 +16,31 @@ export const handler = callable(async (data, { user }) => {
   const uid = user!.id, email = user!.email ?? "";
   const db = admin();
 
+  // Урамшууллын код (affiliate): хүчинтэй, өөрийнх биш бол хөнгөлөлт. Хүснэгт байхгүй/алдаа → кодгүй үргэлжилнэ.
+  let amount = product.amount, discount = 0, refCode: string | null = null;
+  const refIn = String(data.ref ?? "").trim().toUpperCase().slice(0, 16);
+  if (/^[A-Z0-9]{4,16}$/.test(refIn)) {
+    try {
+      const { data: rc } = await db.from("mp_referral_codes").select("code,user_id,discount_pct,active").eq("code", refIn).maybeSingle();
+      if (rc && rc.active && rc.user_id !== uid) {
+        discount = Math.round(product.amount * Number(rc.discount_pct || 0) / 100 / 100) * 100;
+        amount = Math.max(100, product.amount - discount); refCode = rc.code;
+      }
+    } catch (e) { console.warn("referral lookup", (e as Error).message); }
+  }
+
   const since = new Date(Date.now() - REUSE_PENDING_MS).toISOString();
   const { data: pend } = await db.from("payments").select("*").eq("uid", uid).eq("tool", tool).eq("status", "pending")
-    .gte("created_at", since).order("created_at", { ascending: false }).limit(1);
+    .eq("amount", amount).gte("created_at", since).order("created_at", { ascending: false }).limit(1);
   if (pend && pend[0]) return { ...publicView(pend[0] as Payment), reused: true };
 
   const mode = await wireMode();
   const site = await getSetting("site_url", "https://businessbi.mn");
   const row: Record<string, unknown> = {
-    uid, email, tool, amount: product.amount, currency: product.currency, status: "pending",
+    uid, email, tool, amount, currency: product.currency, status: "pending",
     provider: useWire(mode) ? "wire" : "mock", livemode: mode === "live", meta,
   };
+  if (refCode) { row.ref_code = refCode; row.base_amount = product.amount; row.discount = discount; }
   // id-г урьдчилан гаргана: success_url, metadata, Idempotency-Key-д хэрэгтэй
   const id = crypto.randomUUID();
   row.id = id;
@@ -39,7 +53,7 @@ export const handler = callable(async (data, { user }) => {
     if (mode === "live" && !key.startsWith("sk_live_")) throw new HttpsError("failed-precondition", "Live горимд sk_live_ түлхүүр хэрэгтэй.");
     const ops = (await getSetting("wire_operators", "")).split(",").map((s) => s.trim()).filter(Boolean);
     const params = {
-      amount: product.amount, currency: product.currency, description: `BusinessBI — ${product.title}`,
+      amount, currency: product.currency, description: `BusinessBI — ${product.title}`,
       metadata: { paymentId: id, uid, tool }, successUrl, cancelUrl, operators: mode === "test" ? ["sandbox"] : ops,
     };
     // 1) Inline QR (хуудас солихгүй, шинэ цонхгүй): intent → confirm → next_action.qr {text,image,deeplinks}

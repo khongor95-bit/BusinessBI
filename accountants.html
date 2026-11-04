@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Нягтлангийн сүлжээ — BusinessBI.mn</title>
+<title>Нягтлан олох — итгэмжтэй нягтлан, онлайн гэрээ · BusinessBI</title>
 <meta name="description" content="Баталгаажсан нягтлангуудаас сонгож хүсэлт илгээ, онлайн гэрээ байгуул. Тайлан гаргах ажил BusinessBI програм дээр явагдаж, компани явцаа самбараасаа харна.">
 <link rel="canonical" href="https://businessbi.mn/accountants.html">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="theme-color" content="#216a4c">
+<meta name="theme-color" content="#0b0d1c">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="BusinessBI.mn">
-<meta property="og:title" content="Нягтлангийн сүлжээ — BusinessBI.mn">
+<meta property="og:title" content="Нягтлан олох — итгэмжтэй нягтлан, онлайн гэрээ">
 <meta property="og:description" content="Баталгаажсан нягтлангуудаас сонгож хүсэлт илгээ, онлайн гэрээ байгуул.">
 <meta property="og:url" content="https://businessbi.mn/accountants.html">
 <meta property="og:image" content="https://businessbi.mn/og-image.png">
@@ -25,7 +25,7 @@
 <script src="mp.js"></script>
 <script src="ebarimt.js"></script>
 <script src="site.js" defer></script>
-<script src="shell.js?v=20261104d" defer></script>
+<script src="shell.js?v=20261104e" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -89,6 +89,98 @@
 .ok{background:var(--bbi-green-soft);border:1px solid #cfe3d7;color:var(--bbi-green);border-radius:10px;padding:14px;font-weight:600;line-height:1.5}
 .err{background:#fcf2ee;border:1px solid #e6c0b5;color:#c0492b;border-radius:10px;padding:12px;font-size:13.5px;margin-bottom:10px}
 .acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+
+/* ═══ Нягтлан олох — other-levels загвар ═══ */
+.nh{isolation:isolate;position:relative;overflow:hidden;background:#0b0d1c;color:#fff;text-align:center;padding:96px 20px 150px}
+.nh-wall{position:absolute;inset:-18% -20%;display:flex;flex-direction:column;justify-content:center;gap:22px;transform:rotate(-8deg);z-index:-2}
+.nh-row{display:flex;gap:22px;width:max-content;animation:nhL 100s linear infinite}
+.nh-row:nth-child(2){animation-name:nhR;animation-duration:120s}.nh-row:nth-child(3){animation-duration:140s}
+.nh-row img{width:320px;height:200px;object-fit:cover;object-position:left top;border-radius:14px;flex:none;box-shadow:rgba(0,0,0,.45) 0 12px 30px;background:#1a1d33}
+@keyframes nhL{to{transform:translateX(-50%)}}@keyframes nhR{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+@media (prefers-reduced-motion:reduce){.nh-row{animation:none}}
+.nh-shade{position:absolute;inset:0;z-index:-1;background:radial-gradient(rgba(11,13,28,.74) 0%,rgba(11,13,28,.82) 55%,rgba(11,13,28,.94) 100%)}
+.nh .k{display:inline-block;font-size:13px;color:#e5e7eb;border:1px solid rgba(255,255,255,.18);padding:6px 12px;border-radius:999px;margin-bottom:18px;background:rgba(11,13,28,.55)}
+.nh h1{margin:0 auto 16px;font-size:clamp(32px,4.3vw,64px);line-height:1.05;letter-spacing:-.03em;font-weight:800;color:#fff;max-width:960px}
+.nh h1 span{color:#c9a470}
+.nh p.l{margin:0 auto;max-width:680px;font-size:clamp(16px,1.6vw,19px);line-height:1.5;color:rgba(255,255,255,.85)}
+.nh-search{margin:30px auto 0;display:flex;gap:12px;max-width:760px}
+.nh-search .box{flex:1;display:flex;align-items:center;gap:10px;background:#fff;border-radius:12px;height:56px;padding:0 16px;color:#171717}
+.nh-search .box svg{width:20px;height:20px;color:#8a8f9a;flex:none}
+.nh-search input{flex:1;border:0;background:transparent;font:inherit;font-size:16px;outline:none;min-width:0;color:#171717}
+.nh-search button{flex:none;height:56px;padding:0 24px;border:0;border-radius:12px;background:#c9a470;color:#171717;font:inherit;font-weight:700;font-size:15px;cursor:pointer}
+.nh-search button:hover{background:#d4b27f}
+.nh-pop{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px;font-size:13px;color:rgba(255,255,255,.7)}
+.nh-pop a{color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:5px 12px;background:rgba(255,255,255,.06)}
+.nh-pop a:hover{border-color:#c9a470;color:#f0d4ac}
+.nwrap{max-width:1200px;margin:0 auto;padding:0 20px}
+.svc-card{position:relative;z-index:2;margin-top:-80px;background:#fff;border-radius:22px;box-shadow:rgba(11,13,28,.45) 0 30px 80px -30px;padding:22px}
+.svc-card h2{font-size:18px;font-weight:700;margin:4px 6px 14px;color:#111827}
+.svc-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.svc{display:flex;flex-direction:column;gap:6px;text-align:left;border:1px solid #e5e7eb;border-radius:16px;padding:16px 18px;background:#fff;cursor:pointer;font:inherit;color:#111827;transition:border-color .15s,transform .15s,background .15s}
+.svc:hover{border-color:#c9a470;transform:translateY(-2px)}
+.svc.on{border:2px solid #c9a470;background:#fdf8ec;padding:15px 17px}
+.svc b{font-size:15.5px}.svc span{font-size:13px;color:#6b7280;line-height:1.45}
+.svc em{font-style:normal;font-size:12.5px;color:#9a7a3f;font-weight:600;margin-top:auto}
+.nsec{margin:56px 0}
+.nsec-h{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.nsec-h h2{font-size:clamp(24px,19.64px + 1.1615vw,40px);letter-spacing:-.02em;line-height:1.1;color:#111827;margin:0}
+.nsec-h p{color:#6b7280;margin:6px 0 0;max-width:60ch;line-height:1.55}
+/* calculator */
+.calc{display:grid;grid-template-columns:1.25fr 1fr;gap:16px}
+.calc-in,.calc-out{border:1px solid #e5e7eb;border-radius:22px;padding:24px;background:#fff}
+.calc-out{background:linear-gradient(135deg,#fdf8ec,#f6efdd);border-color:#ecdcb2;display:flex;flex-direction:column}
+.calc label.t{display:block;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;margin:0 0 8px}
+.calc .grp{margin-bottom:20px}
+.calc .chips .chip{background:#fff}
+.calc .chip.on{background:#171717;border-color:#171717;color:#fff}
+.calc-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.rng{display:flex;align-items:center;gap:12px}
+.rng input[type=range]{flex:1;accent-color:#c9a470}
+.rng output{min-width:56px;text-align:right;font-weight:700;color:#111827}
+.seg{display:inline-flex;border:1px solid #d1d5db;border-radius:999px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;font:inherit;font-size:13.5px;padding:7px 14px;border-radius:999px;cursor:pointer;color:#374151}
+.seg button.on{background:#171717;color:#fff}
+.calc-out small{font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.calc-out .big{font-size:clamp(30px,3.4vw,44px);font-weight:800;letter-spacing:-.03em;color:#111827;margin:6px 0 2px;line-height:1.1}
+.calc-out .per{color:#6b7280;font-size:14px}
+.calc-out ul{list-style:none;padding:0;margin:18px 0;display:grid;gap:8px;font-size:14px;color:#374151}
+.calc-out li{display:flex;justify-content:space-between;gap:12px;border-bottom:1px dashed #e7d9b5;padding-bottom:7px}
+.calc-out li b{white-space:nowrap}
+.calc-out .match{font-size:13.5px;color:#4b5563;margin:0 0 14px}
+.calc-out .note{font-size:12px;color:#6b7280;margin-top:12px;line-height:1.5}
+.obtn{appearance:none;border:0;cursor:pointer;font:inherit;font-weight:700;font-size:15px;padding:13px 22px;border-radius:999px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,background .15s}
+.obtn:hover{transform:translateY(-1px)}
+.obtn.gold{background:#c9a470;color:#171717}.obtn.gold:hover{background:#d4b27f}
+.obtn.dark{background:#111827;color:#fff}
+.obtn.ghost{background:#fff;color:#111827;border:1px solid #d1d5db}
+/* list */
+body.ol .filters{border-radius:16px;margin:0 0 16px}
+body.ol .filters input:focus,body.ol .filters select:focus{border-color:#c9a470}
+body.ol .acc{border-radius:20px;padding:22px}
+body.ol .acc:hover{border-color:#c9a470;box-shadow:0 20px 50px -28px rgba(201,164,112,.9)}
+body.ol .ph{background:#fdf8ec;color:#9a7a3f}
+body.ol .price b{color:#111827}
+body.ol .rating .s{color:#c9a470}
+body.ol .chip.on{background:#171717;border-color:#171717}
+body.ol .ok{background:#fdf8ec;border-color:#ecdcb2;color:#7a5c25}
+body.ol .ms b{color:#111827}
+.topline a{color:#9a7a3f!important}
+.how3{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.how3 div{border:1px solid #e5e7eb;border-radius:16px;padding:20px}
+.how3 b{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#0b0d1c;color:#c9a470;font-size:14px;margin-bottom:10px}
+.how3 h3{margin:0 0 6px;font-size:17px;color:#111827}.how3 p{margin:0;color:#6b7280;font-size:14px;line-height:1.55}
+.ncta{border-radius:22px;background:#0b0d1c;color:#fff;padding:clamp(24px,4vw,44px);display:grid;grid-template-columns:1.4fr 1fr;gap:24px;align-items:center;position:relative;overflow:hidden}
+.ncta::after{content:"";position:absolute;right:-80px;top:-80px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(201,164,112,.35),transparent 70%)}
+.ncta h2{margin:0 0 10px;font-size:clamp(22px,2.6vw,32px);letter-spacing:-.02em;color:#fff}
+.ncta p{margin:0;color:rgba(255,255,255,.78);line-height:1.6}
+.ncta .row{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;position:relative;z-index:1}
+.nfaq{max-width:820px;margin:0 auto 72px}
+.nfaq h2{text-align:center;font-size:clamp(22px,2.6vw,30px);margin:0 0 18px;color:#111827}
+.nfaq details{border-bottom:1px solid #e5e7eb;padding:16px 4px}
+.nfaq summary{cursor:pointer;font-weight:600;font-size:16px;color:#111827}
+.nfaq p{margin:10px 0 0;color:#4b5563;line-height:1.6}
+@media(max-width:989px){.svc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.calc,.ncta{grid-template-columns:1fr}.how3{grid-template-columns:1fr 1fr}.ncta .row{justify-content:flex-start}}
+@media(max-width:600px){.nh{padding:56px 16px 120px}.nh-row img{width:200px;height:125px}.nh-search{flex-direction:column}.nwrap{padding:0 16px}.svc-card{padding:14px}.svc-grid,.how3,.calc-row{grid-template-columns:1fr}}
 @media(max-width:960px){.hero-grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr 1fr}}
 @media(max-width:640px){.filters,.grid,.cta-row,.row2,.mstats{grid-template-columns:1fr}.mhead{flex-direction:column;align-items:flex-start}}
 </style>
@@ -96,47 +188,89 @@
 <body class="bbi-page ol" data-auth="supabase">
 <div class="pt" id="pt" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9"/></svg></div>
 
-<section class="bbi-hero">
-  <div class="bbi-wrap hero-grid">
-    <div>
-      <p class="bbi-eyebrow">Нягтлангийн сүлжээ</p>
-      <h1>Итгэмжтэй нягтлан, <em>онлайн гэрээ</em></h1>
-      <p class="bbi-lede">Тайлан гаргуулах нягтлан хайж зовох хэрэггүй. Баталгаажсан нягтлангуудаас туршлага, мэргэшил, үнээр нь харьцуулж сонгоод хүсэлт илгээ. Гэрээг онлайнаар байгуулж, ажлын явцыг самбараасаа хар.</p>
-    </div>
-    <div class="how">
-      <ol>
-        <li><span><b>Хүсэлт илгээх</b> — компанийн мэдээлэл, хэрэгцээгээ бичнэ (1 минут)</span></li>
-        <li><span><b>Гэрээний санал</b> — нягтлан үйлчилгээ, сарын төлбөр, хугацааг тодорхойлж гарын үсэг зурна</span></li>
-        <li><span><b>Та гарын үсэг зурна</b> — нэвтэрч баталгаажуулна; гэрээ PDF-ээр хадгалагдана</span></li>
-        <li><span><b>Ажил эхэлнэ</b> — таны компани нягтлангийн BusinessBI журналд нээгдэж, явцыг «Миний самбар»-аас харна</span></li>
-      </ol>
-    </div>
-  </div>
+<section class="nh">
+  <div class="nh-wall" aria-hidden="true" id="nhWall"></div>
+  <div class="nh-shade"></div>
+  <span class="k">Нягтлан олох</span>
+  <h1>Итгэмжтэй <span>нягтлангаа</span> олоод онлайн гэрээ байгуул</h1>
+  <p class="l">Баталгаажсан нягтлангуудыг туршлага, мэргэшил, үнээр нь харьцуулж сонгоно. Гэрээ, гарын үсэг, тайлангийн явц — бүгд онлайн.</p>
+  <form class="nh-search" id="heroForm" autocomplete="off">
+    <label class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="heroQ" type="search" placeholder="Ямар ажил хийлгэх вэ? ж: НӨАТ, цалин, жилийн тайлан"></label>
+    <button type="submit">Нягтлан хайх</button>
+  </form>
+  <div class="nh-pop">Түгээмэл: <a href="#" data-svc="Татварын тайлан">Татварын тайлан</a><a href="#" data-svc="Цалин, НДШ">Цалин, НДШ</a><a href="#" data-svc="НӨАТ">НӨАТ</a><a href="#" data-svc="Бүртгэл хөтлөх (бүрэн)">Бүрэн бүртгэл</a></div>
 </section>
 
-<section class="bbi-wrap">
-  <div class="filters">
-    <input id="search" type="search" placeholder="Нэр, чиглэл, танилцуулгаар хайх…">
-    <select id="fLoc"><option value="">Бүх байршил</option><option>Улаанбаатар</option><option>Дархан</option><option>Эрдэнэт</option><option>Орон нутаг</option></select>
-    <select id="fSpec"><option value="">Бүх чиглэл</option></select>
-    <select id="fSort"><option value="rating">Үнэлгээгээр</option><option value="priceLow">Үнэ: багаас их</option><option value="exp">Туршлагаар</option></select>
+<div class="nwrap">
+  <div class="svc-card">
+    <h2>Ямар үйлчилгээ хэрэгтэй вэ?</h2>
+    <div class="svc-grid" id="svcGrid"></div>
   </div>
-  <div class="topline"><span id="count"></span><a href="#" id="openReqLink" style="color:var(--bbi-green);font-weight:600;text-decoration:none">Тодорхой нягтлан сонгохгүй — сүлжээнд нээлттэй хүсэлт илгээх →</a></div>
-  <div class="grid" id="grid"><div class="skeleton">Ачааллаж байна…</div></div>
 
-  <div class="cta-row">
-    <div class="cta-card">
-      <h3>Нягтлан бол сүлжээнд элс</h3>
-      <p>Профайлаа нэмээд компаниудаас хүсэлт хүлээн ав. Гэрээг онлайнаар байгуулж, харилцагч бүрээ BusinessBI журналд нэг дороос хөтөл — тайлан СТ-1–СТ-4, ТТ-02 автоматаар.</p>
-      <a href="accountant_signup.html" class="bbi-btn">Нягтлан болж бүртгүүлэх →</a>
+  <section class="nsec" id="calcSec">
+    <div class="nsec-h"><div><h2>Сарын үнээ урьдчилан тооцоол</h2><p>Компанийнхаа хэмжээг оруулахад зах зээлийн дундаж үнийн хүрээ гарна. Энэ төсвөөрөө шууд хүсэлт илгээж болно.</p></div></div>
+    <div class="calc">
+      <div class="calc-in">
+        <div class="grp"><label class="t">Хэрэгтэй үйлчилгээ</label><div class="chips" id="cSvc"></div></div>
+        <div class="calc-row">
+          <div class="grp"><label class="t">Ажилтны тоо</label><div class="rng"><input type="range" id="cEmp" min="0" max="100" value="5"><output id="cEmpO">5</output></div></div>
+          <div class="grp"><label class="t">Сарын баримт, гүйлгээ</label><div class="rng"><input type="range" id="cDoc" min="0" max="1000" step="10" value="80"><output id="cDocO">80</output></div></div>
+        </div>
+        <div class="calc-row">
+          <div class="grp"><label class="t">НӨАТ төлөгч</label><div class="seg" id="cVat"><button type="button" data-v="1" class="on">Тийм</button><button type="button" data-v="0">Үгүй</button></div></div>
+          <div class="grp"><label class="t">Тайлан хоцорсон</label><div class="seg" id="cLate"><button type="button" data-v="0" class="on">Үгүй</button><button type="button" data-v="1">Тийм</button></div></div>
+        </div>
+      </div>
+      <div class="calc-out">
+        <small>Сарын ойролцоо үнэ</small>
+        <div class="big" id="cOut">—</div>
+        <div class="per" id="cPer">сард</div>
+        <ul id="cBreak"></ul>
+        <p class="match" id="cMatch"></p>
+        <button class="obtn gold" id="cReq" type="button">Энэ төсвөөр хүсэлт илгээх →</button>
+        <p class="note">Тооцоо нь зах зээлийн дундаж дээр үндэслэсэн чиглүүлэх үнэ. Эцсийн үнийг нягтлан гэрээний саналдаа тодорхой бичнэ.</p>
+      </div>
     </div>
-    <div class="cta-card light">
-      <h3>Хүсэлт, гэрээгээ хянах</h3>
-      <p>Илгээсэн хүсэлт, ирсэн гэрээний санал, хүчинтэй гэрээ, нягтлангийн бичсэн тайлангийн явц — бүгд нэг самбарт.</p>
-      <a href="my.html" class="bbi-btn ghost">Миний самбар →</a>
+  </section>
+
+  <section class="nsec" id="list">
+    <div class="nsec-h"><div><h2>Баталгаажсан нягтлангууд</h2><p>Профайл дээр дарж туршлага, үнэлгээг нь үзээд хүсэлт илгээнэ.</p></div></div>
+    <div class="filters">
+      <input id="search" type="search" placeholder="Нэр, чиглэл, танилцуулгаар хайх…">
+      <select id="fLoc"><option value="">Бүх байршил</option><option>Улаанбаатар</option><option>Дархан</option><option>Эрдэнэт</option><option>Орон нутаг</option></select>
+      <select id="fSpec"><option value="">Бүх чиглэл</option></select>
+      <select id="fSort"><option value="rating">Үнэлгээгээр</option><option value="priceLow">Үнэ: багаас их</option><option value="exp">Туршлагаар</option></select>
     </div>
+    <div class="topline"><span id="count"></span><a href="#" id="openReqLink" style="font-weight:600;text-decoration:none">Нягтлан сонгохгүй — бүх нягтланд нээлттэй хүсэлт илгээх →</a></div>
+    <div class="grid" id="grid"><div class="skeleton">Ачааллаж байна…</div></div>
+  </section>
+
+  <section class="nsec">
+    <div class="nsec-h"><div><h2>Хэрхэн ажилладаг вэ</h2></div></div>
+    <div class="how3">
+      <div><b>1</b><h3>Хүсэлт илгээ</h3><p>Компанийн мэдээлэл, хэрэгцээгээ 1 минутад бичнэ. Регистр оруулахад нэр нь автоматаар бөглөгдөнө.</p></div>
+      <div><b>2</b><h3>Санал ав</h3><p>Нягтлан үйлчилгээ, сарын төлбөр, хугацааг тодорхойлсон гэрээний санал илгээнэ.</p></div>
+      <div><b>3</b><h3>Онлайн гарын үсэг</h3><p>Хоёр тал нэвтэрч гарын үсэг зурна. Гэрээ PDF-ээр хадгалагдана.</p></div>
+      <div><b>4</b><h3>Явцаа хяна</h3><p>Нягтлан таны компанийг BusinessBI журналд хөтөлж, тайлангийн явцыг «Миний самбар»-аас харна.</p></div>
+    </div>
+  </section>
+
+  <section class="nsec">
+    <div class="ncta">
+      <div><h2>Нягтлан уу? Шинэ харилцагчаа эндээс ол</h2><p>Профайлаа нэмээд компаниудаас хүсэлт хүлээн ав. Гэрээ онлайн, харилцагч бүр BusinessBI журналд нэг дор. Урамшууллын кодоороо хэрэгслийн борлуулалтаас шимтгэл ав.</p></div>
+      <div class="row"><a class="obtn gold" href="for_accountants.html">Нягтлангуудад →</a><a class="obtn ghost" href="my.html">Миний самбар</a></div>
+    </div>
+  </section>
+
+  <div class="nfaq">
+    <h2>Түгээмэл асуулт</h2>
+    <details><summary>Хүсэлт илгээх төлбөртэй юу?</summary><p>Үгүй. Хүсэлт илгээх, санал авах, гэрээ байгуулах нь компанид үнэгүй. Та зөвхөн гэрээнд тохирсон сарын төлбөрөө нягтландаа шууд төлнө.</p></details>
+    <details><summary>«Баталгаажсан» гэдэг нь юу гэсэн үг вэ?</summary><p>BusinessBI баг нягтлангийн бүртгэл, туршлагын мэдээллийг шалгаж баталсан гэсэн үг. Баталгаажсан профайл тэмдэгтэй харагдана.</p></details>
+    <details><summary>Тооцоолуурын үнэ яг тэр хэмжээгээр байх уу?</summary><p>Тооцоолуур зах зээлийн дундаж дээр үндэслэсэн чиглүүлэх үнэ гаргана. Эцсийн үнийг нягтлан таны компанийн нөхцөлийг харж гэрээний саналдаа бичнэ.</p></details>
+    <details><summary>Тодорхой нягтлан сонгохгүйгээр хүсэлт илгээж болох уу?</summary><p>Болно. «Нээлттэй хүсэлт» илгээвэл бүх баталгаажсан нягтланд харагдаж, сонирхсон нягтлангууд санал илгээнэ.</p></details>
+    <details><summary>Холбоо барих мэдээлэл маань хэнд харагдах вэ?</summary><p>Утас, имэйл зэрэг мэдээлэл гэрээний санал ирсний дараа зөвхөн хоёр талд харагдана.</p></details>
   </div>
-</section>
+</div>
 
 <div class="mbg" id="mbg"><div class="modal" id="modal"></div></div>
 
@@ -150,7 +284,7 @@
   const VB=`<svg class="vb" viewBox="0 0 24 24" fill="none"><title>Баталгаажсан</title><path d="M12 2l2.4 1.8 3-.3 1 2.8 2.6 1.5-.8 2.9.8 2.9-2.6 1.5-1 2.8-3-.3L12 22l-2.4-1.8-3 .3-1-2.8L3 16.5l.8-2.9L3 10.7l2.6-1.5 1-2.8 3 .3L12 2z" fill="#216a4c"/><path d="M8.5 12l2.3 2.3 4.7-4.7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   const initials=n=>String(n||'').replace(/\./g,' ').trim().split(/\s+/).map(p=>p[0]||'').slice(0,2).join('').toUpperCase();
   const photo=(a,cls)=>a.photo_url?`<img class="ph ${cls||''}" src="${esc(a.photo_url)}" alt="" onerror="this.outerHTML='<div class=&quot;ph&quot;>${esc(initials(a.name))}</div>'">`:`<div class="ph ${cls||''}">${esc(initials(a.name))}</div>`;
-  const EMPTY=`<div class="empty"><div style="font-size:40px"></div><h3>Эхний нягтлангууд бүртгэгдэж байна</h3><p>Баталгаажсан нягтлангийн профайлууд энд гарна. Тайлан гаргуулах хэрэгцээгээ одоо илгээвэл сүлжээний нягтлангуудад хүрч, тохирох нягтлан гэрээний санал илгээнэ.</p><a href="#" class="bbi-btn" id="emptyReq">Нээлттэй хүсэлт илгээх →</a> <a href="accountant_signup.html" style="display:inline-block;margin-left:10px;color:var(--bbi-green);font-weight:600;text-decoration:none">Нягтлан бол бүртгүүлэх →</a></div>`;
+  const EMPTY=`<div class="empty"><div style="font-size:40px"></div><h3>Эхний нягтлангууд бүртгэгдэж байна</h3><p>Баталгаажсан нягтлангийн профайлууд энд гарна. Тайлан гаргуулах хэрэгцээгээ одоо илгээвэл баталгаажсан нягтлангуудад хүрч, тохирох нягтлан гэрээний санал илгээнэ.</p><a href="#" class="bbi-btn" id="emptyReq">Нээлттэй хүсэлт илгээх →</a> <a href="for_accountants.html" style="display:inline-block;margin-left:10px;color:#9a7a3f;font-weight:600;text-decoration:none">Нягтлан бол бүртгүүлэх →</a></div>`;
 
   async function load(){
     try{
@@ -158,7 +292,7 @@
       const { data, error } = await sb.from('mp_accountants').select('*').eq('status','approved').order('verified',{ascending:false}).order('rating',{ascending:false});
       if(error) throw error; ACC=data||[];
     }catch(e){ console.error('mp load', e); ACC=[]; }
-    render();
+    render(); try{calc();}catch(e){}
   }
   function card(a){
     return `<article class="acc" data-id="${a.id}">
@@ -204,10 +338,10 @@
     }catch(e){ const box=$('revList'); if(box) box.textContent='Үнэлгээ ачаалж чадсангүй.'; }
   }
 
-  function openRequest(a){
+  function openRequest(a,pre){
     requireLogin(user=>{
       const em=user.email||'', nm=(user.user_metadata&&(user.user_metadata.full_name||user.user_metadata.name))||'';
-      open(`<div class="mhead"><div><h2>${a?'Хүсэлт — '+esc(a.name):'Нээлттэй хүсэлт — сүлжээний нягтлангуудад'}</h2><div class="acc-loc">${a?'Нягтлан хүсэлтийг тань үзээд гэрээний санал илгээнэ.':'Батлагдсан бүх нягтлан хүсэлтийг үзэж, санал илгээх боломжтой. Та тохирохыг нь сонгож гэрээ байгуулна.'}</div></div></div>
+      open(`<div class="mhead"><div><h2>${a?'Хүсэлт — '+esc(a.name):'Нээлттэй хүсэлт — бүх нягтланд'}</h2><div class="acc-loc">${a?'Нягтлан хүсэлтийг тань үзээд гэрээний санал илгээнэ.':'Батлагдсан бүх нягтлан хүсэлтийг үзэж, санал илгээх боломжтой. Та тохирохыг нь сонгож гэрээ байгуулна.'}</div></div></div>
         <div class="mbody"><div id="rErr"></div>
           <div class="row2"><div class="field"><label>Регистр / ТТД <span id="rRegSt" class="eb-status"></span></label><input id="rReg" placeholder="ж: 6123456" inputmode="numeric" title="ebarimt.mn-ээс компанийн нэрийг автоматаар татна"></div><div class="field"><label>Компанийн нэр *</label><input id="rCompany" placeholder="ж: Монгол Экүэстрэн ХХК"></div></div>
           <div class="row2"><div class="field"><label>Холбоо барих хүн *</label><input id="rName" value="${esc(nm)}"></div><div class="field"><label>Утас *</label><input id="rPhone" inputmode="tel" placeholder="8800-0000"></div></div>
@@ -220,6 +354,7 @@
           <p style="font-size:12px;color:var(--bbi-muted);margin-top:10px">Хүсэлт илгээснээр <a href="terms.html" style="color:var(--bbi-green)">үйлчилгээний нөхцөл</a>-ийг зөвшөөрч байна. Хүсэлтийн төлөвийг <a href="my.html" style="color:var(--bbi-green)">Миний самбар</a>-аас харна.</p>
         </div>`);
       $('rCancel').onclick=close;
+      if(pre){ document.querySelectorAll('#rSvc .chip').forEach(c=>{ if((pre.services||[]).includes(c.textContent)) c.classList.add('on'); }); if(pre.budget) $('rBudget').value=pre.budget; if(pre.emp!=null) $('rEmp').value=pre.emp; if(pre.docs!=null) $('rDocs').value=pre.docs; if(pre.msg) $('rMsg').value=pre.msg; }
       // Регистр бичмэгц ebarimt.mn-ээс компанийн нэр автоматаар (ebarimt.js → Supabase прокси, 30 хоног кэш)
       if(window.BBIEbarimt){ const st=$('rRegSt'); BBIEbarimt.attach($('rReg'),{name:$('rCompany'),onResult:r=>{ const b=BBIEbarimt.badge(r); st.textContent=b.text; st.className='eb-status '+b.cls; }}); }
       $('rSvc').onclick=e=>{ if(e.target.classList.contains('chip')) e.target.classList.toggle('on'); };
@@ -233,12 +368,67 @@
           const sb=BBIMP.sb;
           const {error}=await sb.from('mp_requests').insert({ client_user_id:user.id, accountant_id:a?a.id:null, company_name:v('rCompany'), company_reg:v('rReg')||null, contact_name:v('rName'), contact_phone:v('rPhone'), contact_email:v('rEmail')||null, services, employees:+v('rEmp')||null, docs_per_month:+v('rDocs')||null, budget:+v('rBudget')||null, message:v('rMsg')||null });
           if(error) throw error;
-          modal.querySelector('.mbody').innerHTML=`<div class="ok">✓ Хүсэлт илгээгдлээ.<br>${a?esc(a.name)+' гэрээний санал үүсгэмэгц':'Сүлжээний нягтлан санал илгээмэгц'} «Миний самбар» дээр гарна — гарын үсэг зурахад гэрээ хүчин төгөлдөр болно.</div><div class="acts"><a href="my.html" class="bbi-btn">Миний самбар →</a><button class="bbi-btn ghost" id="rClose2">Хаах</button></div>`;
+          modal.querySelector('.mbody').innerHTML=`<div class="ok">✓ Хүсэлт илгээгдлээ.<br>${a?esc(a.name)+' гэрээний санал үүсгэмэгц':'Нягтлангууд санал илгээмэгц'} «Миний самбар» дээр гарна — гарын үсэг зурахад гэрээ хүчин төгөлдөр болно.</div><div class="acts"><a href="my.html" class="bbi-btn">Миний самбар →</a><button class="bbi-btn ghost" id="rClose2">Хаах</button></div>`;
           $('rClose2').onclick=close;
         }catch(e){ console.error(e); b.disabled=false; b.textContent='Хүсэлт илгээх'; err.innerHTML='<div class="err">Илгээж чадсангүй: '+esc(e.message||'алдаа')+'. Supabase схем (supabase/schema.sql) ажиллуулсан эсэхийг шалгана уу.</div>'; }
       };
     },{title:'Хүсэлт илгээхийн тулд нэвтэрнэ үү', text:'Хүсэлт, гэрээний санал, гарын үсэг — бүгд таны бүртгэлтэй холбогдоно.'});
   }
+  // ── Hero wall ──
+  (function(){ const imgs=['accounting.png','finance.jpg','excel-dashboard.png','tool-financial.jpg','salary.jpg','budget.jpg','tool-noat.jpg','tool-ndsh.jpg','training.png','powerbi-dashboard.png'];
+    let h=''; for(let r=0;r<3;r++){ const q=[]; for(let i=0;i<8;i++) q.push(imgs[(i*3+r*4)%imgs.length]); h+='<div class="nh-row">'+q.concat(q).map(x=>`<img src="img/${x}" alt="" loading="lazy">`).join('')+'</div>'; } $('nhWall').innerHTML=h; })();
+
+  // ── Үйлчилгээний картууд ──
+  const SVC_INFO={
+    'Бүртгэл хөтлөх (бүрэн)':['Анхан шатнаас тайлан хүртэл бүх бүртгэлийг хөтөлнө','150,000₮-с'],
+    'Татварын тайлан':['ААНОАТ, ХХОАТ, улирал, жилийн тайлан','60,000₮-с'],
+    'Санхүүгийн тайлан':['СТ-1–4, тодруулга, e-balance илгээлт','50,000₮-с'],
+    'НӨАТ':['Падаан тулгалт, eBarimt, сарын тайлан','50,000₮-с'],
+    'Цалин, НДШ':['Цалин бодолт, НДШ, ХХОАТ суутгал','30,000₮-с'],
+    'Банк, касс, авлага өглөг':['Харилцах дансны тулгалт, авлага өглөг','40,000₮-с'],
+    'Аудитын бэлтгэл':['Аудит, татварын шалгалтад баримт бэлдэх','80,000₮-с']};
+  const svcGrid=$('svcGrid');
+  svcGrid.innerHTML=SERVICES.map(x=>{const i=SVC_INFO[x]||['',''];return `<button type="button" class="svc" data-s="${esc(x)}"><b>${esc(x)}</b><span>${esc(i[0])}</span><em>${esc(i[1])}</em></button>`;}).join('')+`<button type="button" class="svc" data-s=""><b>Бүх нягтлан</b><span>Шүүлтгүйгээр бүх баталгаажсан нягтланг харах</span><em>Үзэх →</em></button>`;
+  const toList=()=>setTimeout(()=>{ const y=$('list').getBoundingClientRect().top+scrollY-110; scrollTo({top:y,behavior:'smooth'}); },30);
+  function pickSvc(x){ fSpec.value=x||''; svcGrid.querySelectorAll('.svc').forEach(b=>b.classList.toggle('on',!!x&&b.dataset.s===x)); render(); }
+  svcGrid.addEventListener('click',e=>{ const b=e.target.closest('.svc'); if(!b) return; pickSvc(b.dataset.s); if(b.dataset.s&&!CS.has(b.dataset.s)){ CS.add(b.dataset.s); drawChips(); calc(); } toList(); });
+  fSpec.addEventListener('change',()=>svcGrid.querySelectorAll('.svc').forEach(b=>b.classList.toggle('on',!!fSpec.value&&b.dataset.s===fSpec.value)));
+  document.querySelectorAll('.nh-pop a').forEach(a=>a.onclick=e=>{e.preventDefault(); pickSvc(a.dataset.svc); toList();});
+  $('heroForm').onsubmit=e=>{ e.preventDefault(); const q=$('heroQ').value.trim(); const hit=SERVICES.find(x=>q&&x.toLowerCase().includes(q.toLowerCase())); if(hit){ search.value=''; pickSvc(hit); } else { search.value=q; pickSvc(''); } toList(); };
+
+  // ── Үнийн тооцоолуур (зах зээлийн дундаж — чиглүүлэх үнэ) ──
+  const BASE={'Бүртгэл хөтлөх (бүрэн)':150000,'Татварын тайлан':60000,'Санхүүгийн тайлан':50000,'НӨАТ':50000,'Цалин, НДШ':30000,'Банк, касс, авлага өглөг':40000,'Аудитын бэлтгэл':80000};
+  const CS=new Set(['Татварын тайлан','Санхүүгийн тайлан','Цалин, НДШ']); let VAT=1, LATE=0;
+  function drawChips(){ $('cSvc').innerHTML=SERVICES.map(x=>`<span class="chip${CS.has(x)?' on':''}" data-s="${esc(x)}">${esc(x)}</span>`).join(''); }
+  $('cSvc').onclick=e=>{ const c=e.target.closest('.chip'); if(!c) return; const x=c.dataset.s; CS.has(x)?CS.delete(x):CS.add(x); if(x==='НӨАТ'){ VAT=CS.has(x)?1:VAT; } drawChips(); calc(); };
+  const seg=(id,fn)=>$(id).onclick=e=>{ const b=e.target.closest('button'); if(!b) return; $(id).querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); fn(+b.dataset.v); calc(); };
+  seg('cVat',v=>{VAT=v;}); seg('cLate',v=>{LATE=v;});
+  ['cEmp','cDoc'].forEach(id=>$(id).addEventListener('input',()=>{ $(id+'O').textContent=$(id).value+($(id).value==$(id).max?'+':''); calc(); }));
+  const r10=n=>Math.round(n/10000)*10000;
+  let EST=null;
+  function calc(){
+    const emp=+$('cEmp').value, doc=+$('cDoc').value, lines=[];
+    const full=CS.has('Бүртгэл хөтлөх (бүрэн)');
+    for(const x of SERVICES){ if(!CS.has(x)) continue;
+      let v=BASE[x];
+      if(full && (x==='Санхүүгийн тайлан'||x==='Банк, касс, авлага өглөг')) v=Math.round(v*.5); // бүрэн бүртгэлд хэсэгчлэн багтана
+      if(x==='Цалин, НДШ') v+=Math.max(0,emp-3)*4000;
+      if(x==='НӨАТ'&&!VAT) continue;
+      lines.push([x,v]); }
+    if(VAT&&!CS.has('НӨАТ')&&CS.size) lines.push(['НӨАТ төлөгчийн нэмэгдэл',25000]);
+    const vol=Math.max(0,doc-50)*600; if(vol&&lines.length) lines.push(['Гүйлгээний хэмжээ ('+doc+')',vol]);
+    let sum=lines.reduce((a,b)=>a+b[1],0);
+    if(!lines.length){ $('cOut').textContent='—'; $('cBreak').innerHTML='<li><span>Үйлчилгээ сонгоно уу</span></li>'; $('cMatch').textContent=''; EST=null; return; }
+    const lo=r10(sum*.8), hi=r10(sum*1.25);
+    $('cOut').textContent=fmtMNT(lo).replace('₮','')+' – '+fmtMNT(hi);
+    $('cPer').textContent=LATE?'сард · хоцорсон тайланд нэг удаагийн нэмэлт '+fmtMNT(r10(sum*1.5))+' орчим':'сард';
+    $('cBreak').innerHTML=lines.map(([k,v])=>`<li><span>${esc(k)}</span><b>${fmtMNT(r10(v)||v)}</b></li>`).join('');
+    const n=ACC.filter(a=>(a.price_from||0)<=hi).length;
+    $('cMatch').textContent=ACC.length?(n?`Энэ үнийн хүрээнд ${n} нягтлан үйлчилгээ үзүүлдэг.`:'Энэ хүрээнд тохирох нягтлан одоогоор алга — нээлттэй хүсэлт илгээвэл санал ирнэ.'):'';
+    EST={lo,hi,mid:r10((lo+hi)/2),emp,doc,services:[...CS].filter(x=>x!=='НӨАТ'||VAT)};
+  }
+  $('cReq').onclick=()=>{ if(!EST){ return; } openRequest(null,{services:EST.services,budget:EST.mid,emp:EST.emp,docs:EST.doc,msg:LATE?'Өмнөх үеийн тайлан хоцорсон.':''}); };
+  drawChips(); calc();
   load();
 })();
 </script>

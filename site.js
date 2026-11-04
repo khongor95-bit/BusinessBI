@@ -15,13 +15,13 @@
   const MENU = [
     ["tools.html", "Хэрэгслүүд"],
     ["businessbi_journal.html", "Санхүүгийн програм"],
-    ["accountants.html", "Нягтлангийн сүлжээ"],
+    ["accountants.html", "Нягтлан олох"],
     ["pricing.html", "Үнэ"],
     ["contact.html", "Холбоо барих"],
   ];
   const CONTACT = { email: "hello@businessbi.mn", phone: "+976 9911-2233", phoneHref: "tel:+97699112233" };
   const page = (location.pathname.split("/").pop() || "index.html").toLowerCase();
-  const isActive = (href) => page === href || (href === "accountants.html" && /accountant_signup|partner|my\.html|contract/.test(page)) || (href === "tools.html" && /converter|matcher|invoice|dashboard|payroll|budget/.test(page));
+  const isActive = (href) => page === href || (href === "accountants.html" && /accountant_signup|for_accountants|partner|my\.html|contract/.test(page)) || (href === "tools.html" && /converter|matcher|invoice|dashboard|payroll|budget/.test(page));
 
   const USER_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
 
@@ -63,8 +63,8 @@
           </div>
           <div class="bbi-foot-col">
             <h5>Үйлчилгээ</h5>
-            <a href="accountants.html">Нягтлангийн сүлжээ</a>
-            <a href="accountant_signup.html">Нягтлан болж элсэх</a>
+            <a href="accountants.html">Нягтлан олох</a>
+            <a href="for_accountants.html">Нягтлан болж элсэх</a>
             <a href="my.html">Миний самбар (компани)</a>
             <a href="partner.html">Нягтлангийн самбар</a>
             <a href="pricing.html">Үнэ</a>

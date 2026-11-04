@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="shell.css?v=20261104c">
 <script src="mp.js"></script>
 <script src="site.js" defer></script>
-<script src="shell.js?v=20261104d" defer></script>
+<script src="shell.js?v=20261104e" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -71,10 +71,10 @@
     const st=[['Хүсэлт илгээсэн',REQ.length>0||CON.length>0],['Гэрээний санал ирсэн',CON.length>0],['Гарын үсэг зурсан',active.length>0||CON.some(c=>c.client_signed_at)],['Бүртгэл явагдаж байна',active.some(c=>c.bbi_company_id)]];
     $('root').className=''; $('root').innerHTML=`
       <div class="head"><div><h1>Миний самбар</h1><p>${esc(name)} · компанийн төлөөлөгч</p></div><a href="accountants.html" class="bbi-btn">Нягтлан хайх / хүсэлт илгээх →</a></div>
-      <div class="steps">${st.map(([t,d],i)=>`<div class="step ${d?'done':''}"><b>${i+1}. ${t}</b>${['Нягтлангийн сүлжээнээс','Нягтлан үйлчилгээ, үнэ, хугацааг санал болгоно','Нэвтэрч нэрээ бичиж баталгаажуулна','Нягтлан журналд хөтөлж, тайлан гаргана'][i]}</div>`).join('')}</div>
+      <div class="steps">${st.map(([t,d],i)=>`<div class="step ${d?'done':''}"><b>${i+1}. ${t}</b>${['«Нягтлан олох» хэсгээс','Нягтлан үйлчилгээ, үнэ, хугацааг санал болгоно','Нэвтэрч нэрээ бичиж баталгаажуулна','Нягтлан журналд хөтөлж, тайлан гаргана'][i]}</div>`).join('')}</div>
       ${toSign.length?`<div class="sec"><h2>Гарын үсэг хүлээж буй гэрээ</h2><div class="list">${toSign.map(c=>item(c,true)).join('')}</div></div>`:''}
-      <div class="sec"><h2>Миний нягтлан, хүчинтэй гэрээ</h2>${active.length?`<div class="list">${active.map(c=>item(c,false)).join('')}</div>`:`<div class="empty">Хүчинтэй гэрээ алга. ${CON.length?'Гэрээний саналд гарын үсэг зурмагц энд гарна.':'Нягтлангийн сүлжээнээс нягтлан сонгож хүсэлт илгээнэ үү.'}</div>`}</div>
-      <div class="sec"><h2>Миний хүсэлтүүд</h2>${REQ.length?`<div class="list">${REQ.map(r=>`<div class="item"><div><h3>${esc(r.company_name)} ${badge(REQ_STATUS[r.status]||r.status,r.status==='contracted'?'#216a4c':r.status==='offered'?'#b8862f':'#6b7670')}</h3><div class="meta">${(r.services||[]).join(', ')} · ${fmtDate(r.created_at)}${r.accountant_id?'':' · сүлжээнд нээлттэй'}</div></div></div>`).join('')}</div>`:`<div class="empty">Хүсэлт илгээгээгүй байна.</div>`}</div>
+      <div class="sec"><h2>Миний нягтлан, хүчинтэй гэрээ</h2>${active.length?`<div class="list">${active.map(c=>item(c,false)).join('')}</div>`:`<div class="empty">Хүчинтэй гэрээ алга. ${CON.length?'Гэрээний саналд гарын үсэг зурмагц энд гарна.':'«Нягтлан олох» хэсгээс нягтлан сонгож хүсэлт илгээнэ үү.'}</div>`}</div>
+      <div class="sec"><h2>Миний хүсэлтүүд</h2>${REQ.length?`<div class="list">${REQ.map(r=>`<div class="item"><div><h3>${esc(r.company_name)} ${badge(REQ_STATUS[r.status]||r.status,r.status==='contracted'?'#216a4c':r.status==='offered'?'#b8862f':'#6b7670')}</h3><div class="meta">${(r.services||[]).join(', ')} · ${fmtDate(r.created_at)}${r.accountant_id?'':' · бүх нягтланд нээлттэй'}</div></div></div>`).join('')}</div>`:`<div class="empty">Хүсэлт илгээгээгүй байна.</div>`}</div>
       ${CON.filter(c=>['terminated','declined','signed_client'].includes(c.status)).length?`<div class="sec"><h2>Бусад гэрээ</h2><div class="list">${CON.filter(c=>['terminated','declined','signed_client'].includes(c.status)).map(c=>item(c,false)).join('')}</div></div>`:''}`;
     document.querySelectorAll('[data-review]').forEach(b=>b.onclick=()=>review(CON.find(c=>c.id===b.dataset.review)));
   }

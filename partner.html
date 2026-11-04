@@ -11,7 +11,7 @@
 <script src="mp.js"></script>
 <script src="ebarimt.js"></script>
 <script src="site.js" defer></script>
-<script src="shell.js?v=20261104d" defer></script>
+<script src="shell.js?v=20261104e" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -66,7 +66,7 @@
 (function(){
   const { esc, fmtMNT, fmtDate, fmtDT, SERVICES, REQ_STATUS, conBadge, badge, contractUrl } = BBIMP;
   const $=id=>document.getElementById(id);
-  let me=null, acc=null, REQ=[], CON=[], tab='req';
+  let me=null, acc=null, REQ=[], CON=[], tab='req', REF=null, REFERR=false;
   const mbg=$('mbg'), modal=$('modal');
   const open=html=>{ modal.innerHTML=`<button class="mx" id="mx">×</button>`+html; mbg.classList.add('open'); document.body.style.overflow='hidden'; $('mx').onclick=close; };
   const close=()=>{ mbg.classList.remove('open'); document.body.style.overflow=''; };
@@ -76,7 +76,7 @@
     const sb=await BBIMP.ready(); me=BBIMP.user;
     if(!me){ $('root').innerHTML=`<p style="margin-bottom:6px;font-size:18px;font-weight:700;color:var(--bbi-ink)">Нягтлангийн самбар</p><p>Хүсэлт, гэрээ, харилцагч компаниудаа удирдахын тулд нэвтэрнэ үү.</p><button class="bbi-btn" id="lg">Нэвтрэх</button>`; $('lg').onclick=()=>BBIMP.loginModal(); return; }
     acc=await BBIMP.myAccountant();
-    if(!acc){ $('root').innerHTML=`<p style="font-size:18px;font-weight:700;color:var(--bbi-ink)">Та сүлжээнд бүртгэлгүй байна</p><p>${esc(me.email||'')} бүртгэлтэй холбоотой нягтлангийн профайл алга. Профайл үүсгээд батлагдмагц хүсэлт хүлээн авч, гэрээ байгуулж эхэлнэ.</p><a href="accountant_signup.html" class="bbi-btn">Нягтлангийн профайл үүсгэх →</a><p style="margin-top:18px;font-size:13px">Компани төлөөлж байгаа бол <a href="my.html" style="color:var(--bbi-green);font-weight:600">Миний самбар</a> руу орно уу.</p>`; return; }
+    if(!acc){ $('root').innerHTML=`<p style="font-size:18px;font-weight:700;color:var(--bbi-ink)">Та «Нягтлан олох»-д бүртгэлгүй байна</p><p>${esc(me.email||'')} бүртгэлтэй холбоотой нягтлангийн профайл алга. Профайл үүсгээд батлагдмагц хүсэлт хүлээн авч, гэрээ байгуулж эхэлнэ.</p><a href="accountant_signup.html" class="bbi-btn">Нягтлангийн профайл үүсгэх →</a><p style="margin-top:18px;font-size:13px">Компани төлөөлж байгаа бол <a href="my.html" style="color:var(--bbi-green);font-weight:600">Миний самбар</a> руу орно уу.</p>`; return; }
     if(acc.status!=='approved'){ $('root').innerHTML=`<p style="font-size:18px;font-weight:700;color:var(--bbi-ink)">Профайл шалгагдаж байна</p><p>${esc(acc.name)} — таны профайлыг BusinessBI баталгаажуулж байна (ихэвчлэн 1 ажлын өдөр). Батлагдмагц ${esc(acc.phone||'')} дугаарт мэдэгдэнэ; дараа нь энэ самбараас хүсэлт, гэрээгээ удирдана.</p><p style="margin-top:10px;font-size:13px">Төлөв: ${badge(acc.status==='pending'?'Хүлээгдэж байна':acc.status,'#b8862f')}</p>`; return; }
     await loadAll(); render();
   }
@@ -86,6 +86,7 @@
     REQ=r.data||[]; if(r.error) console.error(r.error);
     const c=await sb.from('mp_contracts').select('*').eq('accountant_user_id',me.id).order('created_at',{ascending:false});
     CON=c.data||[]; if(c.error) console.error(c.error);
+    try{ const rr=await sb.rpc('my_referral_stats'); if(rr.error) throw rr.error; REF=(rr.data&&rr.data[0])||{}; REFERR=false; }catch(e){ console.warn('referral',e); REF=null; REFERR=true; }
   }
   function render(){
     const openReq=REQ.filter(r=>r.status==='new'||r.status==='offered');
@@ -96,10 +97,11 @@
       <div class="head"><div><h1>Нягтлангийн самбар</h1><p>${esc(acc.name)}${acc.company_name?' · '+esc(acc.company_name):''} · ${acc.verified?'✓ баталгаажсан':'баталгаажуулалт хүлээгдэж байна'}</p></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="bbi-btn" id="newCon">+ Шинэ гэрээний санал</button><a href="businessbi_journal.html" class="bbi-btn ghost">Журнал нээх →</a></div></div>
       <div class="kpis"><div class="kpi"><b>${openReq.length}</b><span>нээлттэй хүсэлт</span></div><div class="kpi"><b>${pending.length}</b><span>гарын үсэг хүлээж буй гэрээ</span></div><div class="kpi"><b>${active.length}</b><span>харилцагч компани</span></div><div class="kpi"><b>${fmtMNT(mrr)}</b><span>сарын гэрээт орлого</span></div></div>
-      <div class="tabs">${[['req','Хүсэлтүүд',openReq.length],['con','Гэрээнүүд',pending.length],['cli','Харилцагчид',active.length],['prof','Профайл',0]].map(([k,t,n])=>`<button class="tab ${tab===k?'on':''}" data-t="${k}">${t}${n?`<span class="n">${n}</span>`:''}</button>`).join('')}</div>
+      <div class="tabs">${[['req','Хүсэлтүүд',openReq.length],['con','Гэрээнүүд',pending.length],['cli','Харилцагчид',active.length],['ref','Урамшуулал',0],['prof','Профайл',0]].map(([k,t,n])=>`<button class="tab ${tab===k?'on':''}" data-t="${k}">${t}${n?`<span class="n">${n}</span>`:''}</button>`).join('')}</div>
       <div class="panel ${tab==='req'?'on':''}" id="p-req">${renderReq()}</div>
       <div class="panel ${tab==='con'?'on':''}" id="p-con">${renderCon(CON.filter(c=>c.status!=='active'))}</div>
       <div class="panel ${tab==='cli'?'on':''}" id="p-cli">${renderCli(active)}</div>
+      <div class="panel ${tab==='ref'?'on':''}" id="p-ref">${renderRef()}</div>
       <div class="panel ${tab==='prof'?'on':''}" id="p-prof">${renderProf()}</div>`;
     document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ tab=b.dataset.t; render(); });
     $('newCon').onclick=()=>openOffer(null);
@@ -107,7 +109,7 @@
   }
   function renderReq(){
     const list=REQ.filter(r=>r.status!=='closed');
-    if(!list.length) return `<div class="empty">Хүсэлт ирээгүй байна. Таны профайл <a href="accountants.html" style="color:var(--bbi-green)">сүлжээнд</a> харагдаж байгаа — компани хүсэлт илгээмэгц энд гарна.</div>`;
+    if(!list.length) return `<div class="empty">Хүсэлт ирээгүй байна. Таны профайл <a href="accountants.html" style="color:var(--bbi-green)">«Нягтлан олох»</a> хэсэгт харагдаж байгаа — компани хүсэлт илгээмэгц энд гарна.</div>`;
     return `<div class="list">${list.map(r=>`<div class="item"><div><h3>${esc(r.company_name)} ${badge(r.accountant_id?'Танд илгээсэн':'Нээлттэй','#216a4c')} ${badge(REQ_STATUS[r.status]||r.status,r.status==='new'?'#b8862f':'#6b7670')}</h3>
       <div class="meta">${(r.services||[]).join(', ')||'—'}${r.employees?` · ${r.employees} ажилтан`:''}${r.docs_per_month?` · сард ~${r.docs_per_month} баримт`:''}${r.budget?` · төсөв ${fmtMNT(r.budget)}/сар`:''}<br>${esc(r.contact_name)} · ${esc(r.contact_phone)}${r.contact_email?' · '+esc(r.contact_email):''} · ${fmtDate(r.created_at)}${r.message?`<br><i>${esc(r.message)}</i>`:''}</div></div>
       <div class="acts"><button class="bbi-btn sm" data-offer="${r.id}">Гэрээний санал үүсгэх</button>${r.accountant_id?`<button class="bbi-btn ghost sm" data-decline="${r.id}">Татгалзах</button>`:''}</div></div>`).join('')}</div>`;
@@ -122,13 +124,35 @@
     return `<div class="list">${list.map(c=>`<div class="item"><div><h3>${esc(c.company_name)} ${conBadge(c.status)} ${c.bbi_company_id?badge('Журналд нээлттэй','#2e8b62'):''}</h3><div class="meta">№ ${esc(c.contract_no||'—')} · ${fmtMNT(c.fee_monthly)}/сар · ${fmtDate(c.start_date)} – ${c.term_months} сар · ${(c.services||[]).join(', ')}<br>${esc(c.client_name||'')} · ${esc(c.client_phone||'')} · ${esc(c.client_email||'')}</div></div>
       <div class="acts">${c.bbi_company_id?`<a class="bbi-btn sm" href="businessbi_journal.html?company=${encodeURIComponent(c.bbi_company_id)}">Журналд ажиллах →</a>`:`<button class="bbi-btn sm" data-openco="${c.id}">Журналд компани нээх</button>`}<a class="bbi-btn ghost sm" href="contract.html?id=${c.id}">Гэрээ</a></div></div>`).join('')}</div>`;
   }
+  const TR={а:'a',б:'b',в:'v',г:'g',д:'d',е:'e',ё:'yo',ж:'j',з:'z',и:'i',й:'i',к:'k',л:'l',м:'m',н:'n',о:'o',ө:'u',п:'p',р:'r',с:'s',т:'t',у:'u',ү:'u',ф:'f',х:'h',ц:'ts',ч:'ch',ш:'sh',щ:'sh',ъ:'',ы:'i',ь:'',э:'e',ю:'yu',я:'ya'};
+  function suggestCode(){ const w=String(acc.name||'').trim().split(/\s+/).pop()||'BBI'; const t=[...w.toLowerCase()].map(c=>TR[c]!=null?TR[c]:c).join('').replace(/[^a-z0-9]/g,'').toUpperCase().slice(0,8)||'BBI'; return t+String(Math.floor(10+Math.random()*90)); }
+  function renderRef(){
+    if(REFERR) return `<div class="empty">Урамшууллын систем удахгүй нээгдэнэ. (Админ: <code>supabase/migrations/20261104_referrals.sql</code>-ийг ажиллуулна уу.)</div>`;
+    const R=REF||{};
+    if(!R.code) return `<div class="item" style="grid-template-columns:1fr"><div><h3>Урамшууллын кодоо аваарай</h3>
+      <div class="meta" style="line-height:1.7">Таны кодоор BusinessBI-ийн төлбөртэй хэрэгсэл (ХХОАТ маягт, Excel дашбоард, баримт уншуулагч г.м.) авсан хэрэглэгч <b>10% хөнгөлөлт</b> авч, та төлөгдсөн дүнгийн <b>20%</b>-ийг шимтгэл болгон авна. Шимтгэлийг сар бүр таны профайл дахь данс руу шилжүүлнэ.</div>
+      <div class="acts" style="justify-content:flex-start;margin-top:12px;align-items:center"><input id="refIn" value="${suggestCode()}" maxlength="16" style="padding:10px 12px;border:1.5px solid var(--bbi-line);border-radius:10px;font:inherit;font-weight:700;letter-spacing:.05em;text-transform:uppercase;width:180px"><button class="bbi-btn sm" id="mkRef">Код үүсгэх</button><span id="refErr" style="font-size:13px;color:#c0492b"></span></div>
+      <p class="bbi-note" style="margin-top:10px">Зөвхөн латин үсэг, тоо, 4–16 тэмдэгт. Кодыг дараа нь солих боломжгүй.</p></div></div>`;
+    const link='https://businessbi.mn/?ref='+R.code, bal=Math.max(0,(R.commission||0)-(R.paid_out||0));
+    return `<div class="kpis"><div class="kpi"><b>${R.paid_count||0}</b><span>кодоор хийсэн худалдан авалт</span></div><div class="kpi"><b>${fmtMNT(R.revenue||0)}</b><span>нийт борлуулалт</span></div><div class="kpi"><b>${fmtMNT(R.commission||0)}</b><span>олсон шимтгэл (${R.commission_pct||20}%)</span></div><div class="kpi"><b>${fmtMNT(bal)}</b><span>шилжүүлэх үлдэгдэл</span></div></div>
+      <div class="item" style="grid-template-columns:1fr;margin-top:12px"><div><h3>Таны код: <span style="letter-spacing:.06em">${esc(R.code)}</span></h3>
+      <div class="meta">Энэ линкээр орсон хэрэглэгчид код автоматаар хэрэглэгдэнэ (60 хоног). Эсвэл төлбөрийн цонхонд кодоо бичүүлнэ.</div>
+      <div class="acts" style="justify-content:flex-start;margin-top:12px"><input readonly value="${esc(link)}" style="flex:1;min-width:220px;padding:10px 12px;border:1.5px solid var(--bbi-line);border-radius:10px;font:inherit;font-size:13px"><button class="bbi-btn sm" data-cp="${esc(link)}">Линк хуулах</button><button class="bbi-btn ghost sm" data-cp="${esc(R.code)}">Код хуулах</button></div>
+      <p class="bbi-note" style="margin-top:12px">Худалдан авагч ${R.discount_pct||10}% хөнгөлөлт авна. Шимтгэлийг сар бүрийн эхэнд профайл дахь таны данс руу шилжүүлнэ.</p></div></div>`;
+  }
   function renderProf(){
     return `<div class="item" style="grid-template-columns:1fr"><div><h3>${esc(acc.name)}</h3><div class="meta">${esc(acc.location||'')} · ${acc.experience||0} жил · эхлэх үнэ ${fmtMNT(acc.price_from)}/сар<br>${(acc.specialties||[]).join(', ')}<br>${esc(acc.phone||'')} · ${esc(acc.email||'')}${acc.company_name?'<br>'+esc(acc.company_name):''}${acc.tin?' · ТТД '+esc(acc.tin):''}</div>
       <p style="font-size:13.5px;margin-top:10px;color:var(--bbi-ink-soft)">${esc(acc.bio||'')}</p></div>
-      <div class="acts" style="justify-content:flex-start;margin-top:12px"><button class="bbi-btn sm" id="editProf">Профайл засах</button><a class="bbi-btn ghost sm" href="accountants.html">Сүлжээнд хэрхэн харагдаж буйг үзэх</a></div></div>
+      <div class="acts" style="justify-content:flex-start;margin-top:12px"><button class="bbi-btn sm" id="editProf">Профайл засах</button><a class="bbi-btn ghost sm" href="accountants.html">Профайл хэрхэн харагдаж буйг үзэх</a></div></div>
       <p class="bbi-note" style="margin-top:14px">Гэрээнд таны нэр, компани, ТТД, утас, имэйл орно — бүрэн бөглөнө үү. Баталгаажсан тэмдэг (✓) болон үнэлгээг BusinessBI тохируулна.</p>`;
   }
   function bind(){
+    const mk=$('mkRef'); if(mk) mk.onclick=async()=>{ const code=$('refIn').value.trim().toUpperCase(); const er=$('refErr'); er.textContent='';
+      if(!/^[A-Z0-9]{4,16}$/.test(code)){ er.textContent='Латин үсэг, тоо, 4–16 тэмдэгт'; return; }
+      mk.disabled=true; const {error}=await BBIMP.sb.from('mp_referral_codes').insert({code,user_id:me.id});
+      if(error){ mk.disabled=false; er.textContent=/duplicate|unique/i.test(error.message)?'Энэ код аль хэдийн бүртгэгдсэн — өөрийг сонгоно уу':'Алдаа: '+error.message; return; }
+      await loadAll(); render(); };
+    document.querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>navigator.clipboard.writeText(b.dataset.cp).then(()=>{ const t=b.textContent; b.textContent='✓ Хуулагдлаа'; setTimeout(()=>b.textContent=t,1800); }));
     document.querySelectorAll('[data-offer]').forEach(b=>b.onclick=()=>openOffer(REQ.find(r=>r.id===b.dataset.offer)));
     document.querySelectorAll('[data-decline]').forEach(b=>b.onclick=async()=>{ if(!confirm('Хүсэлтээс татгалзах уу?')) return; const {error}=await BBIMP.sb.from('mp_requests').update({status:'declined'}).eq('id',b.dataset.decline); if(error) alert(error.message); else { await loadAll(); render(); } });
     document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>navigator.clipboard.writeText(contractUrl(b.dataset.copy)).then(()=>{ b.textContent='✓ Хуулагдлаа — Messenger/имэйлээр илгээнэ үү'; setTimeout(()=>b.textContent='Линк хуулах',2500); }));
@@ -186,7 +210,7 @@
 
   // ── Профайл засах ──
   function editProfile(){
-    open(`<h2>Профайл засах</h2><div class="sub">Сүлжээнд болон гэрээнд харагдах мэдээлэл</div><div id="pErr"></div>
+    open(`<h2>Профайл засах</h2><div class="sub">«Нягтлан олох» болон гэрээнд харагдах мэдээлэл</div><div id="pErr"></div>
       <div class="row2"><div class="field"><label>Нэр *</label><input id="pName" value="${esc(acc.name||'')}"></div><div class="field"><label>Байршил</label><select id="pLoc">${['Улаанбаатар','Дархан','Эрдэнэт','Орон нутаг'].map(l=>`<option ${acc.location===l?'selected':''}>${l}</option>`).join('')}</select></div></div>
       <div class="row2"><div class="field"><label>Утас *</label><input id="pPhone" value="${esc(acc.phone||'')}"></div><div class="field"><label>Имэйл</label><input id="pEmail" value="${esc(acc.email||me.email||'')}"></div></div>
       <div class="row2"><div class="field"><label>Компани (байвал)</label><input id="pCo" value="${esc(acc.company_name||'')}"></div><div class="field"><label>ТТД / Регистр (гэрээнд)</label><input id="pTin" value="${esc(acc.tin||'')}"></div></div>
