@@ -214,3 +214,52 @@ body.mega-open .nl-bar{z-index:15}
 .pc:hover .t{background-size:100% 1px}
 .pc .pr{font-size:15.27px;line-height:1;color:#171717}
 .pc .pr s{opacity:.55;margin-right:6px}
+
+/* ============================================================
+   Хэрэгслийн хуудсууд — other-levels-ийн цөөн өнгөний систем
+   хар #171717 · саарал #6b7280 · хүрээ #e5e7eb · алтан #c9a470 · цөцгий #fdfbf6
+   Хуудас бүрийн өөрийн хувьсагчийг (ногоон, хөх, teal) энд нэгтгэнэ.
+   ============================================================ */
+body.ol:not(.home){
+  --bg:#f6f6f4;--bg2:#f0f0ee;--panel:#fff;--panel2:#fafaf9;--card:#fff;
+  --ink:#171717;--muted:#6b7280;--faint:#9ca3af;--sub:#4b5563;--line:#e5e7eb;--line-soft:#f0f0ee;
+  --accent:#171717;--accent2:#000;--accent-soft:rgba(201,164,112,.16);
+  --green:#171717;--green-bright:#c9a470;--green-soft:#faf6ec;--ok:#8a6a2f;
+  --brand:#171717;--brand2:#000;--blue:#6b7280;--chip:#f3f3f1;
+  --acc:#171717;--acc-d:#000;--acc-soft:#faf6ec;
+  --gold:#c9a470;--warn:#a87b2c;
+  --bbi-green:#171717;--bbi-green-dark:#000;--bbi-green-bright:#c9a470;--bbi-green-soft:#faf6ec;
+  --bbi-ink:#171717;--bbi-ink-soft:#4b5563;--bbi-muted:#6b7280;--bbi-line:#e5e7eb;--bbi-line-soft:#f0f0ee;--bbi-bg:#f6f6f4;
+  --bbi-gold:#a87b2c;--bbi-gold-soft:#faf6ec;
+  background:var(--bg);color:var(--ink)
+}
+
+/* «Ашиглах заавар» — inline ногоон загварыг саармаг болгоно */
+body.ol details.bbi-guide{background:#fff!important;border:1px solid #e5e7eb!important;border-radius:16px!important}
+body.ol details.bbi-guide summary{color:#171717!important}
+body.ol details.bbi-guide summary span,body.ol details.bbi-guide p{color:#6b7280!important}
+body.ol details.bbi-guide ol{color:#374151!important}
+
+/* Файл оруулах хэсэг — other-levels: 2px тасархай алтан хүрээ, цөцгий дэвсгэр, 16px булан */
+body.ol .drop,body.ol .upload-zone,body.ol .m-card:not(.done):not(.err){border:2px dashed #d6c79f!important;border-radius:16px!important;background:#fdfbf6!important;transition:background .2s,border-color .2s}
+body.ol .drop:hover,body.ol .drop.over,body.ol .upload-zone:hover,body.ol .upload-zone.drag,body.ol .m-card:not(.done):not(.err):hover{background:#f8f1df!important;border-color:#c9a470!important}
+body.ol .drop.loaded,body.ol .m-card.done{border:2px solid #c9a470!important;background:#fff!important}
+body.ol .drop{padding:40px 20px!important}
+body.ol .drop .t,body.ol .upload-zone h2,body.ol .drop b{font-size:20px!important;font-weight:700!important;letter-spacing:-.03em;color:#171717!important;line-height:1.1}
+body.ol .drop .h,body.ol .upload-zone p{font-size:14px!important;color:#6b7280!important}
+body.ol .up-ic{display:block;width:44px;height:44px;margin:0 auto 10px;color:#c9a470}
+body.ol .m-card .up-ic{width:26px;height:26px;margin:2px auto 4px}
+body.ol .upload-btn{background:#fff!important;color:#171717!important;border:1px solid #d1d5db;border-radius:999px!important;padding:13px 22px!important;font-size:15px!important;font-weight:700!important}
+body.ol .upload-btn:hover{border-color:#171717}
+body.ol .tag.ok{background:#faf6ec!important;color:#8a6a2f!important}
+
+/* Баруун талын bar — хэрэгслийн хуудсанд контентод саад болохгүй: захад нуугдаж, ойртоход гарна */
+@media(min-width:768px){
+  body.ol:not(.home) .nl-bar{margin-inline:0;right:0;transform:translate(calc(100% - 10px),-50%);border-radius:9999px 0 0 9999px;transition:transform .5s cubic-bezier(.3,1,.3,1),box-shadow .3s}
+  body.ol:not(.home) .nl-bar::before{content:"";position:absolute;inset:0 auto 0 -16px;width:16px}
+  body.ol:not(.home) .nl-bar:hover,body.ol:not(.home) .nl-bar:focus-within{transform:translate(-12px,-50%);border-radius:9999px}
+}
+body.ol .tool-ic:empty{display:none}
+body.ol .alert-icon{font-size:12px}
+/* Хэрэгслийн карт, panel — other-levels: 16px булан, саарал хүрээ */
+body.ol:not(.home) .card,body.ol:not(.home) .panel{border-radius:16px;border-color:#e5e7eb}

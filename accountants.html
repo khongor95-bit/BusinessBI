@@ -21,11 +21,11 @@
 <meta property="og:locale" content="mn_MN">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="site.css">
-<link rel="stylesheet" href="shell.css?v=20261104">
+<link rel="stylesheet" href="shell.css?v=20261104b">
 <script src="mp.js"></script>
 <script src="ebarimt.js"></script>
 <script src="site.js" defer></script>
-<script src="shell.js?v=20261104" defer></script>
+<script src="shell.js?v=20261104b" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -116,7 +116,7 @@
 
 <section class="bbi-wrap">
   <div class="filters">
-    <input id="search" type="search" placeholder="🔍 Нэр, чиглэл, танилцуулгаар хайх…">
+    <input id="search" type="search" placeholder="Нэр, чиглэл, танилцуулгаар хайх…">
     <select id="fLoc"><option value="">Бүх байршил</option><option>Улаанбаатар</option><option>Дархан</option><option>Эрдэнэт</option><option>Орон нутаг</option></select>
     <select id="fSpec"><option value="">Бүх чиглэл</option></select>
     <select id="fSort"><option value="rating">Үнэлгээгээр</option><option value="priceLow">Үнэ: багаас их</option><option value="exp">Туршлагаар</option></select>
@@ -150,7 +150,7 @@
   const VB=`<svg class="vb" viewBox="0 0 24 24" fill="none"><title>Баталгаажсан</title><path d="M12 2l2.4 1.8 3-.3 1 2.8 2.6 1.5-.8 2.9.8 2.9-2.6 1.5-1 2.8-3-.3L12 22l-2.4-1.8-3 .3-1-2.8L3 16.5l.8-2.9L3 10.7l2.6-1.5 1-2.8 3 .3L12 2z" fill="#216a4c"/><path d="M8.5 12l2.3 2.3 4.7-4.7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   const initials=n=>String(n||'').replace(/\./g,' ').trim().split(/\s+/).map(p=>p[0]||'').slice(0,2).join('').toUpperCase();
   const photo=(a,cls)=>a.photo_url?`<img class="ph ${cls||''}" src="${esc(a.photo_url)}" alt="" onerror="this.outerHTML='<div class=&quot;ph&quot;>${esc(initials(a.name))}</div>'">`:`<div class="ph ${cls||''}">${esc(initials(a.name))}</div>`;
-  const EMPTY=`<div class="empty"><div style="font-size:40px">🤝</div><h3>Эхний нягтлангууд бүртгэгдэж байна</h3><p>Баталгаажсан нягтлангийн профайлууд энд гарна. Тайлан гаргуулах хэрэгцээгээ одоо илгээвэл сүлжээний нягтлангуудад хүрч, тохирох нягтлан гэрээний санал илгээнэ.</p><a href="#" class="bbi-btn" id="emptyReq">Нээлттэй хүсэлт илгээх →</a> <a href="accountant_signup.html" style="display:inline-block;margin-left:10px;color:var(--bbi-green);font-weight:600;text-decoration:none">Нягтлан бол бүртгүүлэх →</a></div>`;
+  const EMPTY=`<div class="empty"><div style="font-size:40px"></div><h3>Эхний нягтлангууд бүртгэгдэж байна</h3><p>Баталгаажсан нягтлангийн профайлууд энд гарна. Тайлан гаргуулах хэрэгцээгээ одоо илгээвэл сүлжээний нягтлангуудад хүрч, тохирох нягтлан гэрээний санал илгээнэ.</p><a href="#" class="bbi-btn" id="emptyReq">Нээлттэй хүсэлт илгээх →</a> <a href="accountant_signup.html" style="display:inline-block;margin-left:10px;color:var(--bbi-green);font-weight:600;text-decoration:none">Нягтлан бол бүртгүүлэх →</a></div>`;
 
   async function load(){
     try{
@@ -165,7 +165,7 @@
       <div class="acc-top">${photo(a)}<div><div class="acc-name">${esc(a.name)}${a.verified?VB:''}</div><div class="acc-loc">${esc(a.location||'')} · ${a.experience||0} жил туршлага${a.company_name?' · '+esc(a.company_name):''}</div></div></div>
       <p class="acc-bio">${esc(a.bio||'')}</p>
       <div class="tags">${(a.specialties||[]).slice(0,4).map(s=>`<span class="tag">${esc(s)}</span>`).join('')}</div>
-      <div class="acc-foot"><span class="rating"><span class="s">★</span> ${Number(a.rating||0).toFixed(1)} <span class="c">(${a.review_count||0})</span></span><span class="price">эхлэх <b>${fmtMNT(a.price_from)}</b>/сар</span></div>
+      <div class="acc-foot"><span class="rating"><span class="s"></span> ${Number(a.rating||0).toFixed(1)} <span class="c">(${a.review_count||0})</span></span><span class="price">эхлэх <b>${fmtMNT(a.price_from)}</b>/сар</span></div>
     </article>`;
   }
   function render(){
@@ -187,7 +187,7 @@
   document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&mbg.classList.contains('open')) close(); });
 
   async function openProfile(a){
-    open(`<div class="mhead">${photo(a)}<div><h2>${esc(a.name)}${a.verified?VB:''}</h2><div class="acc-loc">${esc(a.location||'')}${a.company_name?' · '+esc(a.company_name):''}</div><div class="rating" style="margin-top:4px"><span class="s">★</span> ${Number(a.rating||0).toFixed(1)} · ${a.review_count||0} үнэлгээ</div></div></div>
+    open(`<div class="mhead">${photo(a)}<div><h2>${esc(a.name)}${a.verified?VB:''}</h2><div class="acc-loc">${esc(a.location||'')}${a.company_name?' · '+esc(a.company_name):''}</div><div class="rating" style="margin-top:4px"><span class="s"></span> ${Number(a.rating||0).toFixed(1)} · ${a.review_count||0} үнэлгээ</div></div></div>
       <div class="mbody">
         <div class="mstats"><div class="ms"><b>${a.experience||0}</b><span>жил туршлага</span></div><div class="ms"><b>${fmtMNT(a.price_from)}</b><span>сарын үнэ эхлэх</span></div><div class="ms"><b>${(a.specialties||[]).length}</b><span>мэргэшсэн чиглэл</span></div></div>
         <p style="font-size:14.5px;line-height:1.65;color:var(--bbi-ink-soft)">${esc(a.bio||'')}</p>
@@ -200,7 +200,7 @@
     try{
       const sb=BBIMP.sb; const {data}=await sb.from('mp_reviews').select('reviewer_name,rating,comment,created_at').eq('accountant_id',a.id).eq('approved',true).order('created_at',{ascending:false}).limit(10);
       const box=$('revList'); if(!box) return;
-      box.innerHTML=(data&&data.length)?data.map(r=>`<div class="rev"><div class="h"><span>${esc(r.reviewer_name)}</span><span class="s">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span></div>${r.comment?`<p>${esc(r.comment)}</p>`:''}</div>`).join(''):'Үнэлгээ одоогоор алга.';
+      box.innerHTML=(data&&data.length)?data.map(r=>`<div class="rev"><div class="h"><span>${esc(r.reviewer_name)}</span><span class="s">${''.repeat(r.rating)}${''.repeat(5-r.rating)}</span></div>${r.comment?`<p>${esc(r.comment)}</p>`:''}</div>`).join(''):'Үнэлгээ одоогоор алга.';
     }catch(e){ const box=$('revList'); if(box) box.textContent='Үнэлгээ ачаалж чадсангүй.'; }
   }
 

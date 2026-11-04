@@ -5,9 +5,9 @@
 <script src="gate.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="site.css">
-<link rel="stylesheet" href="shell.css?v=20261104">
+<link rel="stylesheet" href="shell.css?v=20261104b">
 <script src="site.js" defer></script>
-<script src="shell.js?v=20261104" defer></script>
+<script src="shell.js?v=20261104b" defer></script>
 
 <title>Санхүүгийн шинжилгээ — BusinessBI</title>
 <meta name="description" content="E-balance санхүүгийн тайлангаас харьцаа үзүүлэлт, чиг хандлагын шинжилгээг автоматаар гаргана. Үнэгүй.">
@@ -215,11 +215,11 @@ canvas{max-width:100%}
 
 <div class="wrap">
 
-<details class="bbi-guide" style="max-width:1100px;margin:16px auto;background:#f2f7f4;border:1px solid #d7e5dc;border-radius:10px;"><summary style="cursor:pointer;padding:13px 18px;font-weight:600;color:#0e3b2e;display:flex;align-items:center;gap:8px;">📖 Ашиглах заавар <span style="font-weight:400;font-size:13px;color:#5b7365;">— 1 минут уншаад эхлээрэй</span></summary><ol style="margin:0;padding:4px 22px 14px 40px;color:#243b30;font-size:14.5px;line-height:1.75;"><li style="margin:4px 0;">E-Balance (Сангийн яамны цахим тайлангийн систем)-ээс компанийнхаа санхүүгийн тайланг <b>PDF</b> хэлбэрээр татаж авна.</li><li style="margin:4px 0;">PDF-ээ энд оруулна — баланс, орлогын тайлан автоматаар уншигдана.</li><li style="margin:4px 0;">Орлого-зардал, хөрөнгийн бүтэц, санхүүгийн харьцаанууд график самбарт гарна.</li><li style="margin:4px 0;"><b>«Дүгнэлт ба анхааруулга»</b> хэсгээс анхаарал татахуйц үзүүлэлтүүдээ шалгана.</li><li style="margin:4px 0;">Өөр компанийн тайлан шинжлэхдээ <b>«↩ Шинэ тайлан»</b> товч дарна.</li></ol><p style="margin:0;padding:0 22px 14px;font-size:13px;color:#5b7365;">💡 Тайлан тань браузер дээр л боловсруулагдана — санхүүгийн мэдээлэл тань хаана ч илгээгдэхгүй.</p></details>
+<details class="bbi-guide" style="max-width:1100px;margin:16px auto;background:#f2f7f4;border:1px solid #d7e5dc;border-radius:10px;"><summary style="cursor:pointer;padding:13px 18px;font-weight:600;color:#0e3b2e;display:flex;align-items:center;gap:8px;">Ашиглах заавар <span style="font-weight:400;font-size:13px;color:#5b7365;">— 1 минут уншаад эхлээрэй</span></summary><ol style="margin:0;padding:4px 22px 14px 40px;color:#243b30;font-size:14.5px;line-height:1.75;"><li style="margin:4px 0;">E-Balance (Сангийн яамны цахим тайлангийн систем)-ээс компанийнхаа санхүүгийн тайланг <b>PDF</b> хэлбэрээр татаж авна.</li><li style="margin:4px 0;">PDF-ээ энд оруулна — баланс, орлогын тайлан автоматаар уншигдана.</li><li style="margin:4px 0;">Орлого-зардал, хөрөнгийн бүтэц, санхүүгийн харьцаанууд график самбарт гарна.</li><li style="margin:4px 0;"><b>«Дүгнэлт ба анхааруулга»</b> хэсгээс анхаарал татахуйц үзүүлэлтүүдээ шалгана.</li><li style="margin:4px 0;">Өөр компанийн тайлан шинжлэхдээ <b>«↩ Шинэ тайлан»</b> товч дарна.</li></ol><p style="margin:0;padding:0 22px 14px;font-size:13px;color:#5b7365;">Тайлан тань браузер дээр л боловсруулагдана — санхүүгийн мэдээлэл тань хаана ч илгээгдэхгүй.</p></details>
 
   <!-- UPLOAD -->
   <div class="upload-zone" id="uploadZone">
-    <div class="icon">📊</div>
+    <svg class="up-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4M7 9l5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
     <h2>E-balance PDF тайлан оруулах</h2>
     <p>Монголын нягтлан бодох бүртгэлийн стандарт (МБС/НБОУС) баланс, орлогын тайлан дэмжинэ</p>
     <label class="upload-btn">
@@ -558,7 +558,7 @@ function parseAndRender(text){
 
   document.getElementById('alertsBox').innerHTML=alerts.map(a=>`
     <div class="alert ${a.type}">
-      <div class="alert-icon">${a.type==='danger'?'🔴':a.type==='warn'?'🟡':'🟢'}</div>
+      <div class="alert-icon">●</div>
       <div><strong>${a.title}</strong>${a.msg}</div>
     </div>`).join('');
 

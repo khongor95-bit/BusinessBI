@@ -6,9 +6,9 @@
 <script src="ebarimt.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="site.css">
-<link rel="stylesheet" href="shell.css?v=20261104">
+<link rel="stylesheet" href="shell.css?v=20261104b">
 <script src="site.js" defer></script>
-<script src="shell.js?v=20261104" defer></script>
+<script src="shell.js?v=20261104b" defer></script>
 
 <title>Нэхэмжлэх үүсгэгч — BusinessBI</title>
 <meta name="description" content="НӨАТ-тэй мэргэжлийн нэхэмжлэхийг минутын дотор үүсгэж PDF-ээр татах, хэвлэх. Үнэгүй.">
@@ -241,7 +241,7 @@ body{background:var(--bg);color:var(--ink)}
 </style>
 
 <div class="wrap">
-<details class="bbi-guide" style="max-width:1100px;margin:16px auto;background:#f2f7f4;border:1px solid #d7e5dc;border-radius:10px;"><summary style="cursor:pointer;padding:13px 18px;font-weight:600;color:#0e3b2e;display:flex;align-items:center;gap:8px;">📖 Ашиглах заавар <span style="font-weight:400;font-size:13px;color:#5b7365;">— 1 минут уншаад эхлээрэй</span></summary><ol style="margin:0;padding:4px 22px 14px 40px;color:#243b30;font-size:14.5px;line-height:1.75;"><li style="margin:4px 0;"><b>«Нийлүүлэгч»</b> хэсэгт өөрийн компанийн нэр, ТТД, данс зэрэг мэдээллээ бөглөнө.</li><li style="margin:4px 0;"><b>«Харилцагч»</b> хэсэгт худалдан авагчийн мэдээллийг оруулна.</li><li style="margin:4px 0;">Бараа, үйлчилгээгээ нэр, тоо, нэгж үнээр нь оруулаад <b>«+ Нэхэмжлэхэд нэмэх»</b> дарна — хэдэн ч мөр нэмж болно.</li><li style="margin:4px 0;">Тохиргоо хэсгээс НӨАТ, төлбөрийн нөхцөлөө сонгоно.</li><li style="margin:4px 0;">Бэлэн нэхэмжлэхээ <b>«⬇ PDF татах»</b> эсвэл <b>«🖨 Хэвлэх»</b> товчоор гаргаж авна.</li></ol><p style="margin:0;padding:0 22px 14px;font-size:13px;color:#5b7365;">💡 Хуудсыг дахин ачаалахад оруулсан мэдээлэл арилдаг тул PDF-ээ татаж авахаа мартуузай.</p></details>
+<details class="bbi-guide" style="max-width:1100px;margin:16px auto;background:#f2f7f4;border:1px solid #d7e5dc;border-radius:10px;"><summary style="cursor:pointer;padding:13px 18px;font-weight:600;color:#0e3b2e;display:flex;align-items:center;gap:8px;">Ашиглах заавар <span style="font-weight:400;font-size:13px;color:#5b7365;">— 1 минут уншаад эхлээрэй</span></summary><ol style="margin:0;padding:4px 22px 14px 40px;color:#243b30;font-size:14.5px;line-height:1.75;"><li style="margin:4px 0;"><b>«Нийлүүлэгч»</b> хэсэгт өөрийн компанийн нэр, ТТД, данс зэрэг мэдээллээ бөглөнө.</li><li style="margin:4px 0;"><b>«Харилцагч»</b> хэсэгт худалдан авагчийн мэдээллийг оруулна.</li><li style="margin:4px 0;">Бараа, үйлчилгээгээ нэр, тоо, нэгж үнээр нь оруулаад <b>«+ Нэхэмжлэхэд нэмэх»</b> дарна — хэдэн ч мөр нэмж болно.</li><li style="margin:4px 0;">Тохиргоо хэсгээс НӨАТ, төлбөрийн нөхцөлөө сонгоно.</li><li style="margin:4px 0;">Бэлэн нэхэмжлэхээ <b>«PDF татах»</b> эсвэл <b>«Хэвлэх»</b> товчоор гаргаж авна.</li></ol><p style="margin:0;padding:0 22px 14px;font-size:13px;color:#5b7365;">Хуудсыг дахин ачаалахад оруулсан мэдээлэл арилдаг тул PDF-ээ татаж авахаа мартуузай.</p></details>
 
   <div class="layout">
     <div class="form">
@@ -307,8 +307,8 @@ body{background:var(--bg);color:var(--ink)}
     <div class="tpl-col" id="tplPicker"></div>
     <div class="preview-area" style="position:relative">
       <div style="position:absolute;top:14px;right:14px;display:flex;gap:8px;z-index:100">
-        <button class="btn sec" onclick="window.print()">🖨 Хэвлэх</button>
-        <button class="btn" id="dlBtn">⬇ PDF татах</button>
+        <button class="btn sec" onclick="window.print()">Хэвлэх</button>
+        <button class="btn" id="dlBtn">PDF татах</button>
       </div>
       <div class="page t1" id="page"><div class="inv" id="inv"></div></div>
     </div>

@@ -13,9 +13,9 @@
 <link rel="canonical" href="https://businessbi.mn/receipt_scan.html">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="stylesheet" href="site.css">
-<link rel="stylesheet" href="shell.css?v=20261104">
+<link rel="stylesheet" href="shell.css?v=20261104b">
 <script src="site.js" defer></script>
-<script src="shell.js?v=20261104" defer></script>
+<script src="shell.js?v=20261104b" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -66,7 +66,7 @@ table.t{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}.t t
   <div class="layout">
     <div class="panel">
       <div class="step">Алхам 1</div><h2>Зураг оруулах</h2>
-      <div class="drop" id="drop" onclick="document.getElementById('file').click()"><b>Зураг сонгох эсвэл чирж оруулах</b>JPG, PNG, WEBP · утасны камераар шууд авч болно</div>
+      <div class="drop" id="drop" onclick="document.getElementById('file').click()"><svg class="up-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4M7 9l5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg><b>Зураг сонгох эсвэл чирж оруулах</b>JPG, PNG, WEBP · утасны камераар шууд авч болно</div>
       <input type="file" id="file" accept="image/*" capture="environment" hidden>
       <div class="prev" id="prev"><img id="prevImg" alt="Баримт"></div>
       <div class="f"><label>Тайлбар (заавал биш) — юу худалдан авсан</label><input id="hint" placeholder="ж: Оффисын хангамж, шатахуун" maxlength="300"></div>
@@ -176,14 +176,14 @@ function renderResult(){
     </div>
     ${review}${warns}
     ${(r.lines||[]).length?`<table class="t"><thead><tr><th>Мөр</th><th class="n">Тоо</th><th class="n">Нэгж үнэ</th><th class="n">Дүн</th></tr></thead><tbody>${r.lines.map(l=>`<tr><td>${esc(l.name)}</td><td class="n">${l.qty==null?'':l.qty}</td><td class="n">${l.unit_price==null?'':fmt(l.unit_price)}</td><td class="n">${l.amount==null?'':fmt(l.amount)}</td></tr>`).join('')}</tbody></table>`:''}
-    <div class="card"><h4>📒 Бичилтийн санал <span class="badge ${E.decision.warn?'warn':'ok'}">${E.decision.deduct?'НӨАТ хасна':'НӨАТ өртөгт'}</span></h4>
+    <div class="card"><h4>Бичилтийн санал <span class="badge ${E.decision.warn?'warn':'ok'}">${E.decision.deduct?'НӨАТ хасна':'НӨАТ өртөгт'}</span></h4>
       <div style="font-size:12.5px;color:var(--sub)">${esc(E.decision.why)}${r.city_tax?' · НХАТ '+fmt(r.city_tax)+'₮ өртөгт багтав':''}</div>
       <table class="t"><thead><tr><th>Дебит</th><th>Кредит</th><th class="n">Дүн</th><th>Тайлбар</th></tr></thead><tbody>
         ${E.lines.map(l=>`<tr><td class="mono">${l.dt}</td><td class="mono">${l.kt}</td><td class="n">${fmt(l.amt)}</td><td>${l.kind==='vat'?'Худалдан авалтын НӨАТ':'Зардал / хөрөнгө (цэвэр дүн)'}</td></tr>`).join('')}
         <tr class="tot"><td colspan="2">Нийт — ${esc(E.creditName)} ${E.credit}</td><td class="n">${fmt(E.total)}</td><td>${r.payment_type==='cash'?'бэлэн төлсөн — кассаас':'өглөг нээлттэй — банкны хуулгаар хаагдана'}</td></tr>
       </tbody></table>
       <div class="cite">§ НӨАТ-ын тухай хууль 14.1 (худалдан авалтын НӨАТ-ыг хасах); НББ-ийн тухай хууль 13.7 (анхан шатны баримт: и-баримт ДДТД); Заавар 116: 70 зардал / 12 НӨАТ-ын авлага / 31 өглөг.</div>
-      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn p" onclick="sendToJournal()">📨 Журналд санал болгох</button><button class="btn" onclick="RES=null;$('res').innerHTML='<div class=empty>Татгалзав — өөр зураг уншуулж болно</div>'">Татгалзах</button></div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn p" onclick="sendToJournal()">Журналд санал болгох</button><button class="btn" onclick="RES=null;$('res').innerHTML='<div class=empty>Татгалзав — өөр зураг уншуулж болно</div>'">Татгалзах</button></div>
       <div style="font-size:11.5px;color:var(--muted);margin-top:8px">Санал «Санхүүгийн програм → Импорт → Баримтын зураг» хэсэгт очно; тэнд нягтлан данс солих, батлах, татгалзах сонголттой. Батлахаас өмнө журналд юу ч бичигдэхгүй.</div>
     </div>`;
   ['fPay','expAcc','fTotal','fVat'].forEach(id=>{ $(id).onchange=()=>{ r.payment_type=$('fPay').value; r.total=+$('fTotal').value||0; r.vat_amount=+$('fVat').value||0; renderResult(); }; });

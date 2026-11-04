@@ -10,11 +10,11 @@
 <meta name="theme-color" content="#216a4c">
 <meta property="og:type" content="website"><meta property="og:site_name" content="BusinessBI.mn"><meta property="og:title" content="Цалин бодогч — BusinessBI.mn"><meta property="og:description" content="Цалин, НДШ, ХХОАТ, хөнгөлөлт — сар бүр автоматаар. Цалингийн хуудас, НД тайлан, ХХОАТ маягт."><meta property="og:url" content="https://businessbi.mn/payroll.html"><meta property="og:image" content="https://businessbi.mn/og-image.png"><meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="site.css">
-<link rel="stylesheet" href="shell.css?v=20261104">
+<link rel="stylesheet" href="shell.css?v=20261104b">
 <script src="mp.js"></script>
 <script src="tax.js"></script>
 <script src="site.js" defer></script>
-<script src="shell.js?v=20261104" defer></script>
+<script src="shell.js?v=20261104b" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -86,8 +86,8 @@ table.g{border-collapse:collapse;width:100%;font-size:13px;min-width:900px}
     <div class="co">
       <input id="coName" placeholder="Компанийн нэр" style="width:220px">
       <select id="month"></select>
-      <button class="btn" id="btnBackup" title="Бүх өгөгдлийг JSON файлаар татах">⬇ Нөөц</button>
-      <button class="btn" id="btnRestore">⬆ Сэргээх</button>
+      <button class="btn" id="btnBackup" title="Бүх өгөгдлийг JSON файлаар татах">Нөөц</button>
+      <button class="btn" id="btnRestore">Сэргээх</button>
       <input type="file" id="restoreFile" accept="application/json" hidden>
     </div>
   </div>
@@ -101,7 +101,7 @@ table.g{border-collapse:collapse;width:100%;font-size:13px;min-width:900px}
 
   <!-- Ажилтнууд -->
   <div class="panel on" id="p-emp">
-    <div class="bar"><div class="l"><button class="btn p" id="addEmp">+ Ажилтан нэмэх</button><button class="btn" id="impEmp" title="Excel/CSV: Овог, Нэр, Регистр, ТТД, Албан тушаал, Үндсэн цалин">⬆ Excel-ээс оруулах</button><input type="file" id="impEmpFile" accept=".xlsx,.xls,.csv" hidden></div><div class="r"><span class="hint" style="margin:0" id="empCount"></span></div></div>
+    <div class="bar"><div class="l"><button class="btn p" id="addEmp">+ Ажилтан нэмэх</button><button class="btn" id="impEmp" title="Excel/CSV: Овог, Нэр, Регистр, ТТД, Албан тушаал, Үндсэн цалин">Excel-ээс оруулах</button><input type="file" id="impEmpFile" accept=".xlsx,.xls,.csv" hidden></div><div class="r"><span class="hint" style="margin:0" id="empCount"></span></div></div>
     <div class="tw"><table class="g" id="empTable"></table></div>
     <p class="hint">Excel шиг шууд засна: Tab/Enter-ээр дараагийн нүд рүү. <b>Төрөл</b> — НД-ийн даатгуулагчийн төрлийн код (ердийн ажилтан 01001). Тэтгэвэр тогтоолгосон (22011, 70011 г.м.) бол НДШ 0.8%, ХЧА тэтгэвэртэй 70-код бол ХХОАТ-аас чөлөөлнө, давхар ажил 40-код бол сарын хөнгөлөлт эдлэхгүй. <b>Оршин суугч бус</b> гадаад ажилтанд ХХОАТ 20%, хөнгөлөлтгүй.</p>
   </div>
@@ -111,7 +111,7 @@ table.g{border-collapse:collapse;width:100%;font-size:13px;min-width:900px}
     <div id="taxWarn"></div>
     <div class="kpis" id="kpis"></div>
     <div class="bar"><div class="l"><button class="btn p" id="fillMonth">Үндсэн цалингаар бөглөх</button><button class="btn" id="copyPrev">Өмнөх сараас хуулах</button><button class="btn d" id="clearMonth">Сарыг цэвэрлэх</button></div>
-      <div class="r"><button class="btn" id="xlsPay">⬇ Цалингийн хүснэгт (Excel)</button><button class="btn" id="xlsNd">⬇ НД тайлан (Excel)</button><button class="btn" id="xlsTax">⬇ ХХОАТ маягт (Excel)</button></div></div>
+      <div class="r"><button class="btn" id="xlsPay">Цалингийн хүснэгт (Excel)</button><button class="btn" id="xlsNd">НД тайлан (Excel)</button><button class="btn" id="xlsTax">ХХОАТ маягт (Excel)</button></div></div>
     <div class="tw"><table class="g" id="payTable"></table></div>
     <div id="payWarn"></div>
     <p class="hint">Тооцоолол: НДШ (ажилтан) = цалин × төрлийн хувь (ердийн 11.5%). ТНО = нийт орлого − НДШ. ХХОАТ = ТНО × 10% (жилийн 120 саяас дээш шатлалтай). Сарын хөнгөлөлт = ТНО-ийн шатлалаар 20,000₮…0 (хуулийн 23.1, 2020.01.01-ээс). Гарт олгох = нийт − НДШ − ХХОАТ − бусад суутгал. Ажил олгогчийн НДШ = нийт × тохиргооны хувь (12.5% default; салбараар 12.5–14.5%). Тооцоог нягтлан бодогч баталгаажуулна.</p>
@@ -119,7 +119,7 @@ table.g{border-collapse:collapse;width:100%;font-size:13px;min-width:900px}
 
   <!-- Цалингийн хуудас -->
   <div class="panel" id="p-slip">
-    <div class="bar noprint"><div class="l"><span class="hint" style="margin:0">Ажилтан бүрт хэвлэх хуудас — гарын үсэг зуруулж хадгална.</span></div><div class="r"><button class="btn p" onclick="window.print()">🖨 Хэвлэх / PDF</button></div></div>
+    <div class="bar noprint"><div class="l"><span class="hint" style="margin:0">Ажилтан бүрт хэвлэх хуудас — гарын үсэг зуруулж хадгална.</span></div><div class="r"><button class="btn p" onclick="window.print()">Хэвлэх / PDF</button></div></div>
     <div class="slips" id="slips"></div>
   </div>
 
@@ -133,7 +133,7 @@ table.g{border-collapse:collapse;width:100%;font-size:13px;min-width:900px}
       <div class="f"><label>Ажил олгогчийн НДШ (%)</label><input id="sEmpRate" type="number" step="0.1" min="0" max="30"><small>Тэтгэвэр 8.5 + тэтгэмж 1.0 + ҮОМШӨ 0.8–2.8 + ажилгүйдэл 0.2 + ЭМД 2.0 = 12.5–14.5% (салбараар)</small></div>
       <div class="f"><label>Цалин олгох өдөр</label><input id="sPayDay" type="number" min="1" max="31"><small>Цалингийн хуудсанд харагдана</small></div>
     </div><div style="margin-top:14px;display:flex;gap:10px"><button class="btn p" id="saveSet">Хадгалах</button><button class="btn d" id="wipe">Бүх өгөгдлийг устгах</button></div></div>
-    <p class="hint">Өгөгдөл зөвхөн энэ хөтөчид (localStorage) хадгалагдана. Тогтмол «⬇ Нөөц» дарж JSON файлаа хадгалаарай — хөтөч цэвэрлэвэл устна. Cloud хадгалалт дараагийн хувилбарт.</p>
+    <p class="hint">Өгөгдөл зөвхөн энэ хөтөчид (localStorage) хадгалагдана. Тогтмол «Нөөц» дарж JSON файлаа хадгалаарай — хөтөч цэвэрлэвэл устна. Cloud хадгалалт дараагийн хувилбарт.</p>
   </div>
 </div>
 <div class="toast" id="toast"></div>

@@ -7,10 +7,10 @@
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="stylesheet" href="site.css">
-<link rel="stylesheet" href="shell.css?v=20261104">
+<link rel="stylesheet" href="shell.css?v=20261104b">
 <script src="mp.js"></script>
 <script src="site.js" defer></script>
-<script src="shell.js?v=20261104" defer></script>
+<script src="shell.js?v=20261104b" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -54,7 +54,7 @@
 <div class="wrap">
   <div class="bar">
     <div class="l"><a href="my.html" class="bbi-btn ghost" style="padding:9px 14px;font-size:13.5px">← Самбар</a><span id="stBadge"></span></div>
-    <div class="l"><button class="bbi-btn ghost" style="padding:9px 14px;font-size:13.5px" onclick="window.print()">🖨 Хэвлэх / PDF</button><button class="bbi-btn ghost" style="padding:9px 14px;font-size:13.5px" id="copyLink">🔗 Линк хуулах</button></div>
+    <div class="l"><button class="bbi-btn ghost" style="padding:9px 14px;font-size:13.5px" onclick="window.print()">Хэвлэх / PDF</button><button class="bbi-btn ghost" style="padding:9px 14px;font-size:13.5px" id="copyLink">Линк хуулах</button></div>
   </div>
   <div id="root" class="center">Гэрээ ачааллаж байна…</div>
 </div>
@@ -64,7 +64,7 @@
   const { esc, fmtMNT, fmtDate, fmtDT, conBadge, requireLogin } = BBIMP;
   const $=id=>document.getElementById(id);
   const id=new URLSearchParams(location.search).get('id');
-  $('copyLink').onclick=()=>{ navigator.clipboard.writeText(location.href).then(()=>{ $('copyLink').textContent='✓ Хуулагдлаа'; setTimeout(()=>$('copyLink').textContent='🔗 Линк хуулах',1500); }); };
+  $('copyLink').onclick=()=>{ navigator.clipboard.writeText(location.href).then(()=>{ $('copyLink').textContent='✓ Хуулагдлаа'; setTimeout(()=>$('copyLink').textContent='Линк хуулах',1500); }); };
   if(!id){ $('root').innerHTML='Гэрээний дугаар (id) алга.'; return; }
 
   const plural=(n,w)=>n+' '+w;

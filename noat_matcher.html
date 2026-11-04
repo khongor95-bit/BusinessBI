@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="site.css">
-<link rel="stylesheet" href="shell.css?v=20261104">
+<link rel="stylesheet" href="shell.css?v=20261104b">
 <script src="site.js" defer></script>
-<script src="shell.js?v=20261104" defer></script>
+<script src="shell.js?v=20261104b" defer></script>
 <script src="mp.js"></script>
 
 <title>НӨАТ Тулгагч · BusinessBI</title>
@@ -183,17 +183,17 @@
     <span class="sub">eBarimt-аас татсан падаанг өөрийн бүртгэлтэй тулгана</span>
   </header>
 
-<details class="bbi-guide" style="max-width:1100px;margin:16px auto;background:#f2f7f4;border:1px solid #d7e5dc;border-radius:10px;"><summary style="cursor:pointer;padding:13px 18px;font-weight:600;color:#0e3b2e;display:flex;align-items:center;gap:8px;">📖 Ашиглах заавар <span style="font-weight:400;font-size:13px;color:#5b7365;">— 1 минут уншаад эхлээрэй</span></summary><ol style="margin:0;padding:4px 22px 14px 40px;color:#243b30;font-size:14.5px;line-height:1.75;"><li style="margin:4px 0;">eBarimt системээс падааны жагсаалтаа Excel (.xlsx) хэлбэрээр татаж аваад <b>«Эх файл»</b> хэсэгт оруулна.</li><li style="margin:4px 0;">Дотоод бүртгэлийн файлаа <b>«Тулгах файл»</b> хэсэгт оруулна. Бүртгэлээ ямар бүтэцтэй байлгахаа мэдэхгүй бол загвар файл татах товчоор бэлэн загвар авч бөглөөрэй.</li><li style="margin:4px 0;"><b>«Тулгах ▸»</b> товч дарна — систем падааны дугаар, ТТД, дүнгээр хоёр талыг автоматаар тулгана.</li><li style="margin:4px 0;">Үр дүнгээс зөрүүтэй мөрүүдийг хайлтаар шүүж шалгаад <b>«⬇ Excel татах»</b> товчоор тулгалтын тайлангаа авна.</li></ol><p style="margin:0;padding:0 22px 14px;font-size:13px;color:#5b7365;">💡 Файлууд тань зөвхөн өөрийн тань браузер дээр боловсруулагдана — өгөгдөл сервер лүү илгээгдэхгүй.</p></details>
+<details class="bbi-guide" style="max-width:1100px;margin:16px auto;background:#f2f7f4;border:1px solid #d7e5dc;border-radius:10px;"><summary style="cursor:pointer;padding:13px 18px;font-weight:600;color:#0e3b2e;display:flex;align-items:center;gap:8px;">Ашиглах заавар <span style="font-weight:400;font-size:13px;color:#5b7365;">— 1 минут уншаад эхлээрэй</span></summary><ol style="margin:0;padding:4px 22px 14px 40px;color:#243b30;font-size:14.5px;line-height:1.75;"><li style="margin:4px 0;">eBarimt системээс падааны жагсаалтаа Excel (.xlsx) хэлбэрээр татаж аваад <b>«Эх файл»</b> хэсэгт оруулна.</li><li style="margin:4px 0;">Дотоод бүртгэлийн файлаа <b>«Тулгах файл»</b> хэсэгт оруулна. Бүртгэлээ ямар бүтэцтэй байлгахаа мэдэхгүй бол загвар файл татах товчоор бэлэн загвар авч бөглөөрэй.</li><li style="margin:4px 0;"><b>«Тулгах ▸»</b> товч дарна — систем падааны дугаар, ТТД, дүнгээр хоёр талыг автоматаар тулгана.</li><li style="margin:4px 0;">Үр дүнгээс зөрүүтэй мөрүүдийг хайлтаар шүүж шалгаад <b>«Excel татах»</b> товчоор тулгалтын тайлангаа авна.</li></ol><p style="margin:0;padding:0 22px 14px;font-size:13px;color:#5b7365;">Файлууд тань зөвхөн өөрийн тань браузер дээр боловсруулагдана — өгөгдөл сервер лүү илгээгдэхгүй.</p></details>
 
   <!-- INPUTS -->
   <div class="grid2">
     <!-- FILE A -->
     <div class="card">
-      <h2>📄 Эх файл — eBarimt падаан <span class="tag" id="tagA">хоосон</span></h2>
+      <h2>Эх файл — eBarimt падаан <span class="tag" id="tagA">хоосон</span></h2>
       <div class="body">
         <div class="drop" id="dropA">
           <div class="drop-default">
-            <div class="ic">⬆</div>
+            <svg class="up-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4M7 9l5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
             <div class="t">eBarimt эксел сонгох</div>
             <div class="h">Борлуулалт эсвэл Худалдан авалт · .xlsx / .csv</div>
           </div>
@@ -204,19 +204,19 @@
 
     <!-- FILE B -->
     <div class="card">
-      <h2>📒 Тулгах файл — дотоод бүртгэл <span class="tag" id="tagB">хоосон</span></h2>
+      <h2>Тулгах файл — дотоод бүртгэл <span class="tag" id="tagB">хоосон</span></h2>
       <div class="body">
         <div style="display:grid;grid-template-columns:6fr 1fr;gap:10px;align-items:stretch">
           <div class="drop" id="dropB">
             <div class="drop-default">
-              <div class="ic">⬆</div>
+              <svg class="up-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4M7 9l5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
               <div class="t">Дүүргэсэн загвар сонгох</div>
               <div class="h">Загварыг татаж дүүргээд оруулна уу · .xlsx</div>
             </div>
             <input type="file" id="fileB" accept=".xlsx,.xls,.csv">
           </div>
           <button class="btn ghost sm" id="tplBtn" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:11px;line-height:1.3;white-space:normal;padding:8px">
-            <span style="font-size:20px">⬇</span>Загвар татах
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M4 19h16"/></svg>Загвар татах
           </button>
         </div>
       </div>
@@ -247,7 +247,7 @@
       <div class="tabs" id="tabs"></div>
       <div class="filterbar">
         <input type="text" id="search" placeholder="Хайх — нэр, ТТД, падаан №, дүн...">
-        <button class="btn ghost sm" id="exportBtn">⬇ Excel татах</button>
+        <button class="btn ghost sm" id="exportBtn">Excel татах</button>
       </div>
       <div class="tblwrap"><div id="tbl"></div></div>
     </div>
