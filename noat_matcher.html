@@ -219,6 +219,14 @@
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M4 19h16"/></svg>Загвар татах
           </button>
         </div>
+        <div id="jrnBox" style="display:none;margin-top:10px;padding:10px 12px;border:1px dashed var(--line,#d6d6d6);border-radius:10px;font-size:12.5px;">
+          <b>Санхүүгийн програмаас шууд ачаалах</b> — журнал дахь НӨАТ-тай баримтуудаар дотоод бүртгэлийг үүсгэнэ.
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center;">
+            <select id="jrnCo" style="padding:6px 8px;border-radius:8px;border:1px solid #d6d6d6;"></select>
+            <button class="btn ghost sm" type="button" onclick="loadFromJournal('buy')">Худалдан авалт</button>
+            <button class="btn ghost sm" type="button" onclick="loadFromJournal('sale')">Борлуулалт</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -960,6 +968,47 @@ function setupDrop(which){
 ["A","B"].forEach(setupDrop);
 // Sheet/header сонголт зөвхөн File A-д (eBarimt). File B нь тогтсон загвартай.
 $("#tplBtn").onclick=downloadTemplate;
+/* ── Санхүүгийн програмын (businessbi_journal) журналаас дотоод бүртгэл үүсгэх ── */
+function journalCompanies(){
+  let co={list:[{id:'default',name:'Үндсэн компани'}]};
+  try{ const c=JSON.parse(localStorage.getItem('bbi_companies_v1')||'null'); if(c&&Array.isArray(c.list)&&c.list.length) co=c; }catch(e){}
+  return co.list.map(c=>({id:c.id, name:c.name, key: c.id==='default'?'bbi_gl_v1':'bbi_gl_v1::'+c.id}))
+    .filter(c=>{ try{ const d=JSON.parse(localStorage.getItem(c.key)||'null'); return d&&Array.isArray(d.journal)&&d.journal.length; }catch(e){ return false; } });
+}
+function loadFromJournal(kind){
+  const key=$("#jrnCo").value; let db=null;
+  try{ db=JSON.parse(localStorage.getItem(key)||'null'); }catch(e){}
+  if(!db||!Array.isArray(db.journal)){ toast("Журнал олдсонгүй",true); return; }
+  const st=db.settings||{}, vatAcc= kind==='buy'? (st.accVatIn||'121001') : (st.accVatOut||'311002');
+  const tinOf={}; (db.partners||[]).forEach(p=>{ if(p&&p.name) tinOf[p.name.trim()]=p.tin||''; });
+  const docs={};
+  for(const j of db.journal){
+    if(j.source==='closing') continue;
+    const d=docs[j.doc]||(docs[j.doc]={date:j.date, partner:j.partner||'', rows:[], ref:(j.receipt&&j.receipt.ddtd)||'', no:(j.docRef&&j.docRef.no)||''});
+    d.rows.push(j);
+  }
+  const out=[];
+  for(const d of Object.values(docs)){
+    const vatRows=d.rows.filter(j=> kind==='buy'? j.dt===vatAcc : j.kt===vatAcc);
+    if(!vatRows.length) continue;
+    const noat=vatRows.reduce((s,j)=>s+(+j.amt||0),0);
+    const net=d.rows.filter(j=>!vatRows.includes(j)).filter(j=>!j.reverses).reduce((s,j)=>s+(+j.amt||0),0);
+    if(d.rows.some(j=>j.reverses)) continue;
+    const tin=tinOf[d.partner.trim()]||((/^(\d{7,12})\s·/.exec(d.no)||[])[1])||'';
+    out.push([d.date, d.partner, tin, Math.round((net+noat)*100)/100, Math.round(noat*100)/100, d.ref, ''] );
+  }
+  if(!out.length){ toast("Энэ компанийн журналд "+(kind==='buy'?"худалдан авалтын":"борлуулалтын")+" НӨАТ-тай баримт алга",true); return; }
+  const header=[...TEMPLATE_COLS,...TEMPLATE_OPT].map(c=>c.header);
+  const ws=XLSX.utils.aoa_to_sheet([header,...out]);
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Журнал");
+  const name="Журнал — "+(kind==='buy'?"худалдан авалт":"борлуулалт");
+  state.B={raw:wb,sheets:wb.SheetNames,sheet:wb.SheetNames[0],headerRow:0,fileName:name,fileSize:0};
+  loadSheet("B"); showFileInfo("B",{name, size:0});
+  toast(out.length+" баримт журналаас ачааллаа ✓");
+}
+(function(){ const cs=journalCompanies(); if(!cs.length) return;
+  $("#jrnCo").innerHTML=cs.map(c=>`<option value="${c.key}">${c.name.replace(/[<>&]/g,'')}</option>`).join('');
+  $("#jrnBox").style.display=''; })();
 $$("#keychips .keychip").forEach(c=>c.onclick=()=>c.classList.toggle("on"));
 $("#runBtn").onclick=run;
 $("#exportBtn").onclick=(window.BBIGate&&BBIGate.protect)?BBIGate.protect(exportXlsx,{tool:"НӨАТ тулгагч",action:"download"}):exportXlsx;

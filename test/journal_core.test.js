@@ -227,4 +227,30 @@ function fixture() {
   const e = JC.calcEmp({ type: '01001', gross: 200000, ndshE: 23000, credit: 20000 }, new Date('2026-06-01'));
   ok(e.hhoat >= 0 && e.usedCredit <= e.raw, 'ХХОАТ сөрөг биш, хөнгөлөлт татвараас хэтрэхгүй');
 }
+/* ── Насжилт ── */
+{
+  const db = fixture();
+  db.journal.push({ doc: 'A1', date: '2026-01-05', desc: 'Падаан', partner: 'Номин', dt: '120100', kt: '510101', amt: 100000, source: 'vatsale' });
+  db.journal.push({ doc: 'A2', date: '2026-03-01', desc: 'Падаан', partner: 'Номин', dt: '120100', kt: '510101', amt: 50000, source: 'vatsale' });
+  db.journal.push({ doc: 'A3', date: '2026-03-10', desc: 'Төлөлт', partner: 'Номин', dt: '110101', kt: '120100', amt: 30000, source: 'import' });
+  db.journal.push({ doc: 'A4', date: '2026-03-12', desc: 'Төлөлт A2', partner: 'Номин', dt: '110101', kt: '120100', amt: 50000, source: 'import', ref: 'A2' });
+  const ag = JC.agingData(db, '120100', false, '2026-03-31');
+  const n = ag.rows.find(r => r.partner === 'Номин');
+  eq(n.bal, 70000, 'Номин үлдэгдэл'); eq(n.buckets[2], 70000, '61–90 хоног (1-р сарын падаан, FIFO)'); eq(n.buckets[0], 0, 'A2 ref-ээр хаагдсан');
+  eq(n.oldest, 85, 'хамгийн хуучин падааны нас');
+  const g = ag.rows.find(r => r.partner === 'Ган ХХК'); eq(g.bal, 800000, 'Ган ХХК үлдэгдэл'); eq(g.buckets[2], 800000, 'Ган 61–90');
+  const ap = JC.agingData(db, '310101', true, '2026-03-31'); ok(ap.rows.every(r => r.bal >= 0 || r.advance > 0), 'өглөгийн насжилт');
+}
+/* ── Бараа материал ── */
+{
+  const db = { settings: { from: '2026-01-01', to: '2026-12-31' }, accounts: [], journal: [],
+    inv: { items: [{ id: 'i1', code: 'B1', name: 'Цемент', unit: 'шуудай' }], moves: [
+      { id: 'm1', date: '2026-01-05', item: 'i1', type: 'in', qty: 100, cost: 10000 },
+      { id: 'm2', date: '2026-01-10', item: 'i1', type: 'in', qty: 100, cost: 12000 },
+      { id: 'm3', date: '2026-01-15', item: 'i1', type: 'out', qty: 150 },
+      { id: 'm4', date: '2026-01-20', item: 'i1', type: 'out', qty: 50 } ] } };
+  const S = JC.invState(db);
+  eq(S.calc.m3.cost, 1650000, 'жигнэсэн дундаж 11000 × 150'); eq(S.calc.m4.cost, 550000, 'үлдэгдлийг бүрэн зарлагадахад үлдэх утга'); eq(S.items[0].qty, 0, 'үлдэгдэл 0'); eq(S.totalValue, 0, 'үнэ 0');
+  eq(JC.invState(db, '2026-01-12').items[0].value, 2200000, 'огноогоор үлдэгдэл');
+}
 console.log('journal_core.test.js: ' + n + ' шалгалт OK');

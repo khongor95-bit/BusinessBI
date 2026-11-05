@@ -475,6 +475,78 @@
     return m;
   }
 
+  /* ── Авлага/өглөгийн насжилт (FIFO; төлөлт ref-ээр холбогдсон бол тухайн падаанд) ── */
+  const AGING_BUCKETS = [[0, 30, '0–30'], [31, 60, '31–60'], [61, 90, '61–90'], [91, 180, '91–180'], [181, Infinity, '180+']];
+  function agingData(db, accCode, creditNature, asOf) {
+    const day = d => Date.parse(d + 'T00:00:00Z') / 864e5;
+    const A = asOf || db.settings.to;
+    const per = {};
+    const rows = db.journal.filter(j => j.source !== 'closing' && j.date <= A && (j.dt === accCode || j.kt === accCode))
+      .slice().sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+    for (const j of rows) {
+      const p = (j.partner || '').trim() || '(харилцагчгүй)';
+      const P = per[p] || (per[p] = { inv: [], credit: 0 });
+      const inc = creditNature ? j.kt === accCode : j.dt === accCode;
+      if (j.dt === accCode && j.kt === accCode) continue;
+      if (inc) P.inv.push({ doc: j.doc, date: j.date, open: r2(j.amt) });
+      else {
+        let rest = r2(j.amt);
+        if (j.ref) for (const iv of P.inv) if (rest > 0.004 && iv.doc === String(j.ref) && iv.open > 0.004) { const t = Math.min(rest, iv.open); iv.open = r2(iv.open - t); rest = r2(rest - t); }
+        for (const iv of P.inv) { if (rest <= 0.004) break; if (iv.open > 0.004) { const t = Math.min(rest, iv.open); iv.open = r2(iv.open - t); rest = r2(rest - t); } }
+        if (rest > 0.004) P.credit = r2(P.credit + rest);
+      }
+    }
+    const out = [];
+    const tot = { b: AGING_BUCKETS.map(() => 0), adv: 0, bal: 0, overdue: 0 };
+    for (const [p, P] of Object.entries(per)) {
+      // хожуу ирсэн падааныг урьдчилгаагаар хаана
+      for (const iv of P.inv) { if (P.credit <= 0.004) break; if (iv.open > 0.004) { const t = Math.min(P.credit, iv.open); iv.open = r2(iv.open - t); P.credit = r2(P.credit - t); } }
+      const b = AGING_BUCKETS.map(() => 0); let oldest = null;
+      for (const iv of P.inv) {
+        if (iv.open <= 0.004) continue;
+        const age = Math.max(0, Math.round(day(A) - day(iv.date)));
+        const k = AGING_BUCKETS.findIndex(x => age >= x[0] && age <= x[1]);
+        b[k] = r2(b[k] + iv.open); if (oldest === null || age > oldest) oldest = age;
+      }
+      const bal = r2(b.reduce((x, y) => x + y, 0) - P.credit);
+      if (Math.abs(bal) < 0.005 && P.credit < 0.005) continue;
+      const overdue = r2(b.slice(1).reduce((x, y) => x + y, 0));
+      out.push({ partner: p, buckets: b, advance: P.credit, bal, oldest, overdue });
+      b.forEach((v, i) => { tot.b[i] = r2(tot.b[i] + v); });
+      tot.adv = r2(tot.adv + P.credit); tot.bal = r2(tot.bal + bal); tot.overdue = r2(tot.overdue + overdue);
+    }
+    out.sort((x, y) => y.overdue - x.overdue || y.bal - x.bal);
+    return { rows: out, total: tot, buckets: AGING_BUCKETS.map(x => x[2]), asOf: A };
+  }
+
+  /* ── Бараа материал: жигнэсэн дундаж өртөг (хөдөлгөөн бүрийн дараа) ── */
+  function invState(db, asOf) {
+    const inv = db.inv || { items: [], moves: [] };
+    const st = {};
+    for (const it of inv.items) st[it.id] = { item: it, qty: 0, value: 0, avg: 0, inQty: 0, outQty: 0, outCost: 0 };
+    const moves = inv.moves.map((m, i) => ({ ...m, _i: i })).filter(m => !asOf || m.date <= asOf)
+      .sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : (a.type === 'in' ? 0 : 1) - (b.type === 'in' ? 0 : 1) || a._i - b._i);
+    const calc = {};
+    for (const m of moves) {
+      const S = st[m.item]; if (!S) continue;
+      const q = Number(m.qty) || 0;
+      if (m.type === 'in') {
+        const v = r2(q * (Number(m.cost) || 0));
+        S.qty = r2(S.qty + q); S.value = r2(S.value + v); S.inQty = r2(S.inQty + q);
+        calc[m.id] = { cost: v, unit: Number(m.cost) || 0, short: false };
+      } else {
+        const avg = S.qty > 0 ? S.value / S.qty : (S.avg || 0);
+        const take = Math.min(q, Math.max(S.qty, 0));
+        const cost = q >= S.qty - 1e-9 ? r2(S.value * (take / (S.qty || 1)) + (q - take) * avg) : r2(q * avg);
+        S.qty = r2(S.qty - q); S.value = S.qty <= 1e-9 ? 0 : r2(S.value - cost); S.outQty = r2(S.outQty + q); S.outCost = r2(S.outCost + cost);
+        calc[m.id] = { cost, unit: avg, short: q > take + 1e-9 };
+      }
+      S.avg = S.qty > 1e-9 ? S.value / S.qty : S.avg;
+    }
+    const items = Object.values(st);
+    return { items, calc, totalValue: r2(items.reduce((x, s2) => x + s2.value, 0)) };
+  }
+
   /* ── Тодруулга ── */
   function notesData(db) {
     const b = computeBalance(db);
@@ -589,6 +661,6 @@
 
   return { r2, fmtZ, CATS, catByCode, accByCode, accLabel, validDate, inPeriod, prePeriod, postPeriod, periodClosed, withPeriod,
     citTax, citLabel, computeBalance, catClosing, catOpening, balanceAsOf, movementsByCat, movementsByAcc, incomeStatementData,
-    citDue, salesIncome, fxRateOn, fxBalances, fxRevalPlan, FX_MONETARY, st1LineOf, ST1_ROWS, st1Data, st2Data, st3Data, st4Data, TT02_ADJ_DEF, tt02Data, partnerLedger, notesData, closingPlan,
+    invState, agingData, AGING_BUCKETS, citDue, salesIncome, fxRateOn, fxBalances, fxRevalPlan, FX_MONETARY, st1LineOf, ST1_ROWS, st1Data, st2Data, st3Data, st4Data, TT02_ADJ_DEF, tt02Data, partnerLedger, notesData, closingPlan,
     monthlyDepr, postedDepr, assetRemaining, ndshRate, autoCredit, calcEmp, coOf, payrollTotals };
 });
