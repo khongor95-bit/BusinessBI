@@ -41,7 +41,7 @@ export const handler = callable(async (data) => {
   }
   if (action === "set_setting") {
     const k = String(data.key ?? ""), v = String(data.value ?? "").slice(0, 500);
-    if (!["site_url", "wire_operators", "receipt_model", "admin_emails"].includes(k)) throw new HttpsError("invalid-argument", "key зөвшөөрөгдөөгүй");
+    if (!["site_url", "wire_operators", "receipt_model", "admin_emails", "launch_pct", "launch_limit", "launch_until"].includes(k)) throw new HttpsError("invalid-argument", "key зөвшөөрөгдөөгүй");
     await setSetting(k, v);
     return { ok: true };
   }

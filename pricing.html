@@ -12,18 +12,18 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="BusinessBI.mn">
 <meta property="og:title" content="Үнэ — BusinessBI.mn">
-<meta property="og:description" content="BusinessBI-ийн үнийн мэдээлэл: санхүүгийн програм 14 хоног үнэгүй, НДШ/ХХОАТ хөрвүүлэгч 5,000₮/тайлан, бусад хэрэгслүүд үнэгүй.">
+<meta property="og:description" content="BusinessBI-ийн үнийн мэдээлэл: санхүүгийн програм 30 хоног үнэгүй, 19,900₮/сараас, НДШ/ХХОАТ хөрвүүлэгч 5,000₮/тайлан, бусад хэрэгслүүд үнэгүй.">
 <meta property="og:url" content="https://businessbi.mn/pricing.html">
 <meta property="og:image" content="https://businessbi.mn/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="mn_MN">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="description" content="BusinessBI-ийн үнийн мэдээлэл: санхүүгийн програм 14 хоног үнэгүй, НДШ/ХХОАТ хөрвүүлэгч 5,000₮/тайлан, бусад хэрэгслүүд үнэгүй.">
+<meta name="description" content="BusinessBI-ийн үнийн мэдээлэл: санхүүгийн програм 30 хоног үнэгүй, 19,900₮/сараас, НДШ/ХХОАТ хөрвүүлэгч 5,000₮/тайлан, бусад хэрэгслүүд үнэгүй.">
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="shell.css?v=20261104c">
 <script src="site.js?v=20261105" defer></script>
-<script src="shell.js?v=20261105c" defer></script>
+<script src="shell.js?v=20261106a" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -45,6 +45,13 @@
 .faq details[open] summary::after{content:"–"}
 .faq p{margin-top:10px;font-size:14.5px;color:var(--bbi-ink-soft);line-height:1.7}
 @media(max-width:900px){.grid{grid-template-columns:1fr}}
+.seg{display:inline-flex;border:1px solid var(--bbi-line);border-radius:24px;overflow:hidden;background:#fff}
+.seg button{border:0;background:transparent;padding:10px 18px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;color:var(--bbi-ink-soft)}
+.seg button.on{background:#171717;color:#fff}
+.seg small{font-weight:500;opacity:.8}
+.promo{background:#faf3e4;border:1px solid #f0d4ac;color:#5a4520;border-radius:14px;padding:12px 16px;font-size:14.5px;margin-top:18px}
+.plan .price s{font-size:16px;color:var(--bbi-muted);font-weight:500;margin-right:8px;letter-spacing:0}
+.plan .sub{font-size:13px;color:var(--bbi-muted);margin-top:-6px}
 </style>
 </head>
 <body class="bbi-page ol">
@@ -58,6 +65,34 @@
   </div>
 </section>
 
+<script>
+/* Багцын үнэ (серверийн _shared/payments.ts PRODUCTS-тэй ижил). Эхлэлтийн хямдралыг Supabase RPC-ээс татна. */
+const PLANS=[
+  {id:'starter',name:'Эхлэл',k:'1 компани',m:19900,y:199000,feats:['1 компани','Журнал, данс, СТ-1–СТ-4 тайлан','Банк, НӨАТ падаан импорт','Авлага-өглөгийн тооцоо, насжилт','ТТ-02 татварын тайлан','Cloud нөөцлөлт']},
+  {id:'business',name:'Бизнес',k:'3 компани',m:39900,y:399000,hi:true,feats:['3 компани','Бүх модуль: цалин, үндсэн хөрөнгө','Бараа материал, валют-ханш','Динамик самбар, тодруулга','Сэргээх цэгүүд, хаалт','Эхлэл багцын бүх боломж']},
+  {id:'accountant',name:'Нягтлан',k:'15 компани',m:79900,y:799000,feats:['15 компани хүртэл','Бүх модуль','Урамшууллын код — 20% шимтгэл','Нягтлангийн самбар, гэрээ','Хэрэглэгч бүртгүүлэхэд та авна','Бизнес багцын бүх боломж']},
+];
+let PER='m', PROMO=null;
+const fmtP=n=>n.toLocaleString('mn-MN')+'₮';
+function renderPlans(){
+  const g=document.getElementById('plGrid'); if(!g) return;
+  g.innerHTML=PLANS.map(P=>{ const base=P[PER]; const disc=PROMO? Math.round(base*PROMO.pct/100/100)*100:0; const pay=base-disc;
+    return `<div class="bbi-card plan ${P.hi?'hi':''}"><div class="k">${P.k}</div><h3>${P.name}</h3>
+      <div class="price">${disc?`<s>${fmtP(base)}</s>`:''}${fmtP(pay)}<small> / ${PER==='m'?'сар':'жил'}</small></div>
+      ${PER==='y'?`<div class="sub">сард ${fmtP(Math.round(pay/12/100)*100)}</div>`:''}
+      <ul>${P.feats.map(f=>`<li>${f}</li>`).join('')}</ul>
+      <a href="businessbi_journal.html#plan=${P.id}_${PER}" class="bbi-btn ${P.hi?'':'ghost'}">${P.hi?'Бизнес багц эхлүүлэх':'Сонгох'}</a></div>`; }).join('');
+  const pr=document.getElementById('plPromo');
+  if(PROMO){ pr.style.display=''; pr.innerHTML=`🎉 <b>Эхлэлтийн урамшуулал:</b> эхний 100 хэрэглэгч бүх багцыг <b>${PROMO.pct}% хямд</b> авна — одоогоор <b>${PROMO.left}</b> байр үлдсэн. Нэг удаа авсан хямдрал дараагийн сунгалтад ч хадгалагдана.`; } else pr.style.display='none';
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('#plSeg button').forEach(b=>b.onclick=()=>{ PER=b.dataset.p; document.querySelectorAll('#plSeg button').forEach(x=>x.classList.toggle('on',x===b)); renderPlans(); });
+  renderPlans();
+  const K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wZmpjZXppYXNhZG5zd3dua3BjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDY3MDMsImV4cCI6MjA5ODI4MjcwM30.LJ1Fh2TGjyPDv6EeTDzlhcR0S3WkUHhy2yRxnop940A';
+  fetch('https://mpfjceziasadnswwnkpc.supabase.co/rest/v1/rpc/launch_slots_left',{method:'POST',headers:{'Content-Type':'application/json',apikey:K,Authorization:'Bearer '+K},body:'{}'})
+    .then(r=>r.json()).then(rows=>{ const r=Array.isArray(rows)?rows[0]:rows; if(r&&r.pct>0&&r.left_slots>0){ PROMO={pct:r.pct,left:r.left_slots}; renderPlans(); } }).catch(()=>{});
+});
+</script>
 <section class="bbi-wrap" style="padding-bottom:64px">
   <div class="grid">
     <div class="bbi-card plan">
@@ -90,16 +125,26 @@
     <div class="bbi-card plan">
       <div class="k">Санхүүгийн програм</div>
       <h3>Ерөнхий журнал</h3>
-      <div class="price">14 хоног <small>үнэгүй</small></div>
+      <div class="price">30 хоног <small>үнэгүй</small></div>
       <ul>
-        <li>Ерөнхий журнал, дансны төлөвлөгөө, харилцагч</li>
-        <li>Банкны хуулга, eBarimt, НДШ импорт</li>
-        <li>СТ-1–СТ-4, ТТ-02, тодруулга, хаалт</li>
-        <li>Олон компани, cloud нөөцлөлт</li>
-        <li>Туршилтын дараах сарын төлбөрийг бүртгүүлсэн хэрэглэгчдэд эхэлж зарлана</li>
+        <li>Бүртгүүлмэгц бүх модультай туршилт — карт шаардахгүй</li>
+        <li>Ерөнхий журнал, банкны хуулга, eBarimt, НДШ импорт</li>
+        <li>СТ-1–СТ-4, ТТ-02, тодруулга, хаалт, самбар</li>
+        <li>Дараа нь доорх 3 багцаас сонгоно</li>
       </ul>
       <a href="businessbi_journal.html" class="bbi-btn ghost">Үнэгүй турших</a>
     </div>
+  </div>
+
+  <div id="plans" style="margin-top:56px">
+    <div style="display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap">
+      <div><p class="bbi-eyebrow">Санхүүгийн програм</p><h2 style="font-size:30px;font-weight:800;letter-spacing:-.01em;margin-top:6px">Багцаа сонго</h2>
+        <p style="color:var(--bbi-ink-soft);margin-top:8px;max-width:620px">Odoo шиг модулиар: хэрэгтэйгээ л ас. Нягтлан хөлслөхөөс 4–7 дахин хямд, нэг компанийн үнэ.</p></div>
+      <div class="seg" id="plSeg"><button class="on" data-p="m">Сараар</button><button data-p="y">Жилээр <small>— 2 сар үнэгүй</small></button></div>
+    </div>
+    <div class="promo" id="plPromo" style="display:none"></div>
+    <div class="grid" id="plGrid" style="margin-top:22px"></div>
+    <p class="bbi-note" style="margin-top:10px">Үнэ НӨАТ орсон, нэг хэрэглэгчийн эрх. Компанийн тоо багцаар хязгаарлагдана, модулиа хүссэн үедээ асааж, унтраана. Төлбөр — банкны апп (QR), цахим хэтэвч; эрх автоматаар сунгагдана.</p>
   </div>
   <p class="bbi-note">Бүх үнэ НӨАТ орсон дүн. Нягтлангийн үйлчилгээ, сургалт, захиалгат ажлын үнийг <a href="contact.html" style="color:var(--bbi-green);font-weight:600">хүсэлт</a> илгээхэд санал болгоно.</p>
 

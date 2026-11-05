@@ -29,7 +29,33 @@ export const PRODUCTS: Record<string, { amount: number; currency: string; title:
   tpl_quote: { amount: 15000, currency: "MNT", title: "Excel загвар — Үнийн санал, нэхэмжлэх", validHours: 720 },
   tpl_cit: { amount: 25000, currency: "MNT", title: "Excel загвар — ААНОАТ тооцоолуур", validHours: 720 },
   tpl_all: { amount: 199000, currency: "MNT", title: "Excel загвар — бүх 21 загварын багц", validHours: 720 },
+  /* Санхүүгийн програмын захиалга — компани тутамд биш, хэрэглэгчийн эрх (багцаар компанийн тоо хязгаарлана) */
+  sub_start_m: { amount: 19900,  currency: "MNT", title: "Санхүүгийн програм — Эхлэл, 1 сар",     validHours: 1 },
+  sub_start_y: { amount: 199000, currency: "MNT", title: "Санхүүгийн програм — Эхлэл, 1 жил",     validHours: 1 },
+  sub_biz_m:   { amount: 39900,  currency: "MNT", title: "Санхүүгийн програм — Бизнес, 1 сар",    validHours: 1 },
+  sub_biz_y:   { amount: 399000, currency: "MNT", title: "Санхүүгийн програм — Бизнес, 1 жил",    validHours: 1 },
+  sub_acc_m:   { amount: 79900,  currency: "MNT", title: "Санхүүгийн програм — Нягтлан, 1 сар",   validHours: 1 },
+  sub_acc_y:   { amount: 799000, currency: "MNT", title: "Санхүүгийн програм — Нягтлан, 1 жил",   validHours: 1 },
 };
+export const SUB_PLANS: Record<string, { plan: "starter" | "business" | "accountant"; months: number }> = {
+  sub_start_m: { plan: "starter", months: 1 }, sub_start_y: { plan: "starter", months: 12 },
+  sub_biz_m: { plan: "business", months: 1 }, sub_biz_y: { plan: "business", months: 12 },
+  sub_acc_m: { plan: "accountant", months: 1 }, sub_acc_y: { plan: "accountant", months: 12 },
+};
+/** Эхлэлтийн хямдрал: app_settings launch_pct (default 50), launch_limit (100), launch_until (YYYY-MM-DD, хоосон = хугацаагүй).
+    Эхний N төлсөн хэрэглэгч (uid-ээр тоолно) захиалгын бүх төлбөрт хямдралтай. */
+export async function launchDiscount(uid: string): Promise<{ pct: number; left: number }> {
+  const pct = Number(await getSetting("launch_pct", "50")) || 0;
+  const limit = Number(await getSetting("launch_limit", "100")) || 0;
+  const until = await getSetting("launch_until", "");
+  if (pct <= 0 || limit <= 0) return { pct: 0, left: 0 };
+  if (until && new Date().toISOString().slice(0, 10) > until) return { pct: 0, left: 0 };
+  const { data } = await admin().from("payments").select("uid").like("tool", "sub_%").eq("status", "paid");
+  const uids = new Set((data ?? []).map((r: any) => r.uid));
+  if (uids.has(uid)) return { pct, left: Math.max(0, limit - uids.size) };   // нэг удаа авсан хүн үргэлжлүүлэн авна
+  const left = limit - uids.size;
+  return left > 0 ? { pct, left } : { pct: 0, left: 0 };
+}
 export const REUSE_PENDING_MS = 8 * 60 * 1000;   // WIRE intent 10 мин TTL
 
 export type Payment = {
@@ -56,6 +82,7 @@ export function publicView(p: Payment) {
     qr: pending && raw?.qr?.text ? raw.qr : null,
     intentExpiresAt: pending && intentExp ? intentExp : null,
     paidAt: ms(p.paid_at) || null, expiresAt: ms(p.expires_at) || null, downloads: p.downloads ?? 0, provider: p.provider,
+    baseAmount: (p as any).base_amount ?? p.amount, discount: (p as any).discount ?? 0, promo: (p.meta as any)?.promo ?? null,
   };
 }
 
@@ -66,7 +93,24 @@ export async function markPaid(p: Payment, extra: Record<string, unknown>): Prom
   const upd = { status: "paid", paid_at: paidAt.toISOString(), expires_at: new Date(paidAt.getTime() + validHours * 3600 * 1000).toISOString(), ...extra };
   const { data, error } = await admin().from("payments").update(upd).eq("id", p.id).select().single();
   if (error) throw error;
+  if (SUB_PLANS[p.tool]) { try { await extendSubscription(p.uid, p.tool); } catch (e) { console.error("extendSubscription", (e as Error).message); } }
   return data as Payment;
+}
+/** Захиалга төлөгдөхөд subscriptions.paid_until-ийг сунгана: суурь = max(өнөөдөр, одоогийн paid_until) + N сар. Багц дээшилбэл шууд шинэ багц. */
+export async function extendSubscription(uid: string, tool: string): Promise<void> {
+  const sp = SUB_PLANS[tool]; if (!sp) return;
+  const db = admin();
+  const { data: cur } = await db.from("subscriptions").select("plan,paid_until").eq("user_id", uid).maybeSingle();
+  const today = new Date(); today.setUTCHours(0, 0, 0, 0);
+  let base = today;
+  if (cur?.paid_until && cur.plan !== "trial") { const pu = new Date(cur.paid_until + "T00:00:00Z"); if (pu > base) base = pu; }
+  const next = new Date(base); next.setUTCMonth(next.getUTCMonth() + sp.months);
+  const paidUntil = next.toISOString().slice(0, 10);
+  const now = new Date().toISOString();
+  const { error } = cur
+    ? await db.from("subscriptions").update({ plan: sp.plan, paid_until: paidUntil, updated_at: now }).eq("user_id", uid)
+    : await db.from("subscriptions").insert({ user_id: uid, plan: sp.plan, paid_until: paidUntil, note: "", updated_at: now });
+  if (error) throw error;
 }
 
 export async function getPayment(id: string): Promise<Payment | null> {

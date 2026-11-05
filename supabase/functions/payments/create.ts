@@ -3,7 +3,7 @@
    дээрээ харуулна), болохгүй бол hosted checkout URL (pay.wire.mn, шинэ цонх); mock горимд mock хуудас.
    8 минутын дотор үүссэн төлөгдөөгүй нэхэмжлэл байвал түүнийг дахин ашиглана (QR-ийг нь дахин өгнө). */
 import { admin, callable, getSetting, HttpsError } from "../_shared/http.ts";
-import { PRODUCTS, REUSE_PENDING_MS, publicView, mockSig, wireMode, useWire, type Payment } from "../_shared/payments.ts";
+import { PRODUCTS, REUSE_PENDING_MS, SUB_PLANS, launchDiscount, publicView, mockSig, wireMode, useWire, type Payment } from "../_shared/payments.ts";
 import { cancelIntent, confirmIntent, createIntent, createPaymentIntent, WireError } from "../_shared/wire.ts";
 
 export const handler = callable(async (data, { user }) => {
@@ -17,17 +17,23 @@ export const handler = callable(async (data, { user }) => {
   const db = admin();
 
   // Урамшууллын код (affiliate): хүчинтэй, өөрийнх биш бол хөнгөлөлт. Хүснэгт байхгүй/алдаа → кодгүй үргэлжилнэ.
-  let amount = product.amount, discount = 0, refCode: string | null = null;
+  let amount = product.amount, discount = 0, refCode: string | null = null, promo = "";
   const refIn = String(data.ref ?? "").trim().toUpperCase().slice(0, 16);
   if (/^[A-Z0-9]{4,16}$/.test(refIn)) {
     try {
       const { data: rc } = await db.from("mp_referral_codes").select("code,user_id,discount_pct,active").eq("code", refIn).maybeSingle();
       if (rc && rc.active && rc.user_id !== uid) {
         discount = Math.round(product.amount * Number(rc.discount_pct || 0) / 100 / 100) * 100;
-        amount = Math.max(100, product.amount - discount); refCode = rc.code;
+        refCode = rc.code;
       }
     } catch (e) { console.warn("referral lookup", (e as Error).message); }
   }
+  // Захиалгад эхлэлтийн хямдрал (эхний N хэрэглэгч) — урамшууллын кодтой давхардахгүй, ихийг нь авна
+  if (SUB_PLANS[tool]) {
+    try { const ld = await launchDiscount(uid); const d2 = Math.round(product.amount * ld.pct / 100 / 100) * 100;
+      if (d2 > discount) { discount = d2; promo = "launch"; } } catch (e) { console.warn("launch discount", (e as Error).message); }
+  }
+  amount = Math.max(100, product.amount - discount);
 
   const since = new Date(Date.now() - REUSE_PENDING_MS).toISOString();
   const { data: pend } = await db.from("payments").select("*").eq("uid", uid).eq("tool", tool).eq("status", "pending")
@@ -40,7 +46,7 @@ export const handler = callable(async (data, { user }) => {
     uid, email, tool, amount, currency: product.currency, status: "pending",
     provider: useWire(mode) ? "wire" : "mock", livemode: mode === "live", meta,
   };
-  if (refCode) { row.ref_code = refCode; row.base_amount = product.amount; row.discount = discount; }
+  if (refCode || discount) { row.ref_code = refCode; row.base_amount = product.amount; row.discount = discount; if (promo) meta.promo = promo; }
   // id-г урьдчилан гаргана: success_url, metadata, Idempotency-Key-д хэрэгтэй
   const id = crypto.randomUUID();
   row.id = id;

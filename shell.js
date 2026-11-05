@@ -118,7 +118,7 @@ if(!document.getElementById('nlModal') && !B.dataset.noFloat) B.appendChild(frag
       card('invoice_generator.html','tool-invoice.jpg','Нэхэмжлэх үүсгэгч','Үнэгүй'),
       card('receipt_scan.html','accounting.png','Баримт уншуулагч','5,000₮ / 24 цаг')]},
     {k:'apps',n:'Програм',all:['pricing.html','Үнэ, багц',''],items:[
-      card('businessbi_journal.html','finance.jpg','Санхүүгийн програм','14 хоног үнэгүй'),
+      card('businessbi_journal.html','finance.jpg','Санхүүгийн програм','30 хоног үнэгүй · 19,900₮/сараас'),
       card('payroll.html','salary.jpg','Цалин бодогч','Beta · үнэгүй'),
       card('budget.html','budget.jpg','Бизнес төлөвлөлт','Beta · үнэгүй'),
       card('financial_dashboard.html','tool-financial.jpg','Санхүүгийн шинжилгээ','Үнэгүй')]},

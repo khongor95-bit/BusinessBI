@@ -459,6 +459,32 @@ body:not(.th-gold) .chip.on{background:var(--c-accent);border-color:var(--c-acce
 .stat .spark{position:absolute;right:10px;bottom:8px;width:84px;height:30px;opacity:.9;}
 .stat .delta{font-size:10.5px;font-weight:700;margin-left:6px;}
 .stat .delta.up{color:var(--s-prof);} .stat .delta.dn{color:var(--s-loss);}
+/* ══ БАГЦ, ЗАХИАЛГА ══ */
+.pl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0;}
+@media(max-width:760px){.pl-grid{grid-template-columns:1fr;}}
+.pl{border:1px solid var(--bdr);border-radius:12px;padding:14px;background:var(--bg-surface);display:flex;flex-direction:column;gap:6px;position:relative;}
+.pl.hi{border-color:var(--gold,var(--c-accent));box-shadow:0 0 0 1px var(--gold,var(--c-accent));}
+.pl .k{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-d,var(--c-accent));}
+.pl h4{font-size:16px;margin:0;}
+.pl .pr{font-size:22px;font-weight:800;font-family:'Courier New',monospace;letter-spacing:-.5px;}
+.pl .pr s{font-size:13px;color:var(--txt-muted);font-weight:500;margin-right:6px;}
+.pl .pr small{font-size:11px;font-weight:500;color:var(--txt-muted);font-family:inherit;}
+.pl ul{list-style:none;padding:0;margin:4px 0 8px;font-size:11.5px;color:var(--txt-sub);line-height:1.6;}
+.pl li::before{content:"✓";color:var(--gold-d,var(--c-accent));font-weight:700;margin-right:6px;}
+.pl .cur{position:absolute;top:10px;right:10px;font-size:10px;background:#1c1c1c;color:#f0d4ac;border-radius:10px;padding:2px 8px;font-weight:700;}
+.pl .btn{margin-top:auto;justify-content:center;}
+.pl-seg{display:inline-flex;border:1px solid var(--bdr-strong);border-radius:20px;overflow:hidden;}
+.pl-seg button{border:0;background:transparent;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--txt-sub);}
+.pl-seg button.on{background:#1c1c1c;color:#fff;}
+.pl-promo{background:#faf3e4;border:1px solid #f0d4ac;color:#5a4520;border-radius:10px;padding:8px 12px;font-size:12px;margin:6px 0;}
+.pl-pay{text-align:center;padding:6px 0;}
+.pl-pay img{width:220px;height:220px;border:1px solid var(--bdr);border-radius:12px;background:#fff;}
+.pl-banks{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px;}
+.pl-banks a{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--bdr);border-radius:8px;padding:4px 8px;font-size:11px;color:var(--txt);text-decoration:none;}
+.pl-banks img{width:18px;height:18px;border-radius:4px;}
+.pl-status{font-size:12px;margin-top:8px;min-height:18px;color:var(--txt-sub);}
+.pl-status.err{color:var(--red);}
+.mod .lock{font-size:10px;color:#9a7330;font-weight:700;margin-left:4px;}
 </style>
 </head>
 <body class="th-gold locked">
@@ -1094,6 +1120,16 @@ body:not(.th-gold) .chip.on{background:var(--c-accent);border-color:var(--c-acce
     <button class="btn" id="wzBack" onclick="wzGo(-1)" style="visibility:hidden;">← Буцах</button>
     <div style="display:flex;gap:8px;"><button class="btn" onclick="closeModal('wzModal')">Болих</button><button class="btn primary" id="wzNext" onclick="wzGo(1)">Үргэлжлүүлэх →</button></div>
   </div>
+</div></div>
+
+<div class="modal-bg" id="planModal"><div class="modal" style="max-width:820px;">
+  <h3 style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">Санхүүгийн програмын багц <span class="pl-seg"><button id="plSegM" class="on" onclick="plPeriod('m')">Сараар</button><button id="plSegY" onclick="plPeriod('y')">Жилээр — 2 сар үнэгүй</button></span></h3>
+  <div id="plPromo" class="pl-promo" style="display:none;"></div>
+  <div id="plSub" style="font-size:12px;color:var(--sub);margin:4px 0;"></div>
+  <div class="pl-grid" id="plGrid"></div>
+  <div id="plPay" class="pl-pay" style="display:none;"></div>
+  <div class="note">Үнэ НӨАТ орсон. Төлбөр: банкны апп (QR), цахим хэтэвч — WIRE.mn гарцаар. Төлбөр баталгаажмагц эрх автоматаар сунгагдана (ихэвчлэн 5–10 сек). Автомат сунгалт байхгүй — хугацаа дуусахын өмнө сануулна.</div>
+  <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end;"><button class="btn" onclick="plClose()">Хаах</button></div>
 </div></div>
 
 <div class="modal-bg" id="companyModal"><div class="modal" style="max-width:580px;">
@@ -5261,6 +5297,7 @@ const PRESETS=[
 ];
 function modOn(id){
   const m=MODULES.find(x=>x.id===id); if(!m||m.core) return true;
+  if(typeof planAllowsMod==='function' && !planAllowsMod(id)) return false;
   const cfg=DB.settings.modules;
   if(cfg && typeof cfg==='object' && id in cfg) return !!cfg[id];
   return !!m.def || !!(m.has && m.has());   // тохируулаагүй бол: default + өгөгдөлтэй модуль асаалттай
@@ -5285,7 +5322,8 @@ function modRenderPicker(prefix, preset){
   const curPreset= preset || (prefix==='st'? DB.settings.preset : WZ_PRESET) || '';
   presetsEl.innerHTML=PRESETS.map(P=>`<button type="button" class="preset ${P.id===curPreset?'on':''}" onclick="modRenderPicker('${prefix}','${P.id}')${prefix==='st'?';modSaveFromSettings()':''}">${esc(P.name)}</button>`).join('');
   modsEl.innerHTML=MODULES.map(m=>`<label class="mod ${state[m.id]?'on':''} ${m.core?'core':''}"><input type="checkbox" data-mid="${m.id}" ${state[m.id]?'checked':''} ${m.core?'disabled':''} onchange="this.closest('.mod').classList.toggle('on',this.checked);${prefix==='st'?'modSaveFromSettings()':'WZ_PRESET=\'\''}">
-    <span><span class="t">${esc(m.name)}${m.core?'<span class="tag">үндсэн</span>':''}${(!m.core&&m.has&&m.has())?'<span class="tag">өгөгдөлтэй</span>':''}</span><div class="d">${esc(m.desc)}</div></span></label>`).join('');
+    <span><span class="t">${esc(m.name)}${m.core?'<span class="tag">үндсэн</span>':''}${(!m.core&&m.has&&m.has())?'<span class="tag">өгөгдөлтэй</span>':''}${(typeof planAllowsMod==='function'&&!planAllowsMod(m.id))?'<span class="lock" title="Бизнес багцаас дээш">🔒 Бизнес багц</span>':''}</span><div class="d">${esc(m.desc)}</div></span></label>`).join('');
+  if(typeof planAllowsMod==='function' && !PLAN_DEF[curPlan()].allMods && CLOUD.user && CLOUD.sub) modsEl.insertAdjacentHTML('afterend', `<div class="note warn" id="${prefix}ModNote" style="margin-top:8px;">Эхлэл багцад үндсэн модулиуд л багтана. Цалин, хөрөнгө, бараа, валют хэрэгтэй бол <span class="link" onclick="openPlanModal()">Бизнес багц</span> руу шилжинэ үү.</div>`);
 }
 function modCollect(prefix){
   const out={}; document.querySelectorAll('#'+prefix+'Mods input[data-mid]').forEach(i=>{ out[i.dataset.mid]=i.checked; });
@@ -5293,6 +5331,7 @@ function modCollect(prefix){
 }
 function modSaveFromSettings(){
   const cfg=modCollect('st');
+  if(CLOUD.user&&CLOUD.sub&&!PLAN_DEF[curPlan()].allMods){ const want=PREMIUM_MODS.filter(id=>cfg[id]); if(want.length){ want.forEach(id=>cfg[id]=false); openPlanModal('Эдгээр модуль Бизнес багцаас дээш: '+want.map(id=>(MODULES.find(m=>m.id===id)||{}).name).join(', ')); } }
   const off=MODULES.filter(m=>!m.core && cfg[m.id]===false && modOn(m.id) && m.has && m.has());
   DB.settings.modules=cfg;
   const onP=document.querySelector('#stPresets .preset.on'); DB.settings.preset= onP? (PRESETS.find(P=>P.name===onP.textContent)||{}).id||'' : '';
@@ -5353,6 +5392,7 @@ function wzFinish(){
   const name=document.getElementById('wzName').value.trim(), reg=document.getElementById('wzReg').value.replace(/\s+/g,'');
   const y=document.getElementById('wzYear').value, vat=document.getElementById('wzVat').value==='1';
   if(WZ_NEWCO){
+    { const n=CO.list.filter(c=>!c.demo).length, lim=planCompanyLimit(); if(n>=lim){ closeModal('wzModal'); openPlanModal(`Таны ${PLAN_DEF[curPlan()].name} багц ${lim} компани хүртэл — дараагийн компанид дээд багц хэрэгтэй.`); return; } }
     const id='c'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
     CO.list.push({id, name, reg}); saveCO(); switchCompany(id);
   }
@@ -5437,6 +5477,7 @@ function runChecks(){
   }catch(e){}
   { const nd=new Set(DB.journal.filter(j=>!isPosted(j)).map(j=>j.doc)).size; if(nd) checks.push({state:'warn', text:nd+' ноорог баримт батлагдаагүй — журналаас «батлах» (хаалт, түгжээний өмнө заавал)'}); }
   if(lockedThrough()) checks.push({state:'ok', text:'Үе түгжигдсэн: '+lockedThrough()+' хүртэл'});
+  if(CLOUD.user&&CLOUD.sub){ const d=CLOUD.subDays(); if(!CLOUD.subActive()) checks.push({state:'err', text:'Эрх дууссан ('+CLOUD.sub.paid_until+') — өөрчлөлт cloud-д хадгалагдахгүй. <span class="link" onclick="openPlanModal()">Багц сонгох</span>'}); else if(d<=5) checks.push({state:'warn', text:(CLOUD.sub.plan==='trial'?'Туршилтын':PLAN_DEF[curPlan()].name)+' эрх '+d+' хоногийн дараа дуусна — <span class="link" onclick="openPlanModal()">багц сонгож сунгах</span>'}); }
   if(DB.journal.length && !(CLOUD.user&&CLOUD.enabled())) checks.push({state:'warn', text:'Дата зөвхөн энэ хөтөчид (localStorage) — 10 жил хадгалах шаардлага (НББ-ийн хууль 11.1) хангагдахгүй. Cloud-д нэвтэрч хадгалуулна уу (дээд мөрний «Нэвтрэх»).'});
   else if(CLOUD.user && CLOUD.status==='err') checks.push({state:'err', text:'Cloud sync алдаатай — өөрчлөлт cloud-д очихгүй байна (эрх дууссан эсвэл сүлжээ)'});
   if(!DB.accounts.length){ checks.push({state:'err', text:'Дансны төлөвлөгөө хоосон — стандарт төлөвлөгөө ачаална уу'}); return checks; }
@@ -5943,6 +5984,8 @@ const CLOUD={
       try{ const want=new URLSearchParams(location.search).get('company'); if(want && want!==CO.current && CO.list.some(c=>c.id===want)){ history.replaceState(null,'',location.pathname); switchCompany(want); return; } }catch(e){}
       await this.pull();
       this.setSync('ok');
+      try{ applyModules(); }catch(e){}
+      if(window.__plHash){ const h=window.__plHash; window.__plHash=null; setTimeout(()=>{ if(h[2]) plPeriod(h[2]); openPlanModal(); },400); }
       let msg='Cloud холбогдлоо — '+(this.user.email||'');
       if(this.sub){
         if(!this.subActive()) msg='Cloud эрх дууссан — уншилт нээлттэй, шинэ өөрчлөлт локалдоо л хадгалагдана';
@@ -6142,11 +6185,99 @@ function cloudAuthClick(){
     CLOUD.sb.auth.signInWithOAuth({provider:'google', options:{redirectTo:location.href.split('#')[0]}});
   }
 }
-function billingInfo(){
-  // Төлбөрийн сувгийг WIRE.mn-ээр нээх хүртэл: үнийн хуудас + имэйлээр холбогдох
+function billingInfo_old(){
   const email=(CLOUD&&CLOUD.user&&CLOUD.user.email)||'';
   if(confirm('Cloud эрх сунгах:\n\nТуршилтын дараах сарын төлбөрийг бүртгүүлсэн хэрэглэгчдэд эхэлж зарлана. Эрхээ сунгуулах, үнийн санал авах бол hello@businessbi.mn руу нэвтэрсэн имэйлээрээ ('+email+') бичнэ үү.\n\n«OK» дарвал үнийн хуудас нээгдэнэ.')) window.open('pricing.html','_blank');
 }
+
+/* ═══════════════ БАГЦ, ЗАХИАЛГА (Эхлэл / Бизнес / Нягтлан) ═══════════════ */
+const PLANS=[
+  {id:'starter',    name:'Эхлэл',   tool:{m:'sub_start_m',y:'sub_start_y'}, price:{m:19900,y:199000},  companies:1,  allMods:false, feats:['1 компани','Журнал, данс, СТ-1–СТ-4 тайлан','Банк, НӨАТ импорт','Авлага-өглөгийн тооцоо, ТТ-02','Cloud нөөцлөлт']},
+  {id:'business',   name:'Бизнес',  tool:{m:'sub_biz_m',y:'sub_biz_y'},     price:{m:39900,y:399000},  companies:3,  allMods:true,  feats:['3 компани','Бүх модуль: цалин, хөрөнгө, бараа, валют','Насжилт, самбар, тодруулга','Cloud нөөц, сэргээх цэгүүд','Эхлэл багцын бүх боломж'], hi:true},
+  {id:'accountant', name:'Нягтлан', tool:{m:'sub_acc_m',y:'sub_acc_y'},     price:{m:79900,y:799000},  companies:15, allMods:true,  feats:['15 компани хүртэл','Бүх модуль','Урамшууллын код — 20% шимтгэл','Нягтлангийн самбар, гэрээ','Бизнес багцын бүх боломж']},
+];
+const PLAN_DEF={trial:{name:'Туршилт',companies:3,allMods:true}, starter:{name:'Эхлэл',companies:1,allMods:false}, business:{name:'Бизнес',companies:3,allMods:true}, accountant:{name:'Нягтлан',companies:15,allMods:true}};
+const PREMIUM_MODS=['salary','assets','inventory','fx','receipt'];
+function curPlan(){ const p=CLOUD.sub&&CLOUD.sub.plan; return PLAN_DEF[p]? p : 'trial'; }
+function planAllowsMod(id){ if(!PREMIUM_MODS.includes(id)) return true; if(!CLOUD.user||!CLOUD.sub) return true; return !!PLAN_DEF[curPlan()].allMods; }
+function planCompanyLimit(){ if(!CLOUD.user||!CLOUD.sub) return 99; return PLAN_DEF[curPlan()].companies; }
+let PL_PERIOD='m', PL_POLL=null, PL_PID=null;
+function plPeriod(p){ PL_PERIOD=p; document.getElementById('plSegM').classList.toggle('on',p==='m'); document.getElementById('plSegY').classList.toggle('on',p==='y'); plRender(); }
+function plClose(){ closeModal('planModal'); if(PL_POLL){ clearTimeout(PL_POLL); PL_POLL=null; } }
+async function openPlanModal(hint){
+  if(!CLOUD.user){ toast('Эхлээд нэвтэрнэ үү', true); return; }
+  document.getElementById('plPay').style.display='none'; document.getElementById('plGrid').style.display='';
+  PL_HINT=hint||'';
+  openModal('planModal'); plRender();
+  try{ const r=await CLOUD.sb.rpc('launch_slots_left'); const row=r.data&&r.data[0]; PL_PROMO=(row&&row.pct>0&&row.left_slots>0)?row:null; }catch(e){ PL_PROMO=null; }
+  plRender();
+}
+let PL_PROMO=null, PL_HINT='';
+function plRender(){
+  const promo=document.getElementById('plPromo');
+  if(PL_PROMO){ promo.style.display=''; promo.innerHTML=`🎉 <b>Эхлэлтийн урамшуулал:</b> эхний 100 хэрэглэгч бүх багцыг <b>${PL_PROMO.pct}% хямд</b> авна — одоогоор <b>${PL_PROMO.left_slots}</b> байр үлдсэн. Нэг удаа авсан хямдрал дараагийн сунгалтад ч хадгалагдана.`; }
+  else promo.style.display='none';
+  const cur=curPlan(), sub=CLOUD.sub||{};
+  const fmtP=n=>n.toLocaleString('mn-MN')+'₮';
+  document.getElementById('plGrid').innerHTML=PLANS.map(P=>{ const base=P.price[PL_PERIOD]; const disc=PL_PROMO? Math.round(base*PL_PROMO.pct/100/100)*100 : 0; const pay=base-disc;
+    const isCur=cur===P.id && CLOUD.subActive();
+    return `<div class="pl ${P.hi?'hi':''}">${isCur?'<span class="cur">одоогийн багц</span>':''}<div class="k">${P.companies} компани</div><h4>${P.name}</h4>
+      <div class="pr">${disc?`<s>${fmtP(base)}</s>`:''}${fmtP(pay)}<small> / ${PL_PERIOD==='m'?'сар':'жил'}</small></div>
+      ${PL_PERIOD==='y'?`<div style="font-size:11px;color:var(--txt-muted);">сард ${fmtP(Math.round(pay/12/100)*100)}</div>`:''}
+      <ul>${P.feats.map(f=>`<li>${f}</li>`).join('')}</ul>
+      <button class="btn ${P.hi?'primary':''}" onclick="plBuy('${P.id}')">${isCur?'Сунгах':(cur!=='trial'&&PLANS.findIndex(x=>x.id===cur)>PLANS.findIndex(x=>x.id===P.id)?'Энэ багц руу шилжих':'Сонгох')}</button></div>`; }).join('');
+  const st=document.getElementById('plSub');
+  st.textContent=[PL_HINT, sub.plan? `Одоо: ${PLAN_DEF[cur].name}${CLOUD.subActive()?' — '+sub.paid_until+' хүртэл ('+CLOUD.subDays()+' хоног)':' — хугацаа дууссан'}` : ''].filter(Boolean).join(' · ');
+}
+async function plCall(path, data){
+  const { data: sd }=await CLOUD.sb.auth.getSession(); const tok=sd&&sd.session&&sd.session.access_token; if(!tok) throw new Error('Нэвтрэлт дууссан — дахин нэвтэрнэ үү');
+  const c=window.SUPABASE_CONFIG; const res=await fetch(c.url+'/functions/v1/payments/'+path,{method:'POST',headers:{'Content-Type':'application/json',apikey:c.anonKey,Authorization:'Bearer '+tok},body:JSON.stringify({data:data||{}})});
+  let j={}; try{ j=await res.json(); }catch(e){}
+  if(j&&j.error){ const e=new Error(j.error.message||j.error.status); e.code=j.error.status; throw e; }
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  return j.result;
+}
+async function plBuy(planId){
+  const P=PLANS.find(x=>x.id===planId); const tool=P.tool[PL_PERIOD];
+  const box=document.getElementById('plPay'); box.style.display=''; document.getElementById('plGrid').style.display='none';
+  box.innerHTML=`<div class="pl-status"><span class="sb-dot warn"></span> Нэхэмжлэл үүсгэж байна…</div>`;
+  try{
+    const r=await plCall('create',{tool, meta:{plan:planId, period:PL_PERIOD, company:DB.settings.company||''}});
+    PL_PID=r.paymentId;
+    if(r.paid){ await plPaid(); return; }
+    const amt=(r.amount||0).toLocaleString('mn-MN')+'₮'; const discTxt=r.discount? ` <span style="color:var(--txt-muted)">(<s>${(r.baseAmount||0).toLocaleString('mn-MN')}₮</s> − ${r.promo==='launch'?'эхлэлтийн хямдрал':'урамшуулал'})</span>`:'';
+    let h=`<div style="font-size:13px;margin-bottom:6px;"><b>${P.name}</b> — ${PL_PERIOD==='m'?'1 сар':'1 жил'} · <b>${amt}</b>${discTxt}</div>`;
+    if(r.qr&&r.qr.text){
+      h+=r.qr.image? `<img src="${r.qr.image}" alt="QR">` : `<div class="mono" style="word-break:break-all;font-size:10px;max-width:320px;margin:0 auto;">${esc(r.qr.text)}</div>`;
+      h+=`<div style="font-size:12px;margin-top:6px;">Банкны аппаараа QR уншуулна уу${r.qr.deeplinks&&r.qr.deeplinks.length?', эсвэл утсан дээрээ банкаа сонгоно:':''}</div>`;
+      if(r.qr.deeplinks&&r.qr.deeplinks.length) h+=`<div class="pl-banks">${r.qr.deeplinks.slice(0,14).map(d=>`<a href="${esc(d.link)}" rel="noopener"><img src="${esc(d.logo)}" alt="" onerror="this.style.display='none'">${esc(d.description||d.name)}</a>`).join('')}</div>`;
+    } else if(r.checkoutUrl){
+      let win=null; try{ win=window.open(r.checkoutUrl,'bbipay_checkout','popup=yes,width=520,height=760'); }catch(e){}
+      h+=`<div style="font-size:12.5px;">Төлбөрийн цонх ${win?'нээгдлээ':'нээгдсэнгүй'} — <a href="${esc(r.checkoutUrl)}" target="bbipay_checkout" rel="noopener">энд дарж</a> төлнө үү. Энэ хуудсыг хаахгүй.</div>`;
+    } else throw new Error('Төлбөрийн сувгаас хариу ирсэнгүй');
+    h+=`<div class="pl-status" id="plStatus"><span class="sb-dot warn"></span> Төлбөр хүлээж байна… төлсний дараа эрх автоматаар сунгагдана</div><button class="btn sm" onclick="plBack()" style="margin-top:8px;">← Багц руу буцах</button>`;
+    box.innerHTML=h; plPollStart=Date.now(); plPoll();
+  }catch(e){ console.error(e); box.innerHTML=`<div class="pl-status err">${esc(e.message||'алдаа')}${/failed-precondition/.test(e.code||'')?'':' — дахин оролдоно уу'}</div><button class="btn sm" onclick="plBack()">← Багц руу буцах</button>`; }
+}
+let plPollStart=0;
+function plBack(){ if(PL_POLL){ clearTimeout(PL_POLL); PL_POLL=null; } document.getElementById('plPay').style.display='none'; document.getElementById('plGrid').style.display=''; }
+async function plPoll(){
+  if(!PL_PID) return;
+  try{ const r=await plCall('check',{paymentId:PL_PID}); if(r.status==='paid'){ await plPaid(); return; } if(r.status==='failed'){ const st=document.getElementById('plStatus'); if(st){ st.className='pl-status err'; st.textContent='Төлбөр цуцлагдсан эсвэл хугацаа дууссан — дахин оролдоно уу'; } return; } }catch(e){ console.warn(e); }
+  if(Date.now()-plPollStart>12*60*1000){ const st=document.getElementById('plStatus'); if(st){ st.className='pl-status err'; st.textContent='Хүлээх хугацаа дууслаа — төлсөн бол «Компани» цонхноос эрхээ шалгана уу'; } return; }
+  PL_POLL=setTimeout(plPoll, 3000);
+}
+async function plPaid(){
+  if(PL_POLL){ clearTimeout(PL_POLL); PL_POLL=null; }
+  await CLOUD.ensureSub(); CLOUD._subWarned=false;
+  document.getElementById('plPay').innerHTML=`<div style="font-size:32px;">✅</div><div style="font-size:14px;font-weight:700;margin:6px 0;">Төлбөр баталгаажлаа</div><div style="font-size:12.5px;color:var(--sub);">${PLAN_DEF[curPlan()].name} багц — ${esc(String((CLOUD.sub||{}).paid_until||''))} хүртэл</div><button class="btn primary" style="margin-top:12px;" onclick="plClose();renderAll();refreshDots();">Үргэлжлүүлэх</button>`;
+  logEvent('subscription','',curPlan()+' → '+((CLOUD.sub||{}).paid_until||'')); applyModules(); refreshDots();
+  if(CLOUD.status==='err') CLOUD.markDirty();
+  toast('Эрх сунгагдлаа — '+PLAN_DEF[curPlan()].name+' багц');
+}
+function billingInfo(){ openPlanModal(); }
+/* #plan=business_y → нэвтэрсний дараа шууд багцын цонх */
+{ const m=/^#plan=([a-z]+)(?:_([my]))?$/.exec(location.hash||''); if(m){ window.__plHash=m; history.replaceState(null,'',location.pathname); } }
 /* ── Компани удирдлага ── */
 function updateCompanyUI(){
   const co=CO.list.find(c=>c.id===CO.current);
@@ -6160,9 +6291,9 @@ function openCompanyModal(){
     if(!CLOUD.user||!CLOUD.enabled()) si.innerHTML='';
     else if(!CLOUD.sub) si.innerHTML='';
     else if(CLOUD.subActive()){
-      si.innerHTML='<div class="note">Cloud эрх: <b>'+(CLOUD.sub.plan==='trial'?'Туршилтын':'Pro')+'</b> — '+esc(String(CLOUD.sub.paid_until))+' хүртэл ('+CLOUD.subDays()+' хоног үлдсэн). <span class="link" onclick="billingInfo()">Сунгах заавар</span></div>';
+      si.innerHTML='<div class="note">Багц: <b>'+(PLAN_DEF[curPlan()]||{}).name+'</b> — '+esc(String(CLOUD.sub.paid_until))+' хүртэл ('+CLOUD.subDays()+' хоног үлдсэн) · '+planCompanyLimit()+' компани хүртэл. <span class="link" onclick="openPlanModal()">'+(CLOUD.sub.plan==='trial'?'Багц сонгох':'Сунгах / өөрчлөх')+'</span></div>';
     } else {
-      si.innerHTML='<div class="note warn">Cloud эрх <b>дууссан</b> — дата локалдоо хадгалагдаж, cloud уншилт нээлттэй, харин шинэ өөрчлөлт cloud-д илгээгдэхгүй. <span class="link" onclick="billingInfo()">Сунгах заавар</span></div>';
+      si.innerHTML='<div class="note warn">Эрх <b>дууссан</b> ('+esc(String(CLOUD.sub.paid_until))+') — дата локалдоо хадгалагдаж, cloud уншилт нээлттэй, харин шинэ өөрчлөлт cloud-д илгээгдэхгүй. <span class="link" onclick="openPlanModal()">Багц сонгож сунгах</span></div>';
     }
   }
   let t='<thead><tr><th>Компани</th><th></th><th></th></tr></thead><tbody>';
@@ -6210,6 +6341,7 @@ function newCompanyCheck(){
   NEWCO_ATTACH.refresh(true);
 }
 function addCompany(){
+  { const n=CO.list.filter(c=>!c.demo).length, lim=planCompanyLimit(); if(n>=lim){ openPlanModal(`Таны ${PLAN_DEF[curPlan()].name} багц ${lim} компани хүртэл — дараагийн компанид дээд багц хэрэгтэй.`); return; } }
   const name=document.getElementById('newCompanyName').value.trim();
   const reg=document.getElementById('newCompanyReg').value.replace(/\s+/g,'');
   if(!name){ toast(reg?'Нэр татагдсангүй — компанийн нэрээ бичнэ үү':'Компанийн нэрээ бичнэ үү', true); return; }
