@@ -9,7 +9,7 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="theme-color" content="#216a4c">
+<meta name="theme-color" content="#1c1c1c">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="BusinessBI.mn">
 <meta property="og:title" content="BusinessBI — Ерөнхий журнал ба автомат тайлан">
@@ -327,9 +327,58 @@ tr.set-detail>td{background:var(--bg-row)!important;padding:8px 10px 12px 34px;}
   .card{box-shadow:none;border:1px solid #ccc;}
   body{background:#fff;}
 }
+/* ══ ШИНЭ ДҮР ТӨРХ: хар + алт (сайттай нэг хэв маяг). Excel-ийн бүтэц хэвээр; Тохиргооноос хуучин ногоон руу буцааж болно ══ */
+body.th-gold{
+  --hdr:#1c1c1c; --hdr-d:#000;
+  --c-accent:#1c1c1c; --c-accent-dark:#000; --c-accent-soft:#faf3e4;
+  --bg-page:#f6f5f2; --bg-row:#f3f1ec; --bg-hover:#faf3e4; --bg-active:#f0e2c4;
+  --bdr:#e7e3da; --bdr-soft:#eeebe4; --bdr-row:#eeebe4; --c-border:#e7e3da;
+  --txt-accent:#1c1c1c; --gold:#c9a24d; --gold-d:#9a7330; --gold-l:#f0d4ac;
+  --tbl-shadow:0 1px 2px rgba(23,23,23,.05),0 0 0 1px rgba(23,23,23,.05);
+  /* :root дээрх alias-ууд тэнд тооцоологддог тул энд дахин зарлана */
+  --acc:#1c1c1c; --acc-d:#000; --acc-soft:#faf3e4; --acc-mid:#f0e2c4;
+  --bg:var(--bg-page); --row:var(--bg-row); --hover:var(--bg-hover); --shadow:var(--tbl-shadow);
+}
+body.th-gold .app-titlebar .tb-logo{background:#1c1c1c;color:var(--gold);}
+body.th-gold .app-titlebar .brand-acc{color:var(--gold-d);}
+body.th-gold .rtab.active{color:#1c1c1c;border-bottom-color:var(--gold);}
+body.th-gold .rbtn svg,body.th-gold .rbtn-sm svg,body.th-gold .imp-type-card svg{stroke:var(--gold-d);}
+body.th-gold .rbtn.active{background:#faf3e4;}
+body.th-gold .ribbon-aside .ra-value{color:var(--gold-d);}
+body.th-gold .btn.primary{background:#1c1c1c;border-color:#1c1c1c;color:#fff;}
+body.th-gold .btn.primary:hover{background:var(--gold);border-color:var(--gold);color:#1c1c1c;opacity:1;}
+body.th-gold .tbl th{background:#1c1c1c;}
+body.th-gold .tbl tr.total td{border-top:2px solid var(--gold);}
+body.th-gold .grp-head td{border-top-color:var(--gold);}
+body.th-gold .grp-count{background:var(--gold);color:#1c1c1c;}
+body.th-gold .stat{border-top:3px solid var(--gold);}
+body.th-gold .page-head h1{letter-spacing:-.3px;}
+body.th-gold .toast{background:#1c1c1c;border-left:3px solid var(--gold);}
+body.th-gold .link{color:#1c1c1c;text-decoration-color:var(--gold);}
+body.th-gold #homeFlow .link{color:#1c1c1c;}
+/* Эхлэл: тавтай морил + хялбар эхлэл */
+.welcome{background:#1c1c1c;color:#fafafa;border-radius:14px;padding:26px 28px;margin-bottom:16px;position:relative;overflow:hidden;}
+.welcome:after{content:"";position:absolute;right:-60px;top:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(201,162,77,.35),transparent 70%);}
+.welcome h2{font-size:22px;font-weight:700;letter-spacing:-.4px;margin-bottom:6px;}
+.welcome h2 b{color:#c9a24d;}
+.welcome p{font-size:13px;color:#cfcac0;max-width:640px;margin-bottom:16px;}
+.wl-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;position:relative;z-index:1;}
+.wl-opt{background:#262626;border:1px solid #333;border-radius:12px;padding:14px 16px;cursor:pointer;text-align:left;color:#fafafa;transition:border-color .2s,transform .2s;}
+.wl-opt:hover{border-color:#c9a24d;transform:translateY(-2px);}
+.wl-opt .t{font-size:14px;font-weight:700;margin-bottom:4px;display:flex;gap:8px;align-items:center;}
+.wl-opt .d{font-size:12px;color:#b9b3a7;line-height:1.5;}
+.wl-opt.main{background:#c9a24d;border-color:#c9a24d;color:#1c1c1c;}
+.wl-opt.main .d{color:#3a2f1a;}
+.demo-bar{background:#faf3e4;border:1px solid #f0d4ac;color:#5a4520;border-radius:10px;padding:10px 14px;margin-bottom:14px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:12.5px;}
+.prog{height:6px;background:var(--bg-row);border-radius:3px;overflow:hidden;margin:2px 0 10px;}
+.prog i{display:block;height:100%;background:var(--gold,#217346);border-radius:3px;transition:width .4s;}
+.wz-steps{display:flex;gap:6px;margin-bottom:14px;}
+.wz-steps span{flex:1;height:4px;border-radius:2px;background:var(--bg-row);}
+.wz-steps span.on{background:var(--gold,#217346);}
 </style>
 </head>
-<body>
+<body class="th-gold">
+<script>try{ if(localStorage.getItem('bbi_journal_theme')==='green') document.body.classList.remove('th-gold'); }catch(e){}</script>
 <div class="app">
 <header>
 <div class="app-titlebar">
@@ -354,10 +403,12 @@ tr.set-detail>td{background:var(--bg-row)!important;padding:8px 10px 12px 34px;}
 <!-- ═══════════ НҮҮР ═══════════ -->
 <section class="page" id="page-home">
   <div class="page-head"><h1>Нүүр — системийн шалгалт</h1><p>Бүх тоо ерөнхий журналаас бодит цагт тооцогдоно. Асуудал илэрвэл доорх жагсаалтад улаанаар харагдана.</p></div>
+  <div id="homeWelcome"></div>
   <div class="stat-row" id="homeStats"></div>
   <div class="grid2">
     <div class="card"><h3>Бүрэн байдлын шалгалт</h3><ul class="check-list" id="homeChecks"></ul></div>
-    <div class="card"><h3>Ажлын дараалал</h3>
+    <div class="card"><h3>Ажлын дараалал <span id="homeProgTxt" style="float:right;font-weight:600;color:var(--sub);font-size:12px;"></span></h3>
+      <div class="prog"><i id="homeProg" style="width:0"></i></div>
       <ul class="check-list" id="homeFlow"></ul>
     </div>
   </div>
@@ -367,6 +418,10 @@ tr.set-detail>td{background:var(--bg-row)!important;padding:8px 10px 12px 34px;}
 <section class="page" id="page-settings">
   <div class="page-head"><h1>Тохиргоо</h1><p>Компанийн мэдээлэл, тайлант үе, татварын хувь, хаалтын бичилтэд ашиглах дансны кодууд.</p></div>
   <div class="grid2">
+    <div class="card" style="grid-column:1/-1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><h3 style="margin:0;">Харагдах байдал</h3>
+      <select id="stTheme" onchange="setTheme(this.value)" style="padding:6px 10px;border-radius:6px;border:1px solid var(--bdr-strong);"><option value="gold">Хар + алт (шинэ)</option><option value="green">Excel ногоон (хуучин)</option></select>
+      <button class="btn" onclick="openWizard()">Эхлэлийн тохиргоог дахин хийх</button>
+      <button class="btn" onclick="loadDemoCompany()">Жишээ компани нээх</button></div>
     <div class="card"><h3>Компани, тайлант үе</h3>
       <div class="field"><label>Компанийн регистр <span id="stRegSt" style="margin-left:6px;"></span></label>
         <div style="display:flex;gap:6px;">
@@ -899,6 +954,38 @@ tr.set-detail>td{background:var(--bg-row)!important;padding:8px 10px 12px 34px;}
   <h3>Дүрэм хадгалагдлаа</h3>
   <div id="ruleModalBody"></div>
   <button class="btn" onclick="closeModal('ruleModal')" style="margin-top:10px;">Хаах</button>
+</div></div>
+
+<div class="modal-bg" id="wzModal"><div class="modal" style="max-width:560px;">
+  <div class="wz-steps"><span id="wzS1" class="on"></span><span id="wzS2"></span><span id="wzS3"></span></div>
+  <div id="wzP1">
+    <h3>1. Компани</h3>
+    <div class="field"><label>Регистр / ТТД <span id="wzRegSt"></span></label><input id="wzReg" class="mono" placeholder="6720919" inputmode="numeric"></div>
+    <div class="field"><label>Компанийн нэр</label><input id="wzName" placeholder="Жишээ ХХК"></div>
+    <div class="grid2">
+      <div class="field"><label>Тайлант жил</label><select id="wzYear"></select></div>
+      <div class="field"><label>НӨАТ төлөгч мөн үү?</label><select id="wzVat"><option value="1">Тийм (10%)</option><option value="0">Үгүй</option></select></div>
+    </div>
+  </div>
+  <div id="wzP2" style="display:none;">
+    <h3>2. Татвар, ажилтан</h3>
+    <div class="field"><label>Жилийн борлуулалтын орлого (ойролцоогоор)</label><select id="wzSales" onchange="wzCitHint()">
+      <option value="s50">50 сая хүртэл</option><option value="s1500" selected>50 сая — 1.5 тэрбум</option><option value="big">1.5 тэрбумаас дээш</option></select></div>
+    <div class="field"><label>ААНОАТ-ын горим</label><select id="wzCit"><option value="standard">Нийтлэг: 10% / 25%</option><option value="simple1">10% − 90% хөнгөлөлт ≈ ашгийн 1%</option><option value="turnover1">Борлуулалтын 1%</option></select></div>
+    <div class="note" id="wzCitNote"></div>
+    <div class="field"><label>Ажилтантай юу?</label><select id="wzEmp"><option value="1">Тийм — цалин бодно</option><option value="0">Одоохондоо үгүй</option></select></div>
+  </div>
+  <div id="wzP3" style="display:none;">
+    <h3>3. Эхлэх цэг</h3>
+    <div class="field"><label>Эхний үлдэгдэл</label><select id="wzOb">
+      <option value="new">Шинэ компани — эхний үлдэгдэлгүй</option>
+      <option value="ob">Өмнөх жилийн балансаас эхний үлдэгдэл оруулна</option></select></div>
+    <div class="note">Стандарт дансны төлөвлөгөө автоматаар үүснэ. Дараа нь: банкны хуулга, НӨАТ падаан импортлоход өглөг, авлага, тайлан бүгд автоматаар бүрдэнэ.</div>
+  </div>
+  <div style="display:flex;gap:8px;justify-content:space-between;margin-top:14px;">
+    <button class="btn" id="wzBack" onclick="wzGo(-1)" style="visibility:hidden;">← Буцах</button>
+    <div style="display:flex;gap:8px;"><button class="btn" onclick="closeModal('wzModal')">Болих</button><button class="btn primary" id="wzNext" onclick="wzGo(1)">Үргэлжлүүлэх →</button></div>
+  </div>
 </div></div>
 
 <div class="modal-bg" id="companyModal"><div class="modal" style="max-width:580px;">
@@ -5037,6 +5124,128 @@ function fxUndo(doc){
   save(); renderFx(); toast('Буцаагдлаа');
 }
 
+/* ═══════════════ ДҮР ТӨРХ, ХЯЛБАР ЭХЛЭЛ ═══════════════ */
+function setTheme(v){ document.body.classList.toggle('th-gold', v!=='green'); try{ localStorage.setItem('bbi_journal_theme', v); }catch(e){} }
+function isDemo(){ return !!((CO.list.find(c=>c.id===CO.current)||{}).demo); }
+function renderWelcome(){
+  const el=document.getElementById('homeWelcome'); if(!el) return;
+  const st=document.getElementById('stTheme'); if(st) st.value=document.body.classList.contains('th-gold')?'gold':'green';
+  if(isDemo()){
+    el.innerHTML=`<div class="demo-bar"><span><b>Жишээ компани</b> — бүх тоо зохиомол. Чөлөөтэй туршаарай: тайлан, насжилт, бараа, ханшийн тэгшитгэл бүгд бэлэн.</span><span style="display:flex;gap:8px;"><button class="btn primary sm" onclick="openWizard(true)">Өөрийн компаниа эхлүүлэх →</button></span></div>`;
+    return;
+  }
+  const empty=!DB.accounts.length && !DB.journal.length;
+  el.innerHTML= empty? `<div class="welcome"><h2>Санхүүгээ <b>3 алхмаар</b> эхлүүлье</h2>
+    <p>Ерөнхий журнал хөтлөхөд СТ-1–СТ-4 санхүүгийн тайлан, ТТ-02, НӨАТ, насжилт, бараа материал автоматаар бүрдэнэ. Excel шиг ажиллана — гэхдээ томьёо бичих шаардлагагүй.</p>
+    <div class="wl-opts">
+      <button class="wl-opt main" onclick="openWizard()"><div class="t">① Компаниа эхлүүлэх</div><div class="d">Регистр, тайлант жил, татварын горимоо сонгоход дансны төлөвлөгөө бэлэн болно. 2 минут.</div></button>
+      <button class="wl-opt" onclick="loadDemoCompany()"><div class="t">② Жишээ компаниар турших</div><div class="d">10 сарын бодит мэт гүйлгээтэй жишээ компани — тайлан хэрхэн гарахыг шууд харна.</div></button>
+      <button class="wl-opt" onclick="nav('backup')"><div class="t">③ Нөөц файлаас сэргээх</div><div class="d">Өмнө татсан .json нөөцөө оруулж үргэлжлүүлнэ.</div></button>
+    </div></div>` : '';
+}
+let WZ_STEP=1, WZ_NEWCO=false;
+function openWizard(forceNew){
+  WZ_NEWCO= !!forceNew || isDemo() || DB.journal.length>0;
+  const ys=document.getElementById('wzYear'), y=new Date().getFullYear();
+  ys.innerHTML=[y-1,y,y+1].map(v=>`<option ${v===y?'selected':''}>${v}</option>`).join('');
+  document.getElementById('wzName').value= WZ_NEWCO? '' : (DB.settings.company||'');
+  document.getElementById('wzReg').value= WZ_NEWCO? '' : (DB.settings.reg||'');
+  if(window.BBIEbarimt && !openWizard._att){ openWizard._att=BBIEbarimt.attach(document.getElementById('wzReg'),{name:document.getElementById('wzName'),onResult:r=>{ document.getElementById('wzRegSt').innerHTML=ebStatusHTML(r); openWizard._eb=(r&&r.found)?r:null; if(r&&r.found) document.getElementById('wzVat').value=r.vatPayer?'1':'0'; }}); }
+  WZ_STEP=1; wzShow(); wzCitHint(); openModal('wzModal');
+}
+function wzShow(){
+  [1,2,3].forEach(i=>{ document.getElementById('wzP'+i).style.display=i===WZ_STEP?'':'none'; document.getElementById('wzS'+i).classList.toggle('on', i<=WZ_STEP); });
+  document.getElementById('wzBack').style.visibility=WZ_STEP>1?'visible':'hidden';
+  document.getElementById('wzNext').textContent=WZ_STEP<3?'Үргэлжлүүлэх →':'Эхлүүлэх ✓';
+}
+function wzCitHint(){
+  const v=document.getElementById('wzSales').value, vat=document.getElementById('wzVat').value==='1';
+  const mode= v==='s50'&&!vat? 'turnover1' : v==='big'? 'standard' : 'simple1';
+  document.getElementById('wzCit').value=mode;
+  document.getElementById('wzCitNote').textContent= mode==='turnover1'? 'Борлуулалт 50 сая хүртэл, НӨАТ төлөгч бус бол нийт борлуулалтын орлогын 1%-иар (хуулийн 20.2.7).'
+    : mode==='simple1'? 'Жилийн борлуулалт 1.5 тэрбум хүртэл бол ногдуулсан 10% татварын 90%-ийг хөнгөлнө — бодит дарамт ашгийн ~1% (хуулийн 22.1). Уул уурхай, архи, тамхи зэрэг салбар хамаарахгүй.'
+    : 'Ашгийн 6 тэрбум хүртэлх хэсэгт 10%, давсан хэсэгт 25%.';
+}
+function wzGo(d){
+  if(d>0 && WZ_STEP===1 && !document.getElementById('wzName').value.trim()){ toast('Компанийн нэрээ бичнэ үү', true); return; }
+  if(d>0 && WZ_STEP===3){ wzFinish(); return; }
+  WZ_STEP=Math.min(3,Math.max(1,WZ_STEP+d)); wzShow();
+}
+function wzFinish(){
+  const name=document.getElementById('wzName').value.trim(), reg=document.getElementById('wzReg').value.replace(/\s+/g,'');
+  const y=document.getElementById('wzYear').value, vat=document.getElementById('wzVat').value==='1';
+  if(WZ_NEWCO){
+    const id='c'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+    CO.list.push({id, name, reg}); saveCO(); switchCompany(id);
+  }
+  const s=DB.settings, eb=openWizard._eb;
+  s.company=name; s.reg=reg; if(eb&&eb.tin) s.tin=eb.tin; else if(/^\d{7,}$/.test(reg)&&!s.tin) s.tin=reg;
+  s.from=y+'-01-01'; s.to=y+'-12-31';
+  s.vatPct= vat? BBITax.get('vat.rate',new Date(s.to)) : 0;
+  s.citMode=document.getElementById('wzCit').value;
+  s.onboarded={at:new Date().toISOString(), emp:document.getElementById('wzEmp').value==='1', ob:document.getElementById('wzOb').value};
+  const c=CO.list.find(x=>x.id===CO.current); if(c&&name){ c.name=name; saveCO(); }
+  let added=0; for(const [code,nm,cat] of DEFAULT_ACCOUNTS){ if(!accByCode(code)){ DB.accounts.push({code,name:nm,cat,obDt:0,obKt:0}); added++; } }
+  DB.accounts.sort((a,b)=>a.code.localeCompare(b.code));
+  logEvent('onboard','',name+' · '+y+' · '+s.citMode);
+  save(); closeModal('wzModal'); updateCompanyUI();
+  if(s.onboarded.ob==='ob'){ nav('accounts'); toast('Бэлэн! Одоо дансны эхний үлдэгдлээ («засах») оруулна уу — ДТ/КТ тэнцэх ёстой'); }
+  else { nav('import'); toast('Бэлэн! '+added+' данс үүслээ. Эхлээд банкны хуулгаа импортлоорой'); }
+}
+/* Жишээ компани: 10 сарын гүйлгээ — VAT падаан, банк, цалин, элэгдэл, бараа, USD, ханшийн тэгшитгэл */
+function loadDemoCompany(){
+  if(!CO.list.some(c=>c.id==='demo')){ CO.list.push({id:'demo', name:'Жишээ Трейд ХХК (демо)', demo:true}); saveCO(); }
+  switchCompany('demo');
+  if(DB.journal.length && !confirm('Жишээ компанийн өгөгдлийг шинээр үүсгэх үү?')) return;
+  const now=new Date(); let Y=now.getFullYear(), lastM=Math.min(10, now.getMonth()); if(lastM<3){ Y--; lastM=10; }
+  const yr=String(Y);
+  DB={settings:{...DEFAULT_SETTINGS, company:'Жишээ Трейд ХХК (демо)', reg:'0000000', from:yr+'-01-01', to:yr+'-12-31', citMode:'simple1', director:'Б. Бат', accountant:'Д. Сараа'},
+      accounts:[], partners:[], journal:[], rules:[], payroll:[], assets:[], seq:{doc:100000,batch:1}, employees:{}, events:[], locks:[], bankLayouts:{}, fx:{rates:[]}, inv:{items:[],moves:[]}};
+  for(const [code,name,cat] of DEFAULT_ACCOUNTS) DB.accounts.push({code,name,cat,obDt:0,obKt:0});
+  const OB={'110101':[25000000,0],'100101':[1500000,0],'130101':[6000000,0],'200401':[8000000,0],'201401':[0,2000000],'310101':[0,3500000],'410101':[0,20000000],'440101':[0,15000000]};
+  for(const a of DB.accounts){ const o=OB[a.code]; if(o){ a.obDt=o[0]; a.obKt=o[1]; } }
+  DB.accounts.push({code:'110201',name:'Харилцах данс (USD)',cat:'11',obDt:0,obKt:0,cur:'USD',obFcy:0});
+  DB.accounts.sort((a,b)=>a.code.localeCompare(b.code));
+  const P=['Номин Холдинг','Говь ХК','Мишээл Экспо'], SUP='Тэсо Импекс ХХК';
+  [...P,SUP,'Оффис Тауэр ХХК','Shanghai Trade Co'].forEach((n,i)=>DB.partners.push({id:'p'+i, name:n, tin:String(5100000+i*1371), phone:'', note:''}));
+  const at=new Date().toISOString(), by='демо';
+  const J=(date,desc,partner,dt,kt,amt,source,extra)=>{ DB.journal.push(Object.assign({doc:String(DB.seq.doc), date, desc, partner, dt, kt, amt:r2(amt), source, batch:'B'+DB.seq.batch, posted:true, by, at, docRef:{type: source==='import'?'bank':source.startsWith('vat')?'ebarimt':'calc', no:'ДЕМО'}}, extra||{})); };
+  const doc=()=>{ DB.seq.doc++; DB.seq.batch++; };
+  const md=(m,d)=>yr+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+  DB.inv.items.push({id:'itc', code:'C400', name:'Цемент М400', unit:'шуудай', acc:'130101'},{id:'itp', code:'P12', name:'Хуванцар хоолой Ø12', unit:'м', acc:'130101'});
+  DB.inv.moves.push({id:'ob1', date:md(1,1), item:'itc', type:'in', qty:400, cost:10000, note:'Эхний үлдэгдэл'},{id:'ob2', date:md(1,1), item:'itp', type:'in', qty:1000, cost:2000, note:'Эхний үлдэгдэл'});
+  DB.fx.rates.push({date:md(1,1),cur:'USD',rate:3410},{date:md(4,15),cur:'USD',rate:3422},{date:md(6,30),cur:'USD',rate:3455},{date:md(9,30),cur:'USD',rate:3481});
+  DB.assets.push({id:'ad1', name:'Компьютер, сервер', acc:'200401', deprAcc:'201401', cost:8000000, years:4, start:(Y-1)+'-01-01', accumStart:2000000, note:'демо'});
+  for(let m=1;m<=lastM;m++){
+    const p=P[m%3], net=12000000+m*600000, vat=r2(net*0.1);
+    doc(); J(md(m,8),'Барааны борлуулалт',p,'120100','510101',net,'vatsale'); J(md(m,8),'Барааны борлуулалт — НӨАТ',p,'120100','311002',vat,'vatsale');
+    if(m>1){ const pp=P[(m-1)%3], g=r2((12000000+(m-1)*600000)*1.1*0.9); doc(); J(md(m,3),'Төлбөр орлого — '+pp,pp,'110101','120100',g,'import'); }
+    const cq=300, cc=10000+m*120, pq=500, pc=2000+m*20, bnet=r2(cq*cc+pq*pc);
+    doc(); J(md(m,5),'Бараа худалдан авалт',SUP,'130101','310101',bnet,'vatbuy'); J(md(m,5),'Бараа худалдан авалт — НӨАТ',SUP,'121001','310101',r2(bnet*0.1),'vatbuy');
+    DB.inv.moves.push({id:'mi'+m+'a', date:md(m,5), item:'itc', type:'in', qty:cq, cost:cc, note:'Падаан'},{id:'mi'+m+'b', date:md(m,5), item:'itp', type:'in', qty:pq, cost:pc, note:'Падаан'});
+    DB.inv.moves.push({id:'mo'+m+'a', date:md(m,9), item:'itc', type:'out', qty:310, note:p},{id:'mo'+m+'b', date:md(m,9), item:'itp', type:'out', qty:480, note:p});
+    doc(); J(md(m,20),'Нийлүүлэгчид төлөв',SUP,'310101','110101',r2(bnet*1.1*0.85),'import');
+    doc(); J(md(m,1),'Оффисын түрээс','Оффис Тауэр ХХК','700105','310101',1500000,'vatbuy'); J(md(m,1),'Оффисын түрээс — НӨАТ','Оффис Тауэр ХХК','121001','310101',150000,'vatbuy');
+    doc(); J(md(m,2),'Түрээс төлөв','Оффис Тауэр ХХК','310101','110101',1650000,'import');
+    const me=md(m,28);
+    doc(); J(me,'Цалин бодолт','Ажилчид','700101','313001',6000000,'manual'); J(me,'АО НДШ','Ажилчид','700103','311001',750000,'manual');
+    J(me,'Ажилтны НДШ','Ажилчид','313001','311001',690000,'manual'); J(me,'ХХОАТ','Ажилчид','313001','311004',461000,'manual');
+    doc(); J(md(m,28),'Цалин олгов','Ажилчид','313001','110101',4849000,'import');
+    doc(); J(md(m,28),'НДШ төлөв','','311001','110101',1440000,'import'); J(md(m,28),'ХХОАТ төлөв','','311004','110101',461000,'import');
+    doc(); J(md(m,28),'Банкны шимтгэл','','750101','110101',12000+m*300,'import');
+    DB.journal.push({doc:'ЭЛЭГДЭЛ-'+yr+'-'+String(m).padStart(2,'0'), date:md(m,28), desc:'Сарын элэгдэл — Компьютер, сервер', partner:'', dt:'701014', kt:'201401', amt:166666.67, source:'depr', batch:'B'+DB.seq.batch, ref:'ad1', posted:true, by, at, docRef:{type:'calc', no:'Элэгдлийн тооцоо'}});
+  }
+  if(lastM>=4){ doc(); J(md(4,16),'Экспортын борлуулалт (USD)','Shanghai Trade Co','110201','510101',3000*3422,'manual',{cur:'USD',fcy:3000,rate:3422}); }
+  // Барааны өртөг (жигнэсэн дундаж) → ДТ 61 / КТ 15
+  const S=JC.invState(DB);
+  for(const mv of DB.inv.moves){ if(mv.type!=='out') continue; const c=S.calc[mv.id]; if(!c||!(c.cost>0)) continue; DB.seq.doc++; mv.doc='БАРАА-'+DB.seq.doc;
+    DB.journal.push({doc:mv.doc, date:mv.date, desc:'Борлуулсан барааны өртөг: '+(mv.item==='itc'?'Цемент М400':'Хуванцар хоолой')+' '+mv.qty, partner:'', dt:'610101', kt:'130101', amt:r2(c.cost), source:'inv', batch:'B'+DB.seq.batch, ref:mv.id, posted:true, by, at, docRef:{type:'calc', no:'Барааны зарлага'}}); }
+  for(const d of [md(6,30), md(9,30)]){ if(d>md(lastM,28)) continue; const pl=JC.fxRevalPlan(DB,d); for(const e of pl.entries) DB.journal.push({doc:'ХАНШ-'+d, date:d, desc:e.why, partner:'', dt:e.dt, kt:e.kt, amt:e.amt, source:'fxreval', batch:'B'+DB.seq.batch, posted:true, by, at, docRef:{type:'calc', no:'Ханшийн тэгшитгэл '+d}}); }
+  logEvent('demo','', DB.journal.length+' бичилт');
+  save(); renderAll(); refreshDots(); updateCompanyUI(); nav('home');
+  toast('Жишээ компани бэлэн — '+DB.journal.length+' бичилт. Тайлан, насжилт, бараа, ханш цэсүүдийг үзээрэй');
+}
+
 /* ═══════════════ HOME / CHECKS ═══════════════ */
 function runChecks(){
   const checks=[];
@@ -5093,6 +5302,10 @@ function renderHome(){
     {done:DB.journal.length>0, text:'Баланс, санхүүгийн тайлан шалгах', page:'reports'},
     {done:periodClosed(), text:'Тайлант үе дуусахад хаалтын бичилт хийх', page:'closing'},
   ];
+  const nDone=flow.filter(f=>f.done).length;
+  document.getElementById('homeProg').style.width=Math.round(nDone/flow.length*100)+'%';
+  document.getElementById('homeProgTxt').textContent=nDone+' / '+flow.length;
+  renderWelcome();
   document.getElementById('homeFlow').innerHTML=flow.map(f=>
     `<li style="cursor:pointer;" onclick="nav('${f.page}')"><span class="ck-ico ${f.done?'ok':'warn'}">${f.done?'✓':'·'}</span><span class="${f.done?'':'link'}" style="text-decoration:none;">${f.text}</span></li>`).join('');
 }
@@ -5309,6 +5522,7 @@ const CLOUD={
   },
   async push(){
     if(!this.user||!this.sb) return;
+    if(isDemo()){ this.setSync('ok'); return; }   // жишээ компани cloud-д хадгалагдахгүй
     if(this.sub && !this.subActive()){
       this.setSync('err');
       if(!this._subWarned){
@@ -5369,6 +5583,7 @@ const CLOUD={
   },
   async pull(){
     if(!this.user||!this.sb) return;
+    if(isDemo()) return;
     const uid=this.user.id, cid=CO.current, key=LS_KEY;
     let r=await this.sb.from('companies').select('name,meta,journal_count,updated_at').eq('user_id',uid).eq('id',cid);
     if(r.error) throw r.error;
@@ -5580,8 +5795,8 @@ document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>
 load();
 refreshDots();
 CLOUD.init();
-nav(DB.accounts.length? 'home':'settings');
-if(!DB.accounts.length) toast('Тавтай морил! Эхлээд тохиргоогоо бөглөөд, дансны төлөвлөгөөгөө ачаална уу.');
+nav('home');   // хоосон үед Нүүрний «3 алхмаар эхлүүлье» карт угтана
+/* Хоосон үед Нүүр хуудасны «3 алхмаар эхлүүлье» карт гарна */
 </script>
 </body>
 </html>
