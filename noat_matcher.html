@@ -975,7 +975,9 @@ function journalCompanies(){
   return co.list.map(c=>({id:c.id, name:c.name, key: c.id==='default'?'bbi_gl_v1':'bbi_gl_v1::'+c.id}))
     .filter(c=>{ try{ const d=JSON.parse(localStorage.getItem(c.key)||'null'); return d&&Array.isArray(d.journal)&&d.journal.length; }catch(e){ return false; } });
 }
+function bbiUnlocked(){ try{ for(let i=0;i<sessionStorage.length;i++){ const k=sessionStorage.key(i); if(k&&k.startsWith('bbi_unlock::')&&Date.now()-(+sessionStorage.getItem(k)||0)<15*60*1000) return true; } }catch(e){} return false; }
 function loadFromJournal(kind){
+  if(!bbiUnlocked()){ toast('Санхүүгийн програмд нэвтэрч PIN-ээ оруулсны дараа журналаас ачаална',true); window.open('businessbi_journal.html','_blank'); return; }
   const key=$("#jrnCo").value; let db=null;
   try{ db=JSON.parse(localStorage.getItem(key)||'null'); }catch(e){}
   if(!db||!Array.isArray(db.journal)){ toast("Журнал олдсонгүй",true); return; }

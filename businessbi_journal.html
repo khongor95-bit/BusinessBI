@@ -375,9 +375,38 @@ body.th-gold #homeFlow .link{color:#1c1c1c;}
 .wz-steps{display:flex;gap:6px;margin-bottom:14px;}
 .wz-steps span{flex:1;height:4px;border-radius:2px;background:var(--bg-row);}
 .wz-steps span.on{background:var(--gold,#217346);}
+/* ══ ДАВХАР НЭВТРЭЛТ: нэвтрэх + PIN ══ */
+#lockScreen{position:fixed;inset:0;z-index:1000;background:#141414;display:flex;align-items:center;justify-content:center;padding:16px;font-family:'Segoe UI',system-ui,Arial,sans-serif;}
+#lockScreen.off{display:none;}
+body.locked{overflow:hidden;}
+body.locked .app{filter:blur(6px);pointer-events:none;user-select:none;}
+.lk-card{width:100%;max-width:380px;background:#1e1e1e;border:1px solid #2e2e2e;border-radius:16px;padding:28px 26px;color:#f3f1ec;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+.lk-logo{width:44px;height:44px;border-radius:11px;background:#c9a24d;color:#1c1c1c;font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+.lk-card h2{font-size:19px;font-weight:700;margin-bottom:6px;letter-spacing:-.2px;}
+.lk-card p{font-size:12.5px;color:#b9b3a7;line-height:1.55;margin-bottom:16px;}
+.lk-steps{display:flex;gap:6px;justify-content:center;margin-bottom:16px;font-size:11px;color:#8a857b;}
+.lk-steps b{display:inline-flex;align-items:center;gap:5px;font-weight:600;}
+.lk-steps b i{width:18px;height:18px;border-radius:50%;border:1px solid #555;display:inline-flex;align-items:center;justify-content:center;font-style:normal;font-size:10px;}
+.lk-steps b.on{color:#f0d4ac;} .lk-steps b.on i{background:#c9a24d;border-color:#c9a24d;color:#1c1c1c;}
+.lk-steps b.done i{background:#2f6b45;border-color:#2f6b45;color:#fff;}
+.lk-btn{width:100%;padding:11px 14px;border-radius:10px;border:1px solid #3a3a3a;background:#262626;color:#f3f1ec;font-size:13.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;margin-top:8px;}
+.lk-btn:hover{border-color:#c9a24d;}
+.lk-btn.gold{background:#c9a24d;border-color:#c9a24d;color:#1c1c1c;}
+.lk-btn.gold:hover{background:#d8b465;}
+.lk-btn:disabled{opacity:.5;cursor:default;}
+.lk-in{width:100%;padding:11px 12px;border-radius:10px;border:1px solid #3a3a3a;background:#141414;color:#f3f1ec;font-size:14px;margin-top:8px;}
+.lk-pin{letter-spacing:14px;text-align:center;font-size:24px;font-family:'Courier New',monospace;padding:12px;}
+.lk-in:focus{outline:2px solid #c9a24d;border-color:#c9a24d;}
+.lk-or{font-size:11px;color:#77736b;margin:14px 0 4px;display:flex;align-items:center;gap:8px;}
+.lk-or:before,.lk-or:after{content:"";flex:1;height:1px;background:#333;}
+.lk-msg{font-size:12px;margin-top:10px;min-height:16px;color:#f0d4ac;}
+.lk-msg.err{color:#f87171;}
+.lk-link{background:none;border:0;color:#b9b3a7;font-size:12px;text-decoration:underline;cursor:pointer;margin-top:14px;}
+.lk-user{font-size:12px;color:#d6d0c4;background:#262626;border-radius:8px;padding:6px 10px;display:inline-block;margin-bottom:12px;}
 </style>
 </head>
-<body class="th-gold">
+<body class="th-gold locked">
+<div id="lockScreen"><div class="lk-card" id="lkCard"><div class="lk-logo">B</div><h2>Ачаалж байна…</h2></div></div>
 <script>try{ if(localStorage.getItem('bbi_journal_theme')==='green') document.body.classList.remove('th-gold'); }catch(e){}</script>
 <div class="app">
 <header>
@@ -388,6 +417,7 @@ body.th-gold #homeFlow .link{color:#1c1c1c;}
   <button class="tb-chip sync cloud-ui" style="display:none;" id="qatAuthBtn" onclick="cloudAuthClick()" title="Cloud хадгалалт (Supabase)"><span class="sb-dot" id="syncDot"></span><span id="qatAuthLabel">Локал</span></button>
   <div class="tb-right">
     <button class="tb-ico" title="Нөөц хадгалах (JSON)" onclick="downloadBackup()"><svg viewBox="0 0 16 16"><path d="M2.5 2.5h7.5l3 3v8h-10.5z"/><path d="M5 2.5v3h5v-3"/><rect x="5" y="9" width="6" height="4.5"/></svg></button>
+    <button class="tb-ico" title="Түгжих (PIN-ээр нээнэ)" onclick="LOCK.lockNow()"><svg viewBox="0 0 16 16"><rect x="3" y="7" width="10" height="7" rx="1.2"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg></button>
     <button class="tb-ico" title="Хэвлэх" onclick="window.print()"><svg viewBox="0 0 16 16"><path d="M4.5 5.5V2h7v3.5"/><rect x="2.5" y="5.5" width="11" height="5.5" rx="1"/><path d="M4.5 9.5h7V14h-7z"/></svg></button>
     <span class="tb-sep"></span>
     <a href="dashboard.html" class="tb-link" title="Дашбоард — орлого, зардал, ашиг, авлага-өглөг, тайлангийн хуанли">Дашбоард</a>
@@ -5436,21 +5466,165 @@ function renderAll(){
   if(cur) nav(cur.id.slice(5));   // nav өөрөө зөв renderer-ээ дуудна
   updateCompanyUI();
 }
+
+/* ═══════════════ ДАВХАР НЭВТРЭЛТ: 1) Google / имэйл  2) төхөөрөмжийн 6 оронтой PIN ═══════════════
+   PIN-ийг PBKDF2 (SHA-256, 150 000 давталт, давс) хэшээр зөвхөн энэ төхөөрөмжид хадгална — PIN өөрөө хаана ч хадгалагдахгүй.
+   15 минут идэвхгүй бол дахин PIN асууна. 5 удаа буруу → гаргаж, дахин нэвтрүүлнэ. */
+const LOCK={
+  IDLE_MS:15*60*1000, MAX_TRY:5, user:null, timer:null,
+  pinKey(uid){ return 'bbi_pin::'+uid; },
+  okKey(uid){ return 'bbi_unlock::'+uid; },
+  card(html){ document.getElementById('lkCard').innerHTML='<div class="lk-logo">B</div>'+html; },
+  steps(n){ const st=(i,t)=>`<b class="${i<n?'done':i===n?'on':''}"><i>${i<n?'✓':i}</i>${t}</b>`; return `<div class="lk-steps">${st(1,'Нэвтрэх')}<span>—</span>${st(2,'PIN код')}</div>`; },
+  show(){ document.getElementById('lockScreen').classList.remove('off'); document.body.classList.add('locked'); },
+  hide(){ document.getElementById('lockScreen').classList.add('off'); document.body.classList.remove('locked'); },
+  msg(t,err){ const m=document.getElementById('lkMsg'); if(m){ m.textContent=t||''; m.className='lk-msg'+(err?' err':''); } },
+  unavailable(){
+    this.show();
+    this.card(`<h2>Нэвтрэх үйлчилгээ ачаалагдсангүй</h2><p>Санхүүгийн програм нэвтрэлт шаарддаг. Интернэт холболтоо шалгаад хуудсаа дахин ачаална уу.</p><button class="lk-btn gold" onclick="location.reload()">Дахин ачаалах</button>`);
+  },
+  onSignedOut(){
+    this.user=null; this.show();
+    this.card(`<h2>Санхүүгийн програм</h2><p>Таны санхүүгийн мэдээллийг хамгаалахын тулд нэвтрээд, дараа нь PIN кодоо оруулна.</p>${this.steps(1)}
+      <button class="lk-btn gold" onclick="LOCK.google()"><svg width="16" height="16" viewBox="0 0 48 48"><path fill="#1c1c1c" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/></svg>Google-ээр нэвтрэх</button>
+      <div class="lk-or">эсвэл имэйлээр</div>
+      <input class="lk-in" id="lkEmail" type="email" placeholder="tanii@email.mn" autocomplete="email" onkeydown="if(event.key==='Enter')LOCK.email()">
+      <button class="lk-btn" id="lkEmailBtn" onclick="LOCK.email()">Нэвтрэх холбоос илгээх</button>
+      <div class="lk-msg" id="lkMsg"></div>
+      <a class="lk-link" href="index.html" style="display:inline-block;">← Вэб сайт руу буцах</a>`);
+  },
+  google(){ CLOUD.sb.auth.signInWithOAuth({provider:'google', options:{redirectTo:location.href.split('#')[0]}}); },
+  async email(){
+    const e=(document.getElementById('lkEmail').value||'').trim();
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){ this.msg('Имэйл хаягаа зөв бичнэ үү',true); return; }
+    const b=document.getElementById('lkEmailBtn'); b.disabled=true; this.msg('Илгээж байна…');
+    try{
+      const r=await CLOUD.sb.auth.signInWithOtp({email:e, options:{emailRedirectTo:location.href.split('#')[0]}});
+      if(r.error) throw r.error;
+      this.msg('✓ '+e+' хаяг руу нэвтрэх холбоос илгээлээ. Имэйлээ нээгээд холбоос дээр дарна уу.');
+    }catch(err){ this.msg('Илгээж чадсангүй: '+(err.message||err),true); b.disabled=false; }
+  },
+  /* Энэ төхөөрөмж дээрх локал дата өөр хэрэглэгчийнх эсэх */
+  localKeys(){ const k=[]; for(let i=0;i<localStorage.length;i++){ const x=localStorage.key(i); if(x&&(x.startsWith('bbi_gl_v1')||x==='bbi_companies_v1')) k.push(x); } return k; },
+  onUser(user){
+    this.user=user; const uid=user.id;
+    let owner=''; try{ owner=localStorage.getItem('bbi_gl_owner')||''; }catch(e){}
+    const hasData=this.localKeys().some(k=>!k.endsWith('::dirtyAt')&&k!=='bbi_companies_v1');
+    if(!owner || !hasData){ try{ localStorage.setItem('bbi_gl_owner', uid); }catch(e){} }
+    else if(owner!==uid){ this.foreign(); return false; }
+    this.pinStep();
+    return true;
+  },
+  foreign(){
+    this.show();
+    const dirty=this.localKeys().some(k=>k.endsWith('::dirtyAt'));
+    this.card(`<h2>Өөр хэрэглэгчийн дата байна</h2><div class="lk-user">${esc(this.user.email||'')}</div>
+      <p>Энэ төхөөрөмж дээр өөр хэрэглэгчийн санхүүгийн дата хадгалагдсан байна. Нууцлалын үүднээс та түүнийг харах боломжгүй.${dirty?' Тэр датаны зарим нь cloud-д илгээгдээгүй байна.':''}</p>
+      <button class="lk-btn gold" onclick="LOCK.wipeForeign(${dirty?'true':'false'})">${dirty?'Нөөц файл татаад, төхөөрөмжийг цэвэрлэх':'Төхөөрөмжийг цэвэрлээд үргэлжлэх'}</button>
+      <button class="lk-btn" onclick="CLOUD.sb.auth.signOut()">Гарах</button>
+      <p style="margin-top:12px;font-size:11.5px;">Датаны эзэн нь энэ төхөөрөмж дээр нэвтэрвэл өөрийн датаагаа үргэлжлүүлэн ашиглана.</p>`);
+  },
+  wipeForeign(backup){
+    const keys=this.localKeys();
+    if(backup){
+      const dump={}; keys.forEach(k=>{ try{ dump[k]=JSON.parse(localStorage.getItem(k)); }catch(e){ dump[k]=localStorage.getItem(k); } });
+      const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(dump)],{type:'application/json'}));
+      a.download='businessbi_devicebackup_'+todayISO()+'.json'; document.body.appendChild(a); a.click(); a.remove();
+    }
+    if(!confirm('Энэ төхөөрөмж дээрх өмнөх хэрэглэгчийн санхүүгийн датаг устгах уу?'+(backup?' (нөөц файл татагдсан)':''))) return;
+    keys.forEach(k=>{ try{ localStorage.removeItem(k); }catch(e){} });
+    try{ localStorage.setItem('bbi_gl_owner', this.user.id); }catch(e){}
+    location.reload();
+  },
+  rec(){ try{ return JSON.parse(localStorage.getItem(this.pinKey(this.user.id))||'null'); }catch(e){ return null; } },
+  unlockedFresh(){
+    try{ const t=+sessionStorage.getItem(this.okKey(this.user.id))||0; return t && (Date.now()-t)<this.IDLE_MS; }catch(e){ return false; }
+  },
+  pinStep(){
+    if(this.unlockedFresh()){ this.unlock(); return; }
+    this.show();
+    const r=this.rec();
+    if(!r) this.card(`<h2>PIN код үүсгэх</h2><div class="lk-user">${esc(this.user.email||'')}</div>${this.steps(2)}
+      <p>Энэ төхөөрөмж дээр програм нээх бүрт асуух 6 оронтой PIN кодоо сонгоно уу.</p>
+      <input class="lk-in lk-pin" id="lkPin1" type="password" inputmode="numeric" maxlength="6" placeholder="••••••" autocomplete="new-password" oninput="this.value=this.value.replace(/\\D/g,'');if(this.value.length===6)document.getElementById('lkPin2').focus()">
+      <input class="lk-in lk-pin" id="lkPin2" type="password" inputmode="numeric" maxlength="6" placeholder="давтах" autocomplete="new-password" oninput="this.value=this.value.replace(/\\D/g,'')" onkeydown="if(event.key==='Enter')LOCK.setPin()">
+      <button class="lk-btn gold" onclick="LOCK.setPin()">PIN хадгалах</button><div class="lk-msg" id="lkMsg"></div>
+      <button class="lk-link" onclick="CLOUD.sb.auth.signOut()">Өөр бүртгэлээр нэвтрэх</button>`);
+    else this.card(`<h2>PIN кодоо оруулна уу</h2><div class="lk-user">${esc(this.user.email||'')}</div>${this.steps(2)}
+      <input class="lk-in lk-pin" id="lkPin" type="password" inputmode="numeric" maxlength="6" placeholder="••••••" autocomplete="current-password" oninput="this.value=this.value.replace(/\\D/g,'');if(this.value.length===6)LOCK.checkPin()">
+      <div class="lk-msg" id="lkMsg"></div>
+      <button class="lk-link" onclick="LOCK.forgot()">PIN мартсан?</button> &nbsp; <button class="lk-link" onclick="CLOUD.sb.auth.signOut()">Гарах</button>`);
+    setTimeout(()=>{ const f=document.getElementById('lkPin')||document.getElementById('lkPin1'); if(f) f.focus(); },50);
+  },
+  async hash(pin, salt){
+    const enc=new TextEncoder();
+    const key=await crypto.subtle.importKey('raw', enc.encode(pin), 'PBKDF2', false, ['deriveBits']);
+    const bits=await crypto.subtle.deriveBits({name:'PBKDF2', hash:'SHA-256', salt:enc.encode(salt+'|'+this.user.id), iterations:150000}, key, 256);
+    return Array.from(new Uint8Array(bits)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  },
+  async setPin(){
+    const a=document.getElementById('lkPin1').value, b=document.getElementById('lkPin2').value;
+    if(!/^\d{6}$/.test(a)){ this.msg('PIN яг 6 оронтой тоо байна',true); return; }
+    if(/^(\d)\1{5}$/.test(a)||'0123456789'.includes(a)||'9876543210'.includes(a)){ this.msg('Хэт энгийн PIN (111111, 123456 г.м) — өөрийг сонгоно уу',true); return; }
+    if(a!==b){ this.msg('Хоёр PIN таарахгүй байна',true); return; }
+    const salt=Array.from(crypto.getRandomValues(new Uint8Array(16))).map(x=>x.toString(16).padStart(2,'0')).join('');
+    const h=await this.hash(a,salt);
+    try{ localStorage.setItem(this.pinKey(this.user.id), JSON.stringify({salt, h, at:new Date().toISOString(), fails:0})); }catch(e){}
+    this.unlock(); toast('PIN хадгалагдлаа — дараа нээхэд асууна');
+  },
+  async checkPin(){
+    const el=document.getElementById('lkPin'); const pin=el.value; const r=this.rec(); if(!r) { this.pinStep(); return; }
+    el.disabled=true;
+    const ok=(await this.hash(pin, r.salt))===r.h;
+    if(ok){ r.fails=0; try{ localStorage.setItem(this.pinKey(this.user.id), JSON.stringify(r)); }catch(e){} this.unlock(); return; }
+    r.fails=(r.fails||0)+1; try{ localStorage.setItem(this.pinKey(this.user.id), JSON.stringify(r)); }catch(e){}
+    el.disabled=false; el.value=''; el.focus();
+    if(r.fails>=this.MAX_TRY){ r.fails=0; try{ localStorage.setItem(this.pinKey(this.user.id), JSON.stringify(r)); }catch(e){} toast(this.MAX_TRY+' удаа буруу — аюулгүй байдлын үүднээс дахин нэвтэрнэ үү', true); CLOUD.sb.auth.signOut(); return; }
+    this.msg('PIN буруу байна — '+(this.MAX_TRY-r.fails)+' оролдлого үлдлээ',true);
+  },
+  forgot(){
+    if(!confirm('PIN-ээ шинэчлэхийн тулд гарч, дахин нэвтэрнэ. Нэвтэрсний дараа шинэ PIN үүсгэнэ. Үргэлжлүүлэх үү?')) return;
+    try{ localStorage.removeItem(this.pinKey(this.user.id)); }catch(e){}
+    CLOUD.sb.auth.signOut();
+  },
+  unlock(){
+    try{ sessionStorage.setItem(this.okKey(this.user.id), String(Date.now())); }catch(e){}
+    this.hide(); this.watch();
+  },
+  lockNow(){
+    if(!this.user){ return; }
+    try{ sessionStorage.removeItem(this.okKey(this.user.id)); }catch(e){}
+    document.querySelectorAll('.modal-bg.open').forEach(m=>m.classList.remove('open'));
+    this.pinStep();
+  },
+  watch(){
+    if(this._w) return; this._w=true;
+    const bump=()=>{ if(this.user && !document.body.classList.contains('locked')){ const k=this.okKey(this.user.id); try{ const t=+sessionStorage.getItem(k)||0; if(Date.now()-t>15000) sessionStorage.setItem(k,String(Date.now())); }catch(e){} } };
+    ['mousedown','keydown','touchstart','wheel'].forEach(ev=>document.addEventListener(ev,bump,{passive:true}));
+    const check=()=>{ if(this.user && !document.body.classList.contains('locked') && !this.unlockedFresh()) this.lockNow(); };
+    setInterval(check, 30000);
+    document.addEventListener('visibilitychange',()=>{ if(!document.hidden) check(); });
+  }
+};
 /* ═══════════════ CLOUD (Supabase Postgres) ═══════════════ */
 const CLOUD={
   sb:null, user:null, timer:null, lastPush:{}, cloudJournalCount:null, status:'local',
   enabled(){ const c=window.SUPABASE_CONFIG||{}; return !!(c.url && c.anonKey && window.supabase); },
   init(){
     updateCompanyUI();
-    if(!this.enabled()){ this.setSync('local'); return; }
+    if(!this.enabled()){ this.setSync('local'); LOCK.unavailable(); return; }
     document.querySelectorAll('.cloud-ui').forEach(e=>e.style.display='');
     const c=window.SUPABASE_CONFIG;
     this.sb=window.supabase.createClient(c.url, c.anonKey);
     this.sb.auth.onAuthStateChange((ev, session)=>{
+      const prev=this.user&&this.user.id;
       this.user=session&&session.user? session.user : null;
       this.updateAuthUI();
-      if(this.user) this.onLogin();
-      else this.setSync('local');
+      // Давхар нэвтрэлт: 1) нэвтэрсэн хэрэглэгч энэ төхөөрөмжийн датаны эзэн эсэх 2) PIN
+      if(this.user){
+        if(prev===this.user.id) return;   // токен шинэчлэлт, таб сэргэх — дахин ачаалахгүй
+        if(LOCK.onUser(this.user)) this.onLogin();
+      } else { this.setSync('local'); LOCK.onSignedOut(); }
     });
     this.updateAuthUI();
   },
@@ -5674,7 +5848,7 @@ const CLOUD={
 function cloudAuthClick(){
   if(!CLOUD.enabled()) return;
   if(CLOUD.user){
-    if(confirm((CLOUD.user.email||'')+' — гарах уу? Дата локалдоо хэвээр үлдэнэ.')) CLOUD.sb.auth.signOut();
+    if(confirm((CLOUD.user.email||'')+' — гарах уу? Програм түгжигдэж, дахин нэвтрэх шаардлагатай болно.')) CLOUD.sb.auth.signOut();
   } else {
     CLOUD.sb.auth.signInWithOAuth({provider:'google', options:{redirectTo:location.href.split('#')[0]}});
   }

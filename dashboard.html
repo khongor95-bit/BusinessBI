@@ -299,9 +299,19 @@ try{ const c=JSON.parse(localStorage.getItem(CO_KEY)||'null'); if(c&&Array.isArr
 if(Q.get('company')&&CO.list.some(c=>c.id===Q.get('company'))) CO.current=Q.get('company');
 const lsKey=id=> id==='default'?'bbi_gl_v1':'bbi_gl_v1::'+id;
 const EMPTY=()=>({settings:{from:'2026-01-01',to:'2026-12-31',accReceivable:'120100',accPayable:'310101',accVatIn:'121001',accVatOut:'311002',accTaxPay:'311003'},accounts:[],partners:[],journal:[]});
-let DB=EMPTY(), SRC='local';
+let DB=EMPTY(), SRC='local', LOCKED_NOTE=false;
+function bbiLockedNote(){
+  if(document.getElementById('bbiLockNote')) return;
+  const d=document.createElement('div'); d.id='bbiLockNote';
+  d.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(20,20,20,.92);display:flex;align-items:center;justify-content:center;padding:16px;font-family:system-ui,Arial,sans-serif;';
+  d.innerHTML='<div style="max-width:360px;background:#1e1e1e;border:1px solid #2e2e2e;border-radius:16px;padding:26px;color:#f3f1ec;text-align:center;"><div style="font-size:30px;margin-bottom:8px;">🔒</div><h2 style="font-size:18px;margin:0 0 8px;">Дашбоард түгжигдсэн</h2><p style="font-size:13px;color:#b9b3a7;line-height:1.5;margin:0 0 16px;">Санхүүгийн мэдээллийг харахын тулд санхүүгийн програмд нэвтэрч, PIN кодоо оруулна уу.</p><a href="businessbi_journal.html" style="display:block;padding:11px;border-radius:10px;background:#c9a24d;color:#1c1c1c;font-weight:700;text-decoration:none;">Нэвтрэх →</a><a href="dashboard.html?demo=1" style="display:block;margin-top:10px;color:#b9b3a7;font-size:12px;">Жишээ датагаар үзэх</a></div>';
+  document.body.appendChild(d);
+}
+function bbiUnlocked(){ try{ for(let i=0;i<sessionStorage.length;i++){ const k=sessionStorage.key(i); if(k&&k.startsWith('bbi_unlock::')&&Date.now()-(+sessionStorage.getItem(k)||0)<15*60*1000) return true; } }catch(e){} return false; }
+/* Санхүүгийн програмын давхар нэвтрэлт (нэвтрэх + PIN) хийгдээгүй бол локал санхүүгийн датаг харуулахгүй */
 function loadLocal(id){
   const d=EMPTY();
+  if(!bbiUnlocked()){ try{ if(localStorage.getItem(lsKey(id))) LOCKED_NOTE=true; }catch(e){} return d; }
   try{ const raw=localStorage.getItem(lsKey(id)); if(raw){ const x=JSON.parse(raw); if(x&&typeof x==='object'){ d.settings=Object.assign(d.settings,x.settings||{}); d.accounts=Array.isArray(x.accounts)?x.accounts:[]; d.partners=Array.isArray(x.partners)?x.partners:[]; d.journal=Array.isArray(x.journal)?x.journal:[]; } } }catch(e){}
   return d;
 }
@@ -553,8 +563,9 @@ function setUser(u){
 if(Q.get('demo')){ DB=demoDB(); SRC='demo'; CO={list:[{id:'demo',name:'Жишээ Трейд ХХК'}],current:'demo'}; }
 else DB=loadLocal(CO.current);
 renderCompanies(); render(); setSync(SRC==='demo'?'ok':'off');
+if(LOCKED_NOTE) bbiLockedNote();
 window.addEventListener('DOMContentLoaded',()=>{
-  if(window.BBIMP && SRC!=='demo') BBIMP.onAuth(u=>{ setUser(u); CLOUD.sb=BBIMP.sb; if(u) cloudPull(); else setSync('off'); });
+  if(window.BBIMP && SRC!=='demo') BBIMP.onAuth(u=>{ setUser(u); CLOUD.sb=BBIMP.sb; if(u){ if(bbiUnlocked()) cloudPull(); else bbiLockedNote(); } else setSync('off'); });
 });
 
 /* ─── Excel татах (SheetJS-ийг шаардлагатай үед л ачаална) ─── */
