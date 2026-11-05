@@ -116,7 +116,7 @@ if(!document.getElementById('nlModal') && !B.dataset.noFloat) B.appendChild(frag
       card('ndsh_hhoat_converter.html','tool-ndsh.jpg','НДШ / ХХОАТ хөрвүүлэгч','5,000₮ / тайлан'),
       card('noat_matcher.html','tool-noat.jpg','НӨАТ тулгагч','Үнэгүй'),
       card('invoice_generator.html','tool-invoice.jpg','Нэхэмжлэх үүсгэгч','Үнэгүй'),
-      card('receipt_scan.html','accounting.png','Баримт уншуулагч','5,000₮ / 24 цаг')]},
+      card('receipt_scan.html','tool-receipt.jpg','Баримт уншуулагч','5,000₮ / 24 цаг')]},
     {k:'apps',n:'Програм',all:['pricing.html','Үнэ, багц',''],items:[
       card('businessbi_journal.html','finance.jpg','Санхүүгийн програм','30 хоног үнэгүй · 19,900₮/сараас'),
       card('payroll.html','salary.jpg','Цалин бодогч','Beta · үнэгүй'),
@@ -124,7 +124,7 @@ if(!document.getElementById('nlModal') && !B.dataset.noFloat) B.appendChild(frag
       card('financial_dashboard.html','tool-financial.jpg','Санхүүгийн шинжилгээ','Үнэгүй')]},
     {k:'auto',n:'Excel',all:['templates.html','Бүх Excel загвар',''],items:[
       card('templates.html','tpl/payroll.jpg','Excel загварууд (21)','15,000₮-с'),
-      card('dashboard_maker.html','excel-dashboard.png','Дашбоард үүсгэгч','Үнэгүй харах'),
+      card('dashboard_maker.html','tool-dashmaker.jpg','Дашбоард үүсгэгч','Үнэгүй харах'),
       card('custom_dashboard.html','custom-powerbi.jpg','Захиалгат дашбоард','290,000₮-с'),
       card('templates.html#feasibility','tpl/feasibility.jpg','ТЭЗҮ загвар','49,000₮')]}
   ];
