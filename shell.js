@@ -113,20 +113,20 @@ if(!document.getElementById('nlModal') && !B.dataset.noFloat) B.appendChild(frag
   // Давхардалгүй: карт бүр зөвхөн нэг табд, зураг бүр нэг удаа. «Нягтлан олох» дээд цэсэнд тусдаа байгаа тул энд оруулахгүй.
   const TABS=[
     {k:'tools',n:'Хэрэгсэл',all:['tools.html','Бүх хэрэгсэл',''],items:[
-      card('ndsh_hhoat_converter.html','tool-ndsh.jpg','НДШ / ХХОАТ хөрвүүлэгч','5,000₮ / тайлан'),
-      card('noat_matcher.html','tool-noat.jpg','НӨАТ тулгагч','Үнэгүй'),
-      card('invoice_generator.html','tool-invoice.jpg','Нэхэмжлэх үүсгэгч','Үнэгүй'),
-      card('receipt_scan.html','tool-receipt.jpg','Баримт уншуулагч','5,000₮ / 24 цаг')]},
+      card('ndsh_hhoat_converter.html','cv/ndsh.jpg','НДШ / ХХОАТ хөрвүүлэгч','5,000₮ / тайлан'),
+      card('noat_matcher.html','cv/noat.jpg','НӨАТ тулгагч','Үнэгүй'),
+      card('invoice_generator.html','cv/invoice.jpg','Нэхэмжлэх үүсгэгч','Үнэгүй'),
+      card('receipt_scan.html','cv/receipt.jpg','Баримт уншуулагч','5,000₮ / 24 цаг')]},
     {k:'apps',n:'Програм',all:['pricing.html','Үнэ, багц',''],items:[
-      card('businessbi_journal.html','finance.jpg','Санхүүгийн програм','30 хоног үнэгүй · 19,900₮/сараас'),
-      card('payroll.html','salary.jpg','Цалин бодогч','Beta · үнэгүй'),
-      card('budget.html','budget.jpg','Бизнес төлөвлөлт','Beta · үнэгүй'),
-      card('financial_dashboard.html','tool-financial.jpg','Санхүүгийн шинжилгээ','Үнэгүй')]},
+      card('businessbi_journal.html','cv/finance.jpg','Санхүүгийн програм','30 хоног үнэгүй · 19,900₮/сараас'),
+      card('payroll.html','cv/salary.jpg','Цалин бодогч','Beta · үнэгүй'),
+      card('budget.html','cv/budget.jpg','Бизнес төлөвлөлт','Beta · үнэгүй'),
+      card('financial_dashboard.html','cv/analysis.jpg','Санхүүгийн шинжилгээ','Үнэгүй')]},
     {k:'auto',n:'Excel',all:['templates.html','Бүх Excel загвар',''],items:[
-      card('templates.html','tpl/payroll.jpg','Excel загварууд (21)','15,000₮-с'),
-      card('dashboard_maker.html','tool-dashmaker.jpg','Дашбоард үүсгэгч','Үнэгүй харах'),
+      card('templates.html','cv/tplall.jpg','Excel загварууд (21)','15,000₮-с'),
+      card('dashboard_maker.html','cv/dashmaker.jpg','Дашбоард үүсгэгч','Үнэгүй харах'),
       card('custom_dashboard.html','custom-powerbi.jpg','Захиалгат дашбоард','290,000₮-с'),
-      card('templates.html#feasibility','tpl/feasibility.jpg','ТЭЗҮ загвар','49,000₮')]}
+      card('templates.html#feasibility','cv/tplfeas.jpg','ТЭЗҮ загвар','49,000₮')]}
   ];
   // Урамшууллын код: ?ref=CODE → 60 хоног хадгална (pay.js төлбөрийн цонхонд автоматаар хэрэглэнэ)
   try{ const rf=new URLSearchParams(location.search).get('ref'); if(rf&&/^[A-Za-z0-9]{4,16}$/.test(rf)) localStorage.setItem('bbi_ref',JSON.stringify({code:rf.toUpperCase(),t:Date.now()})); }catch(e){}
