@@ -64,7 +64,7 @@ function fixture() {
   eq(is.finex, 2000, 'санхүүгийн зардал'); eq(is.grossProfit, 1800000, 'нийт ашиг'); eq(is.opProfit, 103000, 'татварын өмнөх ашиг');
   eq(is.cit, 10300, 'ААНОАТ 10% (tax.js)'); eq(is.netProfit, 92700, 'цэвэр ашиг');
   db.settings.citMode = 'simple1'; eq(JC.incomeStatementData(db).cit, 1030, 'ААНОАТ 1% горим');
-  eq(JC.citLabel(db), 'ААНОАТ 1% (хуулийн 20.2.7)', 'горимын нэр');
+  eq(JC.citLabel(db), 'ААНОАТ 10% − 90% хөнгөлөлт ≈ ашгийн 1% (хуулийн 22.1)', 'горимын нэр');
   db.settings.citMode = 'standard'; eq(JC.citTax(db, 7e9), 850000000, '6 тэрбумаас дээш 25%');
 }
 /* ── СТ-1: хөрөнгө = өр төлбөр + эздийн өмч (нээлт, хаалт хоёулаа) ── */
@@ -72,7 +72,7 @@ function fixture() {
   const db = fixture(); const v = JC.st1Data(db);
   eq(v.o['1.3'], v.o['2.4'], 'СТ-1 нээлтийн тэнцэл'); eq(v.c['1.3'], v.c['2.4'], 'СТ-1 хаалтын тэнцэл');
   eq(v.c['1.1.1'], 6063500, 'СТ-1 мөнгө'); eq(v.c['1.2.1'], 4900000, 'СТ-1 үндсэн хөрөнгө (цэвэр)');
-  eq(v.c['2.3.9'], r2(4800000 + 103000), 'хуримтлагдсан ашиг + тайлант үеийн ашиг (хаагдаагүй үед татвар бичигдээгүй тул татварын өмнөх дүнгээр)');
+  eq(v.c['2.3.9'], r2(4800000 + 103000 - 10300), 'хуримтлагдсан ашиг + тайлант үеийн цэвэр ашиг (бичигдээгүй ААНОАТ хасагдана)'); eq(v.c['2.1.1.3'] >= 10300, true, 'бичигдээгүй ААНОАТ өр төлбөрт');
   eq(JC.st1LineOf({ cat: '32', code: '311001' }), '2.1.1.4', 'НДШ-ийн өглөг тусдаа мөр');
   eq(JC.st1LineOf({ cat: '99', code: 'x' }), null, 'хамаарахгүй данс');
 }
@@ -150,5 +150,81 @@ function fixture() {
   eq(JC.accLabel(db, '110101'), '110101 — Харилцах данс', 'accLabel'); eq(JC.accLabel(db, '999'), '999', 'бүртгэлгүй код'); eq(JC.catByCode('51').group, 'income', 'ангилал'); eq(JC.CATS.length, 23, 'ангиллын тоо');
   const b2 = JC.computeBalance({ settings: db.settings, accounts: db.accounts, journal: [{ doc: 'u', date: '2026-02-01', dt: '999999', kt: '110101', amt: 5, source: 'manual' }] });
   eq(b2.unknown[0], '999999', 'бүртгэлгүй данс илэрнэ'); eq(b2.balanced, false, 'тэнцэхгүй');
+}
+/* ── Гадаад валют: ханшийн тэгшитгэл ── */
+{
+  const db = fixture();
+  db.settings.accFxGain = '520201'; db.settings.accFxLoss = '750201';
+  db.accounts.push({ code: '110201', name: 'Харилцах данс USD', cat: '11', obDt: 3400000, obKt: 0, cur: 'USD', obFcy: 1000 });
+  db.accounts.push({ code: '310201', name: 'Гадаад өглөг USD', cat: '31', obDt: 0, obKt: 0, cur: 'USD', obFcy: 0 });
+  db.accounts.push({ code: '410201', name: 'Нэмэлт өмч', cat: '41', obDt: 0, obKt: 3400000 }, { code: '520201', name: 'Ханшийн зөрүүний бодит бус олз', cat: '52' }, { code: '750201', name: 'Ханшийн зөрүүний бодит бус гарз', cat: '75' });
+  db.fx = { rates: [{ date: '2025-12-31', cur: 'USD', rate: 3400 }, { date: '2026-03-01', cur: 'USD', rate: 3450 }, { date: '2026-06-30', cur: 'USD', rate: 3500 }] };
+  eq(JC.fxRateOn(db, 'USD', '2026-05-15'), 3450, 'хамгийн ойрын өмнөх ханш'); eq(JC.fxRateOn(db, 'USD', '2025-01-01'), 0, 'ханш алга'); eq(JC.fxRateOn(db, 'MNT', '2026-01-01'), 1, 'MNT=1');
+  // 500$ бараа зээлээр авав @3450 (MNT данс ← USD өглөг), 200$ орлого @3450
+  db.journal.push({ doc: 'F1', date: '2026-03-05', desc: 'Импорт', dt: '150101', kt: '310201', amt: 1725000, cur: 'USD', fcy: 500, rate: 3450, source: 'manual' });
+  db.journal.push({ doc: 'F2', date: '2026-03-10', desc: 'USD орлого', dt: '110201', kt: '120100', amt: 690000, cur: 'USD', fcy: 200, rate: 3450, source: 'manual' });
+  const fb = JC.fxBalances(db, '2026-06-30');
+  eq(fb['110201'].fcy, 1200, 'USD дансны валютын үлдэгдэл'); eq(fb['110201'].mnt, 4090000, '₮ үлдэгдэл'); eq(fb['310201'].fcy, -500, 'өглөг (КТ) сөрөг');
+  const plan = JC.fxRevalPlan(db, '2026-06-30');
+  const rb = plan.rows.find(r => r.code === '110201'), rp = plan.rows.find(r => r.code === '310201');
+  eq(rb.target, 4200000, 'тэгшитгэсэн дүн 1200×3500'); eq(rb.diff, 110000, 'мөнгөний олз'); eq(rp.diff, -25000, 'өглөгийн гарз (ханш өсөхөд)');
+  eq(plan.gain, 110000, 'нийт олз'); eq(plan.loss, 25000, 'нийт гарз'); eq(plan.entries.length, 2, '2 бичилт');
+  const eG = plan.entries.find(e => e.kt === '520201'), eL = plan.entries.find(e => e.dt === '750201');
+  ok(eG && eG.dt === '110201' && eG.amt === 110000, 'олзын бичилт ДТ мөнгө / КТ олз'); ok(eL && eL.kt === '310201' && eL.amt === 25000, 'гарзын бичилт ДТ гарз / КТ өглөг');
+  const before = JC.incomeStatementData(db).opProfit;
+  for (const e of plan.entries) db.journal.push({ doc: 'FX', date: '2026-06-30', desc: e.why, dt: e.dt, kt: e.kt, amt: e.amt, source: 'fxreval' });
+  const is = JC.incomeStatementData(db);
+  eq(is.fx, 85000, 'СТ-2 ханшийн цэвэр олз'); eq(r2(is.opProfit - before), 85000, 'ашигт нөлөө'); eq(JC.st2Data(db)[13], 85000, 'СТ-2 13-р мөр');
+  eq(is.other, 30000, 'бусад орлогоос FX хасагдсан'); eq(is.finex, 2000, 'санхүүгийн зардлаас FX хасагдсан');
+  const again = JC.fxRevalPlan(db, '2026-06-30'); eq(again.entries.length, 0, 'дахин тэгшитгэхэд зөрүүгүй');
+  ok(JC.computeBalance(db).balanced, 'тэгшитгэлийн дараа баланс тэнцэнэ');
+  const tt = JC.tt02Data(db, '2026-12-31'); eq(tt.L[4], 110000, 'ТТ-02 1.3 бодит бус олз');
+  const db2 = fixture(); db2.accounts.push({ code: '110301', name: 'CNY', cat: '11', obDt: 480000, cur: 'CNY', obFcy: 1000 }); db2.fx = { rates: [] };
+  eq(JC.fxRevalPlan(db2, '2026-06-30').missing[0], 'CNY', 'ханшгүй валют мэдэгдэнэ');
+}
+/* ── Аудитын засварууд ── */
+{
+  // Хаалт тухайн жилийнх: 2026 хаагдсан ч 2027 нээлттэй
+  const db = fixture();
+  const P = JC.closingPlan(db);
+  for (const p of P.plan) db.journal.push({ doc: 'ХААЛТ-2026-12-31', date: '2026-12-31', desc: p.why, dt: p.dt, kt: p.kt, amt: p.amt, source: 'closing' });
+  ok(JC.periodClosed(db), '2026 хаагдсан');
+  const is26 = JC.incomeStatementData(db);
+  eq(is26.netProfit, P.net, 'хаалтын дараа СТ-2 цэвэр ашиг = хаалтын цэвэр ашиг');
+  eq(JC.st3Data(db).retC, JC.st1Data(db).c['2.3.9'], 'СТ-3 хуримтлагдсан ашиг = СТ-1');
+  db.settings.from = '2027-01-01'; db.settings.to = '2027-12-31';
+  ok(!JC.periodClosed(db), '2027 хаалтгүй — нээлттэй');
+  eq(JC.closingPlan(db).plOpening.length, 0, '2026 хаалтын дараа орлого/зардлын эхний үлдэгдэлгүй');
+}
+{
+  // Өмнөх жилийн хаагдаагүй орлого 2026-ын хаалтад орохгүй
+  const db = fixture();
+  db.journal.push({ doc: 'P', date: '2025-06-01', desc: 'Өмнөх жилийн борлуулалт', dt: '110101', kt: '510101', amt: 5000000, source: 'manual' });
+  const P = JC.closingPlan(db), is = JC.incomeStatementData(db);
+  eq(P.profit, is.opProfit, 'хаалтын ашиг = СТ-2 ашиг'); ok(P.plOpening.includes('510101'), 'өмнөх жилийн хаагдаагүй орлогыг анхааруулна');
+}
+{
+  // Жилийн дунд урьдчилж бичсэн ААНОАТ — ногдох татвараас бага бол хуулийн дүнгээр
+  const db = fixture();
+  db.journal.push({ doc: 'T', date: '2026-06-30', desc: 'ААНОАТ урьдчилгаа', dt: '910101', kt: '311003', amt: 3000, source: 'manual' });
+  const is = JC.incomeStatementData(db), P = JC.closingPlan(db);
+  eq(is.cit, P.tax, 'СТ-2 татвар = хаалтын татвар'); eq(is.cit, 10300, 'ногдох татвар');
+  // ТТ-02: 91 зардал хасагдахгүй
+  eq(JC.tt02Data(db, '2026-12-31').L[28], 103000, 'ТТ-02 татвар ногдох орлого ААНОАТ-ын зардлаар буурахгүй');
+  // Ногдол ашиг хаагдсан үед ч СТ-3-д тусна
+  db.journal.push({ doc: 'D', date: '2026-07-01', desc: 'Ногдол ашиг', dt: '440101', kt: '110101', amt: 40000, source: 'manual' });
+  eq(JC.st3Data(db).divid, 40000, 'ногдол ашиг (хаалтаас өмнө)');
+  for (const p of JC.closingPlan(db).plan) db.journal.push({ doc: 'C', date: '2026-12-31', desc: p.why, dt: p.dt, kt: p.kt, amt: p.amt, source: 'closing' });
+  eq(JC.st3Data(db).divid, 40000, 'ногдол ашиг (хаалтын дараа)'); eq(JC.st3Data(db).retC, JC.st1Data(db).c['2.3.9'], 'СТ-3 = СТ-1 (ногдол ашигтай)');
+}
+{
+  // Борлуулалтын 1% горим
+  const db = fixture(); db.settings.citMode = 'turnover1';
+  eq(JC.incomeStatementData(db).cit, 30300, 'борлуулалтын (51+52) 1%');
+  db.settings.citMode = 'simple1'; const tt = JC.tt02Data(db, '2026-12-31');
+  eq(tt.L[29], 10300, 'ТТ-02 ногдуулсан 10%'); eq(tt.L[30], 9270, '90% хөнгөлөлт'); eq(tt.L[31], 1030, 'төлөх 1%');
+  // ХХОАТ сөрөг гарахгүй
+  const e = JC.calcEmp({ type: '01001', gross: 200000, ndshE: 23000, credit: 20000 }, new Date('2026-06-01'));
+  ok(e.hhoat >= 0 && e.usedCredit <= e.raw, 'ХХОАТ сөрөг биш, хөнгөлөлт татвараас хэтрэхгүй');
 }
 console.log('journal_core.test.js: ' + n + ' шалгалт OK');

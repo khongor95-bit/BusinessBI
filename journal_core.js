@@ -54,7 +54,8 @@
   const inPeriod = (db, d) => d >= db.settings.from && d <= db.settings.to;
   const prePeriod = (db, d) => { const f = db.settings.from; return !!(f && validDate(d) && d < f); };
   const postPeriod = (db, d) => { const t = db.settings.to; return !!(t && validDate(d) && d > t); };
-  const periodClosed = db => db.journal.some(j => j.source === 'closing');
+  // Хаалт тухайн тайлант үеийнх эсэхийг огноогоор шалгана (өмнөх жилийн хаалт шинэ жилийг түгжихгүй)
+  const periodClosed = db => db.journal.some(j => j.source === 'closing' && inPeriod(db, j.date));
   function withPeriod(db, from, to, fn) {
     const s = db.settings, of = s.from, ot = s.to;
     s.from = from; s.to = to;
@@ -63,7 +64,22 @@
 
   /* ── ААНОАТ: tax.js-ээс, тайлант үеийн эцсийн огноогоор ── */
   const citTax = (db, base) => BBITax.cit(base, db.settings.to || new Date(), db.settings.citMode);
-  const citLabel = db => db.settings.citMode === 'simple1' ? 'ААНОАТ 1% (хуулийн 20.2.7)' : 'ААНОАТ 10%/25% (хуулийн 20.1)';
+  const citLabel = db => db.settings.citMode === 'turnover1' ? 'ААНОАТ 1% борлуулалтын орлогоос (хуулийн 20.2.7)' : db.settings.citMode === 'simple1' ? 'ААНОАТ 10% − 90% хөнгөлөлт ≈ ашгийн 1% (хуулийн 22.1)' : 'ААНОАТ 10%/25% (хуулийн 20.1)';
+  /* Төлбөл зохих ААНОАТ:
+     standard  — 10% / 25%
+     simple1   — 10%-ийн 90%-ийг хөнгөлнө (жилийн борлуулалт 1.5 тэрбум хүртэл) → татвар ногдох орлогын ~1%
+     turnover1 — НӨАТ төлөгч бус, борлуулалт 50 сая хүртэл: нийт борлуулалтын орлогын 1% */
+  function citDue(db, profit, sales) {
+    const mode = db.settings.citMode, d = db.settings.to || new Date();
+    if (mode === 'turnover1') return sales > 0 ? BBITax.cit(sales, d, 'simple1') : 0;
+    if (!(profit > 0)) return 0;
+    const gross = BBITax.cit(profit, d, 'standard');
+    return mode === 'simple1' ? r2(gross * 0.1) : gross;
+  }
+  function salesIncome(db) {
+    const mv = movementsByCat(db), n = c => { const m = mv[c] || { dt: 0, kt: 0 }; return r2(m.kt - m.dt); };
+    return r2(n('51') + n('52'));
+  }
 
   /* ── Гүйлгээ баланс ── */
   function computeBalance(db) {
@@ -142,12 +158,25 @@
     const net = (cat, creditNature) => { const m = mv[cat] || { dt: 0, kt: 0 }; return creditNature ? r2(m.kt - m.dt) : r2(m.dt - m.kt); };
     const sales = net('51', true), other = net('52', true);
     const cogs = net('61', false), opex = net('70', false), finex = net('75', false);
-    const grossProfit = r2(sales - cogs);
-    const opProfit = r2(grossProfit + other - opex - finex);
+    let B = { '51': sales, '52': other, '61': cogs, '70': opex, '75': finex };
+    // Ханшийн тэгшитгэлийн олз/гарзыг СТ-2-ын 13-р мөрөнд тусад нь гаргана
+    let fx = 0;
+    const st = db.settings || {};
+    const mvA = movementsByAcc(db);
+    for (const code of [...new Set([st.accFxGain, st.accFxLoss].filter(Boolean))]) {
+      const a = accByCode(db, code), m = mvA[code];
+      if (!a || !m || !(a.cat in B)) continue;
+      const netCr = r2(m.kt - m.dt);
+      fx = r2(fx + netCr);
+      B[a.cat] = (a.cat === '51' || a.cat === '52') ? r2(B[a.cat] - netCr) : r2(B[a.cat] + netCr);
+    }
+    const grossProfit = r2(B['51'] - B['61']);
+    const opProfit = r2(grossProfit + B['52'] - B['70'] - B['75'] + fx);
     const taxBooked = net('91', false);
-    const cit = taxBooked > 0 ? taxBooked : citTax(db, opProfit);
+    // Хаалтын тооцоотой ижил: бичигдсэн татвар ба хуулиар ногдох татварын ихийг авна
+    const cit = r2(Math.max(taxBooked, citDue(db, opProfit, r2(sales + other))));
     const netProfit = r2(opProfit - cit);
-    return { sales, other, cogs, opex, finex, grossProfit, opProfit, cit, taxBooked, netProfit };
+    return { sales: B['51'], other: B['52'], cogs: B['61'], opex: B['70'], finex: B['75'], fx, grossProfit, opProfit, cit, taxBooked, netProfit };
   }
 
   /* ── СТ-1 (Сангийн сайдын 2017 оны 361-р тушаалын маягт) ── */
@@ -237,6 +266,10 @@
       if (['61', '70', '75', '91'].includes(r.acc.cat)) plNet = r2(plNet - (r.clDt - r.clKt));
     }
     close['2.3.9'] = r2((close['2.3.9'] || 0) + plNet);
+    if (!periodClosed(db)) { // хараахан бичигдээгүй ААНОАТ-ыг өр төлбөрт тусгана (СТ-2/СТ-3-тай таарах)
+      const is = incomeStatementData(db), extra = r2(is.cit - is.taxBooked);
+      if (extra > 0.004) { close['2.3.9'] = r2(close['2.3.9'] - extra); close['2.1.1.3'] = r2((close['2.1.1.3'] || 0) + extra); }
+    }
     const val = { o: { ...open }, c: { ...close } };
     for (const row of ST1_ROWS) {
       if (row[2] === 'sum') {
@@ -253,7 +286,7 @@
     L[1] = is.sales; L[2] = is.cogs; L[3] = is.grossProfit;
     L[4] = 0; L[5] = 0; L[6] = 0; L[7] = 0; L[8] = is.other;
     L[9] = 0; L[10] = is.opex; L[11] = is.finex; L[12] = 0;
-    L[13] = 0; L[14] = 0; L[15] = 0; L[16] = 0; L[17] = 0;
+    L[13] = is.fx || 0; L[14] = 0; L[15] = 0; L[16] = 0; L[17] = 0;
     L[18] = is.opProfit; L[19] = is.cit; L[20] = r2(is.opProfit - is.cit);
     L[21] = 0; L[22] = L[20]; L[23] = 0; L[24] = L[22]; L[25] = 0;
     return L;
@@ -271,7 +304,9 @@
     // Хаалт хийгдсэн бол 44-ийн mv-д ашиг орсон; тайлант ашгийг тусад нь мөрөөр харуулна
     const closed = periodClosed(db);
     const ownChange = r2(own.mvK - own.mvD);
-    const divid = closed ? 0 : r2(ret.mvD - 0); // хаагдаагүй үед 44-ийн ДТ хөдөлгөөн = ногдол ашиг гэж үзнэ
+    const m44 = movementsByCat(db)['44'] || { dt: 0, kt: 0 };
+    const divid = r2(m44.dt); // хаалтаас бусад 44-ийн ДТ хөдөлгөөн = ногдол ашиг (хаагдсан эсэхээс үл хамаарна)
+    void closed;
     return { ownO: own.o, retO: ret.o, net: is.netProfit, ownChange, divid, ownC: r2(own.o + ownChange), retC: r2(ret.o + is.netProfit - divid) };
   }
   /* ── СТ-4: мөнгөн гүйлгээ, шууд арга ── */
@@ -327,11 +362,13 @@
       const mv = movementsByAcc(db);
       const L = {}; for (let i = 1; i <= 59; i++) L[i] = 0;
       const incRows = [], expRows = { 18: [], 19: [], 20: [] };
+      let fxUnreal = 0;
       for (const a of db.accounts) {
         const m = mv[a.code]; if (!m) continue;
         if (a.cat === '51' || a.cat === '52') {
           const amt = r2(m.kt - m.dt); if (Math.abs(amt) < 0.005) continue;
           let line = 6;
+          if (a.code === (db.settings || {}).accFxGain) { fxUnreal = r2(fxUnreal + amt); incRows.push({ line: 4, name: a.code + ' — ' + a.name, amt }); continue; }
           if (a.cat === '52') {
             const n = a.name.toLowerCase();
             if (n.includes('түрээс')) line = 8;
@@ -342,7 +379,7 @@
           L[line] = r2(L[line] + amt);
           incRows.push({ line, name: a.code + ' — ' + a.name, amt });
         }
-        if (['61', '70', '75', '91'].includes(a.cat)) {
+        if (['61', '70', '75'].includes(a.cat)) { // 91 (ААНОАТ-ын зардал) хасагдах зардал биш
           const amt = r2(m.dt - m.kt); if (Math.abs(amt) < 0.005) continue;
           const bucket = a.cat === '61' ? 18 : a.cat === '70' ? 19 : 20;
           L[bucket] = r2(L[bucket] + amt);
@@ -350,7 +387,7 @@
         }
       }
       const adj = Object.assign({ ...TT02_ADJ_DEF }, db.settings.tt02 || {});
-      L[2] = adj.ex2; L[3] = adj.sp3; L[4] = adj.oth4;
+      L[2] = adj.ex2; L[3] = adj.sp3; L[4] = r2(adj.oth4 + fxUnreal);
       L[5] = r2(L[6] + L[7] + L[8] + L[9] + L[10] + L[11] + L[12] + L[13] + L[14] + L[15] + L[16]);
       L[1] = r2(L[2] + L[3] + L[4] + L[5]);
       L[17] = r2(L[18] + L[19] + L[20]);
@@ -361,8 +398,8 @@
       L[26] = r2(L[24] + L[25]);
       L[27] = adj.loss27;
       L[28] = r2(L[26] - L[27]);
-      L[29] = L[28] > 0 ? citTax(db, L[28]) : 0;
-      L[30] = adj.rel30;
+      L[29] = db.settings.citMode === 'turnover1' ? citDue(db, 0, salesIncome(db)) : (L[28] > 0 ? BBITax.cit(L[28], db.settings.to || new Date(), 'standard') : 0);
+      L[30] = db.settings.citMode === 'simple1' ? r2(Math.max(adj.rel30, L[29] * 0.9)) : adj.rel30;
       L[31] = r2(L[29] - L[30]);
       L[51] = 0; // Тусгай хувь хэмжээ — системд одоогоор 0
       L[52] = adj.wh52; L[53] = adj.fo53;
@@ -371,6 +408,59 @@
       L[59] = r2(L[31] - (L[57] + L[58]) + L[51] - L[52] - L[53]);
       return { L, adj, incRows, expRows, qEnd };
     });
+  }
+
+  /* ── Гадаад валют, ханшийн тэгшитгэл ──
+     Данс: a.cur ('USD'…), a.obFcy (эхний үлдэгдэл валютаар, ДТ +). Журналын мөр: cur, fcy, rate; amt үргэлж ₮.
+     fcy нь тухайн мөрийн cur-тэй ижил валюттай дансанд л нөлөөлнө. */
+  const FX_MONETARY = ['11', '12', '13', '14', '31', '32', '34', '35'];
+  function fxRateOn(db, cur, date) {
+    if (!cur || cur === 'MNT') return 1;
+    let best = null;
+    for (const r of ((db.fx && db.fx.rates) || [])) {
+      if (r.cur !== cur || !(Number(r.rate) > 0)) continue;
+      if (date && r.date > date) continue;
+      if (!best || r.date > best.date) best = r;
+    }
+    return best ? Number(best.rate) : 0;
+  }
+  function fxBalances(db, date) {
+    const out = {};
+    for (const a of db.accounts) if (a.cur && a.cur !== 'MNT') out[a.code] = { acc: a, cur: a.cur, fcy: r2(a.obFcy || 0), mnt: r2((a.obDt || 0) - (a.obKt || 0)) };
+    for (const j of db.journal) {
+      if (j.source === 'closing') continue;
+      if (date && j.date > date) continue;
+      const side = (code, sg) => {
+        const o = out[code]; if (!o) return;
+        o.mnt = r2(o.mnt + sg * (Number(j.amt) || 0));
+        if (j.cur === o.cur && j.fcy) o.fcy = r2(o.fcy + sg * Number(j.fcy));
+      };
+      side(j.dt, 1); side(j.kt, -1);
+    }
+    return out;
+  }
+  function fxRevalPlan(db, date) {
+    const s = db.settings || {};
+    const gainAcc = s.accFxGain || '520201', lossAcc = s.accFxLoss || '750201';
+    const bal = fxBalances(db, date);
+    const rows = [], missing = new Set();
+    for (const code of Object.keys(bal).sort()) {
+      const o = bal[code];
+      if (!FX_MONETARY.includes(o.acc.cat)) continue;
+      const rate = fxRateOn(db, o.cur, date);
+      if (!rate) { if (Math.abs(o.fcy) > 0.004 || Math.abs(o.mnt) > 0.004) missing.add(o.cur); continue; }
+      const target = r2(o.fcy * rate), diff = r2(target - o.mnt);
+      rows.push({ code, name: o.acc.name, cat: o.acc.cat, cur: o.cur, fcy: o.fcy, rate, mnt: o.mnt, target, diff });
+    }
+    const entries = [];
+    let gain = 0, loss = 0;
+    for (const r of rows) {
+      if (Math.abs(r.diff) < 0.01) continue;
+      const why = 'Ханшийн тэгшитгэл ' + r.cur + ' ' + r.rate + ' — ' + r.code;
+      if (r.diff > 0) { entries.push({ dt: r.code, kt: gainAcc, amt: r.diff, why }); gain = r2(gain + r.diff); }
+      else { entries.push({ dt: lossAcc, kt: r.code, amt: r2(-r.diff), why }); loss = r2(loss - r.diff); }
+    }
+    return { rows, entries, missing: [...missing], gain, loss, net: r2(gain - loss), gainAcc, lossAcc };
   }
 
   /* ── Харилцагчийн тооцоо ── */
@@ -418,10 +508,12 @@
 
   /* ── Хаалтын төлөвлөгөө ── */
   function closingPlan(db) {
-    const b = computeBalance(db);
+    // Зөвхөн тайлант үеийн хөдөлгөөнийг хаана (СТ-2-той таарна); орлого/зардлын эхний үлдэгдлийг plOpening-оор анхааруулна
+    const mvA = movementsByAcc(db);
     const s = db.settings;
     const plan = [];
-    for (const r of b.rows) {
+    const rows = db.accounts.slice().sort((a, b) => a.code.localeCompare(b.code)).map(a => { const m = mvA[a.code] || { dt: 0, kt: 0 }; return { acc: a, clDt: m.dt, clKt: m.kt }; });
+    for (const r of rows) {
       const cat = r.acc.cat, g = (catByCode(cat) || {}).group;
       if (g === 'income') {
         const bal = r2(r.clKt - r.clDt);
@@ -437,11 +529,11 @@
     const expense = plan.filter(p => p.dt === s.accSummary).reduce((x, p) => x + p.amt, 0);
     const profit = r2(income - expense);
     // Тайлант үед аль хэдийн бичигдсэн ААНОАТ (91 данс) давхар тооцогдохгүй: зөвхөн ЗӨРҮҮГ нэмнэ
-    const taxAcc = b.rows.find(r => r.acc.code === s.accTaxExp);
+    const taxAcc = rows.find(r => r.acc.code === s.accTaxExp);
     const taxBooked = taxAcc ? r2(taxAcc.clDt - taxAcc.clKt) : 0;
     let tax = 0;
-    if (profit > 0) {
-      const due = citTax(db, profit);
+    const due = citDue(db, profit, salesIncome(db));
+    if (due > 0.004) {
       const extra = r2(due - taxBooked);
       if (extra > 0.004) plan.push({ dt: s.accTaxExp, kt: s.accTaxPay, amt: extra, why: citLabel(db) + ' нэмж тооцох (бичигдсэн ' + fmtZ(taxBooked) + ')' });
       tax = r2(Math.max(due, taxBooked));
@@ -455,7 +547,9 @@
       plan.push({ dt: s.accProfit, kt: s.accSummary, amt: -net, why: 'Алдагдлыг тайлант үеийн данс руу' });
       plan.push({ dt: s.accRetained, kt: s.accProfit, amt: -net, why: 'Алдагдлыг хуримтлагдсан дүнд шилжүүлэх' });
     }
-    return { plan, profit, tax, net };
+    const b = computeBalance(db);
+    const plOpening = b.rows.filter(r => ['income', 'expense', 'tax-expense'].includes((catByCode(r.acc.cat) || {}).group) && Math.abs(r2(r.obDt - r.obKt)) > 0.004).map(r => r.acc.code);
+    return { plan, profit, tax, net, plOpening };
   }
 
   /* ── Үндсэн хөрөнгө: шулуун шугамын элэгдэл ── */
@@ -480,8 +574,8 @@
     const taxable = r2(Math.max(0, gross - ndshE));      // ОЗЦ = цалин − НДШ (бодит шимтгэлээр)
     const raw = exempt ? 0 : r2(BBITax.hhoatMonthly(taxable, date));
     const eff = (exempt || noCredit) ? 0 : credit;
-    const usedCredit = r2(eff);
-    const hhoat = r2(raw - eff);                         // хөнгөлөлтийн дараах татвар (clamp хийхгүй — хөрвүүлэгчтэй ижил)
+    const usedCredit = r2(Math.min(eff, raw));          // хөнгөлөлт ногдуулсан татвараас хэтрэхгүй (ХХОАТ 23.1)
+    const hhoat = r2(Math.max(0, raw - usedCredit));     // сөрөг ХХОАТ (буцаан олголт) үүсэхгүй
     const net = r2(gross - ndshE - hhoat);
     return { taxable, raw, usedCredit, hhoat, net, exempt, noCredit };
   }
@@ -495,6 +589,6 @@
 
   return { r2, fmtZ, CATS, catByCode, accByCode, accLabel, validDate, inPeriod, prePeriod, postPeriod, periodClosed, withPeriod,
     citTax, citLabel, computeBalance, catClosing, catOpening, balanceAsOf, movementsByCat, movementsByAcc, incomeStatementData,
-    st1LineOf, ST1_ROWS, st1Data, st2Data, st3Data, st4Data, TT02_ADJ_DEF, tt02Data, partnerLedger, notesData, closingPlan,
+    citDue, salesIncome, fxRateOn, fxBalances, fxRevalPlan, FX_MONETARY, st1LineOf, ST1_ROWS, st1Data, st2Data, st3Data, st4Data, TT02_ADJ_DEF, tt02Data, partnerLedger, notesData, closingPlan,
     monthlyDepr, postedDepr, assetRemaining, ndshRate, autoCredit, calcEmp, coOf, payrollTotals };
 });
