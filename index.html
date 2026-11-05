@@ -21,9 +21,9 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="description" content="Журналаа бичихэд СТ-1–СТ-4 санхүүгийн тайлан, ТТ-02 татварын тайлан автоматаар гарна. НДШ→ХХОАТ хөрвүүлэгч, НӨАТ тулгагч, нэхэмжлэх үүсгэгч — Монголын нягтлан бодогчдод зориулсан.">
 <link rel="stylesheet" href="site.css">
-<link rel="stylesheet" href="shell.css?v=20261104c">
+<link rel="stylesheet" href="shell.css?v=20261106d">
 <script src="site.js?v=20261105" defer></script>
-<script src="shell.js?v=20261106c" defer></script>
+<script src="shell.js?v=20261106d" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -266,39 +266,74 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
 .hl.in svg path{stroke-dashoffset:0}
 @media (prefers-reduced-motion:reduce){.sw .wi{transform:none;transition:none}.hl svg path{stroke-dashoffset:0}}
 
-/* 4 баганат категори + онцлох бичлэгтэй карт */
+/* ═══ Брэнд токен ═══ */
+:root{--b-pri:#0F5E57;--b-pri-d:#0c4d47;--b-acc:#B79A63;--b-bg:#F6F4EE;--b-line:#E6E1D6;--b-ink:#171717;--b-mute:#5f5a50;--b-r:14px;--b-ease:cubic-bezier(.3,1,.3,1)}
+
+/* ═══ Ангиллын 4 карт — editorial, бодит UI preview ═══ */
+.coll{padding:8px 0 24px}
+.coll-nav{display:none!important}
+.coll-track{display:grid;grid-auto-flow:row;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-columns:auto;overflow:visible;scroll-snap-type:none;gap:20px;padding:0 48px}
+.mcard{background:#fff;border:1px solid var(--b-line);border-radius:var(--b-r);overflow:hidden;transition:border-color .25s,transform .25s var(--b-ease)}
+.mcard .m{aspect-ratio:1400/600;border-radius:0;background:var(--b-bg);border-bottom:1px solid var(--b-line)}
+.mcard .m img{object-fit:cover;object-position:left top}
+.mcard:hover{border-color:#cfc8b8;transform:translateY(-2px)}
+.mcard:hover .m img{transform:none}
+.mcard .c{display:grid;gap:4px;justify-content:start;align-items:start;text-align:left;padding:16px 18px 18px}
+.mcard .c .t{font-size:clamp(17px,.9vw + 8px,22px);font-weight:600;letter-spacing:-.02em;line-height:1.25;background:none;display:flex;align-items:center;gap:6px}
+.mcard .c .t:after{content:"→";font-weight:400;color:var(--b-mute);transition:transform .25s var(--b-ease)}
+.mcard:hover .c .t:after{transform:translateX(3px);color:var(--b-pri)}
+.mcard .c .d{font-size:14px;line-height:1.45;color:var(--b-mute);font-weight:400;letter-spacing:0;background:none}
+.mcard:focus-visible{outline:2px solid var(--b-pri);outline-offset:3px}
+@media(max-width:1000px){.coll-track{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:749px){.coll-track{grid-template-columns:1fr;gap:12px;padding:0 20px}.mcard .c{padding:14px 16px 16px}}
+
+/* 4 баганат бүтээгдэхүүний grid */
 .pgrid.four{grid-template-columns:repeat(4,1fr)}
 @media(min-width:750px) and (max-width:1000px){.pgrid.four{grid-template-columns:1fr 1fr}}
-.feat{padding-top:56px}
+
+/* ═══ Онцлох: Sonnet ═══ */
+.feat{padding:72px 0 40px}
 .feat-grid{display:grid;grid-template-columns:1.14fr .86fr;gap:56px;align-items:center}
-.feat-media{position:relative}
-.feat-vid{display:block;border-radius:20px;overflow:hidden;background:#0f1420;aspect-ratio:16/9;box-shadow:0 30px 60px -30px rgba(15,20,32,.45)}
+.feat-vid{display:block;border-radius:var(--b-r);overflow:hidden;background:var(--b-bg);aspect-ratio:16/9;border:1px solid var(--b-line)}
 .feat-vid video{width:100%;height:100%;object-fit:cover;display:block}
-.feat-badge{position:absolute;top:-34px;right:-34px;width:124px;height:124px;border-radius:50%;background:#171717;color:#fff;display:grid;place-items:center;pointer-events:none}
-.feat-badge svg{position:absolute;inset:0;width:100%;height:100%;animation:fspin 14s linear infinite}
-.feat-badge text{font-size:11.2px;font-weight:700;letter-spacing:2.2px;fill:#e9c46a}
-.feat-badge span{font-size:30px;font-weight:800;line-height:.9;text-align:center}
-.feat-badge small{display:block;font-size:11px;font-weight:600;letter-spacing:1px;margin-top:4px;opacity:.8}
-@keyframes fspin{to{transform:rotate(360deg)}}
-.feat-thumbs{display:flex;gap:12px;margin-top:14px}
-.feat-thumbs button{width:120px;aspect-ratio:16/9;border-radius:10px;overflow:hidden;border:2px solid transparent;padding:0;background:none;cursor:pointer;opacity:.6;transition:opacity .2s,border-color .2s}
-.feat-thumbs button.on,.feat-thumbs button:hover{opacity:1;border-color:#171717}
+.feat-thumbs{display:flex;gap:10px;margin-top:12px}
+.feat-thumbs button{width:112px;aspect-ratio:16/9;border-radius:8px;overflow:hidden;border:1px solid var(--b-line);padding:0;background:var(--b-bg);cursor:pointer;opacity:.55;transition:opacity .2s,border-color .2s}
+.feat-thumbs button.on,.feat-thumbs button:hover{opacity:1;border-color:var(--b-pri)}
+.feat-thumbs button:focus-visible{outline:2px solid var(--b-pri);outline-offset:2px}
 .feat-thumbs img{width:100%;height:100%;object-fit:cover;display:block}
-.feat-info h2{text-align:left;margin:0 0 20px}
-.feat-pr{font-size:30px;font-weight:700;margin:0 0 10px}
-.feat-pr span{font-size:16px;font-weight:500;opacity:.65}
+.feat-tags{display:flex;align-items:center;gap:12px;margin:0 0 18px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:999px;background:#E7F0EE;color:var(--b-pri);font-size:13px;font-weight:600}
+.feat-cat{font-size:13px;color:var(--b-mute);font-weight:500}
+.feat-info h2{text-align:left;margin:0 0 16px;font-size:clamp(28px,1.6vw + 14px,42px);font-weight:600;line-height:1.12;letter-spacing:-.025em}
+.feat-name{color:var(--b-pri)}
+.feat-desc{font-size:17px;line-height:1.55;color:var(--b-mute);margin:0 0 24px;max-width:480px}
+.feat-pr{font-size:26px;font-weight:600;letter-spacing:-.01em;margin:0 0 6px;color:var(--b-ink)}
+.feat-pr span{font-size:15px;font-weight:400;color:var(--b-mute)}
 .feat-promo[hidden]{display:none}
-.feat-promo{display:inline-block;background:#fdf3d6;color:#7a5b10;border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600;margin:0 0 14px}
-.feat-list{list-style:none;padding:0;margin:8px 0 26px;display:grid;gap:10px;font-size:16px;line-height:1.5}
-.feat-list li{padding-left:26px;position:relative}
-.feat-list li:before{content:"";position:absolute;left:0;top:7px;width:14px;height:8px;border-left:2px solid #1baf7a;border-bottom:2px solid #1baf7a;transform:rotate(-45deg)}
-.feat-btns{display:flex;gap:12px;flex-wrap:wrap}
-.btn-dark,.btn-line{display:inline-flex;align-items:center;justify-content:center;height:52px;padding:0 26px;border-radius:999px;font-weight:600;font-size:15.5px;text-decoration:none;transition:transform .15s,background .2s}
-.btn-dark{background:#171717;color:#fff}.btn-dark:hover{transform:translateY(-1px)}
-.btn-line{border:1px solid #171717;color:#171717}.btn-line:hover{background:#171717;color:#fff}
-.feat-more{display:inline-block;margin-top:18px;color:#171717;font-weight:600;font-size:15px;text-decoration:none;border-bottom:1px solid currentColor}
-@media(max-width:900px){.feat-grid{grid-template-columns:1fr;gap:28px}.feat-badge{top:-30px;right:8px;width:84px;height:84px}.feat-badge text{font-size:12px!important}.feat-thumbs button{width:auto;flex:1}.feat-badge span{font-size:20px}.feat-badge small{font-size:9px}}
-@media (prefers-reduced-motion:reduce){.feat-badge svg{animation:none}}
+.feat-promo{font-size:13.5px;color:#7a5f2c;margin:0 0 4px}
+.feat-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.btn-pri,.btn-sec{display:inline-flex;align-items:center;justify-content:center;height:50px;padding:0 24px;border-radius:10px;font-weight:600;font-size:15px;text-decoration:none;transition:background .2s,border-color .2s,color .2s}
+.btn-pri{background:var(--b-pri);color:#fff}.btn-pri:hover{background:var(--b-pri-d)}
+.btn-sec{border:1px solid var(--b-line);background:#fff;color:var(--b-ink)}.btn-sec:hover{border-color:var(--b-pri);color:var(--b-pri)}
+.btn-pri:focus-visible,.btn-sec:focus-visible{outline:2px solid var(--b-acc);outline-offset:3px}
+.feat-more{display:inline-block;margin-top:16px;color:var(--b-mute);font-size:14px;text-decoration:underline;text-underline-offset:3px}
+.feat-more:hover{color:var(--b-pri)}
+@media(max-width:900px){.feat{padding:48px 0 24px}.feat-grid{grid-template-columns:1fr;gap:28px}}
+@media(max-width:749px){.feat-vid{aspect-ratio:4/3}.feat-thumbs{display:none}.feat-btns a{flex:1 1 100%}.feat-desc{font-size:16px}}
+
+/* ═══ Нэгдсэн typography, spacing, бүтээгдэхүүний карт ═══ */
+.sec{padding:64px 0 8px}
+.sec h2,.intro h2,.last h2{font-weight:600;letter-spacing:-.025em}
+.net-box h2{font-weight:600}
+.sec-top{margin-bottom:28px}
+.sec-top .sub{margin-top:12px;color:var(--b-mute);font-size:15.5px}
+.pc .m{border-radius:var(--b-r);border:1px solid var(--b-line);background:var(--b-bg);transition:border-color .25s}
+.pc:hover .m{border-color:#cfc8b8}
+.pc:hover .m img{transform:scale(1.015)}
+.pc .qa span{background:var(--b-pri);height:36px;font-size:14px;border-radius:8px}
+.pc .t{font-weight:500}
+.pc .pr{color:var(--b-mute);font-size:14.5px}
+@media(max-width:749px){.sec{padding:44px 0 4px}}
 </style>
 </head>
 <body class="home ol">
@@ -371,10 +406,10 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
 <!-- ═══════════ АНГИЛАЛ (slider) ═══════════ -->
 <section class="coll" aria-label="Ангилал">
   <div class="coll-track" id="collTrack">
-    <a class="mcard rv" href="#apps"><div class="m"><img src="img/cv/catApps.jpg" alt="" loading="lazy"></div><div class="c"><span>Програм</span></div></a>
-    <a class="mcard rv" href="#tool-list"><div class="m"><img src="img/cv/catTools.jpg" alt="" loading="lazy"></div><div class="c"><span>Хэрэгслүүд</span></div></a>
-    <a class="mcard rv" href="#templates"><div class="m"><img src="img/cv/catExcel.jpg" alt="" loading="lazy"></div><div class="c"><span>Excel загвар</span></div></a>
-    <a class="mcard rv" href="#custom"><div class="m"><img src="img/cv/catCustom.jpg" alt="" loading="lazy"></div><div class="c"><span>Захиалгат дашбоард</span></div></a>
+    <a class="mcard rv" href="#apps"><div class="m"><img src="img/cv/prev-app.jpg" alt="Програм — интерфейсийн жишээ" loading="lazy" width="1400" height="600"></div><div class="c"><span class="t">Програм</span><span class="d">Журнал, санхүүгийн тайлан, цалин</span></div></a>
+    <a class="mcard rv" href="#tool-list"><div class="m"><img src="img/cv/prev-tools.jpg" alt="Хэрэгслүүд — интерфейсийн жишээ" loading="lazy" width="1400" height="600"></div><div class="c"><span class="t">Хэрэгслүүд</span><span class="d">НДШ, НӨАТ, нэхэмжлэх, баримт</span></div></a>
+    <a class="mcard rv" href="#templates"><div class="m"><img src="img/cv/prev-excel.jpg" alt="Excel загвар — интерфейсийн жишээ" loading="lazy" width="1400" height="600"></div><div class="c"><span class="t">Excel загвар</span><span class="d">Цалин, тайлан, ТЭЗҮ зэрэг 21 загвар</span></div></a>
+    <a class="mcard rv" href="#custom"><div class="m"><img src="img/cv/prev-custom.jpg" alt="Захиалгат дашбоард — интерфейсийн жишээ" loading="lazy" width="1400" height="600"></div><div class="c"><span class="t">Захиалгат дашбоард</span><span class="d">Excel, Power BI, HTML дээр хийж өгнө</span></div></a>
   </div>
   <div class="coll-nav" id="collNav">
     <button class="coll-btn prev" id="collPrev" aria-label="Өмнөх" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -382,39 +417,31 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
   </div>
 </section>
 
-<!-- ═══════════ ОНЦЛОХ: САНХҮҮГИЙН ПРОГРАМ (бичлэгтэй карт) ═══════════ -->
+<!-- ═══════════ ОНЦЛОХ: САНХҮҮГИЙН ПРОГРАМ (Sonnet) ═══════════ -->
 <section class="sec feat" id="featured">
   <div class="container">
     <div class="feat-grid">
       <div class="feat-media rv">
-        <a class="feat-vid" href="businessbi_journal.html" aria-label="Санхүүгийн програм нээх">
-          <video id="featVid" src="img/cv/journal.mp4" poster="img/cv/journal-poster.jpg" autoplay muted loop playsinline preload="metadata"></video>
+        <a class="feat-vid" href="businessbi_journal.html" aria-label="Sonnet санхүүгийн програм нээх">
+          <video id="featVid" src="img/cv/journal.mp4" poster="img/cv/journal-poster.jpg" autoplay muted loop playsinline preload="metadata" width="1600" height="900"></video>
         </a>
-        <div class="feat-badge" aria-hidden="true">
-          <svg viewBox="0 0 120 120"><defs><path id="fbc" d="M60,60 m-46,0 a46,46 0 1,1 92,0 a46,46 0 1,1 -92,0"/></defs><text><textPath href="#fbc">• 30 ХОНОГ ҮНЭГҮЙ • САНХҮҮГИЙН ПРОГРАМ </textPath></text></svg>
-          <span>30<small>хоног</small></span>
-        </div>
-        <div class="feat-thumbs">
-          <button type="button" data-t="0" class="on"><img src="img/cv/jt0.jpg" alt="Журнал" loading="lazy"></button>
-          <button type="button" data-t="7"><img src="img/cv/jt7.jpg" alt="Тайлан" loading="lazy"></button>
-          <button type="button" data-t="14"><img src="img/cv/jt14.jpg" alt="График" loading="lazy"></button>
+        <div class="feat-thumbs" aria-label="Бичлэгийн хэсгүүд">
+          <button type="button" data-t="0" class="on" aria-label="Нүүр самбар"><img src="img/cv/jt0.jpg" alt="" loading="lazy"></button>
+          <button type="button" data-t="7" aria-label="Ерөнхий журнал"><img src="img/cv/jt7.jpg" alt="" loading="lazy"></button>
+          <button type="button" data-t="14" aria-label="Тайлан, насжилт"><img src="img/cv/jt14.jpg" alt="" loading="lazy"></button>
         </div>
       </div>
       <div class="feat-info rv">
-        <p class="kicker">Онцлох</p>
-        <h2>Санхүүгийн програм</h2>
+        <div class="feat-tags"><span class="pill">30 хоног үнэгүй</span><span class="feat-cat">Санхүүгийн програм</span></div>
+        <h2><span class="feat-name">Sonnet</span> — Санхүүгээ удирдах илүү хялбар арга.</h2>
+        <p class="feat-desc">Журнал, банкны хуулга, бараа материал, татвар, санхүүгийн тайлангаа нэг системд удирд.</p>
         <p class="feat-pr">19,900₮ <span>/ сараас</span></p>
         <p class="feat-promo" id="featPromo" hidden></p>
-        <ul class="feat-list">
-          <li>Журнал, харилцагч, бараа, үндсэн хөрөнгө, цалин</li>
-          <li>СТ-1–СТ-4, ТТ-02 тайлан</li>
-          <li>Модулиудаа өөрөө сонгоно</li>
-        </ul>
         <div class="feat-btns">
-          <a class="btn-dark" href="businessbi_journal.html">30 хоног үнэгүй турших</a>
-          <a class="btn-line" href="pricing.html#plans">Багц сонгох</a>
+          <a class="btn-pri" href="businessbi_journal.html">30 хоног үнэгүй турших</a>
+          <a class="btn-sec" href="dashboard.html?demo=1">Demo үзэх</a>
         </div>
-        <a class="feat-more" href="pricing.html">Дэлгэрэнгүй →</a>
+        <a class="feat-more" href="pricing.html#plans">Багц, үнийн дэлгэрэнгүй</a>
       </div>
     </div>
   </div>
@@ -623,6 +650,7 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
 <script>
 (function(){
   var v=document.getElementById('featVid'); if(!v) return;
+  if(window.matchMedia&&matchMedia('(max-width:749px)').matches){ v.poster='img/cv/journal-poster-m.jpg'; v.src='img/cv/journal-m.mp4'; }
   var bs=[].slice.call(document.querySelectorAll('.feat-thumbs button'));
   bs.forEach(function(b){ b.onclick=function(){ try{ v.currentTime=+b.dataset.t; v.play(); }catch(e){} }; });
   v.addEventListener('timeupdate',function(){ var t=v.currentTime,k=0; bs.forEach(function(b,i){ if(t>=+b.dataset.t) k=i; }); bs.forEach(function(b,i){ b.classList.toggle('on',i===k); }); });
