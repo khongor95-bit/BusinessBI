@@ -121,7 +121,7 @@ async function runExtract(){
   }catch(e){ console.error(e); $('res').innerHTML='<div class="err"><b>Уншиж чадсангүй.</b> '+esc(e.message||e)+'<br>Зураг тод, бүтэн (дээд, доод хэсэг нь орсон) байх ёстой. Дахин оролдоно уу.</div>'; }
   btn.disabled=false; btn.textContent='Уншуулах';
 }
-$('runBtn').onclick=BBIGate.protect(BBIPay.require({tool:'receipt', meta:()=>({file:FILE&&FILE.name})}, runExtract), {tool:'Баримтын зураг → бичилт', action:'extract'});
+$('runBtn').onclick=BBIGate.protect(BBIPay.require({tool:'receipt', title:'Баримт уншуулах', meta:()=>({file:FILE&&FILE.name}), bullets:['Баримтын зургаас борлуулагч, ТТД, огноо, дүн, НӨАТ-ыг автоматаар уншина','Журналын бичилтийн санал гаргаж, Sonet-д илгээнэ','Төлснөөс хойш 24 цагийн турш хязгааргүй уншуулна'], desc:'' }, runExtract), {tool:'Баримтын зураг → бичилт', action:'extract'});
 function refreshTicket(){ try{ const t=BBIPay.ticketInfo('receipt'); $('ticket').textContent=t?('Эрх хүчинтэй: '+t.leftText):'Эрх авна (5,000₮ / 24 цаг)'; }catch(e){} }
 refreshTicket(); setInterval(refreshTicket,30000);
 
