@@ -335,17 +335,6 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
 .pc .pr{color:var(--b-mute);font-size:14.5px}
 @media(max-width:749px){.sec{padding:44px 0 4px}}
 
-/* Эргэдэг бичиг — other-levels маяг: дэвсгэргүй, том үсэг тойрогт, голд icon; бичлэгийн баруун дээд буланд наасан stamp шиг */
-.feat-media{position:relative}
-.feat-spin{position:absolute;width:148px;height:148px;top:-82px;right:-6px;z-index:3;pointer-events:none;color:#171717}
-.feat-spin:before{content:"";position:absolute;inset:6%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.92) 0 58%,rgba(255,255,255,.55) 70%,rgba(255,255,255,0) 78%)}
-.feat-spin .fs-ring{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.feat-spin .fs-ring text{font:500 17px/1 var(--bbi-font,Inter,sans-serif);letter-spacing:.02em;fill:#171717;text-transform:uppercase}
-.feat-spin .fs-ic{position:absolute;left:50%;top:50%;width:30px;height:30px;transform:translate(-50%,-50%)}
-@media(prefers-reduced-motion:no-preference){.feat-spin .fs-ring{animation:fsSpin 14s linear infinite}}
-@keyframes fsSpin{to{rotate:-360deg}}
-@media(max-width:1100px){.feat-spin{width:124px;height:124px;top:-66px}.feat-spin .fs-ic{width:26px;height:26px}}
-@media(max-width:749px){.feat-spin{width:104px;height:104px;top:-50px;right:4px}.feat-spin .fs-ic{width:22px;height:22px}}
 
 
 /* ═══ Ангиллын 4 карт — зураг дээр, icon хавтан, гарчиг, тайлбар, алтан холбоос (other-levels маяг) ═══ */
@@ -486,10 +475,6 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
         <a class="feat-vid" href="businessbi_journal.html" aria-label="Sonet ERP нээх">
           <video id="featVid" src="img/cv/journal.mp4" poster="img/cv/journal-poster.jpg" autoplay muted loop playsinline preload="metadata" width="1600" height="900"></video>
         </a>
-        <div class="feat-spin" aria-hidden="true">
-          <svg class="fs-ring" viewBox="0 0 160 160"><defs><path id="fsP" d="M80,80 m-60,0 a60,60 0 1,1 120,0 a60,60 0 1,1 -120,0"/></defs><text><textPath href="#fsP" textLength="377" lengthAdjust="spacing">•SONET ERP•30 ХОНОГ ҮНЭГҮЙ </textPath></text></svg>
-          <svg class="fs-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16"/><path d="m7 15 4-4 3 3 5-6"/></svg>
-        </div>
         <div class="feat-thumbs" aria-label="Бичлэгийн хэсгүүд">
           <button type="button" data-t="0" class="on" aria-label="Нүүр самбар"><img src="img/cv/jt0.jpg" alt="" loading="lazy"></button>
           <button type="button" data-t="7" aria-label="Ерөнхий журнал"><img src="img/cv/jt7.jpg" alt="" loading="lazy"></button>
