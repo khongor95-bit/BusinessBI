@@ -334,6 +334,17 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
 .pc .t{font-weight:500}
 .pc .pr{color:var(--b-mute);font-size:14.5px}
 @media(max-width:749px){.sec{padding:44px 0 4px}}
+
+/* Эргэдэг дугуй бичиг (other levels маягийн) */
+.feat-media{position:relative}
+.feat-badge{position:absolute;top:-46px;right:-46px;width:148px;height:148px;border-radius:50%;background:#F6F4EE;border:1px solid var(--b-line);display:grid;place-items:center;pointer-events:none;z-index:2}
+.feat-badge .fb-ring{position:absolute;inset:0;width:100%;height:100%;animation:fbSpin 22s linear infinite}
+.feat-badge text{font:600 10.5px/1 var(--bbi-font,Inter,sans-serif);letter-spacing:.14em;fill:#171717;text-transform:uppercase}
+.feat-badge .fb-core{width:58px;height:58px;border-radius:50%;background:var(--b-pri);color:#fff;display:grid;place-items:center;font-size:28px;font-weight:600;letter-spacing:-.02em;font-family:Georgia,"Times New Roman",serif;font-style:italic}
+@keyframes fbSpin{to{transform:rotate(360deg)}}
+@media(max-width:1100px){.feat-badge{top:-36px;right:-16px;width:124px;height:124px}.feat-badge text{font-size:10.5px}.feat-badge .fb-core{width:48px;height:48px;font-size:23px}}
+@media(max-width:749px){.feat-badge{top:-34px;right:6px;width:112px;height:112px}.feat-badge .fb-core{width:38px;height:38px;font-size:19px}}
+@media(prefers-reduced-motion:reduce){.feat-badge .fb-ring{animation:none}}
 </style>
 </head>
 <body class="home ol">
@@ -425,6 +436,10 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
         <a class="feat-vid" href="businessbi_journal.html" aria-label="Sonnet санхүүгийн програм нээх">
           <video id="featVid" src="img/cv/journal.mp4" poster="img/cv/journal-poster.jpg" autoplay muted loop playsinline preload="metadata" width="1600" height="900"></video>
         </a>
+        <div class="feat-badge" aria-hidden="true">
+          <svg class="fb-ring" viewBox="0 0 160 160"><defs><path id="fbPath" d="M80,80 m-62,0 a62,62 0 1,1 124,0 a62,62 0 1,1 -124,0"/></defs><text><textPath href="#fbPath" textLength="388" lengthAdjust="spacing">SONNET • САНХҮҮГИЙН ПРОГРАМ • 30 ХОНОГ ҮНЭГҮЙ •</textPath></text></svg>
+          <span class="fb-core">S</span>
+        </div>
         <div class="feat-thumbs" aria-label="Бичлэгийн хэсгүүд">
           <button type="button" data-t="0" class="on" aria-label="Нүүр самбар"><img src="img/cv/jt0.jpg" alt="" loading="lazy"></button>
           <button type="button" data-t="7" aria-label="Ерөнхий журнал"><img src="img/cv/jt7.jpg" alt="" loading="lazy"></button>
