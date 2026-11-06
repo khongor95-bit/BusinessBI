@@ -124,7 +124,7 @@ if(!document.getElementById('nlModal') && !B.dataset.noFloat) B.appendChild(frag
       card('invoice_generator.html','cv/invoice.jpg','Нэхэмжлэх үүсгэгч','Үнэгүй'),
       card('receipt_scan.html','cv/receipt.jpg','Баримт уншуулагч','5,000₮ / 24 цаг')]},
     {k:'apps',n:'Програм',all:['pricing.html','Үнэ, багц',''],items:[
-      card('businessbi_journal.html','cv/finance.jpg','Sonnet — санхүүгийн програм','30 хоног үнэгүй · 19,900₮/сараас'),
+      card('businessbi_journal.html','cv/finance.jpg','Sonet — санхүүгийн програм','30 хоног үнэгүй · 19,900₮/сараас'),
       card('payroll.html','cv/salary.jpg','Цалин бодогч','Beta · үнэгүй'),
       card('budget.html','cv/budget.jpg','Бизнес төлөвлөлт','Beta · үнэгүй'),
       card('financial_dashboard.html','cv/analysis.jpg','Санхүүгийн шинжилгээ','Үнэгүй')]},
