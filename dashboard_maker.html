@@ -6,7 +6,7 @@
 <script src="pay.js?v=20261104e"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="site.css">
-<link rel="stylesheet" href="shell.css?v=20261106c3">
+<link rel="stylesheet" href="shell.css?v=20261106ol">
 <script src="site.js?v=20261106t" defer></script>
 <script src="shell.js?v=20261106t" defer></script>
 <title>Дашбоард үүсгэгч — Excel, CSV-г график болгох · BusinessBI</title>
@@ -32,7 +32,7 @@
 <style>
 html,body{margin:0;padding:0}
 body{background:#fff;font-family:var(--bbi-font);color:#111827;-webkit-font-smoothing:antialiased;line-height:1.6}
-.oldt{--g:#B79A63;--navy:#0b0d1c;font-family:inherit;color:#111827}
+.oldt{--g:#c9a470;--navy:#0b0d1c;font-family:inherit;color:#111827}
 .oldt *{box-sizing:border-box}
 .oldt-hero{isolation:isolate;background:var(--navy);color:#fff;text-align:center;padding:96px 20px 150px;position:relative;overflow:hidden}
 .oldt-wall{position:absolute;inset:-18% -20%;display:flex;flex-direction:column;justify-content:center;gap:22px;transform:rotate(-8deg);z-index:-2}
@@ -62,8 +62,8 @@ body{background:#fff;font-family:var(--bbi-font);color:#111827;-webkit-font-smoo
 .oldt-btn{appearance:none;border:0;cursor:pointer;font:inherit;font-weight:700;font-size:15px;padding:13px 22px;border-radius:999px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:transform .15s,background .15s;line-height:1.4}
 .oldt-btn:hover{transform:translateY(-1px)}
 .oldt-btn--gold{background:var(--g);color:#171717}
-.oldt-btn--gold:hover{background:#0c4d47}
-.oldt-btn--dark{background:#0F5E57;color:#fff}
+.oldt-btn--gold:hover{background:#d4b27f}
+.oldt-btn--dark{background:#111827;color:#fff}
 .oldt-btn--ghost{background:#fff;color:#111827;border:1px solid #d1d5db}
 .oldt-btn[disabled]{opacity:.6;cursor:wait}
 .oldt-status{min-height:22px;margin:12px 0 0;text-align:center;font-size:14px;color:#6b7280}
@@ -94,7 +94,7 @@ body{background:#fff;font-family:var(--bbi-font);color:#111827;-webkit-font-smoo
 .oldt-insights{margin:0;padding:4px 6px 10px 22px;display:grid;gap:8px;font-size:14px;line-height:1.5;color:#4b5563}
 .oldt-insights b{color:#111827}
 .oldt-hidden{display:none!important}
-.oldt-cta{margin:40px 0;border-radius:22px;background:linear-gradient(135deg,#f1f6f5,#f6efdd);border:1px solid #ecdcb2;padding:clamp(24px,4vw,44px);display:grid;grid-template-columns:1.4fr 1fr;gap:24px;align-items:center}
+.oldt-cta{margin:40px 0;border-radius:22px;background:linear-gradient(135deg,#fdf8ec,#f6efdd);border:1px solid #ecdcb2;padding:clamp(24px,4vw,44px);display:grid;grid-template-columns:1.4fr 1fr;gap:24px;align-items:center}
 .oldt-cta h2{margin:0 0 10px;font-size:clamp(22px,2.6vw,32px);letter-spacing:-.02em;color:#111827}
 .oldt-cta p{margin:0;color:#4b5563;line-height:1.6}
 .oldt-cta .oldt-row{justify-content:flex-end;margin:0}
@@ -114,9 +114,9 @@ body{background:#fff;font-family:var(--bbi-font);color:#111827;-webkit-font-smoo
 .oldt-next__sub{margin:0 0 24px;color:#6b7280}
 .oldt-next__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;text-align:left;align-items:stretch}
 .oldt-opt{position:relative;display:flex;flex-direction:column;border:1px solid #e5e7eb;border-radius:20px;padding:26px 24px 22px;background:#fff}
-.oldt-opt--main{border:2px solid #0F5E57;background:#f1f6f5;box-shadow:rgba(15,94,87,.7) 0 20px 50px -24px}
+.oldt-opt--main{border:2px solid #c9a470;background:#fdf8ec;box-shadow:rgba(201,164,112,.7) 0 20px 50px -24px}
 .oldt-opt__tag{align-self:flex-start;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#6b7280;background:#f3f4f6;padding:5px 10px;border-radius:999px;margin-bottom:14px}
-.oldt-opt--main .oldt-opt__tag{background:#0F5E57;color:#fff}
+.oldt-opt--main .oldt-opt__tag{background:#c9a470;color:#171717}
 .oldt-opt h3{margin:0 0 8px;font-size:19px;color:#111827}
 .oldt-opt p{margin:0 0 20px;color:#4b5563;font-size:14px;line-height:1.55;flex:1 1 0%}
 .oldt-opt .oldt-btn{width:100%;justify-content:center}
@@ -126,7 +126,7 @@ body{background:#fff;font-family:var(--bbi-font);color:#111827;-webkit-font-smoo
 .oldt-uses__lead{text-align:center;color:#6b7280;margin:0 auto 22px;max-width:640px;line-height:1.55}
 .oldt-uses__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 .oldt-uses__grid a{display:block;border:1px solid #e5e7eb;border-radius:16px;padding:18px 20px;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s}
-.oldt-uses__grid a:hover{border-color:#0F5E57;transform:translateY(-2px)}
+.oldt-uses__grid a:hover{border-color:#c9a470;transform:translateY(-2px)}
 .oldt-uses__grid h3{margin:0 0 6px;font-size:17px;color:#111827}
 .oldt-uses__grid p{margin:0;color:#6b7280;font-size:14px;line-height:1.55}
 .oldt-uses__more{text-align:center;margin:22px 0 0;color:#4b5563}

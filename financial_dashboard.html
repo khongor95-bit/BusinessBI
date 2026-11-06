@@ -5,7 +5,7 @@
 <script src="gate.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="site.css">
-<link rel="stylesheet" href="shell.css?v=20261106c3">
+<link rel="stylesheet" href="shell.css?v=20261106ol">
 <script src="site.js?v=20261106t" defer></script>
 <script src="shell.js?v=20261106t" defer></script>
 
@@ -51,7 +51,7 @@ body{background:var(--bg);color:var(--ink)}
 .s-links{display:flex;gap:38px;align-items:center}
 .s-links a{text-decoration:none;color:#111;font-weight:500;font-size:15px;transition:color .2s}
 .s-links a:hover,.s-links a.active{color:var(--accent)}
-.s-cta{background:#0F5E57;color:#fff!important;padding:11px 22px;border-radius:50px;font-size:14px;font-weight:500}
+.s-cta{background:#111;color:#fff!important;padding:11px 22px;border-radius:50px;font-size:14px;font-weight:500}
 .s-cta:hover{color:#fff;background:#333}
 
 /* MAIN */
@@ -465,7 +465,7 @@ function parseAndRender(text){
   // ── Орлого/зардал бар чарт ──
   const ic=document.getElementById('incomeChart');
   const bars=[
-    {label:'Борлуулалт',prev:prevRev,cur:rev,color:'#0f5e57'},
+    {label:'Борлуулалт',prev:prevRev,cur:rev,color:'#171717'},
     {label:'Өртөг',prev:prevCogs,cur:cogs,color:'#b79a63'},
     {label:'Нийт ашиг',prev:prevGross,cur:gross,color:'#4e9af1'},
     {label:'Цэвэр ашиг',prev:prevProfit,cur:profit,color:profit<0?'#dc2626':'#16a34a'},
@@ -487,7 +487,7 @@ function parseAndRender(text){
 
   // ── Donut чарт ──
   const donutData=[
-    {label:'Мөнгө',val:cash||0,color:'#0f5e57'},
+    {label:'Мөнгө',val:cash||0,color:'#171717'},
     {label:'Авлага',val:(recv||0)+(taxRecv||0)+(otherRecv||0),color:'#b79a63'},
     {label:'Бараа материал',val:invent||0,color:'#4e9af1'},
     {label:'Урьдчилгаа',val:prepaid||0,color:'#f59e0b'},
