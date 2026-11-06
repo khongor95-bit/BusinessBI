@@ -32,11 +32,11 @@
         <a href="index.html" class="bbi-logo"><span>Business<b>BI</b></span>${sub}</a>
         <div class="bbi-menu" id="bbiMenu">
           ${MENU.map(([h, t]) => `<a href="${h}"${isActive(h) ? ' class="active"' : ""}>${t}</a>`).join("")}
-          <a href="businessbi_journal.html" class="bbi-cta">Программ турших</a>
+          <a href="pricing.html#plans" class="bbi-cta">Sonet ERP</a>
         </div>
         <div class="bbi-nav-right">
           <a href="auth.html" class="bbi-login" id="bbiLogin">${USER_ICON}<span>Нэвтрэх</span></a>
-          <a href="businessbi_journal.html" class="bbi-cta">Программ турших</a>
+          <a href="pricing.html#plans" class="bbi-cta">Sonet ERP</a>
           <button class="bbi-burger" id="bbiBurger" aria-label="Цэс"><span></span><span></span><span></span></button>
         </div>
       </div>

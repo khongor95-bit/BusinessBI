@@ -5355,7 +5355,7 @@ function renderWelcome(){
     <p>Ерөнхий журнал хөтлөхөд СТ-1–СТ-4 санхүүгийн тайлан, ТТ-02, НӨАТ, насжилт, бараа материал автоматаар бүрдэнэ. Excel шиг ажиллана — гэхдээ томьёо бичих шаардлагагүй.</p>
     <div class="wl-opts">
       <button class="wl-opt main" onclick="openWizard()"><div class="t">① Компаниа эхлүүлэх</div><div class="d">Регистр, тайлант жил, татвар, хэрэгтэй модулиа сонгоход дансны төлөвлөгөө бэлэн болно. 2 минут.</div></button>
-      <button class="wl-opt" onclick="loadDemoCompany()"><div class="t">② Жишээ компаниар турших</div><div class="d">10 сарын бодит мэт гүйлгээтэй жишээ компани — тайлан хэрхэн гарахыг шууд харна.</div></button>
+      <button class="wl-opt" onclick="loadDemoCompany()"><div class="t">② Жишээ компани үзэх</div><div class="d">10 сарын бодит мэт гүйлгээтэй жишээ компани — тайлан хэрхэн гарахыг шууд харна.</div></button>
       <button class="wl-opt" onclick="nav('backup')"><div class="t">③ Нөөц файлаас сэргээх</div><div class="d">Өмнө татсан .json нөөцөө оруулж үргэлжлүүлнэ.</div></button>
     </div></div>` : '';
 }
@@ -5477,7 +5477,7 @@ function runChecks(){
   }catch(e){}
   { const nd=new Set(DB.journal.filter(j=>!isPosted(j)).map(j=>j.doc)).size; if(nd) checks.push({state:'warn', text:nd+' ноорог баримт батлагдаагүй — журналаас «батлах» (хаалт, түгжээний өмнө заавал)'}); }
   if(lockedThrough()) checks.push({state:'ok', text:'Үе түгжигдсэн: '+lockedThrough()+' хүртэл'});
-  if(CLOUD.user&&CLOUD.sub){ const d=CLOUD.subDays(); if(!CLOUD.subActive()) checks.push({state:'err', text:'Эрх дууссан ('+CLOUD.sub.paid_until+') — өөрчлөлт cloud-д хадгалагдахгүй. <span class="link" onclick="openPlanModal()">Багц сонгох</span>'}); else if(d<=5) checks.push({state:'warn', text:(CLOUD.sub.plan==='trial'?'Туршилтын':PLAN_DEF[curPlan()].name)+' эрх '+d+' хоногийн дараа дуусна — <span class="link" onclick="openPlanModal()">багц сонгож сунгах</span>'}); }
+  if(CLOUD.user&&CLOUD.sub){ const d=CLOUD.subDays(); if(!CLOUD.subActive()) checks.push({state:'err', text:'Эрх дууссан ('+CLOUD.sub.paid_until+') — өөрчлөлт cloud-д хадгалагдахгүй. <span class="link" onclick="openPlanModal()">Багц сонгох</span>'}); else if(d<=5) checks.push({state:'warn', text:(CLOUD.sub.plan==='trial'?'Багц сонгоогүй — эрх':PLAN_DEF[curPlan()].name+' эрх')+' '+d+' хоногийн дараа дуусна — <span class="link" onclick="openPlanModal()">багц сонгож сунгах</span>'}); }
   if(DB.journal.length && !(CLOUD.user&&CLOUD.enabled())) checks.push({state:'warn', text:'Дата зөвхөн энэ хөтөчид (localStorage) — 10 жил хадгалах шаардлага (НББ-ийн хууль 11.1) хангагдахгүй. Cloud-д нэвтэрч хадгалуулна уу (дээд мөрний «Нэвтрэх»).'});
   else if(CLOUD.user && CLOUD.status==='err') checks.push({state:'err', text:'Cloud sync алдаатай — өөрчлөлт cloud-д очихгүй байна (эрх дууссан эсвэл сүлжээ)'});
   if(!DB.accounts.length){ checks.push({state:'err', text:'Дансны төлөвлөгөө хоосон — стандарт төлөвлөгөө ачаална уу'}); return checks; }
@@ -5989,7 +5989,7 @@ const CLOUD={
       let msg='Cloud холбогдлоо — '+(this.user.email||'');
       if(this.sub){
         if(!this.subActive()) msg='Cloud эрх дууссан — уншилт нээлттэй, шинэ өөрчлөлт локалдоо л хадгалагдана';
-        else if(this.sub.plan==='trial') msg+=' · Туршилтын эрх '+this.subDays()+' хоног';
+        else if(this.sub.plan==='trial') msg+=' · Багц сонгоогүй — '+this.subDays()+' хоногийн дотор сонгоно уу';
       }
       toast(msg, this.sub && !this.subActive());
     }catch(e){ console.error(e); this.setSync('err'); toast('Cloud холболтод алдаа: '+e.message, true); }
@@ -6196,7 +6196,7 @@ const PLANS=[
   {id:'business',   name:'Бизнес',  tool:{m:'sub_biz_m',y:'sub_biz_y'},     price:{m:39900,y:399000},  companies:3,  allMods:true,  feats:['3 компани','Бүх модуль: цалин, хөрөнгө, бараа, валют','Насжилт, самбар, тодруулга','Cloud нөөц, сэргээх цэгүүд','Эхлэл багцын бүх боломж'], hi:true},
   {id:'accountant', name:'Нягтлан', tool:{m:'sub_acc_m',y:'sub_acc_y'},     price:{m:79900,y:799000},  companies:15, allMods:true,  feats:['15 компани хүртэл','Бүх модуль','Урамшууллын код — 20% шимтгэл','Нягтлангийн самбар, гэрээ','Бизнес багцын бүх боломж']},
 ];
-const PLAN_DEF={trial:{name:'Туршилт',companies:3,allMods:true}, starter:{name:'Эхлэл',companies:1,allMods:false}, business:{name:'Бизнес',companies:3,allMods:true}, accountant:{name:'Нягтлан',companies:15,allMods:true}};
+const PLAN_DEF={trial:{name:'Багц сонгоогүй',companies:3,allMods:true}, starter:{name:'Эхлэл',companies:1,allMods:false}, business:{name:'Бизнес',companies:3,allMods:true}, accountant:{name:'Нягтлан',companies:15,allMods:true}};
 const PREMIUM_MODS=['salary','assets','inventory','fx','receipt'];
 function curPlan(){ const p=CLOUD.sub&&CLOUD.sub.plan; return PLAN_DEF[p]? p : 'trial'; }
 function planAllowsMod(id){ if(!PREMIUM_MODS.includes(id)) return true; if(!CLOUD.user||!CLOUD.sub) return true; return !!PLAN_DEF[curPlan()].allMods; }
