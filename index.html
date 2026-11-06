@@ -22,8 +22,8 @@
 <meta name="description" content="Журналаа бичихэд СТ-1–СТ-4 санхүүгийн тайлан, ТТ-02 татварын тайлан автоматаар гарна. НДШ→ХХОАТ хөрвүүлэгч, НӨАТ тулгагч, нэхэмжлэх үүсгэгч — Монголын нягтлан бодогчдод зориулсан.">
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="shell.css?v=20261106e">
-<script src="site.js?v=20261105" defer></script>
-<script src="shell.js?v=20261106e" defer></script>
+<script src="site.js?v=20261106s" defer></script>
+<script src="shell.js?v=20261106s" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -335,16 +335,17 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
 .pc .pr{color:var(--b-mute);font-size:14.5px}
 @media(max-width:749px){.sec{padding:44px 0 4px}}
 
-/* Эргэдэг дугуй бичиг (other levels маягийн) */
+/* Эргэдэг бичиг — other-levels.com spinning-text-тэй ижил зарчим: дэвсгэргүй, үсэг бүр тойрог дээр, голд нь outline icon, баруун дээд буланд */
 .feat-media{position:relative}
-.feat-badge{position:absolute;top:-46px;right:-46px;width:148px;height:148px;border-radius:50%;background:#F6F4EE;border:1px solid var(--b-line);display:grid;place-items:center;pointer-events:none;z-index:2}
-.feat-badge .fb-ring{position:absolute;inset:0;width:100%;height:100%;animation:fbSpin 22s linear infinite}
-.feat-badge text{font:600 10.5px/1 var(--bbi-font,Inter,sans-serif);letter-spacing:.14em;fill:#171717;text-transform:uppercase}
-.feat-badge .fb-core{width:58px;height:58px;border-radius:50%;background:var(--b-pri);color:#fff;display:grid;place-items:center;font-size:28px;font-weight:600;letter-spacing:-.02em;font-family:Georgia,"Times New Roman",serif;font-style:italic}
-@keyframes fbSpin{to{transform:rotate(360deg)}}
-@media(max-width:1100px){.feat-badge{top:-36px;right:-16px;width:124px;height:124px}.feat-badge text{font-size:10.5px}.feat-badge .fb-core{width:48px;height:48px;font-size:23px}}
-@media(max-width:749px){.feat-badge{top:-34px;right:6px;width:112px;height:112px}.feat-badge .fb-core{width:38px;height:38px;font-size:19px}}
-@media(prefers-reduced-motion:reduce){.feat-badge .fb-ring{animation:none}}
+.feat-spin{--a:calc(360deg / var(--n));--r:calc(-1 * 1.05ch / sin(var(--a)));position:absolute;top:0;right:0;margin-right:calc(var(--r) * -1.25);z-index:3;width:0;height:0;display:flex;align-items:center;justify-content:center;pointer-events:none;color:#171717;font:400 18px/1 var(--bbi-font,Inter,sans-serif);text-transform:uppercase}
+.feat-spin .fs-ic{position:absolute;left:0;top:0;width:34px;height:34px;transform:translate(-50%,-50%)}
+.feat-spin .fs-chars{position:absolute;left:0;top:0;width:0;height:0}
+.feat-spin .sc{position:absolute;top:0;left:0;display:inline-block;transform:translate(-50%,-50%) rotate(calc(var(--a) * var(--i))) translateY(var(--r))}
+@media(prefers-reduced-motion:no-preference){.feat-spin .fs-chars{animation:fsSpin 12s linear infinite}}
+@keyframes fsSpin{to{rotate:-360deg}}
+@media(max-width:1100px){.feat-spin{font-size:15px}.feat-spin .fs-ic{width:28px;height:28px}}
+@media(max-width:900px){.feat-spin{top:2px}}
+@media(max-width:749px){.feat-spin{font-size:12px}.feat-spin .fs-ic{width:22px;height:22px}}
 </style>
 </head>
 <body class="home ol">
@@ -396,7 +397,7 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
     </nav>
 
     <div class="cta-row">
-      <a href="businessbi_journal.html" class="btn white">Санхүүгийн програм турших</a>
+      <a href="businessbi_journal.html" class="btn white">Sonnet-ийг үнэгүй турших</a>
       <a href="pricing.html" class="btn outline">Бүх эрх авах</a>
     </div>
     <a href="dashboard.html?demo=1" class="new"><i>ШИНЭ</i>Дашбоардын жишээ →</a>
@@ -436,9 +437,9 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
         <a class="feat-vid" href="businessbi_journal.html" aria-label="Sonnet санхүүгийн програм нээх">
           <video id="featVid" src="img/cv/journal.mp4" poster="img/cv/journal-poster.jpg" autoplay muted loop playsinline preload="metadata" width="1600" height="900"></video>
         </a>
-        <div class="feat-badge" aria-hidden="true">
-          <svg class="fb-ring" viewBox="0 0 160 160"><defs><path id="fbPath" d="M80,80 m-62,0 a62,62 0 1,1 124,0 a62,62 0 1,1 -124,0"/></defs><text><textPath href="#fbPath" textLength="388" lengthAdjust="spacing">SONNET • САНХҮҮГИЙН ПРОГРАМ • 30 ХОНОГ ҮНЭГҮЙ •</textPath></text></svg>
-          <span class="fb-core">S</span>
+        <div class="feat-spin" aria-hidden="true" style="--n:23">
+          <svg class="fs-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16"/><path d="m7 15 4-4 3 3 5-6"/></svg>
+          <div class="fs-chars"><span class="sc" style="--i:0">•</span><span class="sc" style="--i:1">S</span><span class="sc" style="--i:2">O</span><span class="sc" style="--i:3">N</span><span class="sc" style="--i:4">N</span><span class="sc" style="--i:5">E</span><span class="sc" style="--i:6">T</span><span class="sc" style="--i:7">•</span><span class="sc" style="--i:8">3</span><span class="sc" style="--i:9">0</span><span class="sc" style="--i:10"> </span><span class="sc" style="--i:11">Х</span><span class="sc" style="--i:12">О</span><span class="sc" style="--i:13">Н</span><span class="sc" style="--i:14">О</span><span class="sc" style="--i:15">Г</span><span class="sc" style="--i:16"> </span><span class="sc" style="--i:17">Ү</span><span class="sc" style="--i:18">Н</span><span class="sc" style="--i:19">Э</span><span class="sc" style="--i:20">Г</span><span class="sc" style="--i:21">Ү</span><span class="sc" style="--i:22">Й</span></div>
         </div>
         <div class="feat-thumbs" aria-label="Бичлэгийн хэсгүүд">
           <button type="button" data-t="0" class="on" aria-label="Нүүр самбар"><img src="img/cv/jt0.jpg" alt="" loading="lazy"></button>
@@ -447,7 +448,7 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
         </div>
       </div>
       <div class="feat-info rv">
-        <div class="feat-tags"><span class="pill">30 хоног үнэгүй</span><span class="feat-cat">Санхүүгийн програм</span></div>
+        <div class="feat-tags"><span class="pill">30 хоног үнэгүй</span><span class="feat-cat">BusinessBI-ийн санхүүгийн програм</span></div>
         <h2><span class="feat-name">Sonnet</span> — Санхүүгээ удирдах илүү хялбар арга.</h2>
         <p class="feat-desc">Журнал, банкны хуулга, бараа материал, татвар, санхүүгийн тайлангаа нэг системд удирд.</p>
         <p class="feat-pr">19,900₮ <span>/ сараас</span></p>
@@ -467,7 +468,7 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
   <div class="container">
     <div class="sec-top"><div><h2>Програм</h2></div><a class="more" href="pricing.html">Үнэ харах →</a></div>
     <div class="pgrid four">
-      <a class="pc rv" href="businessbi_journal.html"><div class="m"><img src="img/cv/finance.jpg" alt="Санхүүгийн програм" loading="lazy"><div class="qa"><span>Нээх</span></div></div><div class="ct"><span class="t">Санхүүгийн програм</span><span class="pr">19,900₮/сараас · 30 хоног үнэгүй</span></div></a>
+      <a class="pc rv" href="businessbi_journal.html"><div class="m"><img src="img/cv/finance.jpg" alt="Sonnet санхүүгийн програм" loading="lazy"><div class="qa"><span>Нээх</span></div></div><div class="ct"><span class="t">Sonnet — санхүүгийн програм</span><span class="pr">19,900₮/сараас · 30 хоног үнэгүй</span></div></a>
       <a class="pc rv" href="payroll.html"><div class="m"><img src="img/cv/salary.jpg" alt="Цалин бодогч" loading="lazy"><div class="qa"><span>Нээх</span></div></div><div class="ct"><span class="t">Цалин бодогч</span><span class="pr">Beta · Үнэгүй</span></div></a>
       <a class="pc rv" href="budget.html"><div class="m"><img src="img/cv/budget.jpg" alt="Бизнес төлөвлөлт" loading="lazy"><div class="qa"><span>Нээх</span></div></div><div class="ct"><span class="t">Бизнес төлөвлөлт</span><span class="pr">Beta · Үнэгүй</span></div></a>
       <a class="pc rv" href="financial_dashboard.html"><div class="m"><img src="img/cv/analysis.jpg" alt="Санхүүгийн шинжилгээ" loading="lazy"><div class="qa"><span>Нээх</span></div></div><div class="ct"><span class="t">Санхүүгийн шинжилгээ</span><span class="pr">Үнэгүй</span></div></a>
@@ -557,7 +558,7 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
 <section class="last">
   <div class="container">
     <h2>Үнэгүй турших</h2>
-    <p>Санхүүгийн програм 30 хоног үнэгүй, дараа нь сард 19,900₮-с. Асуулт байвал нэг ажлын өдөрт хариулна.</p>
+    <p>Sonnet санхүүгийн програм 30 хоног үнэгүй, дараа нь сард 19,900₮-с. Асуулт байвал нэг ажлын өдөрт хариулна.</p>
     <div class="cta-row">
       <a href="businessbi_journal.html" class="btn green">Програм турших</a>
       <a href="contact.html" class="btn ghost">Холбоо барих</a>
@@ -576,7 +577,7 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
     {t:'Нэхэмжлэх үүсгэгч', s:'НӨАТ-тэй нэхэмжлэх → PDF', h:'invoice_generator.html', tag:'Үнэгүй', k:'нэхэмжлэх нэхэмжлэл invoice pdf падаан үүсгэх'},
     {t:'Бизнес төлөвлөлт', s:'Төсөв, хугарлын цэг, мөнгөн урсгал', h:'budget.html', tag:'Beta', k:'төсөв төлөвлөгөө бизнес төлөвлөлт хугарлын цэг мөнгөн урсгал прогноз budget'},
     {t:'Санхүүгийн шинжилгээ', s:'E-balance тайлангаас харьцаа, хандлага', h:'financial_dashboard.html', tag:'Үнэгүй', k:'шинжилгээ харьцаа e-balance ebalance хандлага санхүүгийн шинжилгээ ratio'},
-    {t:'Санхүүгийн програм', s:'Ерөнхий журнал → СТ-1–4, ТТ-02', h:'businessbi_journal.html', tag:'30 хоног', k:'журнал ерөнхий журнал ст-1 ст-2 ст-3 ст-4 st-1 st-2 st-3 st-4 санхүүгийн тайлан тт-02 tt-02 tt02 ааноат aanoat баланс гүйлгээ баланс тодруулга хаалт програм программ бүртгэл нягтлан бодох journal'},
+    {t:'Sonnet — санхүүгийн програм', s:'Ерөнхий журнал → СТ-1–4, ТТ-02', h:'businessbi_journal.html', tag:'30 хоног', k:'журнал ерөнхий журнал ст-1 ст-2 ст-3 ст-4 st-1 st-2 st-3 st-4 санхүүгийн тайлан тт-02 tt-02 tt02 ааноат aanoat баланс гүйлгээ баланс тодруулга хаалт програм программ бүртгэл нягтлан бодох journal'},
     {t:'Дашбоард', s:'Орлого, зардал, ашиг, авлага-өглөг', h:'dashboard.html?demo=1', tag:'Шинэ', k:'дашбоард самбар орлого зардал ашиг авлага өглөг график kpi dashboard'},
     {t:'Баримт уншуулагч', s:'Баримтын зураг → журналын бичилт', h:'receipt_scan.html', tag:'5,000₮', k:'баримт зураг уншуулах скан чек receipt ocr'},
     {t:'Нягтлан олох', s:'Итгэмжтэй нягтлан, онлайн гэрээ', h:'accountants.html', tag:'', k:'нягтлан олох нягтлан хайх гэрээ аутсорс тайлан гаргуулах нягтлангийн сүлжээ accountant'},
