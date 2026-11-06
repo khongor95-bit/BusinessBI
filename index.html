@@ -370,6 +370,32 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
 .ocard:focus-visible{outline:2px solid #c9a470;outline-offset:3px}
 @media(max-width:1100px){.ogrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:749px){.ogrid{grid-template-columns:1fr;gap:16px}.oc-b{padding:0 24px 28px}.ocard{border-radius:22px}}
+
+/* ═══ Каталог: tab + нэг төрлийн карт ═══ */
+.catalog .sec-top{margin-bottom:20px}
+.ctabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 28px}
+.ctab{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:999px;border:1px solid #e3ded3;background:#fff;color:#171717;font:600 15px/1 inherit;font-family:inherit;cursor:pointer;transition:background .2s,border-color .2s,color .2s}
+.ctab span{font-size:12px;font-weight:600;min-width:22px;height:22px;border-radius:999px;display:grid;place-items:center;background:#f3efe6;color:#7a6a4a;padding:0 6px}
+.ctab:hover{border-color:#171717}
+.ctab.on{background:#171717;border-color:#171717;color:#fff}
+.ctab.on span{background:#c9a470;color:#171717}
+.ctab:focus-visible{outline:2px solid #c9a470;outline-offset:2px}
+.cpanel{display:none}
+.cpanel.on{display:block;animation:cpIn .35s ease}
+@keyframes cpIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.ogrid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.oc-pr{display:block;font-size:14px;font-weight:600;color:#171717;margin:-6px 0 18px}
+.ocard.dark .oc-pr{color:#fff}
+.cmore{display:inline-block;margin-top:24px;font-weight:600;font-size:15px;color:#171717;border-bottom:1px solid currentColor;text-decoration:none}
+.faq-list{display:grid;gap:10px;max-width:880px}
+.faq details{border:1px solid #ece8df;border-radius:16px;background:#fff;padding:0 22px}
+.faq summary{list-style:none;cursor:pointer;padding:20px 0;font-weight:600;font-size:17px;display:flex;justify-content:space-between;gap:16px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary:after{content:"+";font-weight:400;font-size:22px;line-height:1;color:#a8853f;transition:transform .2s}
+.faq details[open] summary:after{transform:rotate(45deg)}
+.faq details p{margin:0 0 20px;color:#5f5a50;line-height:1.6;font-size:15.5px}
+@media(max-width:1100px){.ogrid.three{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:749px){.ctabs{flex-wrap:nowrap;overflow-x:auto;margin:0 -20px 22px;padding:0 20px;scrollbar-width:none}.ctabs::-webkit-scrollbar{display:none}.ctab{flex:none}.ogrid.three{grid-template-columns:1fr}}
 </style>
 </head>
 <body class="home ol">
@@ -417,14 +443,13 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
       <a href="invoice_generator.html">Нэхэмжлэх</a>
       <a href="budget.html">Төсөв</a>
       <a href="businessbi_journal.html#page=reports">СТ-1–4</a>
-      <a href="receipt_scan.html">Баримт</a>
+      <a href="receipt_scan.html">Баримт уншуулах</a>
     </nav>
 
     <div class="cta-row">
       <a href="businessbi_journal.html" class="btn white">Sonet ERP-ийг үнэгүй турших</a>
-      <a href="pricing.html" class="btn outline">Бүх эрх авах</a>
+      <a href="#catalog" class="btn outline">Бүх бүтээгдэхүүн</a>
     </div>
-    <a href="dashboard.html?demo=1" class="new"><i>ШИНЭ</i>Дашбоардын жишээ →</a>
   </div>
 </section>
 
@@ -487,64 +512,46 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
   </div>
 </section>
 
-<!-- ═══════════ ПРОГРАМ ═══════════ -->
-<section class="sec" id="apps">
+<!-- ═══════════ БҮТЭЭГДЭХҮҮН (нэг каталог, ангиллаар tab) ═══════════ -->
+<section class="sec catalog" id="catalog">
   <div class="container">
-    <div class="sec-top"><div><h2>Програм</h2></div><a class="more" href="pricing.html">Үнэ харах →</a></div>
-    <div class="pgrid four">
-      <a class="pc rv" href="businessbi_journal.html"><div class="m"><img src="img/cv/finance.jpg" alt="Sonet ERP" loading="lazy"><div class="qa"><span>Нээх</span></div></div><div class="ct"><span class="t">Sonet ERP</span><span class="pr">19,900₮/сараас · 30 хоног үнэгүй</span></div></a>
-      <a class="pc rv" href="payroll.html"><div class="m"><img src="img/cv/salary.jpg" alt="Цалин бодогч" loading="lazy"><div class="qa"><span>Нээх</span></div></div><div class="ct"><span class="t">Цалин бодогч</span><span class="pr">Beta · Үнэгүй</span></div></a>
-      <a class="pc rv" href="budget.html"><div class="m"><img src="img/cv/budget.jpg" alt="Бизнес төлөвлөлт" loading="lazy"><div class="qa"><span>Нээх</span></div></div><div class="ct"><span class="t">Бизнес төлөвлөлт</span><span class="pr">Beta · Үнэгүй</span></div></a>
-      <a class="pc rv" href="financial_dashboard.html"><div class="m"><img src="img/cv/analysis.jpg" alt="Санхүүгийн шинжилгээ" loading="lazy"><div class="qa"><span>Нээх</span></div></div><div class="ct"><span class="t">Санхүүгийн шинжилгээ</span><span class="pr">Үнэгүй</span></div></a>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════ ХЭРЭГСЛҮҮД ═══════════ -->
-<section class="sec" id="tool-list">
-  <div class="container">
-    <div class="sec-top"><div><h2>Хэрэгслүүд</h2></div></div>
-    <div class="ogrid">
-      <a class="ocard rv" href="ndsh_hhoat_converter.html"><div class="oc-m"><img src="img/cv/ndsh.jpg" alt="НДШ → ХХОАТ хөрвүүлэгч" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></span><h3>НДШ → ХХОАТ хөрвүүлэгч</h3><p>НДШ-ийн тайлангийн PDF-ээ оруулаад etax-д бэлэн ХХОАТ маягтыг Excel-ээр авна. Урьдчилан харах үнэгүй.</p><span class="oc-l">Хөрвүүлэх →</span></div></a>
-      <a class="ocard rv" href="noat_matcher.html"><div class="oc-m"><img src="img/cv/noat.jpg" alt="НӨАТ тулгагч" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg></span><h3>НӨАТ тулгагч</h3><p>eBarimt-ийн худалдан авалтыг дотоод бүртгэлтэй тулгаж, зөрүүтэй баримтыг шууд олно. Үнэгүй.</p><span class="oc-l">Тулгах →</span></div></a>
-      <a class="ocard rv hi" href="receipt_scan.html"><div class="oc-m"><img src="img/cv/receipt.jpg" alt="Баримт уншуулагч" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span><h3>Баримт уншуулагч</h3><p>Баримтын зургаас борлуулагч, ТТД, дүн, НӨАТ-ыг уншиж, журналын бичилт санал болгоно. 5,000₮ / 24 цаг.</p><span class="oc-l">Уншуулах →</span></div></a>
-      <a class="ocard rv dark" href="invoice_generator.html"><div class="oc-m"><img src="img/cv/invoice.jpg" alt="Нэхэмжлэх үүсгэгч" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/><circle cx="17" cy="17" r="0.5"/></svg></span><h3>Нэхэмжлэх үүсгэгч</h3><p>НӨАТ-тэй нэхэмжлэхийг минутад бэлдэж, PDF-ээр татаж илгээнэ. Үнэгүй.</p><span class="oc-l">Нэхэмжлэх үүсгэх →</span></div></a>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════ MARQUEE ═══════════ -->
-<div class="marq" aria-hidden="true">
-  <div class="marq-track">
-    <span>Журнал</span><span class="dot">●</span><span>Тайлан</span><span class="dot">●</span><span>Цалин</span><span class="dot">●</span><span>НӨАТ</span><span class="dot">●</span><span>Excel</span><span class="dot">●</span>
-    <span>Журнал</span><span class="dot">●</span><span>Тайлан</span><span class="dot">●</span><span>Цалин</span><span class="dot">●</span><span>НӨАТ</span><span class="dot">●</span><span>Excel</span><span class="dot">●</span>
-  </div>
-</div>
-
-
-
-<!-- ═══════════ EXCEL ЗАГВАРУУД ═══════════ -->
-<section class="sec" id="templates">
-  <div class="container">
-    <div class="sec-top"><div><h2>Excel загвар</h2><p class="sub">Цалин, НӨАТ, санхүүгийн тайлан, ТЭЗҮ, зээл, CRM, KPI. Нийт 21 загвар.</p></div><a class="more" href="templates.html">Бүгдийг үзэх →</a></div>
-    <div class="pgrid four">
-      <a class="pc rv" href="templates.html"><div class="m"><img src="img/cv/tplall.jpg" alt="Excel загварын сан — 21 төрөл" loading="lazy"><div class="qa"><span>Үзэх</span></div></div><div class="ct"><span class="t">Excel загварын сан — 21 төрөл</span><span class="pr">15,000₮-с</span></div></a>
-      <a class="pc rv" href="templates.html#payroll"><div class="m"><img src="img/cv/tplpayroll.jpg" alt="Цалин бодох загвар" loading="lazy"><div class="qa"><span>Үзэх</span></div></div><div class="ct"><span class="t">Цалин бодох загвар</span><span class="pr">29,000₮</span></div></a>
-      <a class="pc rv" href="templates.html#fs"><div class="m"><img src="img/cv/tplfs.jpg" alt="Санхүүгийн тайлан (СТ-1, СТ-2)" loading="lazy"><div class="qa"><span>Үзэх</span></div></div><div class="ct"><span class="t">Санхүүгийн тайлан (СТ-1, СТ-2)</span><span class="pr">39,000₮</span></div></a>
-      <a class="pc rv" href="dashboard_maker.html"><div class="m"><img src="img/cv/dashmaker.jpg" alt="Дашбоард үүсгэгч" loading="lazy"><div class="qa"><span>Нээх</span></div></div><div class="ct"><span class="t">Дашбоард үүсгэгч</span><span class="pr">Үнэгүй харах</span></div></a>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════ ЗАХИАЛГАТ ДАШБОАРД ═══════════ -->
-<section class="sec" id="custom">
-  <div class="container">
-    <div class="sec-top"><div><h2>Захиалгат дашбоард</h2><p class="sub">Таны өгөгдөл дээр Excel, Power BI, HTML дашбоард хийж өгнө.</p></div><a class="more" href="custom_dashboard.html">Дэлгэрэнгүй →</a></div>
-    <div class="pgrid">
-      <a class="pc rv" href="custom_dashboard.html#excel"><div class="m"><img src="img/custom-excel.jpg" alt="Захиалгат Excel дашбоард" loading="lazy"><div class="qa"><span>Захиалах</span></div></div><div class="ct"><span class="t">Захиалгат Excel дашбоард</span><span class="pr">490,000₮-с</span></div></a>
-      <a class="pc rv" href="custom_dashboard.html#powerbi"><div class="m"><img src="img/custom-powerbi.jpg" alt="Захиалгат Power BI дашбоард" loading="lazy"><div class="qa"><span>Захиалах</span></div></div><div class="ct"><span class="t">Захиалгат Power BI дашбоард</span><span class="pr">890,000₮-с</span></div></a>
-      <a class="pc rv" href="custom_dashboard.html#html"><div class="m"><img src="img/custom-html.jpg" alt="Захиалгат HTML дашбоард" loading="lazy"><div class="qa"><span>Захиалах</span></div></div><div class="ct"><span class="t">Интерактив HTML дашбоард</span><span class="pr">290,000₮-с</span></div></a>
-    </div>
+    <div class="sec-top"><div><h2>Бүх бүтээгдэхүүн</h2><p class="sub">Ангилалаа сонгоно уу. Дэлгэрэнгүйг карт дээр дарж үзнэ.</p></div></div>
+    <div class="ctabs" role="tablist" aria-label="Бүтээгдэхүүний ангилал"><button type="button" role="tab" class="ctab on" data-tab="apps" aria-selected="true" aria-controls="apps">Програм<span>4</span></button><button type="button" role="tab" class="ctab" data-tab="tool-list" aria-selected="false" aria-controls="tool-list">Хэрэгслүүд<span>4</span></button><button type="button" role="tab" class="ctab" data-tab="templates" aria-selected="false" aria-controls="templates">Excel загвар<span>4</span></button><button type="button" role="tab" class="ctab" data-tab="custom" aria-selected="false" aria-controls="custom">Захиалгат дашбоард<span>3</span></button></div>
+      <div class="cpanel on" id="apps" role="tabpanel" data-n="4">
+        <div class="ogrid">
+        <a class="ocard hi" href="businessbi_journal.html"><div class="oc-m"><img src="img/cv/finance.jpg" alt="Sonet ERP" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 13h3M8 16h6"/></svg></span><h3>Sonet ERP</h3><p>Журнал, банкны хуулга, бараа, үндсэн хөрөнгө, цалин, татвар, СТ-1–СТ-4 тайлан нэг системд.</p><span class="oc-pr">19,900₮/сараас · 30 хоног үнэгүй</span><span class="oc-l">Турших →</span></div></a>
+        <a class="ocard" href="payroll.html"><div class="oc-m"><img src="img/cv/salary.jpg" alt="Цалин бодогч" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5M16 4.5a3.5 3.5 0 0 1 0 7M18 13.7c2 .8 3.5 3 3.5 5.6"/></svg></span><h3>Цалин бодогч</h3><p>НДШ, ХХОАТ, хөнгөлөлтийг бодож, цалингийн хуудас гаргана.</p><span class="oc-pr">Beta · Үнэгүй</span><span class="oc-l">Нээх →</span></div></a>
+        <a class="ocard" href="budget.html"><div class="oc-m"><img src="img/cv/budget.jpg" alt="Бизнес төлөвлөлт" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><h3>Бизнес төлөвлөлт</h3><p>Төсөв, хугарлын цэг, мөнгөн урсгалын төлөвлөгөө.</p><span class="oc-pr">Beta · Үнэгүй</span><span class="oc-l">Нээх →</span></div></a>
+        <a class="ocard" href="financial_dashboard.html"><div class="oc-m"><img src="img/cv/analysis.jpg" alt="Санхүүгийн шинжилгээ" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16"/><path d="m7 15 4-4 3 3 5-6"/></svg></span><h3>Санхүүгийн шинжилгээ</h3><p>e-balance тайлангаас санхүүгийн харьцаа, хандлагыг гаргана.</p><span class="oc-pr">Үнэгүй</span><span class="oc-l">Нээх →</span></div></a>
+        </div>
+        <a class="cmore" href="pricing.html">Үнэ, багц харах →</a>
+      </div>
+      <div class="cpanel" id="tool-list" role="tabpanel" data-n="4">
+        <div class="ogrid">
+        <a class="ocard" href="ndsh_hhoat_converter.html"><div class="oc-m"><img src="img/cv/ndsh.jpg" alt="НДШ → ХХОАТ хөрвүүлэгч" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></span><h3>НДШ → ХХОАТ хөрвүүлэгч</h3><p>НДШ-ийн тайлангийн PDF-ээс etax-д бэлэн ХХОАТ маягтыг Excel-ээр гаргана.</p><span class="oc-pr">Урьдчилан харах үнэгүй · 5,000₮ / тайлан</span><span class="oc-l">Хөрвүүлэх →</span></div></a>
+        <a class="ocard" href="noat_matcher.html"><div class="oc-m"><img src="img/cv/noat.jpg" alt="НӨАТ тулгагч" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg></span><h3>НӨАТ тулгагч</h3><p>eBarimt-ийн худалдан авалтыг дотоод бүртгэлтэй тулгаж, зөрүүг олно.</p><span class="oc-pr">Үнэгүй</span><span class="oc-l">Тулгах →</span></div></a>
+        <a class="ocard hi" href="receipt_scan.html"><div class="oc-m"><img src="img/cv/receipt.jpg" alt="Баримт уншуулагч" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span><h3>Баримт уншуулагч</h3><p>Баримтын зургаас борлуулагч, ТТД, дүн, НӨАТ-ыг уншиж бичилт санал болгоно.</p><span class="oc-pr">5,000₮ / 24 цаг</span><span class="oc-l">Уншуулах →</span></div></a>
+        <a class="ocard dark" href="invoice_generator.html"><div class="oc-m"><img src="img/cv/invoice.jpg" alt="Нэхэмжлэх үүсгэгч" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><h3>Нэхэмжлэх үүсгэгч</h3><p>НӨАТ-тэй нэхэмжлэхийг минутад бэлдэж, PDF-ээр татна.</p><span class="oc-pr">Үнэгүй</span><span class="oc-l">Нэхэмжлэх үүсгэх →</span></div></a>
+        </div>
+        <a class="cmore" href="tools.html">Бүх хэрэгсэл →</a>
+      </div>
+      <div class="cpanel" id="templates" role="tabpanel" data-n="4">
+        <div class="ogrid">
+        <a class="ocard" href="templates.html"><div class="oc-m"><img src="img/cv/tplall.jpg" alt="Excel загварын сан" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg></span><h3>Excel загварын сан</h3><p>Цалин, НӨАТ, санхүүгийн тайлан, ТЭЗҮ, зээл, CRM, KPI — 21 бэлэн загвар.</p><span class="oc-pr">15,000₮-с</span><span class="oc-l">Загвар үзэх →</span></div></a>
+        <a class="ocard" href="templates.html#payroll"><div class="oc-m"><img src="img/cv/tplpayroll.jpg" alt="Цалин бодох загвар" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5M16 4.5a3.5 3.5 0 0 1 0 7M18 13.7c2 .8 3.5 3 3.5 5.6"/></svg></span><h3>Цалин бодох загвар</h3><p>НДШ, ХХОАТ томьёотой, ажилтан бүрийн цалингийн хуудастай.</p><span class="oc-pr">29,000₮</span><span class="oc-l">Үзэх →</span></div></a>
+        <a class="ocard" href="templates.html#fs"><div class="oc-m"><img src="img/cv/tplfs.jpg" alt="Санхүүгийн тайлан (СТ-1, СТ-2)" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></span><h3>Санхүүгийн тайлан (СТ-1, СТ-2)</h3><p>Гүйлгээ баланснаас баланс, орлогын тайланг автоматаар гаргана.</p><span class="oc-pr">39,000₮</span><span class="oc-l">Үзэх →</span></div></a>
+        <a class="ocard" href="dashboard_maker.html"><div class="oc-m"><img src="img/cv/dashmaker.jpg" alt="Дашбоард үүсгэгч" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span><h3>Дашбоард үүсгэгч</h3><p>Excel файлаа оруулахад KPI, график бүхий дашбоард үүсгэнэ.</p><span class="oc-pr">Үнэгүй харах</span><span class="oc-l">Үүсгэх →</span></div></a>
+        </div>
+        <a class="cmore" href="templates.html">Бүх загвар →</a>
+      </div>
+      <div class="cpanel" id="custom" role="tabpanel" data-n="3">
+        <div class="ogrid three">
+        <a class="ocard" href="custom_dashboard.html#excel"><div class="oc-m"><img src="img/custom-excel.jpg" alt="Excel дашбоард" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg></span><h3>Excel дашбоард</h3><p>Таны өгөгдөл дээр автомат шинэчлэгддэг Excel дашбоард.</p><span class="oc-pr">490,000₮-с</span><span class="oc-l">Захиалах →</span></div></a>
+        <a class="ocard" href="custom_dashboard.html#powerbi"><div class="oc-m"><img src="img/custom-powerbi.jpg" alt="Power BI дашбоард" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16"/><path d="m7 15 4-4 3 3 5-6"/></svg></span><h3>Power BI дашбоард</h3><p>Олон эх сурвалжийг нэгтгэсэн удирдлагын Power BI тайлан.</p><span class="oc-pr">890,000₮-с</span><span class="oc-l">Захиалах →</span></div></a>
+        <a class="ocard" href="custom_dashboard.html#html"><div class="oc-m"><img src="img/custom-html.jpg" alt="Интерактив HTML дашбоард" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4M6 13l3-3 3 2 5-5"/></svg></span><h3>Интерактив HTML дашбоард</h3><p>Хөтөч дээр нээгддэг, хуваалцахад хялбар интерактив дашбоард.</p><span class="oc-pr">290,000₮-с</span><span class="oc-l">Захиалах →</span></div></a>
+        </div>
+        <a class="cmore" href="custom_dashboard.html">Дэлгэрэнгүй →</a>
+      </div>
   </div>
 </section>
 
@@ -566,14 +573,15 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
   </div>
 </section>
 
-<!-- ═══════════ ХЭРХЭН ═══════════ -->
-<section class="sec how" id="how">
+<!-- ═══════════ ТҮГЭЭМЭЛ АСУУЛТ ═══════════ -->
+<section class="sec faq" id="faq">
   <div class="container">
-    <div class="sec-head"><h2>Хэрхэн ажилладаг</h2></div>
-    <div class="steps-grid">
-      <div class="step"><div class="n">01</div><h3>Файл оруулах</h3><p>НДШ-ийн PDF, eBarimt-ийн Excel, банкны хуулга, e-balance тайлан.</p></div>
-      <div class="step"><div class="n">02</div><h3>Тооцоолол</h3><p>Татвар, шимтгэл, хөнгөлөлт, зөрүүг маягтын дагуу тооцно.</p></div>
-      <div class="step"><div class="n">03</div><h3>Тайлан</h3><p>Excel маягтыг etax, e-balance-д оруулах, хэвлэх, илгээх.</p></div>
+    <div class="sec-top"><div><h2>Түгээмэл асуулт</h2></div><a class="more" href="contact.html">Өөр асуулт байна уу? →</a></div>
+    <div class="faq-list">
+      <details><summary>Мэдээлэл маань хаана хадгалагдах вэ?</summary><p>Хэрэгслүүд (НДШ, НӨАТ, нэхэмжлэх) файлыг таны хөтөч дотор боловсруулдаг тул сервер рүү илгээгдэхгүй. Sonet ERP-ийн мэдээлэл таны бүртгэлтэй холбогдож, шифрлэгдсэн cloud нөөцөд хадгалагдана.</p></details>
+      <details><summary>30 хоногийн туршилт дуусахад юу болох вэ?</summary><p>Мэдээлэл тань хэвээр үлдэнэ. Багц сонгож төлбөрөө хийвэл үргэлжлүүлэн ашиглана. Картын мэдээлэл урьдчилан шаардахгүй.</p></details>
+      <details><summary>Өөр програмаас шилжиж болох уу?</summary><p>Болно. Компаниа үүсгээд дансны эхний үлдэгдлээ оруулаад шууд эхэлнэ. Банкны хуулга, eBarimt-ийн падааныг Excel-ээр импортлоно. Шилжүүлэлтэд туслалцаа хэрэгтэй бол бидэнтэй холбогдоорой.</p></details>
+      <details><summary>Төлбөрөө хэрхэн хийх вэ?</summary><p>WIRE.mn-ээр дамжуулан банкны апп, QR-аар төлнө. Төлбөр баталгаажмагц эрх шууд нээгдэнэ.</p></details>
     </div>
   </div>
 </section>
@@ -698,6 +706,18 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
   var K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wZmpjZXppYXNhZG5zd3dua3BjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDY3MDMsImV4cCI6MjA5ODI4MjcwM30.LJ1Fh2TGjyPDv6EeTDzlhcR0S3WkUHhy2yRxnop940A';
   fetch('https://mpfjceziasadnswwnkpc.supabase.co/rest/v1/rpc/launch_slots_left',{method:'POST',headers:{'Content-Type':'application/json',apikey:K,Authorization:'Bearer '+K},body:'{}'})
     .then(function(r){return r.json()}).then(function(rows){ var r=Array.isArray(rows)?rows[0]:rows; if(r&&r.pct>0&&r.left_slots>0){ var e=document.getElementById('featPromo'); e.textContent='Эхний 100 хэрэглэгчид '+r.pct+'% хямд — '+r.left_slots+' байр үлдсэн'; e.hidden=false; } }).catch(function(){});
+})();
+</script>
+<script>
+(function(){
+  var tabs=[].slice.call(document.querySelectorAll('.ctab')); if(!tabs.length) return;
+  function show(k,scroll){ var ok=false; tabs.forEach(function(t){ var on=t.dataset.tab===k; if(on) ok=true; t.classList.toggle('on',on); t.setAttribute('aria-selected',on?'true':'false'); });
+    if(!ok) return false; document.querySelectorAll('.cpanel').forEach(function(p){ p.classList.toggle('on',p.id===k); });
+    if(scroll){ var c=document.getElementById('catalog'); window.scrollTo({top:c.getBoundingClientRect().top+scrollY-90,behavior:'smooth'}); } return true; }
+  tabs.forEach(function(t){ t.addEventListener('click',function(){ show(t.dataset.tab,false); try{history.replaceState(null,'','#'+t.dataset.tab)}catch(e){} }); });
+  function fromHash(){ var h=location.hash.slice(1); if(h==='catalog'){ return; } if(h && show(h,true)) {} }
+  document.addEventListener('click',function(e){ var a=e.target.closest&&e.target.closest('a[href^="#"]'); if(!a) return; var k=a.getAttribute('href').slice(1); if(document.querySelector('.ctab[data-tab="'+k+'"]')){ e.preventDefault(); show(k,true); try{history.replaceState(null,'','#'+k)}catch(_){} } });
+  window.addEventListener('hashchange',fromHash); if(location.hash) setTimeout(fromHash,60);
 })();
 </script>
 </body>

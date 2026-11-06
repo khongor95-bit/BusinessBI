@@ -110,6 +110,31 @@ footer{background:#111;color:#fff;padding:50px 0 36px}
   .embed-frame{height:600px}
 }
 *:focus-visible{outline:2px solid #b79a63;outline-offset:3px}
+/* ═══ Ангиллын 4 карт — зураг дээр, icon хавтан, гарчиг, тайлбар, алтан холбоос (other-levels маяг) ═══ */
+.ogrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.ocard{display:flex;flex-direction:column;background:#fff;border:1px solid #ece8df;border-radius:28px;overflow:hidden;color:#171717;text-decoration:none;transition:transform .3s cubic-bezier(.3,1,.3,1),box-shadow .3s}
+.ocard:hover{transform:translateY(-3px);box-shadow:0 24px 48px -30px rgba(23,23,23,.35)}
+.oc-m{aspect-ratio:450/235;overflow:hidden;background:#f1eee6}
+.oc-m img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;transition:transform .5s cubic-bezier(.3,1,.3,1)}
+.ocard:hover .oc-m img{transform:scale(1.03)}
+.oc-b{position:relative;z-index:1;display:flex;flex-direction:column;flex:1;padding:0 32px 36px}
+.oc-ic{width:68px;height:68px;margin-top:-34px;margin-bottom:22px;border-radius:18px;background:#f6efe0;color:#8a6d3b;display:grid;place-items:center;box-shadow:0 10px 24px -12px rgba(23,23,23,.35)}
+.oc-ic svg{width:30px;height:30px}
+.ocard h3{margin:0 0 12px;font-size:clamp(20px,.6vw + 14px,25px);font-weight:700;letter-spacing:-.02em;line-height:1.2}
+.ocard p{margin:0 0 22px;font-size:16.5px;line-height:1.55;color:#5f5a50}
+.oc-l{margin-top:auto;font-size:17px;font-weight:700;color:#a8853f;display:inline-flex;gap:6px;transition:gap .25s}
+.ocard:hover .oc-l{gap:10px}
+.ocard.hi{border:1.5px solid #c9a470;box-shadow:0 26px 50px -32px rgba(201,164,112,.9)}
+.ocard.dark{background:radial-gradient(120% 90% at 100% 100%,#3a3020 0%,#12142a 55%,#0b0d1c 100%);border-color:#0b0d1c;color:#fff}
+.ocard.dark p{color:rgba(255,255,255,.78)}
+.ocard.dark .oc-ic{background:rgba(255,255,255,.08);color:#e2c58f;box-shadow:none;border:1px solid rgba(255,255,255,.12)}
+.ocard.dark .oc-l{color:#e2bd7a}
+.ocard:focus-visible{outline:2px solid #c9a470;outline-offset:3px}
+@media(max-width:1100px){.ogrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:749px){.ogrid{grid-template-columns:1fr;gap:16px}.oc-b{padding:0 24px 28px}.ocard{border-radius:22px}}
+.oc-pr{display:block;font-size:14px;font-weight:600;color:#171717;margin:-6px 0 18px}
+.ocard.dark .oc-pr{color:#fff}
+.tgroup{margin:0 0 56px}.tgroup h2{font-size:28px;font-weight:600;letter-spacing:-.02em;margin:0 0 6px}.tgroup>p{color:#5f5a50;margin:0 0 24px;font-size:15.5px}
 </style>
 </head>
 <body class="ol">
@@ -121,65 +146,24 @@ footer{background:#111;color:#fff;padding:50px 0 36px}
     <div class="tag">Хэрэгслүүд</div>
     <h1>Цаг хэмнэх <em>онлайн хэрэгслүүд</em></h1>
     <p>Нягтлан, санхүүчдэд зориулсан автоматжуулалтын хэрэгслүүд. Өгөгдлөө оруулаад л үр дүнгээ ав — боловсруулалт хөтөч дотор чинь хийгдэнэ.</p>
-    <div class="free-note">✓ 5 хэрэгсэл үнэгүй · НДШ/ХХОАТ хөрвүүлэгч: урьдчилан харах үнэгүй, Excel татахад 5,000₮</div>
+    <div class="free-note">✓ 5 хэрэгсэл үнэгүй · НДШ/ХХОАТ: 5,000₮ / тайлан · Баримт уншуулагч: 5,000₮ / 24 цаг</div>
   </section>
 
-  <div class="tool-grid">
-    <a class="tool-card" href="ndsh_hhoat_converter.html" target="_blank" rel="noopener">
-      <span class="tool-badge badge-paid">5,000₮ / тайлан</span>
-      <div class="tool-ic"></div>
-      <h3>НДШ / ХХОАТ хөрвүүлэгч</h3>
-      <p>НДШ-ийн PDF тайлангаа оруулахад ХХОАТ суутгалыг автоматаар тооцоолж, etax-д бэлэн Excel маягт гаргана. Урьдчилан харах үнэгүй, татахад 5,000₮.</p>
-      <span class="tool-open">Нээх →</span>
-    </a>
-
-    <a class="tool-card" href="payroll.html" target="_blank" rel="noopener">
-      <span class="tool-badge badge-free">Beta · үнэгүй</span>
-      <div class="tool-ic"></div>
-      <h3>Цалин бодогч</h3>
-      <p>Ажилтны цалин, НДШ, ХХОАТ, хөнгөлөлтийг сар бүр тооцоолж, цалингийн хуудас, НД тайлан, ХХОАТ маягтын Excel гаргана.</p>
-      <span class="tool-open">Нээх →</span>
-    </a>
-
-    <a class="tool-card" href="budget.html" target="_blank" rel="noopener">
-      <span class="tool-badge badge-free">Beta · үнэгүй</span>
-      <div class="tool-ic"></div>
-      <h3>Бизнес төлөвлөлт</h3>
-      <p>6 алхмын асуулт-хариултаар жилийн төсөв: орлого тоо × үнэ, зардал, хугарлын цэг, мөнгөн урсгал. What-if, төсвийн баримт, гүйцэтгэл, прогноз.</p>
-      <span class="tool-open">Нээх →</span>
-    </a>
-
-    <a class="tool-card" href="dashboard_maker.html" target="_blank" rel="noopener">
-      <span class="tool-badge badge-free">Шинэ</span>
-      <div class="tool-ic"></div>
-      <h3>Дашбоард үүсгэгч</h3>
-      <p>Excel, CSV файлаа оруулахад KPI, график, дүгнэлттэй дашбоард хэдхэн секундэд гарна. Excel-ээр татах 9,900₮.</p>
-      <span class="tool-open">Нээх →</span>
-    </a>
-
-    <a class="tool-card" href="noat_matcher.html" target="_blank" rel="noopener">
-      <span class="tool-badge badge-free">Үнэгүй</span>
-      <div class="tool-ic"></div>
-      <h3>НӨАТ тулгагч</h3>
-      <p>eBarimt-аас татсан падааныг дотоод бүртгэлтэй автоматаар тулгаж, зөрүүг шууд илрүүлнэ.</p>
-      <span class="tool-open">Нээх →</span>
-    </a>
-
-    <a class="tool-card" href="invoice_generator.html" target="_blank" rel="noopener">
-      <span class="tool-badge badge-free">Үнэгүй</span>
-      <div class="tool-ic"></div>
-      <h3>Автомат нэхэмжлэх</h3>
-      <p>Мэдээллээ оруулаад мэргэжлийн нэхэмжлэх (НӨАТ-тай) хормын дотор үүсгэж, PDF татаж ав.</p>
-      <span class="tool-open">Нээх →</span>
-    </a>
-
-    <a class="tool-card" href="financial_dashboard.html" target="_blank" rel="noopener">
-      <span class="tool-badge badge-free">Үнэгүй</span>
-      <div class="tool-ic"></div>
-      <h3>Санхүүгийн тайлангийн шинжилгээ</h3>
-      <p>Балансаа оруулахад харьцаа, чиг хандлага, гол үзүүлэлтийн шинжилгээг автоматаар гаргана.</p>
-      <span class="tool-open">Нээх →</span>
-    </a>
+  <div class="tgroup" id="tax"><h2>Тайлан, татвар, баримт</h2><p>Сар бүрийн тайлан, НӨАТ, баримтын ажлыг хурдасгана.</p>
+    <div class="ogrid">
+      <a class="ocard" href="ndsh_hhoat_converter.html"><div class="oc-m"><img src="img/cv/ndsh.jpg" alt="НДШ → ХХОАТ хөрвүүлэгч" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></span><h3>НДШ → ХХОАТ хөрвүүлэгч</h3><p>НДШ-ийн PDF тайлангаас ХХОАТ суутгалыг тооцож, etax-д бэлэн Excel маягт гаргана.</p><span class="oc-pr">Урьдчилан харах үнэгүй · 5,000₮ / тайлан</span><span class="oc-l">Хөрвүүлэх →</span></div></a>
+      <a class="ocard" href="noat_matcher.html"><div class="oc-m"><img src="img/cv/noat.jpg" alt="НӨАТ тулгагч" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg></span><h3>НӨАТ тулгагч</h3><p>eBarimt-аас татсан падааныг дотоод бүртгэлтэй тулгаж, зөрүүг шууд илрүүлнэ.</p><span class="oc-pr">Үнэгүй</span><span class="oc-l">Тулгах →</span></div></a>
+      <a class="ocard hi" href="receipt_scan.html"><div class="oc-m"><img src="img/cv/receipt.jpg" alt="Баримт уншуулагч" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span><h3>Баримт уншуулагч</h3><p>Баримтын зургаас борлуулагч, ТТД, огноо, дүн, НӨАТ-ыг уншиж, журналын бичилт санал болгоно.</p><span class="oc-pr">5,000₮ / 24 цаг</span><span class="oc-l">Уншуулах →</span></div></a>
+      <a class="ocard dark" href="invoice_generator.html"><div class="oc-m"><img src="img/cv/invoice.jpg" alt="Нэхэмжлэх үүсгэгч" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><h3>Нэхэмжлэх үүсгэгч</h3><p>НӨАТ-тэй мэргэжлийн нэхэмжлэхийг хормын дотор үүсгэж, PDF татна.</p><span class="oc-pr">Үнэгүй</span><span class="oc-l">Нэхэмжлэх үүсгэх →</span></div></a>
+    </div>
+  </div>
+  <div class="tgroup" id="plan"><h2>Цалин, төлөвлөлт, шинжилгээ</h2><p>Цалин бодох, төсөв төлөвлөх, санхүүгийн байдлаа шинжлэх.</p>
+    <div class="ogrid">
+      <a class="ocard" href="payroll.html"><div class="oc-m"><img src="img/cv/salary.jpg" alt="Цалин бодогч" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5M16 4.5a3.5 3.5 0 0 1 0 7M18 13.7c2 .8 3.5 3 3.5 5.6"/></svg></span><h3>Цалин бодогч</h3><p>Цалин, НДШ, ХХОАТ, хөнгөлөлтийг тооцож, цалингийн хуудас, НД тайлан гаргана.</p><span class="oc-pr">Beta · Үнэгүй</span><span class="oc-l">Нээх →</span></div></a>
+      <a class="ocard" href="budget.html"><div class="oc-m"><img src="img/cv/budget.jpg" alt="Бизнес төлөвлөлт" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><h3>Бизнес төлөвлөлт</h3><p>Жилийн төсөв, хугарлын цэг, мөнгөн урсгал, what-if шинжилгээ.</p><span class="oc-pr">Beta · Үнэгүй</span><span class="oc-l">Нээх →</span></div></a>
+      <a class="ocard" href="financial_dashboard.html"><div class="oc-m"><img src="img/cv/analysis.jpg" alt="Санхүүгийн шинжилгээ" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16"/><path d="m7 15 4-4 3 3 5-6"/></svg></span><h3>Санхүүгийн шинжилгээ</h3><p>Балансаа оруулахад харьцаа, чиг хандлага, гол үзүүлэлтийг гаргана.</p><span class="oc-pr">Үнэгүй</span><span class="oc-l">Нээх →</span></div></a>
+      <a class="ocard" href="dashboard_maker.html"><div class="oc-m"><img src="img/cv/dashmaker.jpg" alt="Дашбоард үүсгэгч" loading="lazy" width="900" height="675"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span><h3>Дашбоард үүсгэгч</h3><p>Excel, CSV файлаас KPI, график, дүгнэлттэй дашбоард секундэд гаргана.</p><span class="oc-pr">Үнэгүй харах · Excel татах 9,900₮</span><span class="oc-l">Үүсгэх →</span></div></a>
+    </div>
   </div>
 
   <div class="band">
