@@ -347,6 +347,28 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
 @media(max-width:900px){.feat-spin{top:2px}}
 @media(max-width:749px){.feat-spin{font-size:12px}.feat-spin .fs-ic{width:22px;height:22px}}
 
+
+/* ═══ Ангиллын 4 карт — зураг дээр, icon хавтан, гарчиг, тайлбар, алтан холбоос (other-levels маяг) ═══ */
+.coll-track.ocards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;padding:0 48px;overflow:visible}
+.ocard{display:flex;flex-direction:column;background:#fff;border:1px solid #ece8df;border-radius:28px;overflow:hidden;color:#171717;text-decoration:none;transition:transform .3s cubic-bezier(.3,1,.3,1),box-shadow .3s}
+.ocard:hover{transform:translateY(-3px);box-shadow:0 24px 48px -30px rgba(23,23,23,.35)}
+.oc-m{aspect-ratio:450/235;overflow:hidden;background:#f1eee6}
+.oc-m img{width:100%;height:100%;object-fit:cover;object-position:left top;display:block;transform:scale(1.12);transform-origin:85% 90%}
+.oc-b{position:relative;z-index:1;display:flex;flex-direction:column;flex:1;padding:0 32px 36px}
+.oc-ic{width:68px;height:68px;margin-top:-34px;margin-bottom:22px;border-radius:18px;background:#f6efe0;color:#8a6d3b;display:grid;place-items:center;box-shadow:0 10px 24px -12px rgba(23,23,23,.35)}
+.oc-ic svg{width:30px;height:30px}
+.ocard h3{margin:0 0 12px;font-size:clamp(20px,.6vw + 14px,25px);font-weight:700;letter-spacing:-.02em;line-height:1.2}
+.ocard p{margin:0 0 22px;font-size:16.5px;line-height:1.55;color:#5f5a50}
+.oc-l{margin-top:auto;font-size:17px;font-weight:700;color:#a8853f;display:inline-flex;gap:6px;transition:gap .25s}
+.ocard:hover .oc-l{gap:10px}
+.ocard.hi{border:1.5px solid #c9a470;box-shadow:0 26px 50px -32px rgba(201,164,112,.9)}
+.ocard.dark{background:radial-gradient(120% 90% at 100% 100%,#3a3020 0%,#12142a 55%,#0b0d1c 100%);border-color:#0b0d1c;color:#fff}
+.ocard.dark p{color:rgba(255,255,255,.78)}
+.ocard.dark .oc-ic{background:rgba(255,255,255,.08);color:#e2c58f;box-shadow:none;border:1px solid rgba(255,255,255,.12)}
+.ocard.dark .oc-l{color:#e2bd7a}
+.ocard:focus-visible{outline:2px solid #c9a470;outline-offset:3px}
+@media(max-width:1100px){.coll-track.ocards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:749px){.coll-track.ocards{grid-template-columns:1fr;gap:16px;padding:0 20px}.oc-b{padding:0 24px 28px}.ocard{border-radius:22px}}
 </style>
 </head>
 <body class="home ol">
@@ -418,11 +440,11 @@ body.home .sugg .tag{background:#faf3e4;color:#8a6420}
 
 <!-- ═══════════ АНГИЛАЛ (slider) ═══════════ -->
 <section class="coll" aria-label="Ангилал">
-  <div class="coll-track" id="collTrack">
-    <a class="mcard rv" href="#apps"><div class="m"><img src="img/cv/prev-app.jpg" alt="Програм — интерфейсийн жишээ" loading="lazy" width="1400" height="600"></div><div class="c"><span class="t">Програм</span><span class="d">Журнал, санхүүгийн тайлан, цалин</span></div></a>
-    <a class="mcard rv" href="#tool-list"><div class="m"><img src="img/cv/prev-tools.jpg" alt="Хэрэгслүүд — интерфейсийн жишээ" loading="lazy" width="1400" height="600"></div><div class="c"><span class="t">Хэрэгслүүд</span><span class="d">НДШ, НӨАТ, нэхэмжлэх, баримт</span></div></a>
-    <a class="mcard rv" href="#templates"><div class="m"><img src="img/cv/prev-excel.jpg" alt="Excel загвар — интерфейсийн жишээ" loading="lazy" width="1400" height="600"></div><div class="c"><span class="t">Excel загвар</span><span class="d">Цалин, тайлан, ТЭЗҮ зэрэг 21 загвар</span></div></a>
-    <a class="mcard rv" href="#custom"><div class="m"><img src="img/cv/prev-custom.jpg" alt="Захиалгат дашбоард — интерфейсийн жишээ" loading="lazy" width="1400" height="600"></div><div class="c"><span class="t">Захиалгат дашбоард</span><span class="d">Excel, Power BI, HTML дээр хийж өгнө</span></div></a>
+  <div class="coll-track ocards" id="collTrack">
+    <a class="ocard rv hi" href="#apps"><div class="oc-m"><img src="img/cv/prev-app.jpg" alt="Програм — интерфейсийн жишээ" loading="lazy" width="1400" height="600"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 13h3M8 16h6"/></svg></span><h3>Програм</h3><p>Sonet ERP — журнал, санхүүгийн тайлан, цалин, бараа, татвар нэг системд. Цалин бодогч, төсөв төлөвлөлт.</p><span class="oc-l">Програмууд үзэх →</span></div></a>
+    <a class="ocard rv" href="#tool-list"><div class="oc-m"><img src="img/cv/prev-tools.jpg" alt="Хэрэгслүүд — интерфейсийн жишээ" loading="lazy" width="1400" height="600"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg></span><h3>Хэрэгслүүд</h3><p>НДШ → ХХОАТ, НӨАТ тулгалт, нэхэмжлэх, баримт уншуулах. Өдөр тутмын ажлыг минутад. Ихэнх нь үнэгүй.</p><span class="oc-l">Хэрэгслүүд үзэх →</span></div></a>
+    <a class="ocard rv" href="#templates"><div class="oc-m"><img src="img/cv/prev-excel.jpg" alt="Excel загвар — интерфейсийн жишээ" loading="lazy" width="1400" height="600"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg></span><h3>Excel загвар</h3><p>Цалин, НӨАТ, санхүүгийн тайлан, ТЭЗҮ, зээл зэрэг Монголын хуульд нийцсэн 21 бэлэн загвар.</p><span class="oc-l">Загвар үзэх →</span></div></a>
+    <a class="ocard rv dark" href="#custom"><div class="oc-m"><img src="img/cv/prev-custom.jpg" alt="Захиалгат дашбоард — интерфейсийн жишээ" loading="lazy" width="1400" height="600"></div><div class="oc-b"><span class="oc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4M6 13l3-3 3 2 5-5"/></svg></span><h3>Захиалгат дашбоард</h3><p>Таны өгөгдөл дээр Excel, Power BI, интерактив HTML дашбоардыг манай баг хийж өгнө.</p><span class="oc-l">Захиалга өгөх →</span></div></a>
   </div>
   <div class="coll-nav" id="collNav">
     <button class="coll-btn prev" id="collPrev" aria-label="Өмнөх" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
