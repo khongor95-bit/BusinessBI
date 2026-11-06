@@ -21,11 +21,11 @@
 <meta property="og:locale" content="mn_MN">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="site.css">
-<link rel="stylesheet" href="shell.css?v=20261106d">
+<link rel="stylesheet" href="shell.css?v=20261106e">
 <script src="mp.js"></script>
 <script src="ebarimt.js"></script>
 <script src="site.js?v=20261105" defer></script>
-<script src="shell.js?v=20261106d" defer></script>
+<script src="shell.js?v=20261106e" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -313,6 +313,7 @@ body.ol .ms b{color:#111827}
   [search,fLoc,fSpec,fSort].forEach(el=>el.addEventListener('input',render));
   grid.addEventListener('click',e=>{ const c=e.target.closest('.acc'); if(!c) return; const a=ACC.find(x=>x.id===c.dataset.id); if(a) openProfile(a); });
   $('openReqLink').onclick=e=>{e.preventDefault(); openRequest(null);};
+  if(location.hash==='#request') setTimeout(()=>openRequest(null),300);
 
   const mbg=$('mbg'), modal=$('modal');
   const open=html=>{ modal.innerHTML=`<button class="mx" id="mx">×</button>`+html; mbg.classList.add('open'); document.body.style.overflow='hidden'; $('mx').onclick=close; };

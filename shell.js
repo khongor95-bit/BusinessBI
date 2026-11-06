@@ -136,12 +136,36 @@ if(!document.getElementById('nlModal') && !B.dataset.noFloat) B.appendChild(frag
   ];
   // Урамшууллын код: ?ref=CODE → 60 хоног хадгална (pay.js төлбөрийн цонхонд автоматаар хэрэглэнэ)
   try{ const rf=new URLSearchParams(location.search).get('ref'); if(rf&&/^[A-Za-z0-9]{4,16}$/.test(rf)) localStorage.setItem('bbi_ref',JSON.stringify({code:rf.toUpperCase(),t:Date.now()})); }catch(e){}
+
+  // «Нягтлан олох» mega: баталгаажсан нягтлангууд (Supabase, anon уншилт) + үлдсэн нүдэнд үйлдлийн карт
+  const SBU='https://mpfjceziasadnswwnkpc.supabase.co', SBK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wZmpjZXppYXNhZG5zd3dua3BjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDY3MDMsImV4cCI6MjA5ODI4MjcwM30.LJ1Fh2TGjyPDv6EeTDzlhcR0S3WkUHhy2yRxnop940A';
+  const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const ini=n=>String(n||'').replace(/\./g,' ').trim().split(/\s+/).map(p=>p[0]||'').slice(0,2).join('').toUpperCase();
+  const mnt=v=>v?Number(v).toLocaleString('en-US')+'₮':'';
+  const ACT=[
+    ['accountants.html#request','<path d="M4 4h16v12H5.2L4 17.2z"/><path d="M8 9h8M8 12h5"/>','Нээлттэй хүсэлт илгээх','Хэрэгцээгээ бичээд нягтлангуудаас санал ав'],
+    ['accountants.html','<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/>','Нягтлан хайх','Байршил, мэргэшил, үнээр шүүх'],
+    ['for_accountants.html','<circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7"/><path d="M19 4v4M17 6h4"/>','Нягтлан бол бүртгүүлэх','Профайлаа нээж, харилцагч ав'],
+    ['my.html','<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 14h4"/>','Гэрээ, самбар','Гэрээ, тайлангийн явцаа хар']];
+  const accCard=a=>`<a class="acc-c" href="accountants.html"><div class="acc-h">${a.photo_url?`<img class="acc-ph" src="${esc(a.photo_url)}" alt="" loading="lazy">`:`<span class="acc-ph">${esc(ini(a.name))}</span>`}<div><b>${esc(a.name)}${a.verified?' <i title="Баталгаажсан">✓</i>':''}</b><small>${esc(a.location||'')}${a.experience?' · '+a.experience+' жил':''}</small></div></div><p>${esc((a.specialties||[]).slice(0,3).join(' · '))}</p><div class="acc-f"><span>${a.review_count?`★ ${Number(a.rating||0).toFixed(1)} <em>(${a.review_count})</em>`:'<em>Шинэ</em>'}</span>${a.price_from?`<span>${mnt(a.price_from)}<em>/сараас</em></span>`:''}</div></a>`;
+  const actCard=(x,i)=>`<a class="acc-c act${i===0?' pri':''}" href="${x[0]}"><span class="acc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${x[1]}</svg></span><b>${x[2]}</b><p>${x[3]}</p><span class="acc-go">${ARR}</span></a>`;
+  function accFill(list){
+    const cards=list.slice(0,4).map(accCard);
+    let note='';
+    if(!list.length) note=`<div class="acc-note"><b>Эхний баталгаажсан нягтлангууд бүртгэгдэж байна.</b> Одоо нээлттэй хүсэлт илгээвэл тохирох нягтлан тантай холбогдоно.</div>`;
+    const acts=ACT.slice(0,Math.max(0,4-cards.length)).map(actCard);
+    return note+cards.join('')+acts.join('');
+  }
+  let accLoaded=false;
+  function loadAcc(){ if(accLoaded) return; accLoaded=true;
+    fetch(SBU+'/rest/v1/mp_accountants?select=id,name,photo_url,verified,location,experience,rating,review_count,price_from,specialties&status=eq.approved&order=verified.desc,rating.desc&limit=4',{headers:{apikey:SBK,Authorization:'Bearer '+SBK}})
+      .then(r=>r.ok?r.json():[]).then(d=>{ const g=document.getElementById('megaAcc'); if(g&&Array.isArray(d)&&d.length) g.innerHTML=accFill(d); }).catch(()=>{}); }
   function init(){
     const nav=document.querySelector('.bbi-nav'), menu=document.getElementById('bbiMenu'); if(!nav||!menu||nav.dataset.home) return !!(nav&&menu);
     nav.dataset.home='1';
     // Санхүүгийн програмыг эхэнд (алтан pill), Хэрэгслүүд хоёрт (mega)
     const links=[...menu.querySelectorAll(':scope > a:not(.bbi-cta)')];
-    const fin=links.find(a=>/businessbi_journal/.test(a.getAttribute('href'))), tools=links.find(a=>/tools\.html/.test(a.getAttribute('href')));
+    const fin=links.find(a=>/businessbi_journal/.test(a.getAttribute('href'))), tools=links.find(a=>/tools\.html/.test(a.getAttribute('href'))), accL=links.find(a=>/^accountants\.html/.test(a.getAttribute('href')));
     if(fin) menu.insertBefore(fin, menu.firstChild);
     menu.querySelectorAll(':scope > a:not(.bbi-cta)').forEach(a=>{ if(a.querySelector('.t')) return; const t=a.textContent; a.innerHTML=`<span class="t">${t}</span><span class="dup" aria-hidden="true">${t}</span>`; a.classList.remove('active'); });
     if(!tools || matchMedia('(max-width:960px)').matches && false) return true;
@@ -149,19 +173,23 @@ if(!document.getElementById('nlModal') && !B.dataset.noFloat) B.appendChild(frag
     mega.innerHTML=`<div class="mega-c"><div class="mega-l">
       <div class="mega-tabs"><p class="lbl">Ангилал</p><div class="mega-nav">${TABS.map((t,i)=>`<button type="button" data-i="${i}" class="${i?'':'on'}"><span class="ic">${IC[t.k]}</span><span class="h">${t.n}</span></button>`).join('')}</div>
         <div class="mega-foot"><a href="learn.html"><span>Зөвлөгөө</span>${ARR}</a></div></div>
-      <div class="mega-r">${TABS.map((t,i)=>`<div class="mega-panel ${i?'':'on'}"><div class="mega-head"><p>${t.n}</p><a class="mega-all" href="${t.all[0]}"><span>${t.all[1]} ${t.all[2]!==''?`<small>(${t.all[2]})</small>`:''}</span>${ARR}</a></div><div class="mega-grid">${t.items.join('')}</div></div>`).join('')}</div>
+      <div class="mega-r">${TABS.map((t,i)=>`<div class="mega-panel ${i?'':'on'}"><div class="mega-head"><p>${t.n}</p><a class="mega-all" href="${t.all[0]}"><span>${t.all[1]} ${t.all[2]!==''?`<small>(${t.all[2]})</small>`:''}</span>${ARR}</a></div><div class="mega-grid">${t.items.join('')}</div></div>`).join('')}<div class="mega-panel accp"><div class="mega-head"><p>Нягтлан олох</p><a class="mega-all" href="accountants.html"><span>Бүх нягтлан</span>${ARR}</a></div><div class="mega-grid" id="megaAcc">${accFill([])}</div></div></div>
     </div></div>`;
     const ov=document.createElement('div'); ov.className='mega-ov';
     nav.insertBefore(mega, nav.firstChild); nav.appendChild(ov);
     const btns=[...mega.querySelectorAll('.mega-nav button')], panels=[...mega.querySelectorAll('.mega-panel')];
     btns.forEach((b,i)=>{ const act=()=>{ btns.forEach(x=>x.classList.toggle('on',x===b)); panels.forEach((p,j)=>p.classList.toggle('on',j===i)); }; b.addEventListener('mouseenter',act); b.addEventListener('click',act); });
     let tm=null;
-    const open=()=>{ if(matchMedia('(max-width:960px)').matches) return; clearTimeout(tm); document.body.classList.add('mega-open'); tools.classList.add('mega-on'); };
-    const close=()=>{ clearTimeout(tm); tm=setTimeout(()=>{ document.body.classList.remove('mega-open'); tools.classList.remove('mega-on'); },180); };
-    [tools,mega].forEach(el=>{ el.addEventListener('mouseenter',open); el.addEventListener('mouseleave',close); });
-    menu.querySelectorAll(':scope > a').forEach(a=>{ if(a!==tools) a.addEventListener('mouseenter',()=>{ clearTimeout(tm); document.body.classList.remove('mega-open'); tools.classList.remove('mega-on'); }); });
+    const trig=[tools,accL].filter(Boolean);
+    const shut=()=>{ document.body.classList.remove('mega-open'); trig.forEach(x=>x.classList.remove('mega-on')); };
+    const open=(el)=>{ if(matchMedia('(max-width:960px)').matches) return; clearTimeout(tm);
+      if(el===tools||el===accL){ const acc=el===accL; mega.classList.toggle('acc',acc); trig.forEach(x=>x.classList.toggle('mega-on',x===el)); if(acc) loadAcc(); }
+      document.body.classList.add('mega-open'); };
+    const close=()=>{ clearTimeout(tm); tm=setTimeout(shut,180); };
+    [...trig,mega].forEach(el=>{ el.addEventListener('mouseenter',()=>open(el)); el.addEventListener('mouseleave',close); });
+    menu.querySelectorAll(':scope > a').forEach(a=>{ if(!trig.includes(a)) a.addEventListener('mouseenter',()=>{ clearTimeout(tm); shut(); }); });
     ov.addEventListener('mouseenter',close);
-    addEventListener('keydown',e=>{ if(e.key==='Escape'){ document.body.classList.remove('mega-open'); tools.classList.remove('mega-on'); } });
+    addEventListener('keydown',e=>{ if(e.key==='Escape') shut(); });
     return true;
   }
   const tryInit=(n)=>{ if(init()) return; if(n<40) setTimeout(()=>tryInit(n+1),50); };
