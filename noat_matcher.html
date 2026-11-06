@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="shell.css?v=20261106ol">
-<script src="site.js?v=20261106t" defer></script>
-<script src="shell.js?v=20261106t" defer></script>
+<script src="site.js?v=20261106e1" defer></script>
+<script src="shell.js?v=20261106e1" defer></script>
 <script src="mp.js"></script>
 
 <title>НӨАТ Тулгагч · BusinessBI</title>
@@ -220,7 +220,7 @@
           </button>
         </div>
         <div id="jrnBox" style="display:none;margin-top:10px;padding:10px 12px;border:1px dashed var(--line,#d6d6d6);border-radius:10px;font-size:12.5px;">
-          <b>Санхүүгийн програмаас шууд ачаалах</b> — журнал дахь НӨАТ-тай баримтуудаар дотоод бүртгэлийг үүсгэнэ.
+          <b>Sonet ERP-ээс шууд ачаалах</b> — журнал дахь НӨАТ-тай баримтуудаар дотоод бүртгэлийг үүсгэнэ.
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center;">
             <select id="jrnCo" style="padding:6px 8px;border-radius:8px;border:1px solid #d6d6d6;"></select>
             <button class="btn ghost sm" type="button" onclick="loadFromJournal('buy')">Худалдан авалт</button>
@@ -968,7 +968,7 @@ function setupDrop(which){
 ["A","B"].forEach(setupDrop);
 // Sheet/header сонголт зөвхөн File A-д (eBarimt). File B нь тогтсон загвартай.
 $("#tplBtn").onclick=downloadTemplate;
-/* ── Санхүүгийн програмын (businessbi_journal) журналаас дотоод бүртгэл үүсгэх ── */
+/* ── Sonet ERP-ийн (businessbi_journal) журналаас дотоод бүртгэл үүсгэх ── */
 function journalCompanies(){
   let co={list:[{id:'default',name:'Үндсэн компани'}]};
   try{ const c=JSON.parse(localStorage.getItem('bbi_companies_v1')||'null'); if(c&&Array.isArray(c.list)&&c.list.length) co=c; }catch(e){}
@@ -977,7 +977,7 @@ function journalCompanies(){
 }
 function bbiUnlocked(){ try{ for(let i=0;i<sessionStorage.length;i++){ const k=sessionStorage.key(i); if(k&&k.startsWith('bbi_unlock::')&&Date.now()-(+sessionStorage.getItem(k)||0)<15*60*1000) return true; } }catch(e){} return false; }
 function loadFromJournal(kind){
-  if(!bbiUnlocked()){ toast('Санхүүгийн програмд нэвтэрч PIN-ээ оруулсны дараа журналаас ачаална',true); window.open('businessbi_journal.html','_blank'); return; }
+  if(!bbiUnlocked()){ toast('Sonet ERP-д нэвтэрч PIN-ээ оруулсны дараа журналаас ачаална',true); window.open('businessbi_journal.html','_blank'); return; }
   const key=$("#jrnCo").value; let db=null;
   try{ db=JSON.parse(localStorage.getItem(key)||'null'); }catch(e){}
   if(!db||!Array.isArray(db.journal)){ toast("Журнал олдсонгүй",true); return; }
@@ -1018,6 +1018,6 @@ $("#search").oninput=()=>{ if(state.result)renderTable(); };
 
 </script>
 
-<section class="bbi-band"><p class="k">BusinessBI санхүүгийн програм</p><h2>Журналаа бич. Тайлан нь бэлэн.</h2><p>Гүйлгээгээ бүртгэхэд СТ-1–СТ-4 санхүүгийн тайлан, татварын тайлан автоматаар — Сангийн сайдын 361-р тушаалын дагуу.</p><a href="businessbi_journal.html">14 хоног үнэгүй турших →</a></section>
+<section class="bbi-band"><p class="k">BusinessBI · Sonet ERP</p><h2>Журналаа бич. Тайлан нь бэлэн.</h2><p>Гүйлгээгээ бүртгэхэд СТ-1–СТ-4 санхүүгийн тайлан, татварын тайлан автоматаар — Сангийн сайдын 361-р тушаалын дагуу.</p><a href="businessbi_journal.html">14 хоног үнэгүй турших →</a></section>
 </body>
 </html>

@@ -14,7 +14,7 @@
   const ADMIN_EMAIL = "khongor95@gmail.com";
   const MENU = [
     ["tools.html", "Хэрэгслүүд"],
-    ["businessbi_journal.html", "Sonet"],
+    ["businessbi_journal.html", "Sonet ERP"],
     ["accountants.html", "Нягтлан олох"],
     ["pricing.html", "Үнэ"],
     ["contact.html", "Холбоо барих"],
@@ -49,11 +49,11 @@
         <div class="bbi-foot-grid">
           <div class="bbi-foot-col">
             <a href="index.html" class="bbi-logo"><span>Business<b>BI</b></span></a>
-            <p class="bbi-foot-tag">Монголын нягтлан бодогч, жижиг бизнест зориулсан санхүүгийн програм, автоматжуулалтын хэрэгслүүд.</p>
+            <p class="bbi-foot-tag">Монголын нягтлан бодогч, жижиг бизнест зориулсан Sonet ERP, автоматжуулалтын хэрэгслүүд.</p>
           </div>
           <div class="bbi-foot-col">
             <h5>Бүтээгдэхүүн</h5>
-            <a href="businessbi_journal.html">Sonet — санхүүгийн програм</a>
+            <a href="businessbi_journal.html">Sonet ERP</a>
             <a href="ndsh_hhoat_converter.html">НДШ / ХХОАТ хөрвүүлэгч</a>
             <a href="noat_matcher.html">НӨАТ тулгагч</a>
             <a href="payroll.html">Цалин бодогч</a>

@@ -231,8 +231,8 @@ td .d2{display:block;font-size:12px;color:var(--muted);font-weight:400;margin-to
 
     <section class="card empty" id="emptyState" hidden>
       <h2>Журналд бичилт алга</h2>
-      <p>Дашбоард ерөнхий журналын бичилтээс бодит цагт тооцогддог. Эхлээд санхүүгийн програмд банкны хуулга импортлох эсвэл гар бичилт хийнэ үү — эсвэл жишээ датагаар үзээрэй.</p>
-      <div class="acts"><a class="btn primary" href="businessbi_journal.html#page=journal">Sonet програм нээх</a><a class="btn" href="dashboard.html?demo=1">Жишээ датагаар үзэх</a></div>
+      <p>Дашбоард ерөнхий журналын бичилтээс бодит цагт тооцогддог. Эхлээд Sonet ERP-д банкны хуулга импортлох эсвэл гар бичилт хийнэ үү — эсвэл жишээ датагаар үзээрэй.</p>
+      <div class="acts"><a class="btn primary" href="businessbi_journal.html#page=journal">Sonet ERP нээх</a><a class="btn" href="dashboard.html?demo=1">Жишээ датагаар үзэх</a></div>
     </section>
 
     <div id="content">
@@ -304,11 +304,11 @@ function bbiLockedNote(){
   if(document.getElementById('bbiLockNote')) return;
   const d=document.createElement('div'); d.id='bbiLockNote';
   d.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(20,20,20,.92);display:flex;align-items:center;justify-content:center;padding:16px;font-family:system-ui,Arial,sans-serif;';
-  d.innerHTML='<div style="max-width:360px;background:#1e1e1e;border:1px solid #2e2e2e;border-radius:16px;padding:26px;color:#f3f1ec;text-align:center;"><div style="font-size:30px;margin-bottom:8px;">🔒</div><h2 style="font-size:18px;margin:0 0 8px;">Дашбоард түгжигдсэн</h2><p style="font-size:13px;color:#b9b3a7;line-height:1.5;margin:0 0 16px;">Санхүүгийн мэдээллийг харахын тулд санхүүгийн програмд нэвтэрч, PIN кодоо оруулна уу.</p><a href="businessbi_journal.html" style="display:block;padding:11px;border-radius:10px;background:#c9a24d;color:#1c1c1c;font-weight:700;text-decoration:none;">Нэвтрэх →</a><a href="dashboard.html?demo=1" style="display:block;margin-top:10px;color:#b9b3a7;font-size:12px;">Жишээ датагаар үзэх</a></div>';
+  d.innerHTML='<div style="max-width:360px;background:#1e1e1e;border:1px solid #2e2e2e;border-radius:16px;padding:26px;color:#f3f1ec;text-align:center;"><div style="font-size:30px;margin-bottom:8px;">🔒</div><h2 style="font-size:18px;margin:0 0 8px;">Дашбоард түгжигдсэн</h2><p style="font-size:13px;color:#b9b3a7;line-height:1.5;margin:0 0 16px;">Санхүүгийн мэдээллийг харахын тулд Sonet ERP-д нэвтэрч, PIN кодоо оруулна уу.</p><a href="businessbi_journal.html" style="display:block;padding:11px;border-radius:10px;background:#c9a24d;color:#1c1c1c;font-weight:700;text-decoration:none;">Нэвтрэх →</a><a href="dashboard.html?demo=1" style="display:block;margin-top:10px;color:#b9b3a7;font-size:12px;">Жишээ датагаар үзэх</a></div>';
   document.body.appendChild(d);
 }
 function bbiUnlocked(){ try{ for(let i=0;i<sessionStorage.length;i++){ const k=sessionStorage.key(i); if(k&&k.startsWith('bbi_unlock::')&&Date.now()-(+sessionStorage.getItem(k)||0)<15*60*1000) return true; } }catch(e){} return false; }
-/* Санхүүгийн програмын давхар нэвтрэлт (нэвтрэх + PIN) хийгдээгүй бол локал санхүүгийн датаг харуулахгүй */
+/* Sonet ERP-ийн давхар нэвтрэлт (нэвтрэх + PIN) хийгдээгүй бол локал санхүүгийн датаг харуулахгүй */
 function loadLocal(id){
   const d=EMPTY();
   if(!bbiUnlocked()){ try{ if(localStorage.getItem(lsKey(id))) LOCKED_NOTE=true; }catch(e){} return d; }

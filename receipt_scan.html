@@ -14,8 +14,8 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg?v=2">
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="shell.css?v=20261106ol">
-<script src="site.js?v=20261106t" defer></script>
-<script src="shell.js?v=20261106t" defer></script>
+<script src="site.js?v=20261106e1" defer></script>
+<script src="shell.js?v=20261106e1" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -61,8 +61,8 @@ table.t{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}.t t
 <body data-nav-title="Баримтын зураг → бичилт" data-auth="supabase" class="ol">
 <div class="pt" id="pt" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9"/></svg></div>
 <div class="wrap">
-  <div class="head"><div><h1>Баримтын зураг → журналын бичилт</h1><p>И-баримт, НӨАТ-ын падаан, нэхэмжлэхийн зургийг уншуулахад борлуулагч, ТТД, ДДТД, «Төлөх дүн», «НӨАТ» задарч, компанийн НӨАТ-ын горимоор журналын бичилтийн <b>санал</b> гарна. Нягтлан батлахаас өмнө юу ч бичигдэхгүй — санал «Санхүүгийн програм → Импорт → Баримтын зураг» хэсэгт очиж, тэнд батлагдана.</p></div>
-    <div><a class="btn" href="businessbi_journal.html">Sonet програм →</a></div></div>
+  <div class="head"><div><h1>Баримтын зураг → журналын бичилт</h1><p>И-баримт, НӨАТ-ын падаан, нэхэмжлэхийн зургийг уншуулахад борлуулагч, ТТД, ДДТД, «Төлөх дүн», «НӨАТ» задарч, компанийн НӨАТ-ын горимоор журналын бичилтийн <b>санал</b> гарна. Нягтлан батлахаас өмнө юу ч бичигдэхгүй — санал «Sonet ERP → Импорт → Баримтын зураг» хэсэгт очиж, тэнд батлагдана.</p></div>
+    <div><a class="btn" href="businessbi_journal.html">Sonet ERP →</a></div></div>
   <div class="layout">
     <div class="panel">
       <div class="step">Алхам 1</div><h2>Зураг оруулах</h2>
@@ -121,7 +121,7 @@ async function runExtract(){
   }catch(e){ console.error(e); $('res').innerHTML='<div class="err"><b>Уншиж чадсангүй.</b> '+esc(e.message||e)+'<br>Зураг тод, бүтэн (дээд, доод хэсэг нь орсон) байх ёстой. Дахин оролдоно уу.</div>'; }
   btn.disabled=false; btn.textContent='Уншуулах';
 }
-$('runBtn').onclick=BBIGate.protect(BBIPay.require({tool:'receipt', title:'Баримт уншуулах', meta:()=>({file:FILE&&FILE.name}), bullets:['Баримтын зургаас борлуулагч, ТТД, огноо, дүн, НӨАТ-ыг автоматаар уншина','Журналын бичилтийн санал гаргаж, Sonet-д илгээнэ','Төлснөөс хойш 24 цагийн турш хязгааргүй уншуулна'], desc:'' }, runExtract), {tool:'Баримтын зураг → бичилт', action:'extract'});
+$('runBtn').onclick=BBIGate.protect(BBIPay.require({tool:'receipt', title:'Баримт уншуулах', meta:()=>({file:FILE&&FILE.name}), bullets:['Баримтын зургаас борлуулагч, ТТД, огноо, дүн, НӨАТ-ыг автоматаар уншина','Журналын бичилтийн санал гаргаж, Sonet ERP-д илгээнэ','Төлснөөс хойш 24 цагийн турш хязгааргүй уншуулна'], desc:'' }, runExtract), {tool:'Баримтын зураг → бичилт', action:'extract'});
 function refreshTicket(){ try{ const t=BBIPay.ticketInfo('receipt'); $('ticket').textContent=t?('Эрх хүчинтэй: '+t.leftText):'Эрх авна (5,000₮ / 24 цаг)'; }catch(e){} }
 refreshTicket(); setInterval(refreshTicket,30000);
 
@@ -184,7 +184,7 @@ function renderResult(){
       </tbody></table>
       <div class="cite">§ НӨАТ-ын тухай хууль 14.1 (худалдан авалтын НӨАТ-ыг хасах); НББ-ийн тухай хууль 13.7 (анхан шатны баримт: и-баримт ДДТД); Заавар 116: 70 зардал / 12 НӨАТ-ын авлага / 31 өглөг.</div>
       <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn p" onclick="sendToJournal()">Журналд санал болгох</button><button class="btn" onclick="RES=null;$('res').innerHTML='<div class=empty>Татгалзав — өөр зураг уншуулж болно</div>'">Татгалзах</button></div>
-      <div style="font-size:11.5px;color:var(--muted);margin-top:8px">Санал «Санхүүгийн програм → Импорт → Баримтын зураг» хэсэгт очно; тэнд нягтлан данс солих, батлах, татгалзах сонголттой. Батлахаас өмнө журналд юу ч бичигдэхгүй.</div>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:8px">Санал «Sonet ERP → Импорт → Баримтын зураг» хэсэгт очно; тэнд нягтлан данс солих, батлах, татгалзах сонголттой. Батлахаас өмнө журналд юу ч бичигдэхгүй.</div>
     </div>`;
   ['fPay','expAcc','fTotal','fVat'].forEach(id=>{ $(id).onchange=()=>{ r.payment_type=$('fPay').value; r.total=+$('fTotal').value||0; r.vat_amount=+$('fVat').value||0; renderResult(); }; });
 }
@@ -199,7 +199,7 @@ function sendToJournal(){
     thumb:thumb()};
   try{ const box=JSON.parse(localStorage.getItem(INBOX_KEY)||'[]'); box.push(item); localStorage.setItem(INBOX_KEY, JSON.stringify(box)); }catch(e){ toast('Хадгалж чадсангүй: '+e.message); return; }
   toast('Журналд санал илгээгдлээ — Импорт → Баримтын зураг хэсгээс батална');
-  $('res').innerHTML='<div class="note">✅ Санал илгээгдлээ. <a href="businessbi_journal.html#receipt">Санхүүгийн програм → Импорт → Баримтын зураг</a> хэсэгт батална.<br>Дараагийн баримтаа оруулж болно.</div>'; RES=null; FILE=null; $('prev').style.display='none'; $('runBtn').disabled=true; $('drop').innerHTML='<b>Зураг сонгох эсвэл чирж оруулах</b>JPG, PNG, WEBP';
+  $('res').innerHTML='<div class="note">✅ Санал илгээгдлээ. <a href="businessbi_journal.html#receipt">Sonet ERP → Импорт → Баримтын зураг</a> хэсэгт батална.<br>Дараагийн баримтаа оруулж болно.</div>'; RES=null; FILE=null; $('prev').style.display='none'; $('runBtn').disabled=true; $('drop').innerHTML='<b>Зураг сонгох эсвэл чирж оруулах</b>JPG, PNG, WEBP';
 }
 /* Жижиг thumbnail (160px) — журналд баримтын зураг харагдана; localStorage-д бага зай эзэлнэ */
 function thumb(){ try{ const img=$('prevImg'); const c=document.createElement('canvas'); const k=Math.min(1,160/Math.max(img.naturalWidth,img.naturalHeight)); c.width=Math.round(img.naturalWidth*k); c.height=Math.round(img.naturalHeight*k); c.getContext('2d').drawImage(img,0,0,c.width,c.height); return c.toDataURL('image/jpeg',0.6); }catch(e){ return ''; } }

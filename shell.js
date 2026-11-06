@@ -124,7 +124,7 @@ if(!document.getElementById('nlModal') && !B.dataset.noFloat) B.appendChild(frag
       card('invoice_generator.html','cv/invoice.jpg','Нэхэмжлэх үүсгэгч','Үнэгүй'),
       card('receipt_scan.html','cv/receipt.jpg','Баримт уншуулагч','5,000₮ / 24 цаг')]},
     {k:'apps',n:'Програм',all:['pricing.html','Үнэ, багц',''],items:[
-      card('businessbi_journal.html','cv/finance.jpg','Sonet — санхүүгийн програм','30 хоног үнэгүй · 19,900₮/сараас'),
+      card('businessbi_journal.html','cv/finance.jpg','Sonet ERP','30 хоног үнэгүй · 19,900₮/сараас'),
       card('payroll.html','cv/salary.jpg','Цалин бодогч','Beta · үнэгүй'),
       card('budget.html','cv/budget.jpg','Бизнес төлөвлөлт','Beta · үнэгүй'),
       card('financial_dashboard.html','cv/analysis.jpg','Санхүүгийн шинжилгээ','Үнэгүй')]},
@@ -163,7 +163,7 @@ if(!document.getElementById('nlModal') && !B.dataset.noFloat) B.appendChild(frag
   function init(){
     const nav=document.querySelector('.bbi-nav'), menu=document.getElementById('bbiMenu'); if(!nav||!menu||nav.dataset.home) return !!(nav&&menu);
     nav.dataset.home='1';
-    // Санхүүгийн програмыг эхэнд (алтан pill), Хэрэгслүүд хоёрт (mega)
+    // Sonet ERP-ийг эхэнд (алтан pill), Хэрэгслүүд хоёрт (mega)
     const links=[...menu.querySelectorAll(':scope > a:not(.bbi-cta)')];
     const fin=links.find(a=>/businessbi_journal/.test(a.getAttribute('href'))), tools=links.find(a=>/tools\.html/.test(a.getAttribute('href'))), accL=links.find(a=>/^accountants\.html/.test(a.getAttribute('href')));
     if(fin) menu.insertBefore(fin, menu.firstChild);
