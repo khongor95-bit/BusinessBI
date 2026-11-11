@@ -485,11 +485,203 @@ body:not(.th-gold) .chip.on{background:var(--c-accent);border-color:var(--c-acce
 .pl-status{font-size:12px;margin-top:8px;min-height:18px;color:var(--txt-sub);}
 .pl-status.err{color:var(--red);}
 .mod .lock{font-size:10px;color:#9a7330;font-weight:700;margin-left:4px;}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   SONET v4 — зүүн цэстэй шинэ бүрхүүл · харанхуй / гэрэлтэй / систем горим
+   Зөвхөн body.sk4 дээр үйлчилнэ. Тохиргоо → Дүр төрхөөс хуучин "Хар + алт",
+   "Excel ногоон" руу буцаахад доорх дүрмүүд огт хамаарахгүй.
+   ══════════════════════════════════════════════════════════════════════════ */
+body.sk4{
+  color-scheme:dark;
+  --k-bg:#0f1012; --k-panel:#15171a; --k-card:#1b1d21; --k-line:#2b2e34; --k-line2:#24272c;
+  --k-ink:#f2f1ee; --k-sub:#cfd1d6; --k-muted:#a6a9b0; --k-chip:#25282d; --k-hover:#202328;
+  --k-acc:#e3b54a; --k-acc-ink:#1a1405; --k-acc-text:#e3b54a; --k-acc-soft:#2e2717;
+  --k-good:#5cc98b; --k-good-soft:#16281f; --k-warn:#f0a35e; --k-warn-soft:#2e2216;
+  --k-bad:#ff8080; --k-bad-soft:#321a1a; --k-thead:#25282d;
+  --s-inc:#e3b54a; --s-exp:#6f9be0; --s-prof:#5cc98b; --s-loss:#ff8080;
+}
+body.sk4.sk-light{
+  color-scheme:light;
+  --k-bg:#f4f3ef; --k-panel:#fbfaf7; --k-card:#ffffff; --k-line:#e0ded6; --k-line2:#ebe9e2;
+  --k-ink:#17181b; --k-sub:#3d4047; --k-muted:#5a5d65; --k-chip:#efede6; --k-hover:#f0eee8;
+  --k-acc:#e3b54a; --k-acc-ink:#1a1405; --k-acc-text:#7d5a00; --k-acc-soft:#f8efd6;
+  --k-good:#1c7347; --k-good-soft:#e5f3ea; --k-warn:#8f5310; --k-warn-soft:#f8ecd9;
+  --k-bad:#b23333; --k-bad-soft:#f9e6e4; --k-thead:#26282d;
+  --s-inc:#b8902f; --s-exp:#3f6fb0; --s-prof:#1baf7a; --s-loss:#e34948;
+}
+/* Програмын хуучин хувьсагчдыг шинэ өнгөнд холбоно — бүх хуудас үүгээр дамжин шинэчлэгдэнэ */
+body.sk4{
+  --hdr:var(--k-thead); --hdr-d:var(--k-thead);
+  --c-accent:var(--k-acc-text); --c-accent-dark:var(--k-acc-text); --c-accent-soft:var(--k-acc-soft);
+  --c-green:var(--k-good); --c-green-dark:var(--k-good); --c-green-soft:var(--k-good-soft);
+  --c-surface:var(--k-card); --c-border:var(--k-line); --c-text:var(--k-ink); --c-muted:var(--k-muted); --c-ribbon:var(--k-panel);
+  --bg-page:var(--k-bg); --bg-surface:var(--k-card); --bg-row:var(--k-chip); --bg-hover:var(--k-hover); --bg-active:var(--k-acc-soft);
+  --bdr:var(--k-line); --bdr-soft:var(--k-line2); --bdr-strong:var(--k-line); --bdr-row:var(--k-line2);
+  --txt:var(--k-ink); --txt-sub:var(--k-sub); --txt-muted:var(--k-muted); --txt-accent:var(--k-acc-text);
+  --txt-danger:var(--k-bad); --txt-warn:var(--k-warn);
+  --tbl-shadow:none; --shadow:none;
+  --acc:var(--k-acc-text); --acc-d:var(--k-acc-text); --acc-soft:var(--k-acc-soft); --acc-mid:var(--k-acc-soft);
+  --green:var(--k-good); --green-soft:var(--k-good-soft); --red:var(--k-bad); --red-soft:var(--k-bad-soft);
+  --warn:var(--k-warn); --warn-soft:var(--k-warn-soft);
+  --bg:var(--k-bg); --surface:var(--k-card); --row:var(--k-chip); --hover:var(--k-hover); --sub:var(--k-sub); --muted:var(--k-muted);
+  --gold:var(--k-acc); --gold-d:var(--k-acc-text); --gold-l:var(--k-acc-soft);
+  --s-grid:var(--k-line2); --s-ax:var(--k-muted);
+  --r-sm:8px; --r-md:10px; --r-lg:14px; --r:14px;
+  font-family:Inter,'Segoe UI',system-ui,Arial,sans-serif; font-size:12px;
+  background:var(--k-bg); color:var(--k-ink);
+}
+
+/* ── Бүрхүүл: зүүн цэс + агуулга ── */
+body.sk4 .app{display:grid;grid-template-columns:244px minmax(0,1fr);align-items:start;min-height:100vh;}
+body.sk4 .app>header{grid-column:1;position:sticky;top:0;height:100vh;box-sizing:border-box;overflow:hidden;display:flex;flex-direction:column;gap:10px;padding:16px 12px 12px;background:var(--k-panel);border-right:1px solid var(--k-line);}
+body.sk4 .app>main.main{grid-column:2;max-width:1360px;padding:26px 30px 70px;}
+body.sk4 .page{max-width:none;}
+body.sk4 .app-titlebar{display:contents;}
+body.sk4 .app-titlebar>*{flex-shrink:0;}
+body.sk4 .app-titlebar .tb-sep{display:none;}
+body.sk4 .app-titlebar .tb-brand{padding:0 6px 4px;}
+body.sk4 .app-titlebar .tb-logo{background:var(--k-acc);color:var(--k-acc-ink);border-radius:9px;width:30px;height:30px;}
+body.sk4 .app-titlebar .brand{font-size:14.5px;color:var(--k-ink);}
+body.sk4 .app-titlebar .tb-chip{width:100%;height:36px;justify-content:flex-start;background:var(--k-card);border-color:var(--k-line);border-radius:10px;color:var(--k-ink);}
+body.sk4 .app-titlebar .tb-chip:hover{background:var(--k-hover);border-color:var(--k-line);}
+body.sk4 .app-titlebar .tb-chip svg.chev{margin-left:auto;}
+body.sk4 .app-titlebar #qatCompanyName{max-width:150px;}
+body.sk4 .app-titlebar .tb-chip.sync{background:var(--k-chip);border-color:transparent;height:30px;}
+body.sk4 .app-titlebar .tb-right{order:9;margin:0;padding-top:10px;border-top:1px solid var(--k-line);flex-wrap:wrap;gap:4px;}
+body.sk4 .app-titlebar .tb-ico:hover,body.sk4 .app-titlebar a.tb-link:hover{background:var(--k-hover);color:var(--k-ink);}
+body.sk4 .app-titlebar a.tb-link{padding:0 8px;}
+body.sk4 .app-titlebar a.tb-link.primary{background:transparent;border-color:var(--k-line);color:var(--k-ink);}
+body.sk4 .app-tabbar{display:none;}
+body.sk4 .app-ribbon{order:5;flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:14px;height:auto;overflow-x:hidden;overflow-y:auto;padding:6px 0 8px;background:transparent;border:0;scrollbar-width:thin;}
+body.sk4 .ribbon-panel,body.sk4 .ribbon-panel.active{display:flex;flex-direction:column;gap:2px;height:auto;flex:none;}
+body.sk4 .ribbon-panel::before{display:block;padding:0 10px 4px;font-size:11px;font-weight:600;color:var(--k-muted);letter-spacing:.02em;}
+body.sk4 #rp-t-home::before{content:"Нүүр";}
+body.sk4 #rp-t-jnl::before{content:"1. Сарын бүртгэл";}
+body.sk4 #rp-t-chk::before{content:"2. Хяналт";}
+body.sk4 #rp-t-cls::before{content:"3. Хаалт";}
+body.sk4 #rp-t-rpt::before{content:"4. Тайлан";}
+body.sk4 #rp-t-reg::before{content:"Тохиргоо";}
+body.sk4 .rgroup{display:contents;}
+body.sk4 .rgroup::after,body.sk4 .rgroup-label,body.sk4 .ribbon-aside{display:none;}
+body.sk4 .rgroup-inner,body.sk4 .rcol{display:contents;}
+body.sk4 .rbtn,body.sk4 .rbtn-sm{flex-direction:row;justify-content:flex-start;align-items:center;gap:10px;width:100%;height:auto;min-height:36px;min-width:0;padding:0 10px;border-radius:9px;background:transparent;color:var(--k-muted);font-size:12.5px;text-align:left;}
+body.sk4 .rbtn .rl{font-size:12.5px;font-weight:500;color:inherit;text-align:left;white-space:normal;}
+body.sk4 .rbtn svg,body.sk4 .rbtn-sm svg{width:17px;height:17px;stroke:currentColor;}
+body.sk4 .rbtn:hover,body.sk4 .rbtn-sm:hover{background:var(--k-hover);color:var(--k-ink);}
+body.sk4 .rbtn.active{background:var(--k-chip);color:var(--k-ink);}
+body.sk4 .rbtn.active .rl{font-weight:600;color:inherit;}
+body.sk4 .rbtn.active svg{stroke:var(--k-acc-text);}
+body.sk4 .rbtn .sb-dot{position:static;margin-left:auto;}
+/* Хуудас руу оруулдаггүй үйлдлийн товчууд — дэд мөр болж харагдана */
+body.sk4 .rbtn:not([data-page]),body.sk4 .rbtn-sm{min-height:30px;padding-left:37px;font-size:12px;}
+body.sk4 .rbtn:not([data-page]) .rl{font-size:12px;font-weight:400;}
+body.sk4 .rbtn:not([data-page]) svg,body.sk4 .rbtn-sm svg{display:none;}
+body.sk4 .sb-dot{background:var(--k-line);}
+/* Өнгөний горимын сэлгүүр */
+.sk-seg{display:none;}
+body.sk4 .sk-seg{display:flex;width:100%;gap:2px;padding:3px;margin-bottom:4px;border:1px solid var(--k-line);border-radius:10px;background:var(--k-card);box-sizing:border-box;}
+body.sk4 .sk-seg button{flex:1;height:28px;border:0;border-radius:7px;background:transparent;color:var(--k-muted);font-size:11.5px;font-weight:600;}
+body.sk4 .sk-seg button:hover{color:var(--k-ink);}
+body.sk4 .sk-seg button.on{background:var(--k-acc);color:var(--k-acc-ink);}
+body.sk4 button:focus-visible,body.sk4 a:focus-visible{outline:2px solid var(--k-acc-text);outline-offset:2px;}
+
+/* ── Агуулга ── */
+body.sk4 .page-head{margin-bottom:20px;}
+body.sk4 .page-head h1{font-size:22px;letter-spacing:-.3px;}
+body.sk4 .page-head p{font-size:12.5px;max-width:820px;}
+body.sk4 .card{border-radius:16px;padding:18px 20px;box-shadow:none;}
+body.sk4 .card h3{font-size:14px;}
+body.sk4 .stat{border:1px solid var(--k-line);border-radius:16px;padding:16px 18px;}
+body.sk4 .stat .lbl{color:var(--k-muted);}
+body.sk4 input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]),
+body.sk4 select,body.sk4 textarea{background:var(--k-bg);color:var(--k-ink);border-color:var(--k-line);}
+body.sk4 input[type=file]{background:var(--k-bg);color:var(--k-ink);border-color:var(--k-line);}
+body.sk4 .btn{background:var(--k-chip);border-color:var(--k-line);color:var(--k-ink);}
+body.sk4 .btn:hover{background:var(--k-hover);}
+body.sk4 .btn.primary,body.sk4 .btn.primary:hover{background:var(--k-acc);border-color:var(--k-acc);color:var(--k-acc-ink);}
+body.sk4 .btn.primary:hover{filter:brightness(1.07);}
+body.sk4 .btn.danger{background:var(--k-bad-soft);border-color:var(--k-bad);color:var(--k-bad);}
+body.sk4 .tbl th{color:#f2f1ee;border-color:rgba(255,255,255,.08);border-bottom-color:rgba(255,255,255,.14);}
+body.sk4 .tbl td{border-color:var(--k-line2);}
+body.sk4 .set-sub,body.sk4 .set-sub th,body.sk4 .set-sub td{border-color:var(--k-line2);}
+body.sk4 .grp-head:hover td{background:var(--k-acc-soft);}
+body.sk4 .grp-count{background:var(--k-acc);color:var(--k-acc-ink);}
+body.sk4 .flt-in{background:var(--k-bg);color:var(--k-ink);}
+body.sk4 .badge.hist{background:var(--k-chip);color:var(--k-sub);}
+body.sk4 .steps,body.sk4 .step{background:var(--k-card);}
+body.sk4 .modal-bg{background:rgba(0,0,0,.62);}
+body.sk4 .modal{background:var(--k-card);color:var(--k-ink);border:1px solid var(--k-line);border-radius:16px;}
+body.sk4 .toast{background:var(--k-chip);color:var(--k-ink);border:1px solid var(--k-line);}
+body.sk4 .toast.err{background:var(--k-bad-soft);color:var(--k-bad);border-color:var(--k-bad);}
+body.sk4 .demo-bar,body.sk4 .pl-promo{background:var(--k-acc-soft);border-color:var(--k-line);color:var(--k-ink);}
+body.sk4 .preset.on,body.sk4 .chip.on,body.sk4 .pl-seg button.on{background:var(--k-acc);border-color:var(--k-acc);color:var(--k-acc-ink);}
+body.sk4 .hc-tip{background:var(--k-chip);color:var(--k-ink);border:1px solid var(--k-line);}
+body.sk4 .hc-tip b{color:var(--k-acc-text);}
+body.sk4 .hc-body svg circle.mk{stroke:var(--k-card);}
+body.sk4 .pl .cur{background:var(--k-acc);color:var(--k-acc-ink);}
+body.sk4 .link{color:var(--k-acc-text);}
+body.sk4 .mod .lock{color:var(--k-acc-text);}
+@media (max-width:860px){
+  body.sk4 .app{grid-template-columns:minmax(0,1fr);}
+  body.sk4 .app>header{position:static;height:auto;border-right:0;border-bottom:1px solid var(--k-line);padding:12px;}
+  body.sk4 .app>main.main{grid-column:1;padding:18px 14px 60px;}
+  body.sk4 .app-ribbon{flex:none;flex-direction:row;gap:4px;overflow-x:auto;overflow-y:hidden;padding:2px 0 6px;}
+  body.sk4 .ribbon-panel,body.sk4 .ribbon-panel.active{flex-direction:row;gap:4px;}
+  body.sk4 .ribbon-panel::before,body.sk4 .rbtn:not([data-page]),body.sk4 .rbtn-sm{display:none;}
+  body.sk4 .rbtn{width:auto;white-space:nowrap;min-height:40px;border:1px solid var(--k-line);}
+  body.sk4 .rbtn .rl{white-space:nowrap;}
+  body.sk4 .rbtn .sb-dot{display:none;}
+  body.sk4 .app-titlebar .tb-right{border-top:0;padding-top:0;}
+}
+@media print{
+  body.sk4 .app{display:block;}
+  body.sk4 .app>header{display:none;}
+}
+
+/* ── Нүүр: датаны урсгал (бүх дүр төрхөд ажиллана) ── */
+:root{--pipe-acc:var(--c-accent);}
+body.th-gold{--pipe-acc:var(--gold-d);}
+body.sk4{--pipe-acc:var(--k-acc-text);}
+.pipe-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+.pipe-head h3{margin:0;}
+.pipe-head span{font-size:11.5px;color:var(--muted);}
+.pipe{display:flex;gap:12px;align-items:stretch;flex-wrap:wrap;}
+.pipe-src{flex:2 1 380px;min-width:0;display:flex;flex-direction:column;gap:6px;}
+.pipe-row{display:flex;align-items:stretch;border:1px solid var(--bdr);border-radius:10px;background:var(--surface);overflow:hidden;}
+.pipe-row.on{border-color:var(--pipe-acc);background:var(--acc-soft);}
+.pipe-pick{flex:1 1 0;min-width:0;display:flex;align-items:center;gap:10px;min-height:44px;padding:6px 12px;border:0;background:transparent;color:var(--txt);text-align:left;font-size:12.5px;}
+.pipe-pick:hover{background:var(--hover);}
+.pipe-pick .c{flex:1 1 0;min-width:0;display:flex;flex-direction:column;}
+.pipe-pick b{font-weight:600;}
+.pipe-pick small{font-size:11px;color:var(--muted);}
+.pipe-pick small.ok{color:var(--green);font-weight:600;}
+.pipe-pick small.no{color:var(--warn);font-weight:600;}
+.pipe svg{width:16px;height:16px;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.pipe-row.on svg,.pipe.lit .pipe-trunk svg{stroke:var(--pipe-acc);}
+.pipe-go{flex:0 0 auto;padding:0 12px;border:0;border-left:1px solid var(--bdr);background:transparent;color:var(--muted);font-size:11.5px;font-weight:600;}
+.pipe-go:hover{background:var(--hover);color:var(--txt);}
+.pipe-trunk{flex:0 0 20px;display:flex;align-items:center;justify-content:center;}
+.pipe-stages{flex:3 1 380px;min-width:0;display:flex;gap:10px;flex-wrap:wrap;}
+.pipe-st{flex:1 1 140px;min-width:0;display:flex;flex-direction:column;gap:6px;padding:14px;border:1px solid var(--bdr);border-radius:12px;background:var(--surface);color:var(--txt);text-align:left;font-size:12px;}
+.pipe-st:hover{background:var(--hover);}
+.pipe.lit .pipe-st{border-color:var(--pipe-acc);}
+.pipe-st .k{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+.pipe-st .t{font-size:13.5px;font-weight:700;}
+.pipe-st .m{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;}
+.pipe-st .m.ok{color:var(--green);}
+.pipe-st .m.warn{color:var(--warn);}
+.pipe-st .m.err{color:var(--red);}
+.pipe-st .s{margin-top:auto;padding-top:6px;border-top:1px solid var(--bdr);font-size:11px;color:var(--muted);}
+@media (max-width:860px){ .pipe-trunk{display:none;} }
 </style>
 </head>
 <body class="th-gold locked">
 <div id="lockScreen"><div class="lk-card" id="lkCard"><div class="lk-logo">B</div><h2>Ачаалж байна…</h2></div></div>
-<script>try{ if(localStorage.getItem('bbi_journal_theme')==='green') document.body.classList.remove('th-gold'); }catch(e){}</script>
+<script>(function(){ var v='dark'; try{ v=localStorage.getItem('bbi_journal_theme')||'dark'; }catch(e){}
+  var b=document.body, sk=(v==='dark'||v==='light'||v==='system');
+  if(sk){ b.classList.remove('th-gold'); b.classList.add('sk4');
+    if(v==='light'||(v==='system'&&window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)) b.classList.add('sk-light'); }
+  else if(v==='green'){ b.classList.remove('th-gold'); } })();</script>
 <div class="app">
 <header>
 <div class="app-titlebar">
@@ -498,6 +690,7 @@ body:not(.th-gold) .chip.on{background:var(--c-accent);border-color:var(--c-acce
   <button class="tb-chip" id="qatCompanyBtn" onclick="openCompanyModal()" title="Компани солих, нэмэх"><svg viewBox="0 0 16 16"><path d="M2.5 14V5l5.5-3 5.5 3v9"/><path d="M6 14v-4h4v4"/><path d="M1 14h14"/></svg><span id="qatCompanyName"></span><svg class="chev" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></svg></button>
   <button class="tb-chip sync cloud-ui" style="display:none;" id="qatAuthBtn" onclick="cloudAuthClick()" title="Cloud хадгалалт (Supabase)"><span class="sb-dot" id="syncDot"></span><span id="qatAuthLabel">Локал</span></button>
   <div class="tb-right">
+    <div class="sk-seg" id="skSeg" role="group" aria-label="Өнгөний горим"><button type="button" data-v="dark" onclick="setTheme('dark')">Харанхуй</button><button type="button" data-v="light" onclick="setTheme('light')">Гэрэлтэй</button><button type="button" data-v="system" onclick="setTheme('system')">Систем</button></div>
     <button class="tb-ico" title="Нөөц хадгалах (JSON)" onclick="downloadBackup()"><svg viewBox="0 0 16 16"><path d="M2.5 2.5h7.5l3 3v8h-10.5z"/><path d="M5 2.5v3h5v-3"/><rect x="5" y="9" width="6" height="4.5"/></svg></button>
     <button class="tb-ico" title="Түгжих (PIN-ээр нээнэ)" onclick="LOCK.lockNow()"><svg viewBox="0 0 16 16"><rect x="3" y="7" width="10" height="7" rx="1.2"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg></button>
     <button class="tb-ico" title="Хэвлэх" onclick="window.print()"><svg viewBox="0 0 16 16"><path d="M4.5 5.5V2h7v3.5"/><rect x="2.5" y="5.5" width="11" height="5.5" rx="1"/><path d="M4.5 9.5h7V14h-7z"/></svg></button>
@@ -517,6 +710,7 @@ body:not(.th-gold) .chip.on{background:var(--c-accent);border-color:var(--c-acce
   <div class="page-head"><h1>Нүүр — самбар</h1><p id="homeSub">Бүх тоо ерөнхий журналаас бодит цагт тооцогдоно. Асуудал илэрвэл доорх жагсаалтад улаанаар харагдана.</p></div>
   <div id="homeWelcome"></div>
   <div class="stat-row" id="homeStats"></div>
+  <div class="card" id="homePipe" style="margin-bottom:14px;display:none;"></div>
   <div class="grid2 hc-grid" id="homeCharts" style="margin-bottom:14px;">
     <div class="card hc"><div class="hc-head"><h3>Орлого, зардал, ашиг — сараар</h3><div class="hc-tools"><button class="chip on" data-v="month" onclick="hcMode(this)">Сараар</button><button class="chip" data-v="cum" onclick="hcMode(this)">Өссөн дүнгээр</button></div></div>
       <div class="hc-legend"><span><i style="background:var(--s-inc)"></i>Орлого</span><span><i style="background:var(--s-exp)"></i>Зардал</span><span><i class="dot" style="background:var(--s-prof)"></i>Татварын өмнөх ашиг</span></div>
@@ -543,7 +737,7 @@ body:not(.th-gold) .chip.on{background:var(--c-accent);border-color:var(--c-acce
   <div class="page-head"><h1>Тохиргоо</h1><p>Компанийн мэдээлэл, тайлант үе, татварын хувь, хаалтын бичилтэд ашиглах дансны кодууд.</p></div>
   <div class="grid2">
     <div class="card" style="grid-column:1/-1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><h3 style="margin:0;">Харагдах байдал</h3>
-      <select id="stTheme" onchange="setTheme(this.value)" style="padding:6px 10px;border-radius:6px;border:1px solid var(--bdr-strong);"><option value="gold">Хар + алт (шинэ)</option><option value="green">Excel ногоон (хуучин)</option></select>
+      <select id="stTheme" onchange="setTheme(this.value)" style="padding:6px 10px;border-radius:6px;border:1px solid var(--bdr-strong);"><option value="dark">Шинэ — харанхуй</option><option value="light">Шинэ — гэрэлтэй</option><option value="system">Шинэ — системийг дагах</option><option value="gold">Сонгодог — хар + алт</option><option value="green">Сонгодог — Excel ногоон</option></select>
       <button class="btn" onclick="openWizard()">Эхлэлийн тохиргоог дахин хийх</button>
       <button class="btn" onclick="loadDemoCompany()">Жишээ компани нээх</button></div>
     <div class="card" style="grid-column:1/-1;"><h3>Модулиуд <span style="font-weight:500;color:var(--sub);font-size:12px;">— Odoo шиг: хэрэгтэйгээ л асаана, цэс, товчнууд түүнд тохирч өөрчлөгдөнө</span></h3>
@@ -5341,11 +5535,24 @@ function modSaveFromSettings(){
 window.addEventListener('DOMContentLoaded', ()=>{ try{ applyModules(); }catch(e){ console.error(e); } });
 
 /* ═══════════════ ДҮР ТӨРХ, ХЯЛБАР ЭХЛЭЛ ═══════════════ */
-function setTheme(v){ document.body.classList.toggle('th-gold', v!=='green'); try{ localStorage.setItem('bbi_journal_theme', v); }catch(e){} }
+function curTheme(){ try{ return localStorage.getItem('bbi_journal_theme')||'dark'; }catch(e){ return 'dark'; } }
+function syncThemeUi(v){ document.querySelectorAll('#skSeg button').forEach(x=>{ const on=x.dataset.v===v; x.classList.toggle('on',on); x.setAttribute('aria-pressed',on?'true':'false'); });
+  const st=document.getElementById('stTheme'); if(st) st.value=v; }
+/* dark | light | system = шинэ бүрхүүл (sk4);  gold | green = сонгодог тууз цэс */
+function setTheme(v){
+  const b=document.body, sk=(v==='dark'||v==='light'||v==='system');
+  const light=v==='light'||(v==='system'&&window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches);
+  b.classList.toggle('sk4',sk); b.classList.toggle('sk-light',sk&&light); b.classList.toggle('th-gold',v==='gold');
+  try{ localStorage.setItem('bbi_journal_theme', v); }catch(e){}
+  syncThemeUi(v);
+  try{ const a=document.querySelector('.page.active'); if(a&&a.id==='page-home') renderHome(); }catch(e){}
+}
+window.addEventListener('DOMContentLoaded',()=>{ try{ syncThemeUi(curTheme());
+  if(window.matchMedia){ const mq=matchMedia('(prefers-color-scheme: light)'); const h=()=>{ if(curTheme()==='system') setTheme('system'); }; if(mq.addEventListener) mq.addEventListener('change',h); else if(mq.addListener) mq.addListener(h); } }catch(e){ console.error(e); } });
 function isDemo(){ return !!((CO.list.find(c=>c.id===CO.current)||{}).demo); }
 function renderWelcome(){
   const el=document.getElementById('homeWelcome'); if(!el) return;
-  const st=document.getElementById('stTheme'); if(st) st.value=document.body.classList.contains('th-gold')?'gold':'green';
+  const st=document.getElementById('stTheme'); if(st) st.value=curTheme();
   if(isDemo()){
     el.innerHTML=`<div class="demo-bar"><span><b>Жишээ компани</b> — бүх тоо зохиомол. Чөлөөтэй туршаарай: тайлан, насжилт, бараа, ханшийн тэгшитгэл бүгд бэлэн.</span><span style="display:flex;gap:8px;"><button class="btn primary sm" onclick="openWizard(true)">Өөрийн компаниа эхлүүлэх →</button></span></div>`;
     return;
@@ -5501,6 +5708,45 @@ function runChecks(){
   } else checks.push({state:'warn', text:'Журналд бичилт алга — импорт хийж эхэлнэ үү'});
   return checks;
 }
+/* ═══ Нүүр: датаны урсгал — эх сурвалж → журнал → шалгалт → тайлан. Тоо бүр журналын source талбараас ═══ */
+let PIPE_SEL='';
+function pipeSel(id){ PIPE_SEL=(PIPE_SEL===id?'':id); renderHomePipe(); }
+function renderHomePipe(checks){
+  const el=document.getElementById('homePipe'); if(!el) return;
+  const J=DB.journal||[];
+  if(!J.length){ el.style.display='none'; return; } el.style.display='';
+  checks=checks||runChecks();
+  const esc=t=>String(t==null?'':t).replace(/<[^>]*>/g,'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const docsOf=a=>new Set(a.map(j=>j.doc)).size;
+  const defs=[
+    {id:'vat', src:'НӨАТ-ын падаан',      mach:'Падаан импорт',        s:['vatbuy','vatsale'], page:'import',    on:true},
+    {id:'bank',src:'Банкны хуулга',       mach:'Банк импорт, тулгалт', s:['import'],           page:'import',    on:true},
+    {id:'sal', src:'Цалин, НДШ',          mach:'Цалингийн бичилт',     s:['salary'],           page:'salary',    on:modOn('salary')},
+    {id:'ast', src:'Үндсэн хөрөнгө',      mach:'Элэгдлийн бичилт',     s:['depr'],             page:'assets',    on:modOn('assets')},
+    {id:'inv', src:'Бараа материал',      mach:'Өртгийн бичилт',       s:['inv'],              page:'inventory', on:modOn('inventory')},
+    {id:'fx',  src:'Валютын данс',        mach:'Ханшийн тэгшитгэл',    s:['fxreval'],          page:'fx',        on:modOn('fx')},
+    {id:'man', src:'Анхан шатны баримт',  mach:'Гар бичилт',           s:['manual'],           page:'journal',   on:true},
+  ].filter(d=>d.on).map(d=>{ const a=J.filter(j=>d.s.includes(j.source)); d.n=a.length; d.docs=docsOf(a); return d; });
+  if(PIPE_SEL && !defs.some(d=>d.id===PIPE_SEL)) PIPE_SEL='';
+  const cur=defs.find(d=>d.id===PIPE_SEL)||null;
+  const arrow='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  const rows=defs.map(d=>`<div class="pipe-row${cur&&cur.id===d.id?' on':''}">
+      <button type="button" class="pipe-pick" aria-pressed="${cur&&cur.id===d.id?'true':'false'}" onclick="pipeSel('${d.id}')">
+        <span class="c"><b>${d.src}</b><small>${d.n?d.docs+' баримт':'эх сурвалж'}</small></span>${arrow}
+        <span class="c"><b>${d.mach}</b><small class="${d.n?'ok':'no'}">${d.n?d.n+' бичилт':'оруулаагүй'}</small></span>
+      </button><button type="button" class="pipe-go" onclick="nav('${d.page}')" title="${d.mach} — хуудас нээх">Нээх</button></div>`).join('');
+  const nOk=checks.filter(c=>c.state==='ok').length, nErr=checks.filter(c=>c.state==='err').length;
+  const bad=checks.find(c=>c.state==='err')||checks.find(c=>c.state==='warn');
+  const closed=(()=>{ try{ return periodClosed(); }catch(e){ return false; } })();
+  const st=[
+    {k:'Бүртгэл', t:'Ерөнхий журнал', m:(cur?cur.n:J.length)+' бичилт', cls:'', s:cur?(cur.docs+' баримт · '+cur.src):(docsOf(J)+' баримт · '+defs.filter(d=>d.n).length+' эх сурвалжаас'), page:'journal'},
+    {k:'Хяналт',  t:'Бүрэн байдлын шалгалт', m:nOk+' / '+checks.length+' давсан', cls:nErr?'err':(nOk<checks.length?'warn':'ok'), s:bad?esc(bad.text).slice(0,90):'Бүх шалгалт давсан', page:'balance'},
+    {k:'Гаралт',  t:'Тайлан', m:closed?'Үе хаагдсан':'Нээлттэй үе', cls:closed?'ok':'', s:esc(DB.settings.from)+' – '+esc(DB.settings.to)+' · СТ-1–4'+(modOn('tax')?', ТТ-02':''), page:'reports'},
+  ];
+  el.innerHTML=`<div class="pipe-head"><h3>Датаны урсгал</h3><span>${cur?esc(cur.src)+' → журнал → шалгалт → тайлан':'Эх сурвалж дээр дарахад тайлан хүртэлх зам нь тодорно'}</span></div>
+    <div class="pipe${cur?' lit':''}"><div class="pipe-src">${rows}</div><div class="pipe-trunk">${arrow}</div>
+    <div class="pipe-stages">${st.map(x=>`<button type="button" class="pipe-st" onclick="nav('${x.page}')"><span class="k">${x.k}</span><span class="t">${x.t}</span><span class="m ${x.cls}">${x.m}</span><span class="s">${x.s}</span></button>`).join('')}</div></div>`;
+}
 function renderHome(){
   const b=computeBalance();
   const is=incomeStatementData();
@@ -5515,6 +5761,7 @@ function renderHome(){
     ${ag?`<div class="stat" style="cursor:pointer" onclick="nav('settle')"><div class="lbl">Авлага / Өглөг</div><div class="val"><span style="color:var(--s-prof)">${fmtShort(ag.ar.bal)}</span> <span style="color:var(--muted);font-weight:400">/</span> <span style="color:var(--s-exp)">${fmtShort(ag.ap.bal)}</span></div><div class="hint">${ag.ar.overdue>0?'<span style="color:var(--s-loss);font-weight:700">'+fmtShort(ag.ar.overdue)+' авлага 30+ хоног</span>':'хугацаа хэтэрсэн авлага алга'}</div></div>`:''}
     <div class="stat"><div class="lbl">Татварын өмнөх ашиг</div><div class="val" style="color:${is.opProfit>=0?'var(--green)':'var(--red)'};">${fmtZ(is.opProfit)}${n>1?hcDelta(S.prof[L],S.prof[P]):''}</div>${hcSpark(S.prof,is.opProfit>=0?'var(--s-prof)':'var(--s-loss)')}<div class="hint">орлого — зардал</div></div>`;
   const checks=runChecks();
+  try{ renderHomePipe(checks); }catch(e){ console.error('pipe',e); }
   document.getElementById('homeChecks').innerHTML=checks.map(c=>
     `<li><span class="ck-ico ${c.state}">${c.state==='ok'?'✓':c.state==='warn'?'!':'✕'}</span><span>${c.text}</span></li>`).join('')||'<li>Шалгах зүйл алга</li>';
   const flow=[
