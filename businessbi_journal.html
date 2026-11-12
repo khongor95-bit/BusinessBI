@@ -707,6 +707,55 @@ body.sk4{--pipe-acc:var(--k-acc-text);}
 .pipe-stage.lit .pn:not(.on){opacity:.45;}
 .pipe-stage.lit .pe:not(.on),.pipe-stage.lit .pp:not(.on){opacity:.25;}
 .pipe-foot{margin-top:6px;font-size:11.5px;color:var(--muted);}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   SONET v4 · "Улбар шар" хувилбар (туршилт) — body.sk4.sk-coral
+   Тохиргоо → Харагдах байдал → Өнгө, эсвэл хаягт ?accent=coral / ?accent=gold.
+   Нэг л өргөлтийн өнгө, хөвөгч бөөрөнхий цэс, дүүрэн өнгөтэй идэвхтэй мөр,
+   илүү бөөрөнхий карт. Арын зураг, шилэн бүдгэрүүлэлт байхгүй — тоо уншигдах ёстой.
+   Анхдагч (алт) дүр төрхөд огт нөлөөлөхгүй.
+   ══════════════════════════════════════════════════════════════════════════ */
+body.sk4.sk-coral{
+  --k-bg:#12161c; --k-panel:#181d25; --k-card:#1b2029; --k-line:#2a313c; --k-line2:#232934;
+  --k-ink:#f3f4f6; --k-sub:#cdd2da; --k-muted:#9aa3b0; --k-chip:#232a34; --k-hover:#202631;
+  --k-acc:#f2975c; --k-acc-ink:#1d1207; --k-acc-text:#f6a973; --k-acc-soft:#33261c; --k-thead:#232a34;
+  --s-inc:#f2975c; --s-exp:#7fa0cf;
+  --s-g1:#fbd3b8; --s-g2:#f7b78d; --s-g3:#f2975c; --s-g4:#d9742f; --s-g5:#a85318;
+}
+body.sk4.sk-coral.sk-light{
+  --k-bg:#f2f3f5; --k-panel:#fafafb; --k-card:#ffffff; --k-line:#dfe2e7; --k-line2:#e9ecef;
+  --k-ink:#171a1f; --k-sub:#3c424c; --k-muted:#5b626e; --k-chip:#eceef1; --k-hover:#eef0f3;
+  --k-acc:#f08a4b; --k-acc-ink:#1d1207; --k-acc-text:#9c4a14; --k-acc-soft:#fbe9dc; --k-thead:#272c35;
+  --s-inc:#d9742f; --s-exp:#3f6fb0;
+}
+body.sk4.sk-coral .app-titlebar .tb-logo{border-radius:11px;width:34px;height:34px;font-size:16px;}
+body.sk4.sk-coral .ribbon-panel::before{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;padding-bottom:6px;}
+body.sk4.sk-coral .rbtn,body.sk4.sk-coral .rbtn-sm{border-radius:12px;}
+body.sk4.sk-coral .rbtn[data-page]{min-height:38px;}
+body.sk4.sk-coral .rbtn.active,body.sk4.sk-coral .rbtn.active:hover{background:var(--k-acc);color:var(--k-acc-ink);}
+body.sk4.sk-coral .rbtn.active svg{stroke:var(--k-acc-ink);}
+body.sk4.sk-coral .rbtn.active .sb-dot{background:rgba(29,18,7,.35);}
+body.sk4.sk-coral .app-titlebar .tb-chip{border-radius:12px;height:38px;}
+body.sk4.sk-coral .sk-seg{border-radius:12px;}
+body.sk4.sk-coral .sk-seg button{border-radius:9px;}
+body.sk4.sk-coral .page-head{margin-bottom:22px;}
+body.sk4.sk-coral .page-head h1{font-size:28px;font-weight:500;letter-spacing:-.6px;line-height:1.2;}
+body.sk4.sk-coral .page-head p{margin-top:6px;}
+body.sk4.sk-coral .card{border-radius:20px;padding:20px 22px;}
+body.sk4.sk-coral .stat{border-radius:20px;padding:18px 20px;}
+body.sk4.sk-coral .stat .val{font-family:inherit;font-size:20px;font-weight:600;letter-spacing:-.3px;font-variant-numeric:tabular-nums;}
+body.sk4.sk-coral .btn{border-radius:10px;}
+body.sk4.sk-coral .modal{border-radius:20px;}
+body.sk4.sk-coral .pn{border-radius:14px;}
+body.sk4.sk-coral .pn.src{border-radius:26px 14px 14px 26px;}
+body.sk4.sk-coral .pn.big{border-radius:16px;}
+@media (min-width:861px){
+  body.sk4.sk-coral .app{grid-template-columns:262px minmax(0,1fr);}
+  body.sk4.sk-coral .app>header{top:12px;height:calc(100vh - 24px);margin:12px 0 12px 12px;border:1px solid var(--k-line);border-radius:22px;}
+  body.sk4.sk-coral .app>main.main{padding:30px 34px 70px;}
+  body.sk4.sk-coral.sk-mini .app{grid-template-columns:76px minmax(0,1fr);}
+}
+@media print{ body.sk4.sk-coral .app>header{display:none;} }
 </style>
 </head>
 <body class="th-gold locked">
@@ -716,7 +765,9 @@ body.sk4{--pipe-acc:var(--k-acc-text);}
   if(sk){ b.classList.remove('th-gold'); b.classList.add('sk4');
     try{ if(localStorage.getItem('bbi_journal_side')==='mini') b.classList.add('sk-mini'); }catch(e){}
     if(v==='light'||(v==='system'&&window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)) b.classList.add('sk-light'); }
-  else if(v==='green'){ b.classList.remove('th-gold'); } })();</script>
+  else if(v==='green'){ b.classList.remove('th-gold'); }
+  try{ var q=/[?&]accent=(coral|gold)(&|$)/.exec(location.search); if(q) localStorage.setItem('bbi_journal_accent',q[1]);
+    if(localStorage.getItem('bbi_journal_accent')==='coral') b.classList.add('sk-coral'); }catch(e){} })();</script>
 <div class="app">
 <header>
 <div class="app-titlebar">
@@ -773,6 +824,7 @@ body.sk4{--pipe-acc:var(--k-acc-text);}
   <div class="grid2">
     <div class="card" style="grid-column:1/-1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><h3 style="margin:0;">Харагдах байдал</h3>
       <select id="stTheme" onchange="setTheme(this.value)" style="padding:6px 10px;border-radius:6px;border:1px solid var(--bdr-strong);"><option value="dark">Шинэ — харанхуй</option><option value="light">Шинэ — гэрэлтэй</option><option value="system">Шинэ — системийг дагах</option><option value="gold">Сонгодог — хар + алт</option><option value="green">Сонгодог — Excel ногоон</option></select>
+      <select id="stAccent" onchange="setAccent(this.value)" title="Зөвхөн «Шинэ» дүр төрхөд үйлчилнэ" style="padding:6px 10px;border-radius:6px;border:1px solid var(--bdr-strong);"><option value="gold">Өнгө — алт</option><option value="coral">Өнгө — улбар шар (туршилт)</option></select>
       <button class="btn" onclick="openWizard()">Эхлэлийн тохиргоог дахин хийх</button>
       <button class="btn" onclick="loadDemoCompany()">Жишээ компани нээх</button></div>
     <div class="card" style="grid-column:1/-1;"><h3>Модулиуд <span style="font-weight:500;color:var(--sub);font-size:12px;">— Odoo шиг: хэрэгтэйгээ л асаана, цэс, товчнууд түүнд тохирч өөрчлөгдөнө</span></h3>
@@ -5582,6 +5634,17 @@ function setTheme(v){
   syncThemeUi(v);
   try{ const a=document.querySelector('.page.active'); if(a&&a.id==='page-home') renderHome(); }catch(e){}
 }
+/* Өргөлтийн өнгө: gold (анхдагч) | coral (улбар шар, туршилт) — зөвхөн шинэ бүрхүүлд (sk4) харагдана */
+function curAccent(){ try{ return localStorage.getItem('bbi_journal_accent')==='coral'?'coral':'gold'; }catch(e){ return 'gold'; } }
+function syncAccentUi(){ const s=document.getElementById('stAccent'); if(s) s.value=curAccent(); }
+function setAccent(v){
+  v=(v==='coral')?'coral':'gold';
+  document.body.classList.toggle('sk-coral',v==='coral');
+  try{ localStorage.setItem('bbi_journal_accent',v); }catch(e){}
+  syncAccentUi();
+  try{ const a=document.querySelector('.page.active'); if(a&&a.id==='page-home') renderHome(); }catch(e){}
+}
+window.addEventListener('DOMContentLoaded',()=>{ try{ syncAccentUi(); }catch(e){ console.error(e); } });
 /* Зүүн цэсийг хураах / дэлгэх */
 function syncSideUi(){ const mini=document.body.classList.contains('sk-mini'), t=document.getElementById('skTog');
   if(t){ t.setAttribute('aria-expanded',mini?'false':'true'); t.setAttribute('aria-label',mini?'Цэс дэлгэх':'Цэс хураах'); t.title=mini?'Цэс дэлгэх':'Цэс хураах'; } }
@@ -5602,6 +5665,7 @@ function isDemo(){ return !!((CO.list.find(c=>c.id===CO.current)||{}).demo); }
 function renderWelcome(){
   const el=document.getElementById('homeWelcome'); if(!el) return;
   const st=document.getElementById('stTheme'); if(st) st.value=curTheme();
+  try{ syncAccentUi(); }catch(e){}
   if(isDemo()){
     el.innerHTML=`<div class="demo-bar"><span><b>Жишээ компани</b> — бүх тоо зохиомол. Чөлөөтэй туршаарай: тайлан, насжилт, бараа, ханшийн тэгшитгэл бүгд бэлэн.</span><span style="display:flex;gap:8px;"><button class="btn primary sm" onclick="openWizard(true)">Өөрийн компаниа эхлүүлэх →</button></span></div>`;
     return;
