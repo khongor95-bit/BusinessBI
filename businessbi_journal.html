@@ -638,6 +638,32 @@ body.sk4 .mod .lock{color:var(--k-acc-text);}
   body.sk4 .app>header{display:none;}
 }
 
+/* ── Хураагддаг зүүн цэс: хураахад зөвхөн дүрс үлдэнэ (сонголт хөтөчид хадгалагдана) ── */
+.sk-tog{display:none;}
+body.sk4 .sk-tog{display:flex;align-items:center;justify-content:center;width:30px;height:30px;margin-left:auto;flex-shrink:0;border:0;border-radius:8px;background:transparent;color:var(--k-muted);}
+body.sk4 .sk-tog:hover{background:var(--k-hover);color:var(--k-ink);}
+body.sk4 .sk-tog svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+body.sk4 .app-titlebar .tb-brand{display:flex;align-items:center;gap:9px;}
+@media (min-width:861px){
+  body.sk4 .app{transition:grid-template-columns .18s ease;}
+  body.sk4.sk-mini .app{grid-template-columns:60px minmax(0,1fr);}
+  body.sk4.sk-mini .app>header{padding:14px 8px 10px;align-items:center;}
+  body.sk4.sk-mini .app-titlebar .tb-brand{padding:0;justify-content:center;}
+  body.sk4.sk-mini .app-titlebar .tb-brand>div{display:none;}
+  body.sk4.sk-mini .sk-tog{margin:0;width:40px;height:36px;}
+  body.sk4.sk-mini .app-titlebar .tb-chip{width:40px;padding:0;justify-content:center;}
+  body.sk4.sk-mini .app-titlebar .tb-chip>span,body.sk4.sk-mini .app-titlebar .tb-chip svg.chev,body.sk4.sk-mini .app-titlebar .tb-chip.sync{display:none!important;}
+  body.sk4.sk-mini .app-ribbon{gap:8px;align-items:center;width:100%;}
+  body.sk4.sk-mini .ribbon-panel,body.sk4.sk-mini .ribbon-panel.active{align-items:center;width:100%;}
+  body.sk4.sk-mini .ribbon-panel+.ribbon-panel{border-top:1px solid var(--k-line);padding-top:8px;}
+  body.sk4.sk-mini .ribbon-panel::before,body.sk4.sk-mini .rbtn:not([data-page]),body.sk4.sk-mini .rbtn-sm,body.sk4.sk-mini .rbtn .rl{display:none;}
+  body.sk4.sk-mini .rbtn{width:40px;min-height:38px;padding:0;justify-content:center;}
+  body.sk4.sk-mini .rbtn .sb-dot{position:absolute;top:5px;right:5px;margin:0;}
+  body.sk4.sk-mini .sk-seg,body.sk4.sk-mini .app-titlebar a.tb-link{display:none;}
+  body.sk4.sk-mini .app-titlebar .tb-right{flex-direction:column;align-items:center;width:100%;}
+}
+@media (max-width:860px){ body.sk4 .sk-tog{display:none;} }
+
 /* ── Нүүр: датаны урсгал (бүх дүр төрхөд ажиллана) ── */
 :root{--pipe-acc:var(--c-accent);}
 body.th-gold{--pipe-acc:var(--gold-d);}
@@ -680,12 +706,13 @@ body.sk4{--pipe-acc:var(--k-acc-text);}
 <script>(function(){ var v='dark'; try{ v=localStorage.getItem('bbi_journal_theme')||'dark'; }catch(e){}
   var b=document.body, sk=(v==='dark'||v==='light'||v==='system');
   if(sk){ b.classList.remove('th-gold'); b.classList.add('sk4');
+    try{ if(localStorage.getItem('bbi_journal_side')==='mini') b.classList.add('sk-mini'); }catch(e){}
     if(v==='light'||(v==='system'&&window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)) b.classList.add('sk-light'); }
   else if(v==='green'){ b.classList.remove('th-gold'); } })();</script>
 <div class="app">
 <header>
 <div class="app-titlebar">
-  <div class="tb-brand"><div class="tb-logo">B</div><div><span class="brand"><span class="brand-acc">BusinessBI</span>.mn</span><span class="brand-sub">Sonet ERP</span></div></div>
+  <div class="tb-brand"><div class="tb-logo">B</div><div><span class="brand"><span class="brand-acc">BusinessBI</span>.mn</span><span class="brand-sub">Sonet ERP</span></div><button type="button" class="sk-tog" id="skTog" onclick="toggleSide()" aria-controls="appRibbon" aria-expanded="true" aria-label="Цэс хураах" title="Цэс хураах"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M9.5 4.5v15"/></svg></button></div>
   <span class="tb-sep"></span>
   <button class="tb-chip" id="qatCompanyBtn" onclick="openCompanyModal()" title="Компани солих, нэмэх"><svg viewBox="0 0 16 16"><path d="M2.5 14V5l5.5-3 5.5 3v9"/><path d="M6 14v-4h4v4"/><path d="M1 14h14"/></svg><span id="qatCompanyName"></span><svg class="chev" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></svg></button>
   <button class="tb-chip sync cloud-ui" style="display:none;" id="qatAuthBtn" onclick="cloudAuthClick()" title="Cloud хадгалалт (Supabase)"><span class="sb-dot" id="syncDot"></span><span id="qatAuthLabel">Локал</span></button>
@@ -5547,6 +5574,20 @@ function setTheme(v){
   syncThemeUi(v);
   try{ const a=document.querySelector('.page.active'); if(a&&a.id==='page-home') renderHome(); }catch(e){}
 }
+/* Зүүн цэсийг хураах / дэлгэх */
+function syncSideUi(){ const mini=document.body.classList.contains('sk-mini'), t=document.getElementById('skTog');
+  if(t){ t.setAttribute('aria-expanded',mini?'false':'true'); t.setAttribute('aria-label',mini?'Цэс дэлгэх':'Цэс хураах'); t.title=mini?'Цэс дэлгэх':'Цэс хураах'; } }
+function toggleSide(force){
+  const b=document.body, on=(typeof force==='boolean')?force:!b.classList.contains('sk-mini');
+  b.classList.toggle('sk-mini',on);
+  try{ localStorage.setItem('bbi_journal_side', on?'mini':'full'); }catch(e){}
+  syncSideUi();
+  /* өргөн өөрчлөгдөхөд нүүрийн графикийг шинэ хэмжээгээр дахин зурна */
+  setTimeout(()=>{ try{ const a=document.querySelector('.page.active'); if(a&&a.id==='page-home') renderHome(); }catch(e){} },230);
+}
+window.addEventListener('DOMContentLoaded',()=>{ try{
+  document.querySelectorAll('.rbtn[data-page]').forEach(x=>{ if(!x.title){ const l=x.querySelector('.rl'); if(l) x.title=l.textContent.trim(); } });
+  syncSideUi(); }catch(e){ console.error(e); } });
 window.addEventListener('DOMContentLoaded',()=>{ try{ syncThemeUi(curTheme());
   if(window.matchMedia){ const mq=matchMedia('(prefers-color-scheme: light)'); const h=()=>{ if(curTheme()==='system') setTheme('system'); }; if(mq.addEventListener) mq.addEventListener('change',h); else if(mq.addListener) mq.addListener(h); } }catch(e){ console.error(e); } });
 function isDemo(){ return !!((CO.list.find(c=>c.id===CO.current)||{}).demo); }
